@@ -16,7 +16,7 @@ license = "MIT"
 bincode = "1.2.1"
 clap = "2.33.0"
 dirs = "2.0.2"
-failure = "0.1.6"
+failure = "0.1.7"
 fs2 = "0.4.3"
 serde = { version = "1.0.104", features = ["derive"] }
 

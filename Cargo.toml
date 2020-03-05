@@ -1,0 +1,25 @@
+[package]
+name = "zoxide"
+version = "0.1.0"
+authors = ["Ajeet D'Souza <98ajeet@gmail.com>"]
+description = "A cd command that learns your habits"
+repository = "https://github.com/ajeetdsouza/zoxide/"
+edition = "2018"
+
+keywords = ["cli"]
+categories = ["command-line-utilities", "filesystem"]
+license = "MIT"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bincode = "1.2.1"
+clap = "2.33.0"
+dirs = "2.0.2"
+failure = "0.1.6"
+fs2 = "0.4.3"
+serde = { version = "1.0.104", features = ["derive"] }
+
+[profile.release]
+codegen-units = 1
+lto = "fat"

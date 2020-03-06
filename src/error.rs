@@ -29,4 +29,7 @@ pub enum AppError {
     GetCurrentDirError,
     #[fail(display = "could not access path")]
     PathAccessError,
+
+    #[fail(display = "could not decode ${} in env", 0)]
+    EnvError(String),
 }

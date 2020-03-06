@@ -49,13 +49,13 @@ impl Dir {
 
         let duration = now - self.last_accessed;
         if duration < HOUR {
-            self.rank * 4
+            self.rank * 4.0
         } else if duration < DAY {
-            self.rank * 2
+            self.rank * 2.0
         } else if duration < WEEK {
-            self.rank / 2
+            self.rank / 2.0
         } else {
-            self.rank / 4
+            self.rank / 4.0
         }
     }
 }

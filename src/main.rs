@@ -5,45 +5,50 @@ mod error;
 mod types;
 mod util;
 
+use crate::config::get_zo_data;
 use crate::db::DB;
 use crate::error::AppError;
 use crate::types::Timestamp;
-use crate::util::{fzf_helper, get_current_time, get_db_path, process_query};
+use crate::util::{fzf_helper, get_current_time};
 use clap::{app_from_crate, crate_authors, crate_description, crate_name, crate_version};
 use clap::{App, Arg, SubCommand};
 use failure::ResultExt;
 use std::env;
 use std::path::Path;
 
-fn zoxide_query(
-    db: &mut DB,
-    keywords: &[String],
-    now: Timestamp,
-) -> Result<Option<String>, failure::Error> {
-    if let [path] = keywords {
-        if Path::new(&path).is_dir() {
-            return Ok(Some(path.to_owned()));
+fn zoxide_query(db: &mut DB, mut keywords: Vec<String>, now: Timestamp) -> Option<String> {
+    if let [path] = keywords.as_slice() {
+        if Path::new(path).is_dir() {
+            return Some(path.to_owned());
         }
     }
 
-    if let Some(dir) = db.query(keywords, now) {
-        return Ok(Some(dir.path));
+    for keyword in &mut keywords {
+        keyword.make_ascii_lowercase();
     }
 
-    Ok(None)
+    if let Some(dir) = db.query(&keywords, now) {
+        return Some(dir.path);
+    }
+
+    None
 }
 
 fn zoxide_query_interactive(
     db: &mut DB,
-    keywords: &[String],
+    mut keywords: Vec<String>,
     now: Timestamp,
 ) -> Result<Option<String>, failure::Error> {
     db.remove_invalid();
 
+    for keyword in &mut keywords {
+        keyword.make_ascii_lowercase();
+    }
+
     let dirs = db
         .dirs
         .iter()
-        .filter(|dir| dir.is_match(keywords))
+        .filter(|dir| dir.is_match(&keywords))
         .cloned()
         .collect();
 
@@ -85,17 +90,25 @@ fn zoxide_app() -> App<'static, 'static> {
 fn zoxide() -> Result<(), failure::Error> {
     let matches = zoxide_app().get_matches();
 
-    let db_path = get_db_path()?;
+    let db_path = get_zo_data()?;
     let mut db = DB::open(&db_path)?;
 
     if let Some(matches) = matches.subcommand_matches("query") {
         let now = get_current_time()?;
-        let keywords = process_query(matches.values_of("KEYWORD").unwrap_or_default());
+
+        let keywords = matches
+            .values_of_os("KEYWORD")
+            .unwrap_or_default()
+            .map(|keyword| match keyword.to_str() {
+                Some(keyword) => Ok(keyword.to_owned()),
+                None => Err(AppError::UnicodeError),
+            })
+            .collect::<Result<Vec<String>, _>>()?;
 
         let path_opt = if matches.is_present("interactive") {
-            zoxide_query_interactive(&mut db, &keywords, now)
+            zoxide_query_interactive(&mut db, keywords, now)
         } else {
-            zoxide_query(&mut db, &keywords, now)
+            Ok(zoxide_query(&mut db, keywords, now))
         }?;
 
         if let Some(path) = path_opt {

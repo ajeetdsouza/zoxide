@@ -1,13 +1,14 @@
+use crate::config::get_zo_maxage;
 use crate::dir::Dir;
 use crate::error::AppError;
-use crate::types::Timestamp;
+use crate::types::{Rank, Timestamp};
 use failure::ResultExt;
+use fs2::FileExt;
 use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::{self, BufReader, BufWriter};
 use std::io::{Read, Write};
 use std::path::Path;
-use fs2::FileExt;
 
 #[derive(Debug, Default, Deserialize, Serialize)]
 pub struct DB {
@@ -21,7 +22,8 @@ impl DB {
     pub fn open<P: AsRef<Path>>(path: P) -> Result<DB, failure::Error> {
         match File::open(path) {
             Ok(file) => {
-                file.lock_shared().with_context(|_| AppError::FileLockError)?;
+                file.lock_shared()
+                    .with_context(|_| AppError::FileLockError)?;
                 let rd = BufReader::new(file);
                 let db = DB::read_from(rd).with_context(|_| AppError::DBReadError)?;
                 Ok(db)
@@ -36,7 +38,8 @@ impl DB {
     pub fn save<P: AsRef<Path>>(&mut self, path: P) -> Result<(), failure::Error> {
         if self.modified {
             let file = File::create(path).with_context(|_| AppError::FileOpenError)?;
-            file.lock_exclusive().with_context(|_| AppError::FileLockError)?;
+            file.lock_exclusive()
+                .with_context(|_| AppError::FileLockError)?;
             let wr = BufWriter::new(file);
             self.write_into(wr)
                 .with_context(|_| AppError::DBWriteError)?;
@@ -64,15 +67,27 @@ impl DB {
             None => self.dirs.push(Dir {
                 path: path_str.to_owned(),
                 last_accessed: now,
-                rank: 1,
+                rank: 1.0,
             }),
             Some(dir) => {
                 dir.last_accessed = now;
-                dir.rank += 1;
+                dir.rank += 1.0;
             }
         };
 
+        let max_age = get_zo_maxage()?;
+        let sum_age = self.dirs.iter().map(|dir| dir.rank).sum::<Rank>();
+
+        if sum_age > max_age {
+            let factor = max_age / sum_age;
+            for dir in &mut self.dirs {
+                dir.rank *= factor;
+            }
+        }
+
+        self.dirs.retain(|dir| dir.rank >= 1.0);
         self.modified = true;
+
         Ok(())
     }
 
@@ -85,7 +100,7 @@ impl DB {
                 .iter()
                 .enumerate()
                 .filter(|(_, dir)| dir.is_match(keywords))
-                .max_by_key(|(_, dir)| dir.get_frecency(now))?;
+                .max_by_key(|(_, dir)| dir.get_frecency(now) as i64)?;
 
             if dir.is_dir() {
                 return Some(dir.to_owned());

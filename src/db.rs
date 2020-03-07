@@ -79,7 +79,7 @@ impl DB {
         let sum_age = self.dirs.iter().map(|dir| dir.rank).sum::<Rank>();
 
         if sum_age > max_age {
-            let factor = max_age / sum_age;
+            let factor = 0.9 * max_age / sum_age;
             for dir in &mut self.dirs {
                 dir.rank *= factor;
             }

@@ -112,7 +112,7 @@ fn zoxide() -> Result<(), failure::Error> {
         }?;
 
         if let Some(path) = path_opt {
-            print!("query: {}", path);
+            println!("query: {}", path.trim());
         }
     } else if let Some(matches) = matches.subcommand_matches("add") {
         let now = get_current_time()?;

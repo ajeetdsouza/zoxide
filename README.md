@@ -89,15 +89,6 @@ Using [omf](https://github.com/oh-my-fish/oh-my-fish):
 omf install https://github.com/ajeetdsouza/zoxide
 ```
 
-To enable key bindings you have to set the universal variable `ZOXIDE_KEY_BINDINGS` to 1 and restart the shell. 
-```fish
-set -U ZOXIDE_KEY_BINDINGS 1
-```
-
-| Keybinding | Action                                         |
-| ---------- | -------------------------------------------------------------------------------- |
-| <kbd>Alt</kbd>+<kbd>z</kbd> / <kbd>⌥</kbd>+<kbd>z</kbd> | Launch Zoxide in interactive mode |
-
 ## Configuration
 
 ### Environment variables

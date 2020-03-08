@@ -7,6 +7,7 @@ A cd command that learns your habits
 ## Table of contents
 
 - [Introduction](#introduction)
+- [Examples](#examples)
 - [Getting started](#getting-started)
     - [Installing `zoxide`](#installing-zoxide)
     - [Adding `zoxide` to your shell](#adding-zoxide-to-your-shell)

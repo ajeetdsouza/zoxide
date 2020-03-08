@@ -4,13 +4,6 @@
 
 A cd command that learns your habits
 
-## Table of contents
-
-- [Installing `zoxide`](#installing-zoxide)
-- [Adding `zoxide` to your shell](#adding-zoxide-to-your-shell)
-    + [zsh](#zsh)
-    + [fish](#fish)
-
 ## Introduction
 
 `zoxide` is a new `cd` alternative inspired by [`z`](https://github.com/rupa/z) and [`z.lua`](https://github.com/skywind3000/z.lua). It keeps track of the directories you use most frequently, and uses a ranking algorithm to navigate to the best match.
@@ -90,6 +83,20 @@ Using [fisher](https://github.com/jorgebucaran/fisher):
 ```sh
 fisher add ajeetdsouza/zoxide
 ```
+
+Using [omf](https://github.com/oh-my-fish/oh-my-fish):
+```sh
+omf install https://github.com/ajeetdsouza/zoxide
+```
+
+To enable key bindings you have to set the universal variable `ZOXIDE_KEY_BINDINGS` to 1 and restart the shell. 
+```fish
+set -U ZOXIDE_KEY_BINDINGS 1
+```
+
+| Keybinding | Action                                         |
+| ---------- | -------------------------------------------------------------------------------- |
+| <kbd>Alt</kbd>+<kbd>z</kbd> / <kbd>⌥</kbd>+<kbd>z</kbd> | Launch Zoxide in interactive mode |
 
 ## Configuration
 

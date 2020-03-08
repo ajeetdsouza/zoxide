@@ -40,7 +40,7 @@ zr /foo     # remove /foo from the database
 
 ## Getting started
 
-### Installing `zoxide`
+### Step 1: Installing `zoxide`
 
 If you have Rust, this should be as simple as:
 
@@ -56,39 +56,41 @@ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/ajeetdsou
 
 If you want the interactive fuzzy selection feature, you will also need to install [`fzf`](https://github.com/junegunn/fzf.git).
 
-### Adding `zoxide` to your shell
+### Step 2: Adding `zoxide` to your shell
 
 #### zsh
 
-If you use a package manager, installation should be as simple as adding `ajeetdsouza/zoxide` to your configuration. If you'd rather not use a package manager, simple include the following in your `.zshrc`:
+Using [antibody](https://github.com/getantibody/antibody):
 
 ```sh
-_zoxide_precmd() {
-    zoxide add
-}
-
-precmd_functions+=_zoxide_precmd
-
-z() {
-    if [ $# -ne 0 ]; then
-        _Z_RESULT=$(zoxide query "$@")
-        case $_Z_RESULT in
-            "query: "*)
-                cd "${_Z_RESULT:7}"
-                ;;
-            *)
-                echo "${_Z_RESULT}"
-                ;;
-        esac
-    fi
-}
-
-alias zi="z -i"
-
-alias za="zoxide add"
-alias zq="zoxide query"
-alias zr="zoxide remove"
+antibody bundle ajeetdsouza/zoxide
 ```
+
+Using [zinit](https://github.com/zdharma/zinit):
+
+```sh
+zinit light ajeetdsouza/zoxide
+```
+
+Using [antigen](https://github.com/zsh-users/antigen):
+
+```sh
+antigen bundle zsh-users/zsh-syntax-highlighting
+```
+
+Using [zgen](https://github.com/tarjoilija/zgen):
+
+```sh
+zgen load ajeetdsouza/zoxide
+```
+
+Using [zplug](https://github.com/zplug/zplug):
+
+```sh
+zplug "zsh-users/zsh-history-substring-search"
+```
+
+If you'd rather not use a package manager, add the contents of [zoxide.plugin.zsh](zoxide.plugin.zsh) to your `.zshrc`.
 
 #### fish
 

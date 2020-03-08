@@ -4,6 +4,13 @@
 
 A cd command that learns your habits
 
+## Table of contents
+
+- [Installing `zoxide`](#installing-zoxide)
+- [Adding `zoxide` to your shell](#adding-zoxide-to-your-shell)
+    + [zsh](#zsh)
+    + [fish](#fish)
+
 ## Introduction
 
 `zoxide` is a new `cd` alternative inspired by [`z`](https://github.com/rupa/z) and [`z.lua`](https://github.com/skywind3000/z.lua). It keeps track of the directories you use most frequently, and uses a ranking algorithm to navigate to the best match.
@@ -76,6 +83,12 @@ alias zi="z -i"
 alias za="zoxide add"
 alias zq="zoxide query"
 alias zr="zoxide remove"
+```
+
+#### fish
+Using [fisher](https://github.com/jorgebucaran/fisher):
+```sh
+fisher add ajeetdsouza/zoxide
 ```
 
 ## Configuration

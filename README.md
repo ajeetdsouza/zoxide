@@ -84,7 +84,7 @@ Using [fisher](https://github.com/jorgebucaran/fisher):
 fisher add ajeetdsouza/zoxide
 ```
 
-Using [omf](https://github.com/oh-my-fish/oh-my-fish):
+Using [oh-my-fish](https://github.com/oh-my-fish/oh-my-fish):
 ```sh
 omf install https://github.com/ajeetdsouza/zoxide
 ```

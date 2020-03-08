@@ -9,13 +9,13 @@ A cd command that learns your habits
 - [Introduction](#introduction)
 - [Examples](#examples)
 - [Getting started](#getting-started)
-    - [Installing `zoxide`](#installing-zoxide)
-    - [Adding `zoxide` to your shell](#adding-zoxide-to-your-shell)
-        + [zsh](#zsh)
-        + [fish](#fish)
+  - [Installing `zoxide`](#installing-zoxide)
+  - [Adding `zoxide` to your shell](#adding-zoxide-to-your-shell)
+    - [zsh](#zsh)
+    - [fish](#fish)
 - [Configuration](#configuration)
-    - [Environment variables](#environment-variables)
-    
+  - [Environment variables](#environment-variables)
+
 ## Introduction
 
 `zoxide` is a new `cd` alternative inspired by [`z`](https://github.com/rupa/z) and [`z.lua`](https://github.com/skywind3000/z.lua). It keeps track of the directories you use most frequently, and uses a ranking algorithm to navigate to the best match.
@@ -25,8 +25,8 @@ On my system, compiled with the `x86_64-unknown-linux-musl` target, `hyperfine` 
 ## Examples
 
 ```sh
-z foo       # cd to top directory matching foo
-z foo bar   # cd to top directory matching foo and bar
+z foo       # cd to highest ranked directory matching foo
+z foo bar   # cd to highest ranked directory matching foo and bar
 
 z foo/      # can also cd into actual directories
 
@@ -91,12 +91,15 @@ alias zr="zoxide remove"
 ```
 
 #### fish
+
 Using [fisher](https://github.com/jorgebucaran/fisher):
+
 ```sh
 fisher add ajeetdsouza/zoxide
 ```
 
 Using [oh-my-fish](https://github.com/oh-my-fish/oh-my-fish):
+
 ```sh
 omf install https://github.com/ajeetdsouza/zoxide
 ```

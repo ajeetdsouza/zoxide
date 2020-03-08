@@ -6,10 +6,14 @@ A cd command that learns your habits
 
 ## Table of contents
 
-- [Installing `zoxide`](#installing-zoxide)
-- [Adding `zoxide` to your shell](#adding-zoxide-to-your-shell)
-    + [zsh](#zsh)
-    + [fish](#fish)
+- [Introduction](#introduction)
+- [Getting started](#getting-started)
+    - [Installing `zoxide`](#installing-zoxide)
+    - [Adding `zoxide` to your shell](#adding-zoxide-to-your-shell)
+        + [zsh](#zsh)
+        + [fish](#fish)
+- [Configuration](#configuration)
+    - [Environment variables](#environment-variables)
     
 ## Introduction
 

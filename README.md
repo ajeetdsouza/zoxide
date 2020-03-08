@@ -78,6 +78,17 @@ alias zq="zoxide query"
 alias zr="zoxide remove"
 ```
 
+#### fish
+Using [fisher](https://github.com/jorgebucaran/fisher):
+```sh
+fisher add ajeetdsouza/zoxide
+```
+
+Using [oh-my-fish](https://github.com/oh-my-fish/oh-my-fish):
+```sh
+omf install https://github.com/ajeetdsouza/zoxide
+```
+
 ## Configuration
 
 ### Environment variables

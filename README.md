@@ -8,6 +8,8 @@ A cd command that learns your habits
 
 `zoxide` is a new `cd` alternative inspired by [`z`](https://github.com/rupa/z) and [`z.lua`](https://github.com/skywind3000/z.lua). It keeps track of the directories you use most frequently, and uses a ranking algorithm to navigate to the best match.
 
+On my system, compiled with the `x86_64-unknown-linux-musl` target, `hyperfine` reports that `zoxide` runs 10-20x faster than `z.lua`, which, in turn, runs 3x faster than `z`. This is pretty significant, since this command runs once at every shell prompt, and any slowdown there will result in an increased loading time for every prompt.
+
 ## Examples
 
 ```sh

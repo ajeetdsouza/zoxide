@@ -4,7 +4,9 @@ _zoxide_precmd() {
     zoxide add
 }
 
-precmd_functions+=_zoxide_precmd
+[[ -n "${precmd_functions[(r)_zoxide_precmd]}" ]] || {
+    precmd_functions+=_zoxide_precmd
+}
 
 z() {
     if [ $# -ne 0 ]; then

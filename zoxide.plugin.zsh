@@ -5,7 +5,7 @@ _zoxide_precmd() {
 }
 
 [[ -n "${precmd_functions[(r)_zoxide_precmd]}" ]] || {
-    precmd_functions+=_zoxide_precmd
+    precmd_functions+=(_zoxide_precmd)
 }
 
 z() {

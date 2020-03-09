@@ -75,7 +75,7 @@ zinit light ajeetdsouza/zoxide
 Using [antigen](https://github.com/zsh-users/antigen):
 
 ```sh
-antigen bundle zsh-users/zsh-syntax-highlighting
+antigen bundle ajeetdsouza/zoxide
 ```
 
 Using [zgen](https://github.com/tarjoilija/zgen):
@@ -87,7 +87,7 @@ zgen load ajeetdsouza/zoxide
 Using [zplug](https://github.com/zplug/zplug):
 
 ```sh
-zplug "zsh-users/zsh-history-substring-search"
+zplug "ajeetdsouza/zoxide"
 ```
 
 If you'd rather not use a package manager, add the contents of [zoxide.plugin.zsh](zoxide.plugin.zsh) to your `.zshrc`.

@@ -69,7 +69,7 @@ antibody bundle ajeetdsouza/zoxide
 Using [ohmyzsh](https://github.com/ohmyzsh/ohmyzsh)
 
 ```sh
-mkdir -p $HOME/.oh-my-zsh/custom/plugins/zoxide && curl https://github.com/ajeetdsouza/zoxide/raw/master/zoxide.plugin.zsh -o $HOME/.oh-my-zsh/custom/plugins/zoxide/zoxide.plugin.zsh
+mkdir -p $HOME/.oh-my-zsh/custom/plugins/zoxide && curl https://raw.githubusercontent.com/ajeetdsouza/zoxide/master/zoxide.plugin.zsh -o $HOME/.oh-my-zsh/custom/plugins/zoxide/zoxide.plugin.zsh
 ```
 
 Then add `zoxide` to the plugins section in your `.zshrc`

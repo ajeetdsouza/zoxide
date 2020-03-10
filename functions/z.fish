@@ -1,7 +1,9 @@
 function z
-  if test (count $argv) -gt 0
-    if test "$argv[1]" = "-"
+  set -l argc (count $argv)
+  if test $argc -gt 0
+    if test $argc -eq 1 -a "$argv[1]" = "-"
       cd -
+      commandline -f repaint
     else
       set _Z_RESULT (zoxide query $argv)
       switch "$_Z_RESULT"
@@ -14,5 +16,7 @@ function z
     end
   else
     cd ~
+    commandline -f repaint
   end
 end
+

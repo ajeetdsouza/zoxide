@@ -61,6 +61,8 @@ If you want the interactive fuzzy selection feature, you will also need to insta
 
 ### Step 2: Adding `zoxide` to your shell
 
+By default, `zoxide` defines the `z`, `zi`, `za`, `zq`, and `zr` aliases. If you'd like to go with just the barebones `z`, pass the `--no-define-aliases` flag to `zoxide init`.
+
 #### zsh
 
 Add the following line to your `~/.zshrc`:

@@ -34,6 +34,8 @@ enum Zoxide {
     Init {
         #[structopt(possible_values = &Shell::variants(), case_insensitive = true)]
         shell: Shell,
+        #[structopt(long, help = "Prevents zoxide from defining any aliases other than 'z'")]
+        no_define_aliases: bool,
     },
 
     #[structopt(about = "Search for a directory")]
@@ -92,19 +94,28 @@ pub fn main() -> Result<()> {
 
             db.save()?;
         }
-        Zoxide::Init { shell } => {
+        Zoxide::Init {
+            shell,
+            no_define_aliases,
+        } => {
             match shell {
                 Shell::bash => {
                     println!("{}", INIT_BASH);
-                    println!("{}", INIT_BASH_ALIAS);
+                    if !no_define_aliases {
+                        println!("{}", INIT_BASH_ALIAS);
+                    }
                 }
                 Shell::fish => {
                     println!("{}", INIT_FISH);
-                    println!("{}", INIT_FISH_ALIAS);
+                    if !no_define_aliases {
+                        println!("{}", INIT_FISH_ALIAS);
+                    }
                 }
                 Shell::zsh => {
                     println!("{}", INIT_ZSH);
-                    println!("{}", INIT_ZSH_ALIAS);
+                    if !no_define_aliases {
+                        println!("{}", INIT_ZSH_ALIAS);
+                    }
                 }
             };
         }

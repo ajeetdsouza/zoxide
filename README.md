@@ -1,7 +1,6 @@
 # zoxide
 
 [![crates.io](https://img.shields.io/crates/v/zoxide)](https://crates.io/crates/zoxide)
-
 ![.github/workflows/release.yml](https://github.com/ajeetdsouza/zoxide/workflows/.github/workflows/release.yml/badge.svg)
 
 A cd command that learns your habits

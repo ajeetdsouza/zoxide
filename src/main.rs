@@ -157,18 +157,20 @@ case "$PROMPT_COMMAND" in
 esac
 
 z() {
-    if [ $# -ne 0 ]; then
+    if [ "$#" -eq 0 ]; then
+        cd "$HOME"
+    elif [ "$#" -eq 1 ] && [ "$1" = "-" ]; then
+        cd "-"
+    else
         _Z_RESULT=$(zoxide query "$@")
-        case $_Z_RESULT in
+        case "$_Z_RESULT" in
             "query: "*)
                 cd "${_Z_RESULT:7}"
                 ;;
             *)
-                echo -n "${_Z_RESULT}"
+                echo -n "$_Z_RESULT"
                 ;;
         esac
-    else
-        cd "${HOME}"
     fi
 }
 "#;
@@ -220,18 +222,20 @@ _zoxide_precmd() {
 }
 
 z() {
-    if [ $# -ne 0 ]; then
+    if [ "$#" -eq 0 ]; then
+        cd "$HOME"
+    elif [ "$#" -eq 1 ] && [ "$1" = "-" ]; then
+        cd "-"
+    else
         _Z_RESULT=$(zoxide query "$@")
-        case $_Z_RESULT in
+        case "$_Z_RESULT" in
             "query: "*)
                 cd "${_Z_RESULT:7}"
                 ;;
             *)
-                echo -n "${_Z_RESULT}"
+                echo -n "$_Z_RESULT"
                 ;;
         esac
-    else
-        cd "${HOME}"
     fi
 }
 "#;

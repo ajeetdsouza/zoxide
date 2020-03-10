@@ -2,6 +2,8 @@
 
 [![crates.io](https://img.shields.io/crates/v/zoxide)](https://crates.io/crates/zoxide)
 
+![.github/workflows/release.yml](https://github.com/ajeetdsouza/zoxide/workflows/.github/workflows/release.yml/badge.svg)
+
 A cd command that learns your habits
 
 ## Table of contents
@@ -12,6 +14,7 @@ A cd command that learns your habits
   - [Installing `zoxide`](#installing-zoxide)
   - [Adding `zoxide` to your shell](#adding-zoxide-to-your-shell)
     - [zsh](#zsh)
+    - [bash](#bash)
     - [fish](#fish)
 - [Configuration](#configuration)
   - [Environment variables](#environment-variables)
@@ -60,50 +63,26 @@ If you want the interactive fuzzy selection feature, you will also need to insta
 
 #### zsh
 
-Using [antibody](https://github.com/getantibody/antibody):
+Add the following line to your `~/.zshrc`:
 
 ```sh
-antibody bundle ajeetdsouza/zoxide
+eval "$(zoxide init zsh)"
 ```
 
-Using [zinit](https://github.com/zdharma/zinit):
+#### bash
+
+Add the following line to your `~/.bashrc`:
 
 ```sh
-zinit light ajeetdsouza/zoxide
+eval "$(zoxide init bash)"
 ```
-
-Using [antigen](https://github.com/zsh-users/antigen):
-
-```sh
-antigen bundle ajeetdsouza/zoxide
-```
-
-Using [zgen](https://github.com/tarjoilija/zgen):
-
-```sh
-zgen load ajeetdsouza/zoxide
-```
-
-Using [zplug](https://github.com/zplug/zplug):
-
-```sh
-zplug "ajeetdsouza/zoxide"
-```
-
-If you'd rather not use a package manager, add the contents of [zoxide.plugin.zsh](zoxide.plugin.zsh) to your `.zshrc`.
 
 #### fish
 
-Using [fisher](https://github.com/jorgebucaran/fisher):
+Add the following line to your `~/.config/fish/config.fish`:
 
 ```sh
-fisher add ajeetdsouza/zoxide
-```
-
-Using [oh-my-fish](https://github.com/oh-my-fish/oh-my-fish):
-
-```sh
-omf install https://github.com/ajeetdsouza/zoxide
+zoxide init fish | source
 ```
 
 ## Configuration

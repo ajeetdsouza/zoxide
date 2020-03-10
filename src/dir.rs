@@ -2,7 +2,7 @@ use crate::types::{Rank, Timestamp};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct Dir {
     pub path: String,
     pub rank: Rank,
@@ -17,16 +17,14 @@ impl Dir {
     pub fn is_match(&self, query: &[String]) -> bool {
         let path = self.path.to_ascii_lowercase();
 
-        if let Some(dir_name) = Path::new(&path).file_name() {
-            if let Some(query_last) = query.last() {
-                if let Some(query_dir_name) = Path::new(query_last).file_name() {
-                    // `unwrap()` here should be safe because the values are already encoded as UTF-8
-                    let dir_name_str = dir_name.to_str().unwrap().to_ascii_lowercase();
-                    let query_dir_name_str = query_dir_name.to_str().unwrap().to_ascii_lowercase();
+        if let Some(query_name) = query.last().and_then(|word| Path::new(word).file_name()) {
+            if let Some(path_name) = Path::new(&path).file_name() {
+                // `unwrap()` here should be safe because the values are already encoded as UTF-8
+                let query_name = query_name.to_str().unwrap();
+                let path_name = path_name.to_str().unwrap();
 
-                    if !dir_name_str.contains(&query_dir_name_str) {
-                        return false;
-                    }
+                if !path_name.contains(&query_name) {
+                    return false;
                 }
             }
         }

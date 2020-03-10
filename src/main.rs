@@ -189,18 +189,19 @@ function _zoxide_precmd --on-event fish_prompt
 end
 
 function z
-    if test (count $argv) -gt 0
+    set -l argc (count $argv)
+    if test $argc -eq 0
+        cd "$HOME" && commandline -f repaint
+    else if test $argc -eq 1 -a "$argv[1]" = "-"
+        cd "-" && commandline -f repaint
+    else
         set _Z_RESULT (zoxide query $argv)
         switch "$_Z_RESULT"
             case 'query: *'
-                cd (string sub -s 8 -- "$_Z_RESULT")
-                commandline -f repaint
+                cd (string sub -s 8 -- "$_Z_RESULT") && commandline -f repaint
             case '*'
                 echo -n "$_Z_RESULT"
         end
-    else
-        cd "$HOME"
-        commandline -f repaint
     end
 end
 "#;

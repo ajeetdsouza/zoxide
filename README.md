@@ -13,6 +13,7 @@ A cd command that learns your habits
   - [Adding `zoxide` to your shell](#adding-zoxide-to-your-shell)
     - [zsh](#zsh)
     - [fish](#fish)
+    - [bash](#bash)
 - [Configuration](#configuration)
   - [Environment variables](#environment-variables)
 
@@ -105,6 +106,34 @@ Using [oh-my-fish](https://github.com/oh-my-fish/oh-my-fish):
 ```sh
 omf install https://github.com/ajeetdsouza/zoxide
 ```
+
+#### bash
+
+`bash` lacks `zsh` like `precmd` and `preexec` hooks,
+install this little script to help fix that:
+
+```sh
+$ curl https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh -o ~/.bash-preexec.sh
+
+# Add this line to the end of your .bashrc
+source ~/.bash-preexec.sh
+```
+
+Once `precmd` hooks are setup:
+
+```sh
+$ curl https://raw.githubusercontent.com/ajeetdsouza/zoxide/master/bash_zoxide.sh -o ~/.bash_zoxide.sh
+
+# Add this line to the end of your .bashrc
+source ~/.bash_zoxide.sh
+```
+
+Remember to reload `bash`!
+
+```sh
+$ exec bash
+```
+
 
 ## Configuration
 

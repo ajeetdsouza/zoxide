@@ -1,20 +1,53 @@
-mod config;
 mod db;
 mod dir;
-mod error;
 mod types;
 mod util;
 
-use crate::config::get_zo_data;
 use crate::db::DB;
-use crate::error::AppError;
 use crate::types::Timestamp;
-use crate::util::{fzf_helper, get_current_time};
-use clap::{app_from_crate, crate_authors, crate_description, crate_name, crate_version};
-use clap::{App, Arg, SubCommand};
-use failure::ResultExt;
+use crate::util::{fzf_helper, get_current_time, get_db};
+use anyhow::{anyhow, Context, Result};
+use clap::arg_enum;
 use std::env;
 use std::path::Path;
+use structopt::StructOpt;
+
+// TODO: use structopt to parse env variables: <https://github.com/TeXitoi/structopt/blob/master/examples/env.rs>
+
+arg_enum! {
+    #[allow(non_camel_case_types)]
+    #[derive(Debug)]
+    enum Shell {
+        bash,
+        fish,
+        zsh,
+    }
+}
+
+#[derive(Debug, StructOpt)]
+#[structopt(about = "A cd command that learns your habits")]
+enum Zoxide {
+    #[structopt(about = "Add a new directory or increment its rank")]
+    Add { path: Option<String> },
+
+    #[structopt(about = "Prints shell configuration")]
+    Init {
+        #[structopt(possible_values = &Shell::variants(), case_insensitive = true)]
+        shell: Shell,
+        #[structopt(long, help = "Prevents zoxide from defining any aliases other than 'z'")]
+        no_define_aliases: bool,
+    },
+
+    #[structopt(about = "Search for a directory")]
+    Query {
+        keywords: Vec<String>,
+        #[structopt(short, long, help = "Opens an interactive selection menu using fzf")]
+        interactive: bool,
+    },
+
+    #[structopt(about = "Remove a directory")]
+    Remove { path: String },
+}
 
 fn zoxide_query(db: &mut DB, mut keywords: Vec<String>, now: Timestamp) -> Option<String> {
     if let [path] = keywords.as_slice() {
@@ -36,105 +69,182 @@ fn zoxide_query(db: &mut DB, mut keywords: Vec<String>, now: Timestamp) -> Optio
 
 fn zoxide_query_interactive(
     db: &mut DB,
-    mut keywords: Vec<String>,
+    keywords: Vec<String>,
     now: Timestamp,
-) -> Result<Option<String>, failure::Error> {
-    db.remove_invalid();
-
-    for keyword in &mut keywords {
-        keyword.make_ascii_lowercase();
-    }
-
-    let dirs = db
-        .dirs
-        .iter()
-        .filter(|dir| dir.is_match(&keywords))
-        .cloned()
-        .collect();
-
+) -> Result<Option<String>> {
+    let dirs = db.query_all(keywords);
     fzf_helper(now, dirs)
 }
 
-fn zoxide_app() -> App<'static, 'static> {
-    app_from_crate!()
-        .subcommand(
-            SubCommand::with_name("add")
-                .about("Add a new directory or increment its rank")
-                .author(crate_authors!())
-                .version(crate_version!())
-                .arg(Arg::with_name("PATH")),
-        )
-        .subcommand(
-            SubCommand::with_name("query")
-                .about("Search for a directory")
-                .author(crate_authors!())
-                .version(crate_version!())
-                .arg(
-                    Arg::with_name("interactive")
-                        .short("i")
-                        .long("interactive")
-                        .takes_value(false)
-                        .help("Opens an interactive selection menu using fzf"),
-                )
-                .arg(Arg::with_name("KEYWORD").min_values(0)),
-        )
-        .subcommand(
-            SubCommand::with_name("remove")
-                .about("Remove a directory")
-                .author(crate_authors!())
-                .version(crate_version!())
-                .arg(Arg::with_name("PATH").required(true)),
-        )
-}
+pub fn main() -> Result<()> {
+    let opt = Zoxide::from_args();
+    match opt {
+        Zoxide::Add { path: path_opt } => {
+            let mut db = get_db()?;
+            let now = get_current_time()?;
 
-fn zoxide() -> Result<(), failure::Error> {
-    let matches = zoxide_app().get_matches();
+            match path_opt {
+                Some(path) => db.add(path, now),
+                None => {
+                    let current_dir = env::current_dir()
+                        .with_context(|| anyhow!("unable to fetch current directory"))?;
+                    db.add(current_dir, now)
+                }
+            }?;
 
-    let db_path = get_zo_data()?;
-    let mut db = DB::open(&db_path)?;
-
-    if let Some(matches) = matches.subcommand_matches("query") {
-        let now = get_current_time()?;
-
-        let keywords = matches
-            .values_of_os("KEYWORD")
-            .unwrap_or_default()
-            .map(|keyword| match keyword.to_str() {
-                Some(keyword) => Ok(keyword.to_owned()),
-                None => Err(AppError::UnicodeError),
-            })
-            .collect::<Result<Vec<String>, _>>()?;
-
-        let path_opt = if matches.is_present("interactive") {
-            zoxide_query_interactive(&mut db, keywords, now)
-        } else {
-            Ok(zoxide_query(&mut db, keywords, now))
-        }?;
-
-        if let Some(path) = path_opt {
-            println!("query: {}", path.trim());
+            db.save()?;
         }
-    } else if let Some(matches) = matches.subcommand_matches("add") {
-        let now = get_current_time()?;
-        match matches.value_of_os("PATH") {
-            Some(path) => db.add(path, now)?,
-            None => {
-                let path = env::current_dir().with_context(|_| AppError::GetCurrentDirError)?;
-                db.add(path, now)?;
+        Zoxide::Init {
+            shell,
+            no_define_aliases,
+        } => {
+            match shell {
+                Shell::bash => {
+                    println!("{}", INIT_BASH);
+                    if !no_define_aliases {
+                        println!("{}", INIT_BASH_ALIAS);
+                    }
+                }
+                Shell::fish => {
+                    println!("{}", INIT_FISH);
+                    if !no_define_aliases {
+                        println!("{}", INIT_FISH_ALIAS);
+                    }
+                }
+                Shell::zsh => {
+                    println!("{}", INIT_ZSH);
+                    if !no_define_aliases {
+                        println!("{}", INIT_ZSH_ALIAS);
+                    }
+                }
+            };
+        }
+        Zoxide::Query {
+            keywords,
+            interactive,
+        } => {
+            let mut db = get_db()?;
+            let now = get_current_time()?;
+
+            let path_opt = if interactive {
+                zoxide_query_interactive(&mut db, keywords, now)?
+            } else {
+                zoxide_query(&mut db, keywords, now)
+            };
+
+            if let Some(path) = path_opt {
+                println!("query: {}", path.trim());
             }
-        };
-    } else if let Some(matches) = matches.subcommand_matches("remove") {
-        // unwrap is safe here because PATH has been set as a required field
-        let path = matches.value_of_os("PATH").unwrap();
-        db.remove(path)?;
-    }
+        }
+        Zoxide::Remove { path } => {
+            let mut db = get_db()?;
+            db.remove(path)?;
+            db.save()?;
+        }
+    };
 
-    db.save(db_path)
+    Ok(())
 }
 
-fn main() {
-    if let Err(err) = zoxide() {
-        eprintln!("zoxide: {}", err);
-        std::process::exit(1);
-    }
+const INIT_BASH: &str = r#"
+_zoxide_precmd() {
+    zoxide add
 }
+
+case "$PROMPT_COMMAND" in
+	*_zoxide_precmd*) ;;
+	*) PROMPT_COMMAND="_zoxide_precmd${PROMPT_COMMAND:+;$PROMPT_COMMAND}" ;;
+esac
+
+z() {
+    if [ "$#" -eq 0 ]; then
+        cd "$HOME"
+    elif [ "$#" -eq 1 ] && [ "$1" = "-" ]; then
+        cd "-"
+    else
+        _Z_RESULT=$(zoxide query "$@")
+        case "$_Z_RESULT" in
+            "query: "*)
+                cd "${_Z_RESULT:7}"
+                ;;
+            *)
+                echo -n "$_Z_RESULT"
+                ;;
+        esac
+    fi
+}
+"#;
+
+const INIT_BASH_ALIAS: &str = r#"
+alias zi="z -i"
+
+alias za="zoxide add"
+alias zq="zoxide query"
+alias zr="zoxide remove"
+"#;
+
+const INIT_FISH: &str = r#"
+function _zoxide_precmd --on-event fish_prompt
+    zoxide add
+end
+
+function z
+    set -l argc (count $argv)
+    if test $argc -eq 0
+        cd "$HOME" && commandline -f repaint
+    else if test $argc -eq 1 -a "$argv[1]" = "-"
+        cd "-" && commandline -f repaint
+    else
+        set _Z_RESULT (zoxide query $argv)
+        switch "$_Z_RESULT"
+            case 'query: *'
+                cd (string sub -s 8 -- "$_Z_RESULT") && commandline -f repaint
+            case '*'
+                echo -n "$_Z_RESULT"
+        end
+    end
+end
+"#;
+
+const INIT_FISH_ALIAS: &str = r#"
+abbr -a zi "z -i"
+abbr -a za "zoxide add"
+abbr -a zq "zoxide query"
+abbr -a zr "zoxide remove"
+"#;
+
+const INIT_ZSH: &str = r#"
+_zoxide_precmd() {
+    zoxide add
+}
+
+[[ -n "${precmd_functions[(r)_zoxide_precmd]}" ]] || {
+    precmd_functions+=(_zoxide_precmd)
+}
+
+z() {
+    if [ "$#" -eq 0 ]; then
+        cd "$HOME"
+    elif [ "$#" -eq 1 ] && [ "$1" = "-" ]; then
+        cd "-"
+    else
+        _Z_RESULT=$(zoxide query "$@")
+        case "$_Z_RESULT" in
+            "query: "*)
+                cd "${_Z_RESULT:7}"
+                ;;
+            *)
+                echo -n "$_Z_RESULT"
+                ;;
+        esac
+    fi
+}
+"#;
+
+const INIT_ZSH_ALIAS: &str = r#"
+alias zi="z -i"
+
+alias za="zoxide add"
+alias zq="zoxide query"
+alias zr="zoxide remove"
+"#;

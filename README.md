@@ -47,7 +47,7 @@ zr /foo     # remove /foo from the database
 If you have Rust, this should be as simple as:
 
 ```sh
-cargo install zoxide
+cargo install zoxide -f
 ```
 
 Otherwise, try the install script:

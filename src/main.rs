@@ -34,7 +34,10 @@ enum Zoxide {
     Init {
         #[structopt(possible_values = &Shell::variants(), case_insensitive = true)]
         shell: Shell,
-        #[structopt(long, help = "Prevents zoxide from defining any aliases other than 'z'")]
+        #[structopt(
+            long,
+            help = "Prevents zoxide from defining any aliases other than 'z'"
+        )]
         no_define_aliases: bool,
     },
 
@@ -148,39 +151,35 @@ pub fn main() -> Result<()> {
 
 const INIT_BASH: &str = r#"
 _zoxide_precmd() {
-    zoxide add
+  zoxide add
 }
 
 case "$PROMPT_COMMAND" in
-	*_zoxide_precmd*) ;;
-	*) PROMPT_COMMAND="_zoxide_precmd${PROMPT_COMMAND:+;$PROMPT_COMMAND}" ;;
+  *_zoxide_precmd*) ;;
+  *) PROMPT_COMMAND="_zoxide_precmd${PROMPT_COMMAND:+;${PROMPT_COMMAND}}" ;;
 esac
 
 z() {
-    if [ "$#" -eq 0 ]; then
-        cd "$HOME"
-    elif [ "$#" -eq 1 ] && [ "$1" = "-" ]; then
-        cd "-"
-    else
-        _Z_RESULT=$(zoxide query "$@")
-        case "$_Z_RESULT" in
-            "query: "*)
-                cd "${_Z_RESULT:7}"
-                ;;
-            *)
-                echo -n "$_Z_RESULT"
-                ;;
-        esac
-    fi
+  if [ "${#}" -eq 0 ]; then
+    cd "${HOME}"
+  elif [ "${#}" -eq 1 ] && [ "${1}" = '-' ]; then
+    cd '-'
+  else
+    local result=$(zoxide query "${@}")
+    case "${result}" in
+      "query: "*) cd "${result:7}" ;;
+      *) [ -n "${result}" ] && echo "${result}" ;;
+    esac
+  fi
 }
 "#;
 
 const INIT_BASH_ALIAS: &str = r#"
-alias zi="z -i"
+alias zi='z -i'
 
-alias za="zoxide add"
-alias zq="zoxide query"
-alias zr="zoxide remove"
+alias za='zoxide add'
+alias zq='zoxide query'
+alias zr='zoxide remove'
 "#;
 
 const INIT_FISH: &str = r#"
@@ -189,62 +188,66 @@ function _zoxide_precmd --on-event fish_prompt
 end
 
 function z
-    set -l argc (count $argv)
-    if test $argc -eq 0
-        cd "$HOME" && commandline -f repaint
-    else if test $argc -eq 1 -a "$argv[1]" = "-"
-        cd "-" && commandline -f repaint
+    set -l argc (count "$argv")
+    if [ "$argc" -eq 0 ]
+        cd "$HOME"
+        and commandline -f repaint
+    else if [ "$argc" -eq 1 ]
+        and [ "$argv[1]" = '-' ]
+        cd '-'
+        and commandline -f repaint
     else
-        set _Z_RESULT (zoxide query $argv)
-        switch "$_Z_RESULT"
+        # TODO: use string-collect from fish 3.1.0 once it has wider adoption
+        set -l IFS ''
+        set -l result (zoxide query $argv)
+
+        switch "$result"
             case 'query: *'
-                cd (string sub -s 8 -- "$_Z_RESULT") && commandline -f repaint
+                cd (string sub -s 8 "$result")
+                and commandline -f repaint
             case '*'
-                echo -n "$_Z_RESULT"
+                [ -n "$result" ]
+                and echo "$result"
         end
     end
 end
 "#;
 
 const INIT_FISH_ALIAS: &str = r#"
-abbr -a zi "z -i"
-abbr -a za "zoxide add"
-abbr -a zq "zoxide query"
-abbr -a zr "zoxide remove"
+abbr -a zi 'z -i'
+abbr -a za 'zoxide add'
+abbr -a zq 'zoxide query'
+abbr -a zr 'zoxide remove'
 "#;
 
 const INIT_ZSH: &str = r#"
 _zoxide_precmd() {
-    zoxide add
+  zoxide add
 }
 
 [[ -n "${precmd_functions[(r)_zoxide_precmd]}" ]] || {
-    precmd_functions+=(_zoxide_precmd)
+  precmd_functions+=(_zoxide_precmd)
 }
 
 z() {
-    if [ "$#" -eq 0 ]; then
-        cd "$HOME"
-    elif [ "$#" -eq 1 ] && [ "$1" = "-" ]; then
-        cd "-"
-    else
-        _Z_RESULT=$(zoxide query "$@")
-        case "$_Z_RESULT" in
-            "query: "*)
-                cd "${_Z_RESULT:7}"
-                ;;
-            *)
-                echo -n "$_Z_RESULT"
-                ;;
-        esac
-    fi
+  if [ "${#}" -eq 0 ]; then
+    cd "${HOME}"
+  elif [ "${#}" -eq 1 ] && [ "${1}" = '-' ]; then
+    cd '-'
+  else
+    local result=$(zoxide query "$@")
+    case "$result" in
+      "query: "*) cd "${result:7}" ;;
+      *) [ -n "$result" ] && echo "$result" ;;
+    esac
+  fi
 }
 "#;
 
 const INIT_ZSH_ALIAS: &str = r#"
-alias zi="z -i"
+alias zi='z -i'
 
-alias za="zoxide add"
-alias zq="zoxide query"
-alias zr="zoxide remove"
+alias za='zoxide add'
+alias zq='zoxide query'
+alias zr='zoxide remove'
 "#;

@@ -3,8 +3,6 @@ mod dir;
 mod types;
 mod util;
 
-use crate::db::DB;
-use crate::types::Timestamp;
 use crate::util::{fzf_helper, get_current_time, get_db};
 use anyhow::{anyhow, Context, Result};
 use clap::arg_enum;
@@ -52,10 +50,13 @@ enum Zoxide {
     Remove { path: String },
 }
 
-fn zoxide_query(db: &mut DB, mut keywords: Vec<String>, now: Timestamp) -> Option<String> {
+fn zoxide_query(mut keywords: Vec<String>) -> Result<Option<String>> {
+    let now = get_current_time()?;
+    let mut db = get_db()?;
+
     if let [path] = keywords.as_slice() {
         if Path::new(path).is_dir() {
-            return Some(path.to_owned());
+            return Ok(Some(path.to_owned()));
         }
     }
 
@@ -64,18 +65,16 @@ fn zoxide_query(db: &mut DB, mut keywords: Vec<String>, now: Timestamp) -> Optio
     }
 
     if let Some(dir) = db.query(&keywords, now) {
-        return Some(dir.path);
+        return Ok(Some(dir.path));
     }
 
-    None
+    Ok(None)
 }
 
-fn zoxide_query_interactive(
-    db: &mut DB,
-    keywords: Vec<String>,
-    now: Timestamp,
-) -> Result<Option<String>> {
-    let dirs = db.query_all(keywords);
+fn zoxide_query_interactive(keywords: Vec<String>) -> Result<Option<String>> {
+    let now = get_current_time()?;
+    let dirs = get_db()?.query_all(keywords);
+
     fzf_helper(now, dirs)
 }
 
@@ -94,8 +93,6 @@ pub fn main() -> Result<()> {
                     db.add(current_dir, now)
                 }
             }?;
-
-            db.save()?;
         }
         Zoxide::Init {
             shell,
@@ -126,14 +123,11 @@ pub fn main() -> Result<()> {
             keywords,
             interactive,
         } => {
-            let mut db = get_db()?;
-            let now = get_current_time()?;
-
             let path_opt = if interactive {
-                zoxide_query_interactive(&mut db, keywords, now)?
+                zoxide_query_interactive(keywords)
             } else {
-                zoxide_query(&mut db, keywords, now)
-            };
+                zoxide_query(keywords)
+            }?;
 
             if let Some(path) = path_opt {
                 println!("query: {}", path.trim());
@@ -142,7 +136,6 @@ pub fn main() -> Result<()> {
         Zoxide::Remove { path } => {
             let mut db = get_db()?;
             db.remove(path)?;
-            db.save()?;
         }
     };
 

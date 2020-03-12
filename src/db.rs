@@ -167,3 +167,11 @@ impl DB {
         }
     }
 }
+
+impl Drop for DB {
+    fn drop(&mut self) {
+        if let Err(e) = self.save() {
+            eprintln!("{:#}", e);
+        }
+    }
+}

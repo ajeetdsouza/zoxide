@@ -99,9 +99,7 @@ pub fn main() -> Result<()> {
         }
         Zoxide::Migrate { path } => {
             let mut db = get_db()?;
-
             db.migrate(path)?;
-            db.save()?;
         }
         Zoxide::Init {
             shell,

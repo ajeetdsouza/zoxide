@@ -73,8 +73,6 @@ impl DB {
 
     pub fn migrate<P: AsRef<Path>>(&mut self, path: P) -> Result<()> {
         if !self.dirs.is_empty() {
-            // FIXME: just for testing
-            #[cfg(not(debug_assertions))]
             return Err(anyhow!(
                 "To prevent conflicts, you can only migrate from z with an empty \
                  zoxide database!"
@@ -97,38 +95,23 @@ impl DB {
 
             match split_line.as_slice() {
                 [_, rank_str, path_str] => {
-                    let path = PathBuf::from(path_str);
-                    let rank = rank_str
-                        .parse::<f64>()
-                        .with_context(|| anyhow!("could not parse rank"))?;
-
-                    // otherwise, the rank will get scaled down, depending on
-                    // how old the entry is (import in-place and let zoxide
+                    // Set last_accessed to current time; otherwise, the rank will get scaled down,
+                    // depending on how old the imported entry is (import in-place and let zoxide
                     // scale down organically)
                     let epoch = util::get_current_time()?;
+                    let rank = rank_str
+                        .parse::<f64>()
+                        .with_context(|| anyhow!("could not parse rank: '{}'", rank_str))?;
 
-                    // TODO: does this *need* to be canonicalized?
-                    // 1) the z db already stores canonicalized paths
-                    // 2) zoxide purges nonexistent paths upon query invocation
-                    let path_abs = match path.canonicalize() {
-                        Ok(path) => path,
-                        Err(_) => continue, // ignore dead paths
-                    };
-
-                    // FIXME: Remove when we switch to PathBuf for storing
-                    // diectories inside Dir and just pass `path` (the PathBuf
-                    // constructed from `path-str`)
-                    let path_str = path_abs.to_str().ok_or_else(|| {
-                        anyhow!("invalid unicode in path: {}", path_abs.display())
-                    })?;
-
+                    // FIXME: When we switch to PathBuf for storing directories inside Dir, just
+                    // pass `PathBuf::from(path_str)`
                     self.dirs.push(Dir {
-                        path: path_str.to_owned(),
+                        path: path_str.to_string(),
                         last_accessed: epoch,
                         rank,
                     });
                 }
-                [] | [""] => (),
+                [] | [""] => {} // ignore blank lines
                 line => {
                     eprintln!("invalid line {}: {:?}", line_number, line);
                     continue;
@@ -136,8 +119,7 @@ impl DB {
             };
         }
 
-        // FIXME: just for testing
-        self.modified = false;
+        self.modified = true;
 
         Ok(())
     }

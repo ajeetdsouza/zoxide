@@ -1,7 +1,7 @@
 use crate::dir::Dir;
 use crate::types::{Rank, Timestamp};
 use crate::util;
-use anyhow::{anyhow, Context, Result};
+use anyhow::{anyhow, bail, Context, Result};
 use fs2::FileExt;
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, BufRead, BufReader, BufWriter};
@@ -73,10 +73,10 @@ impl DB {
 
     pub fn migrate<P: AsRef<Path>>(&mut self, path: P) -> Result<()> {
         if !self.dirs.is_empty() {
-            return Err(anyhow!(
+            bail!(
                 "To prevent conflicts, you can only migrate from z with an empty \
                  zoxide database!"
-            ));
+            );
         }
 
         let z_db_file = File::open(path).with_context(|| anyhow!("could not open z db file"))?;
@@ -94,26 +94,32 @@ impl DB {
             let split_line = line.rsplitn(3, '|').collect::<Vec<&str>>();
 
             match split_line.as_slice() {
-                [_, rank_str, path_str] => {
-                    // Set last_accessed to current time; otherwise, the rank will get scaled down,
-                    // depending on how old the imported entry is (import in-place and let zoxide
-                    // scale down organically)
-                    let epoch = util::get_current_time()?;
+                [epoch_str, rank_str, path_str] => {
+                    let epoch = epoch_str
+                        .parse::<i64>()
+                        .with_context(|| anyhow!("could not parse epoch: '{}'", epoch_str))?;
                     let rank = rank_str
                         .parse::<f64>()
                         .with_context(|| anyhow!("could not parse rank: '{}'", rank_str))?;
+                    let path = match PathBuf::from(path_str).canonicalize() {
+                        Ok(path) => path,
+                        Err(e) => {
+                            eprintln!("invalid path '{}' at line {}: {}", path_str, line_number, e);
+                            continue;
+                        }
+                    };
 
                     // FIXME: When we switch to PathBuf for storing directories inside Dir, just
                     // pass `PathBuf::from(path_str)`
                     self.dirs.push(Dir {
-                        path: path_str.to_string(),
+                        path: path.display().to_string(),
                         last_accessed: epoch,
                         rank,
                     });
                 }
                 [] | [""] => {} // ignore blank lines
                 line => {
-                    eprintln!("invalid line {}: {:?}", line_number, line);
+                    eprintln!("invalid entry at line {}: {:?}", line_number, line);
                     continue;
                 }
             };

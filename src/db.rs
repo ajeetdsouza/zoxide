@@ -1,10 +1,10 @@
 use crate::dir::Dir;
 use crate::types::{Rank, Timestamp};
-use crate::util::get_zo_maxage;
+use crate::util;
 use anyhow::{anyhow, Context, Result};
 use fs2::FileExt;
 use std::fs::{self, File, OpenOptions};
-use std::io::{self, BufReader, BufWriter};
+use std::io::{self, BufRead, BufReader, BufWriter};
 use std::path::{Path, PathBuf};
 
 pub struct DB {
@@ -71,6 +71,59 @@ impl DB {
         Ok(())
     }
 
+    pub fn migrate<P: AsRef<Path>>(&mut self, path: P) -> Result<()> {
+        if !self.dirs.is_empty() {
+            return Err(anyhow!(
+                "To prevent conflicts, you can only migrate from z with an empty \
+                 zoxide database!"
+            ));
+        }
+
+        let zdata = File::open(path)?;
+        let reader = BufReader::new(zdata);
+
+        for line in reader.lines().filter_map(|l| l.ok()) {
+            let first_pipe_idx = line
+                .find('|')
+                .with_context(|| anyhow!("missing separator"))?;
+            let last_pipe_idx = line
+                .rfind('|')
+                .with_context(|| anyhow!("missing separator"))?;
+
+            if first_pipe_idx == last_pipe_idx {
+                return Err(anyhow!("invalid data file format -- only 1 separator"));
+            }
+
+            let path = PathBuf::from(&line[..first_pipe_idx]);
+            let rank = line[first_pipe_idx + 1..last_pipe_idx]
+                .parse::<f64>()
+                .with_context(|| anyhow!("could not parse rank"))?;
+
+            // otherwise, the rank will get scaled down, depending on how old
+            // the entry is
+            let epoch = util::get_current_time()?;
+
+            let path_abs = match path.canonicalize() {
+                Ok(path) => path,
+                Err(_) => continue, // ignore dead paths
+            };
+
+            let path_str = path_abs
+                .to_str()
+                .ok_or_else(|| anyhow!("invalid unicode in path: {}", path_abs.display()))?;
+
+            self.dirs.push(Dir {
+                path: path_str.to_owned(),
+                last_accessed: epoch,
+                rank,
+            });
+        }
+
+        self.modified = true;
+
+        Ok(())
+    }
+
     pub fn add<P: AsRef<Path>>(&mut self, path: P, now: Timestamp) -> Result<()> {
         let path_abs = path
             .as_ref()
@@ -93,7 +146,7 @@ impl DB {
             }
         };
 
-        let max_age = get_zo_maxage()?;
+        let max_age = util::get_zo_maxage()?;
         let sum_age = self.dirs.iter().map(|dir| dir.rank).sum::<Rank>();
 
         if sum_age > max_age {

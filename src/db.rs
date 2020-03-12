@@ -73,53 +73,71 @@ impl DB {
 
     pub fn migrate<P: AsRef<Path>>(&mut self, path: P) -> Result<()> {
         if !self.dirs.is_empty() {
+            // FIXME: just for testing
+            #[cfg(not(debug_assertions))]
             return Err(anyhow!(
                 "To prevent conflicts, you can only migrate from z with an empty \
                  zoxide database!"
             ));
         }
 
-        let zdata = File::open(path)?;
-        let reader = BufReader::new(zdata);
+        let z_db_file = File::open(path).with_context(|| anyhow!("could not open z db file"))?;
+        let reader = BufReader::new(z_db_file);
 
-        for line in reader.lines().filter_map(|l| l.ok()) {
-            let first_pipe_idx = line
-                .find('|')
-                .with_context(|| anyhow!("missing separator"))?;
-            let last_pipe_idx = line
-                .rfind('|')
-                .with_context(|| anyhow!("missing separator"))?;
-
-            if first_pipe_idx == last_pipe_idx {
-                return Err(anyhow!("invalid data file format -- only 1 separator"));
-            }
-
-            let path = PathBuf::from(&line[..first_pipe_idx]);
-            let rank = line[first_pipe_idx + 1..last_pipe_idx]
-                .parse::<f64>()
-                .with_context(|| anyhow!("could not parse rank"))?;
-
-            // otherwise, the rank will get scaled down, depending on how old
-            // the entry is
-            let epoch = util::get_current_time()?;
-
-            let path_abs = match path.canonicalize() {
-                Ok(path) => path,
-                Err(_) => continue, // ignore dead paths
+        for (idx, read_line) in reader.lines().enumerate() {
+            let line_number = idx + 1;
+            let line = if let Ok(line) = read_line {
+                line
+            } else {
+                eprintln!("could not read line {}: {:?}", line_number, read_line);
+                continue;
             };
 
-            let path_str = path_abs
-                .to_str()
-                .ok_or_else(|| anyhow!("invalid unicode in path: {}", path_abs.display()))?;
+            let split_line = line.rsplitn(3, '|').collect::<Vec<&str>>();
 
-            self.dirs.push(Dir {
-                path: path_str.to_owned(),
-                last_accessed: epoch,
-                rank,
-            });
+            match split_line.as_slice() {
+                [_, rank_str, path_str] => {
+                    let path = PathBuf::from(path_str);
+                    let rank = rank_str
+                        .parse::<f64>()
+                        .with_context(|| anyhow!("could not parse rank"))?;
+
+                    // otherwise, the rank will get scaled down, depending on
+                    // how old the entry is (import in-place and let zoxide
+                    // scale down organically)
+                    let epoch = util::get_current_time()?;
+
+                    // TODO: does this *need* to be canonicalized?
+                    // 1) the z db already stores canonicalized paths
+                    // 2) zoxide purges nonexistent paths upon query invocation
+                    let path_abs = match path.canonicalize() {
+                        Ok(path) => path,
+                        Err(_) => continue, // ignore dead paths
+                    };
+
+                    // FIXME: Remove when we switch to PathBuf for storing
+                    // diectories inside Dir and just pass `path` (the PathBuf
+                    // constructed from `path-str`)
+                    let path_str = path_abs.to_str().ok_or_else(|| {
+                        anyhow!("invalid unicode in path: {}", path_abs.display())
+                    })?;
+
+                    self.dirs.push(Dir {
+                        path: path_str.to_owned(),
+                        last_accessed: epoch,
+                        rank,
+                    });
+                }
+                [] | [""] => (),
+                line => {
+                    eprintln!("invalid line {}: {:?}", line_number, line);
+                    continue;
+                }
+            };
         }
 
-        self.modified = true;
+        // FIXME: just for testing
+        self.modified = false;
 
         Ok(())
     }

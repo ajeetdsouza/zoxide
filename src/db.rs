@@ -79,7 +79,8 @@ impl DB {
             );
         }
 
-        let z_db_file = File::open(path).with_context(|| anyhow!("could not open z db file"))?;
+        let z_db_file =
+            File::open(path).with_context(|| anyhow!("could not open z database file"))?;
         let reader = BufReader::new(z_db_file);
 
         for (idx, read_line) in reader.lines().enumerate() {
@@ -95,16 +96,38 @@ impl DB {
 
             match split_line.as_slice() {
                 [epoch_str, rank_str, path_str] => {
-                    let epoch = epoch_str
-                        .parse::<i64>()
-                        .with_context(|| anyhow!("could not parse epoch: '{}'", epoch_str))?;
-                    let rank = rank_str
-                        .parse::<f64>()
-                        .with_context(|| anyhow!("could not parse rank: '{}'", rank_str))?;
-                    let path = match PathBuf::from(path_str).canonicalize() {
+                    let epoch = match epoch_str.parse::<i64>() {
+                        Ok(epoch) => epoch,
+                        Err(e) => {
+                            eprintln!(
+                                "invalid epoch '{}' at line {}: {}",
+                                epoch_str, line_number, e
+                            );
+                            continue;
+                        }
+                    };
+                    let rank = match rank_str.parse::<f64>() {
+                        Ok(rank) => rank,
+                        Err(e) => {
+                            eprintln!("invalid rank '{}' at line {}: {}", rank_str, line_number, e);
+                            continue;
+                        }
+                    };
+                    let path_abs = match Path::new(path_str).canonicalize() {
                         Ok(path) => path,
                         Err(e) => {
                             eprintln!("invalid path '{}' at line {}: {}", path_str, line_number, e);
+                            continue;
+                        }
+                    };
+                    let path_str = match path_abs.to_str() {
+                        Some(path) => path,
+                        None => {
+                            eprintln!(
+                                "invalid unicode in path '{}' at line {}",
+                                path_abs.display(),
+                                line_number
+                            );
                             continue;
                         }
                     };
@@ -112,7 +135,7 @@ impl DB {
                     // FIXME: When we switch to PathBuf for storing directories inside Dir, just
                     // pass `PathBuf::from(path_str)`
                     self.dirs.push(Dir {
-                        path: path.display().to_string(),
+                        path: path_str.to_string(),
                         rank,
                         last_accessed: epoch,
                     });

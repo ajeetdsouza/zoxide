@@ -28,6 +28,9 @@ enum Zoxide {
     #[structopt(about = "Add a new directory or increment its rank")]
     Add { path: Option<String> },
 
+    #[structopt(about = "Migrate from z database")]
+    Migrate { path: String },
+
     #[structopt(about = "Prints shell configuration")]
     Init {
         #[structopt(possible_values = &Shell::variants(), case_insensitive = true)]
@@ -93,6 +96,10 @@ pub fn main() -> Result<()> {
                     db.add(current_dir, now)
                 }
             }?;
+        }
+        Zoxide::Migrate { path } => {
+            let mut db = get_db()?;
+            db.migrate(path)?;
         }
         Zoxide::Init {
             shell,
@@ -208,6 +215,7 @@ end
 
 const INIT_FISH_ALIAS: &str = r#"
 abbr -a zi 'z -i'
+
 abbr -a za 'zoxide add'
 abbr -a zq 'zoxide query'
 abbr -a zr 'zoxide remove'

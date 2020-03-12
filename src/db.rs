@@ -1,10 +1,10 @@
 use crate::dir::Dir;
 use crate::types::{Rank, Timestamp};
-use crate::util::get_zo_maxage;
-use anyhow::{anyhow, Context, Result};
+use crate::util;
+use anyhow::{anyhow, bail, Context, Result};
 use fs2::FileExt;
 use std::fs::{self, File, OpenOptions};
-use std::io::{self, BufReader, BufWriter};
+use std::io::{self, BufRead, BufReader, BufWriter};
 use std::path::{Path, PathBuf};
 
 pub struct DB {
@@ -71,6 +71,88 @@ impl DB {
         Ok(())
     }
 
+    pub fn migrate<P: AsRef<Path>>(&mut self, path: P) -> Result<()> {
+        if !self.dirs.is_empty() {
+            bail!(
+                "To prevent conflicts, you can only migrate from z with an empty \
+                 zoxide database!"
+            );
+        }
+
+        let z_db_file =
+            File::open(path).with_context(|| anyhow!("could not open z database file"))?;
+        let reader = BufReader::new(z_db_file);
+
+        for (idx, read_line) in reader.lines().enumerate() {
+            let line_number = idx + 1;
+            let line = if let Ok(line) = read_line {
+                line
+            } else {
+                eprintln!("could not read line {}: {:?}", line_number, read_line);
+                continue;
+            };
+
+            let split_line = line.rsplitn(3, '|').collect::<Vec<&str>>();
+
+            match split_line.as_slice() {
+                [epoch_str, rank_str, path_str] => {
+                    let epoch = match epoch_str.parse::<i64>() {
+                        Ok(epoch) => epoch,
+                        Err(e) => {
+                            eprintln!(
+                                "invalid epoch '{}' at line {}: {}",
+                                epoch_str, line_number, e
+                            );
+                            continue;
+                        }
+                    };
+                    let rank = match rank_str.parse::<f64>() {
+                        Ok(rank) => rank,
+                        Err(e) => {
+                            eprintln!("invalid rank '{}' at line {}: {}", rank_str, line_number, e);
+                            continue;
+                        }
+                    };
+                    let path_abs = match Path::new(path_str).canonicalize() {
+                        Ok(path) => path,
+                        Err(e) => {
+                            eprintln!("invalid path '{}' at line {}: {}", path_str, line_number, e);
+                            continue;
+                        }
+                    };
+                    let path_str = match path_abs.to_str() {
+                        Some(path) => path,
+                        None => {
+                            eprintln!(
+                                "invalid unicode in path '{}' at line {}",
+                                path_abs.display(),
+                                line_number
+                            );
+                            continue;
+                        }
+                    };
+
+                    // FIXME: When we switch to PathBuf for storing directories inside Dir, just
+                    // pass `PathBuf::from(path_str)`
+                    self.dirs.push(Dir {
+                        path: path_str.to_string(),
+                        rank,
+                        last_accessed: epoch,
+                    });
+                }
+                [] | [""] => {} // ignore blank lines
+                line => {
+                    eprintln!("invalid entry at line {}: {:?}", line_number, line);
+                    continue;
+                }
+            };
+        }
+
+        self.modified = true;
+
+        Ok(())
+    }
+
     pub fn add<P: AsRef<Path>>(&mut self, path: P, now: Timestamp) -> Result<()> {
         let path_abs = path
             .as_ref()
@@ -93,7 +175,7 @@ impl DB {
             }
         };
 
-        let max_age = get_zo_maxage()?;
+        let max_age = util::get_zo_maxage()?;
         let sum_age = self.dirs.iter().map(|dir| dir.rank).sum::<Rank>();
 
         if sum_age > max_age {

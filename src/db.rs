@@ -113,8 +113,8 @@ impl DB {
                     // pass `PathBuf::from(path_str)`
                     self.dirs.push(Dir {
                         path: path.display().to_string(),
-                        last_accessed: epoch,
                         rank,
+                        last_accessed: epoch,
                     });
                 }
                 [] | [""] => {} // ignore blank lines

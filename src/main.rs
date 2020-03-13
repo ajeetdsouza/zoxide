@@ -23,7 +23,7 @@ pub fn main() -> Result<()> {
     let opt = Zoxide::from_args();
     match opt {
         Zoxide::Add(add) => add.run()?,
-        Zoxide::Init(init) => init.run()?,
+        Zoxide::Init(init) => init.run(),
         Zoxide::Migrate(migrate) => migrate.run()?,
         Zoxide::Query(query) => query.run()?,
         Zoxide::Remove(remove) => remove.run()?,

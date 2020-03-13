@@ -1,4 +1,3 @@
-use anyhow::{bail, Result};
 use clap::arg_enum;
 use std::io::{self, Write};
 use structopt::StructOpt;
@@ -26,7 +25,7 @@ pub struct Init {
 }
 
 impl Init {
-    pub fn run(&self) -> Result<()> {
+    pub fn run(&self) {
         let config = match self.shell {
             Shell::bash => BASH_CONFIG,
             Shell::fish => FISH_CONFIG,
@@ -44,13 +43,8 @@ impl Init {
         match self.hook {
             Hook::none => (),
             Hook::prompt => writeln!(handle, "{}", config.hook.prompt).unwrap(),
-            Hook::pwd => match config.hook.pwd {
-                Some(pwd) => writeln!(handle, "{}", pwd).unwrap(),
-                None => bail!("pwd hooks are currently not supported for this shell"),
-            },
+            Hook::pwd => writeln!(handle, "{}", config.hook.pwd).unwrap(),
         };
-
-        Ok(())
     }
 }
 
@@ -79,7 +73,7 @@ const BASH_CONFIG: ShellConfig = ShellConfig {
     alias: BASH_ALIAS,
     hook: HookConfig {
         prompt: BASH_HOOK_PROMPT,
-        pwd: None,
+        pwd: BASH_HOOK_PWD,
     },
 };
 
@@ -88,7 +82,7 @@ const FISH_CONFIG: ShellConfig = ShellConfig {
     alias: FISH_ALIAS,
     hook: HookConfig {
         prompt: FISH_HOOK_PROMPT,
-        pwd: None,
+        pwd: FISH_HOOK_PWD,
     },
 };
 
@@ -97,7 +91,7 @@ const ZSH_CONFIG: ShellConfig = ShellConfig {
     alias: ZSH_ALIAS,
     hook: HookConfig {
         prompt: ZSH_HOOK_PROMPT,
-        pwd: Some(ZSH_HOOK_PWD),
+        pwd: ZSH_HOOK_PWD,
     },
 };
 
@@ -109,7 +103,7 @@ struct ShellConfig {
 
 struct HookConfig {
     prompt: &'static str,
-    pwd: Option<&'static str>,
+    pwd: &'static str,
 }
 
 const BASH_Z: &str = r#"
@@ -198,6 +192,28 @@ _zoxide_hook() {
 [[ -n "${precmd_functions[(r)_zoxide_hook]}" ]] || {
   precmd_functions+=(_zoxide_hook)
 }
+"#;
+
+const BASH_HOOK_PWD: &str = r#"
+_zoxide_hook() {
+  if [ -z "${_ZO_PWD}" ]; then
+    _ZO_PWD="${PWD}"
+  elif [ "${_ZO_PWD}" != "${PWD}" ]; then
+    _ZO_PWD="${PWD}"
+    zoxide add
+  fi
+}
+
+case "$PROMPT_COMMAND" in
+  *_zoxide_hook*) ;;
+  *) PROMPT_COMMAND="_zoxide_hook${PROMPT_COMMAND:+;${PROMPT_COMMAND}}" ;;
+esac
+"#;
+
+const FISH_HOOK_PWD: &str = r#"
+function _zoxide_hook --on-variable PWD
+    zoxide add
+end
 "#;
 
 const ZSH_HOOK_PWD: &str = r#"

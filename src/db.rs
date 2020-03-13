@@ -1,6 +1,5 @@
 use crate::dir::Dir;
 use crate::types::{Epoch, Rank};
-use crate::util;
 use anyhow::{anyhow, bail, Context, Result};
 use fs2::FileExt;
 use std::fs::{self, File, OpenOptions};
@@ -153,7 +152,7 @@ impl DB {
         Ok(())
     }
 
-    pub fn add<P: AsRef<Path>>(&mut self, path: P, now: Epoch) -> Result<()> {
+    pub fn add<P: AsRef<Path>>(&mut self, path: P, max_age: Rank, now: Epoch) -> Result<()> {
         let path_abs = path
             .as_ref()
             .canonicalize()
@@ -175,7 +174,6 @@ impl DB {
             }
         };
 
-        let max_age = util::get_zo_maxage()?;
         let sum_age = self.dirs.iter().map(|dir| dir.rank).sum::<Rank>();
 
         if sum_age > max_age {

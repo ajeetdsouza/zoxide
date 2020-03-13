@@ -1,3 +1,5 @@
+use crate::env::Env;
+use crate::types::Rank;
 use crate::util;
 use anyhow::{anyhow, Context, Result};
 use std::env;
@@ -10,16 +12,17 @@ pub struct Add {
 }
 
 impl Add {
-    pub fn run(&self) -> Result<()> {
-        let mut db = util::get_db()?;
+    pub fn run(&self, env: &Env) -> Result<()> {
+        let mut db = util::get_db(env)?;
         let now = util::get_current_time()?;
+        let maxage = env.maxage as Rank;
 
         match &self.path {
-            Some(path) => db.add(path, now),
+            Some(path) => db.add(path, maxage, now),
             None => {
                 let current_dir = env::current_dir()
                     .with_context(|| anyhow!("unable to fetch current directory"))?;
-                db.add(current_dir, now)
+                db.add(current_dir, maxage, now)
             }
         }
     }

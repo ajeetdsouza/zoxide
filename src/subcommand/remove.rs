@@ -1,3 +1,4 @@
+use crate::env::Env;
 use crate::util;
 use anyhow::Result;
 use structopt::StructOpt;
@@ -9,7 +10,7 @@ pub struct Remove {
 }
 
 impl Remove {
-    pub fn run(&self) -> Result<()> {
-        util::get_db()?.remove(&self.path)
+    pub fn run(&self, env: &Env) -> Result<()> {
+        util::get_db(env)?.remove(&self.path)
     }
 }

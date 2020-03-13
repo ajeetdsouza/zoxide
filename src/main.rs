@@ -1,10 +1,12 @@
 mod db;
 mod dir;
+mod env;
 mod subcommand;
 mod types;
 mod util;
 
-use anyhow::Result;
+use crate::env::Env;
+use anyhow::{Context, Result};
 use structopt::StructOpt;
 
 // TODO: use structopt to parse env variables: <https://github.com/TeXitoi/structopt/blob/master/examples/env.rs>
@@ -21,12 +23,16 @@ enum Zoxide {
 
 pub fn main() -> Result<()> {
     let opt = Zoxide::from_args();
+    let env = envy::prefixed("_ZO_")
+        .from_env::<Env>()
+        .with_context(|| "Could not parse environment variables")?;
+
     match opt {
-        Zoxide::Add(add) => add.run()?,
+        Zoxide::Add(add) => add.run(&env)?,
         Zoxide::Init(init) => init.run(),
-        Zoxide::Migrate(migrate) => migrate.run()?,
-        Zoxide::Query(query) => query.run()?,
-        Zoxide::Remove(remove) => remove.run()?,
+        Zoxide::Migrate(migrate) => migrate.run(&env)?,
+        Zoxide::Query(query) => query.run(&env)?,
+        Zoxide::Remove(remove) => remove.run(&env)?,
     };
 
     Ok(())

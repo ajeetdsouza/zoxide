@@ -1,3 +1,4 @@
+use crate::env::Env;
 use crate::util;
 use anyhow::Result;
 use structopt::StructOpt;
@@ -9,7 +10,7 @@ pub struct Migrate {
 }
 
 impl Migrate {
-    pub fn run(&self) -> Result<()> {
-        util::get_db()?.migrate(&self.path)
+    pub fn run(&self, env: &Env) -> Result<()> {
+        util::get_db(env)?.migrate(&self.path)
     }
 }

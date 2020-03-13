@@ -1,44 +1,17 @@
 use crate::db::DB;
 use crate::dir::Dir;
-use crate::types::{Epoch, Rank};
+use crate::env::Env;
+use crate::types::Epoch;
 use anyhow::{anyhow, Context, Result};
-use std::env;
 use std::io::{Read, Write};
-use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::time::SystemTime;
 
-pub fn get_zo_data() -> Result<PathBuf> {
-    const ZO_DATA: &str = "_ZO_DATA";
-
-    Ok(match env::var_os(ZO_DATA) {
-        Some(path) => PathBuf::from(path),
-        None => {
-            let mut path =
-                dirs::home_dir().ok_or_else(|| anyhow!("could not locate home directory"))?;
-            path.push(".zo");
-            path
-        }
-    })
-}
-
-pub fn get_zo_maxage() -> Result<Rank> {
-    const ZO_MAXAGE: &str = "_ZO_MAXAGE";
-
-    let maxage = match env::var_os(ZO_MAXAGE) {
-        Some(maxage_var) => maxage_var
-            .to_str()
-            .ok_or_else(|| anyhow!("invalid Unicode in ${}", ZO_MAXAGE))?
-            .parse::<i64>()
-            .with_context(|| anyhow!("could not parse ${} as integer", ZO_MAXAGE))?
-            as Rank,
-        None => 1000.0,
-    };
-    Ok(maxage)
-}
-
-pub fn get_db() -> Result<DB> {
-    let path = get_zo_data()?;
+pub fn get_db(env: &Env) -> Result<DB> {
+    let path = env
+        .data
+        .as_ref()
+        .ok_or_else(|| anyhow!("could not locate database file"))?;
     DB::open(path)
 }
 

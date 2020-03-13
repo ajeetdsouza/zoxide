@@ -1,4 +1,4 @@
-use crate::types::{Rank, Epoch};
+use crate::types::{Epoch, Rank};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 

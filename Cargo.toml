@@ -17,6 +17,7 @@ anyhow = "1.0.26"
 bincode = "1.2.1"
 clap = "2.33.0"
 dirs = "2.0.2"
+envy = "0.4.1"
 fs2 = "0.4.3"
 serde = { version = "1.0.104", features = ["derive"] }
 structopt = "0.3.11"

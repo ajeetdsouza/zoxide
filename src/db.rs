@@ -70,11 +70,11 @@ impl DB {
         Ok(())
     }
 
-    pub fn migrate<P: AsRef<Path>>(&mut self, path: P) -> Result<()> {
-        if !self.dirs.is_empty() {
+    pub fn migrate<P: AsRef<Path>>(&mut self, path: P, merge: bool) -> Result<()> {
+        if !self.dirs.is_empty() && !merge {
             bail!(
-                "To prevent conflicts, you can only migrate from z with an empty \
-                 zoxide database!"
+                "To prevent conflicts, you can only migrate from z with an empty zoxide database!
+If you wish to merge the two, specify the `--merge` flag."
             );
         }
 
@@ -130,6 +130,17 @@ impl DB {
                             continue;
                         }
                     };
+
+                    if merge {
+                        // If the path exists in the database, add the ranks and set the epoch to
+                        // the largest of the parsed epoch and the already present epoch.
+                        if let Some(dir) = self.dirs.iter_mut().find(|dir| dir.path == path_str) {
+                            dir.rank += rank;
+                            dir.last_accessed = Epoch::max(epoch, dir.last_accessed);
+
+                            continue;
+                        };
+                    }
 
                     // FIXME: When we switch to PathBuf for storing directories inside Dir, just
                     // pass `PathBuf::from(path_str)`

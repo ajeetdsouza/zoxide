@@ -1,5 +1,5 @@
 use crate::dir::Dir;
-use crate::types::{Rank, Timestamp};
+use crate::types::{Epoch, Rank};
 use crate::util;
 use anyhow::{anyhow, bail, Context, Result};
 use fs2::FileExt;
@@ -28,21 +28,21 @@ impl DB {
             .write(true)
             .create(true)
             .open(&path_tmp)
-            .with_context(|| anyhow!("could not open temporary database"))?;
+            .with_context(|| anyhow!("could not open temporary database file"))?;
 
         file_tmp
             .lock_exclusive()
-            .with_context(|| anyhow!("could not lock temporary database"))?;
+            .with_context(|| anyhow!("could not lock temporary database file"))?;
 
         let dirs = match File::open(&path) {
             Ok(file) => {
-                let rd = BufReader::new(&file);
-                bincode::deserialize_from(rd)
+                let reader = BufReader::new(&file);
+                bincode::deserialize_from(reader)
                     .with_context(|| anyhow!("could not deserialize database"))?
             }
             Err(err) => match err.kind() {
                 io::ErrorKind::NotFound => Vec::<Dir>::new(),
-                _ => return Err(err).with_context(|| anyhow!("could not open database")),
+                _ => return Err(err).with_context(|| anyhow!("could not open database file")),
             },
         };
 
@@ -59,13 +59,13 @@ impl DB {
         if self.modified {
             self.file_tmp
                 .set_len(0)
-                .with_context(|| "could not truncate temporary database")?;
+                .with_context(|| "could not truncate temporary database file")?;
 
-            let wr = BufWriter::new(&self.file_tmp);
-            bincode::serialize_into(wr, &self.dirs)
+            let writer = BufWriter::new(&self.file_tmp);
+            bincode::serialize_into(writer, &self.dirs)
                 .with_context(|| anyhow!("could not serialize database"))?;
             fs::rename(&self.path_tmp, &self.path)
-                .with_context(|| anyhow!("could not move temporary database"))?;
+                .with_context(|| anyhow!("could not move temporary database file"))?;
         }
 
         Ok(())
@@ -153,7 +153,7 @@ impl DB {
         Ok(())
     }
 
-    pub fn add<P: AsRef<Path>>(&mut self, path: P, now: Timestamp) -> Result<()> {
+    pub fn add<P: AsRef<Path>>(&mut self, path: P, now: Epoch) -> Result<()> {
         let path_abs = path
             .as_ref()
             .canonicalize()
@@ -165,7 +165,7 @@ impl DB {
 
         match self.dirs.iter_mut().find(|dir| dir.path == path_str) {
             None => self.dirs.push(Dir {
-                path: path_str.to_owned(),
+                path: path_str.to_string(),
                 last_accessed: now,
                 rank: 1.0,
             }),
@@ -191,7 +191,7 @@ impl DB {
         Ok(())
     }
 
-    pub fn query(&mut self, keywords: &[String], now: Timestamp) -> Option<Dir> {
+    pub fn query(&mut self, keywords: &[String], now: Epoch) -> Option<Dir> {
         loop {
             let (idx, dir) = self
                 .dirs
@@ -209,12 +209,8 @@ impl DB {
         }
     }
 
-    pub fn query_all(&mut self, mut keywords: Vec<String>) -> Vec<Dir> {
+    pub fn query_all(&mut self, keywords: &[String]) -> Vec<Dir> {
         self.remove_invalid();
-
-        for keyword in &mut keywords {
-            keyword.make_ascii_lowercase();
-        }
 
         self.dirs
             .iter()
@@ -244,6 +240,7 @@ impl DB {
     fn remove_invalid(&mut self) {
         let orig_len = self.dirs.len();
         self.dirs.retain(Dir::is_dir);
+
         if orig_len != self.dirs.len() {
             self.modified = true;
         }

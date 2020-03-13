@@ -1,6 +1,6 @@
 use crate::db::DB;
 use crate::dir::Dir;
-use crate::types::{Rank, Timestamp};
+use crate::types::{Epoch, Rank};
 use anyhow::{anyhow, Context, Result};
 use std::env;
 use std::io::{Read, Write};
@@ -42,16 +42,16 @@ pub fn get_db() -> Result<DB> {
     DB::open(path)
 }
 
-pub fn get_current_time() -> Result<Timestamp> {
+pub fn get_current_time() -> Result<Epoch> {
     let current_time = SystemTime::now()
         .duration_since(SystemTime::UNIX_EPOCH)
         .with_context(|| "system clock set to invalid time")?
         .as_secs();
 
-    Ok(current_time as Timestamp)
+    Ok(current_time as Epoch)
 }
 
-pub fn fzf_helper(now: Timestamp, mut dirs: Vec<Dir>) -> Result<Option<String>> {
+pub fn fzf_helper(now: Epoch, mut dirs: Vec<Dir>) -> Result<Option<String>> {
     let fzf = Command::new("fzf")
         .arg("-n2..")
         .stdin(Stdio::piped())
@@ -92,5 +92,5 @@ pub fn fzf_helper(now: Timestamp, mut dirs: Vec<Dir>) -> Result<Option<String>> 
         .read_to_string(&mut output)
         .with_context(|| anyhow!("could not read from fzf stdout"))?;
 
-    Ok(output.get(12..).map(str::to_owned))
+    Ok(output.get(12..).map(str::to_string))
 }

@@ -1,4 +1,4 @@
-use crate::types::{Rank, Timestamp};
+use crate::types::{Rank, Epoch};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 
@@ -6,7 +6,7 @@ use std::path::Path;
 pub struct Dir {
     pub path: String,
     pub rank: Rank,
-    pub last_accessed: Timestamp,
+    pub last_accessed: Epoch,
 }
 
 impl Dir {
@@ -40,10 +40,10 @@ impl Dir {
         true
     }
 
-    pub fn get_frecency(&self, now: Timestamp) -> Rank {
-        const HOUR: Timestamp = 60 * 60;
-        const DAY: Timestamp = 24 * HOUR;
-        const WEEK: Timestamp = 7 * DAY;
+    pub fn get_frecency(&self, now: Epoch) -> Rank {
+        const HOUR: Epoch = 60 * 60;
+        const DAY: Epoch = 24 * HOUR;
+        const WEEK: Epoch = 7 * DAY;
 
         let duration = now - self.last_accessed;
         if duration < HOUR {

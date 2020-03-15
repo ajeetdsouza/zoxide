@@ -107,15 +107,19 @@ struct HookConfig {
 }
 
 const BASH_Z: &str = r#"
+_z_cd() {
+  cd "${@}" > /dev/null && test -n "$_ZO_ECHO" && echo "${PWD}"
+}
+
 z() {
   if [ "${#}" -eq 0 ]; then
-    cd "${HOME}"
+    _z_cd "${HOME}"
   elif [ "${#}" -eq 1 ] && [ "${1}" = '-' ]; then
-    cd '-'
+    _z_cd '-'
   else
     local result=$(zoxide query "${@}")
     case "${result}" in
-      "query: "*) cd "${result:7}" ;;
+      "query: "*) _z_cd "${result:7}" ;;
       *) [ -n "${result}" ] && echo "${result}" ;;
     esac
   fi
@@ -123,15 +127,20 @@ z() {
 "#;
 
 const FISH_Z: &str = r#"
+function _z_cd
+    cd "$argv" > /dev/null
+    and commandline -f repaint
+    and [ -n "$_ZO_ECHO" ]
+    and echo "$PWD"
+end
+
 function z
     set -l argc (count "$argv")
     if [ "$argc" -eq 0 ]
-        cd "$HOME"
-        and commandline -f repaint
+        _z_cd "$HOME"
     else if [ "$argc" -eq 1 ]
         and [ "$argv[1]" = '-' ]
-        cd '-'
-        and commandline -f repaint
+        _z_cd '-'
     else
         # TODO: use string-collect from fish 3.1.0 once it has wider adoption
         set -l IFS ''
@@ -139,8 +148,7 @@ function z
 
         switch "$result"
             case 'query: *'
-                cd (string sub -s 8 "$result")
-                and commandline -f repaint
+                _z_cd (string sub -s 8 "$result")
             case '*'
                 [ -n "$result" ]
                 and echo "$result"

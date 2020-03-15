@@ -16,6 +16,7 @@ A cd command that learns your habits
     - [bash](#bash)
     - [fish](#fish)
 - [Configuration](#configuration)
+  - [`init` flags](#init-flags)
   - [Environment variables](#environment-variables)
 
 ## Introduction
@@ -60,7 +61,11 @@ If you want the interactive fuzzy selection feature, you will also need to insta
 
 ### Step 2: Adding `zoxide` to your shell
 
-By default, `zoxide` defines the `z`, `zi`, `za`, `zq`, and `zr` aliases. If you'd like to go with just the barebones `z`, pass the `--no-define-aliases` flag to `zoxide init`.
+If you currently use `z`, `z.lua`, or `zsh-z`, you may want to first migrate your existing database to `zoxide`:
+
+```sh
+zoxide migrate /path/to/db
+```
 
 #### zsh
 
@@ -88,7 +93,16 @@ zoxide init fish | source
 
 ## Configuration
 
+### `init` flags
+
+- `--no-define-aliases`: don't define extra aliases like `zi`, `zq`, `za`, and `zr`
+- `--hook <HOOK>`: change the event that adds a new entry to the database (default: `prompt`)
+  - `none`: never add entries - this will make `zoxide` useless unless you manually configure a hook
+  - `prompt`: add an entry at every prompt
+  - `pwd`: add an entry whenever you change directories
+
 ### Environment variables
 
+- `$_ZO_ECHO`: `z` will print the matched directory before navigating to it
 - `$_ZO_DATA`: sets the location of the database (default: `~/.zo`)
 - `$_ZO_MAXAGE`: sets the maximum total rank after which entries start getting deleted

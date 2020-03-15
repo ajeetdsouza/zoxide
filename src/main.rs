@@ -9,8 +9,6 @@ use crate::env::Env;
 use anyhow::{Context, Result};
 use structopt::StructOpt;
 
-// TODO: use structopt to parse env variables: <https://github.com/TeXitoi/structopt/blob/master/examples/env.rs>
-
 #[derive(Debug, StructOpt)]
 #[structopt(about = "A cd command that learns your habits")]
 enum Zoxide {

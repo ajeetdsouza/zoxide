@@ -87,7 +87,10 @@ If you wish to merge the two, specify the `--merge` flag."
             let line = if let Ok(line) = read_line {
                 line
             } else {
-                eprintln!("could not read line {}: {:?}", line_number, read_line);
+                eprintln!(
+                    "could not read entry at line {}: {:?}",
+                    line_number, read_line
+                );
                 continue;
             };
 

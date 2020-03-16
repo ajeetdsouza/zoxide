@@ -108,7 +108,13 @@ struct HookConfig {
 
 const BASH_Z: &str = r#"
 _z_cd() {
-  cd "${@}" > /dev/null && test -n "$_ZO_ECHO" && echo "${PWD}"
+  cd "${@}" > /dev/null
+
+  if [ "${?}" -eq 0 ]; then
+    if [ -n "$_ZO_ECHO" ]; then
+      echo "${PWD}"
+    fi
+  fi
 }
 
 z() {
@@ -119,8 +125,14 @@ z() {
   else
     local result=$(zoxide query "${@}")
     case "${result}" in
-      "query: "*) _z_cd "${result:7}" ;;
-      *) [ -n "${result}" ] && echo "${result}" ;;
+      "query: "*)
+        _z_cd "${result:7}"
+        ;;
+      *)
+        if [ -n "${result}" ]; then
+            echo "${result}"
+        fi
+        ;;
     esac
   fi
 }
@@ -129,9 +141,13 @@ z() {
 const FISH_Z: &str = r#"
 function _z_cd
     cd "$argv" > /dev/null
-    and commandline -f repaint
-    and [ -n "$_ZO_ECHO" ]
-    and echo "$PWD"
+
+    if [ "$status" -eq 0 ]
+        commandline -f repaint
+        if [ -n "$_ZO_ECHO" ]
+            echo "$PWD"
+        end
+    end
 end
 
 function z
@@ -150,8 +166,9 @@ function z
             case 'query: *'
                 _z_cd (string sub -s 8 "$result")
             case '*'
-                [ -n "$result" ]
-                and echo "$result"
+                if [ -n "$result" ]
+                    echo "$result"
+                end
         end
     end
 end

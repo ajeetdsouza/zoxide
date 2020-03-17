@@ -2,7 +2,7 @@ use crate::db::DB;
 use crate::dir::Dir;
 use crate::env::Env;
 use crate::types::Epoch;
-use anyhow::{anyhow, Context, Result};
+use anyhow::{anyhow, bail, Context, Result};
 use std::io::{Read, Write};
 use std::process::{Command, Stdio};
 use std::time::SystemTime;
@@ -25,15 +25,16 @@ pub fn get_current_time() -> Result<Epoch> {
 }
 
 pub fn fzf_helper(now: Epoch, mut dirs: Vec<Dir>) -> Result<Option<String>> {
-    let fzf = Command::new("fzf")
+    let mut fzf = Command::new("fzf")
         .arg("-n2..")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
         .with_context(|| anyhow!("could not launch fzf"))?;
 
-    let mut fzf_stdin = fzf
+    let fzf_stdin = fzf
         .stdin
+        .as_mut()
         .ok_or_else(|| anyhow!("could not connect to fzf stdin"))?;
 
     for dir in dirs.iter_mut() {
@@ -56,8 +57,9 @@ pub fn fzf_helper(now: Epoch, mut dirs: Vec<Dir>) -> Result<Option<String>> {
             .with_context(|| anyhow!("could not write into fzf stdin"))?;
     }
 
-    let mut fzf_stdout = fzf
+    let fzf_stdout = fzf
         .stdout
+        .as_mut()
         .ok_or_else(|| anyhow!("could not connect to fzf stdout"))?;
 
     let mut output = String::new();
@@ -65,5 +67,25 @@ pub fn fzf_helper(now: Epoch, mut dirs: Vec<Dir>) -> Result<Option<String>> {
         .read_to_string(&mut output)
         .with_context(|| anyhow!("could not read from fzf stdout"))?;
 
-    Ok(output.get(12..).map(str::to_string))
+    let status = fzf.wait().with_context(|| "could not wait on fzf")?;
+
+    match status.code() {
+        // normal exit
+        Some(0) => match output.get(12..) {
+            Some(path) => Ok(Some(path.to_string())),
+            None => bail!("fzf returned invalid output"),
+        },
+
+        // no match
+        Some(1) => Ok(None),
+
+        // error
+        Some(2) => bail!("fzf returned an error"),
+
+        // terminated by a signal
+        Some(128..=254) | None => bail!("fzf was terminated"),
+
+        // unknown
+        _ => bail!("fzf returned an unknown error"),
+    }
 }

@@ -25,7 +25,7 @@ class z(ranger.api.commands.Command):
             output = subprocess.check_output(["zoxide", "query"] + self.args[1:])
             output = output.decode("utf-8")
 
-            query_prefix = "query:"
+            query_prefix = "query: "
 
             if output.startswith(query_prefix):
                 directory = output[len(query_prefix) :].strip()

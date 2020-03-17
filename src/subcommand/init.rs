@@ -108,55 +108,57 @@ struct HookConfig {
 
 const BASH_Z: &str = r#"
 _z_cd() {
-  cd "${@}" > /dev/null
+    cd "$@" || return "$?"
 
-  if [ "${?}" -eq 0 ]; then
     if [ -n "$_ZO_ECHO" ]; then
-      echo "${PWD}"
+        echo "$PWD"
     fi
-  fi
 }
 
 z() {
-  if [ "${#}" -eq 0 ]; then
-    _z_cd "${HOME}"
-  elif [ "${#}" -eq 1 ] && [ "${1}" = '-' ]; then
-    _z_cd '-'
-  else
-    local result=$(zoxide query "${@}")
-    case "${result}" in
-      "query: "*)
-        _z_cd "${result:7}"
-        ;;
-      *)
-        if [ -n "${result}" ]; then
-            echo "${result}"
-        fi
-        ;;
-    esac
-  fi
+    if [ "$#" -eq 0 ]; then
+        _z_cd ~ || return "$?"
+    elif [ "$#" -eq 1 ] && [ "$1" = '-' ]; then
+        _z_cd ~- || return "$?"
+    else
+        result="$(zoxide query $@)" || return "$?"
+        case "$result" in
+            "query: "*)
+                _z_cd "${result:7}" || return "$?"
+                ;;
+            *)
+                if [ -n "$result" ]; then
+                    echo "$result"
+                fi
+                ;;
+        esac
+    fi
 }
 "#;
 
 const FISH_Z: &str = r#"
 function _z_cd
-    cd "$argv" > /dev/null
+    cd "$argv"
+    or return "$status"
 
-    if [ "$status" -eq 0 ]
-        commandline -f repaint
-        if [ -n "$_ZO_ECHO" ]
-            echo "$PWD"
-        end
+    commandline -f repaint
+
+    if [ -n "$_ZO_ECHO" ]
+        echo "$PWD"
     end
 end
 
 function z
-    set -l argc (count "$argv")
+    set argc (count "$argv")
+
     if [ "$argc" -eq 0 ]
         _z_cd "$HOME"
-    else if [ "$argc" -eq 1 ]
-        and [ "$argv[1]" = '-' ]
+        or return "$status"
+
+    else if [ "$argc" -eq 1 ]; and [ "$argv[1]" = '-' ]
         _z_cd '-'
+        or return "$status"
+
     else
         # TODO: use string-collect from fish 3.1.0 once it has wider adoption
         set -l IFS ''
@@ -165,6 +167,7 @@ function z
         switch "$result"
             case 'query: *'
                 _z_cd (string sub -s 8 "$result")
+                or return "$status"
             case '*'
                 if [ -n "$result" ]
                     echo "$result"
@@ -194,12 +197,12 @@ const ZSH_ALIAS: &str = BASH_ALIAS;
 
 const BASH_HOOK_PROMPT: &str = r#"
 _zoxide_hook() {
-  zoxide add
+    zoxide add
 }
 
 case "$PROMPT_COMMAND" in
-  *_zoxide_hook*) ;;
-  *) PROMPT_COMMAND="_zoxide_hook${PROMPT_COMMAND:+;${PROMPT_COMMAND}}" ;;
+    *_zoxide_hook*) ;;
+    *) PROMPT_COMMAND="_zoxide_hook${PROMPT_COMMAND:+;${PROMPT_COMMAND}}" ;;
 esac
 "#;
 
@@ -211,27 +214,27 @@ end
 
 const ZSH_HOOK_PROMPT: &str = r#"
 _zoxide_hook() {
-  zoxide add
+    zoxide add
 }
 
 [[ -n "${precmd_functions[(r)_zoxide_hook]}" ]] || {
-  precmd_functions+=(_zoxide_hook)
+    precmd_functions+=(_zoxide_hook)
 }
 "#;
 
 const BASH_HOOK_PWD: &str = r#"
 _zoxide_hook() {
-  if [ -z "${_ZO_PWD}" ]; then
-    _ZO_PWD="${PWD}"
-  elif [ "${_ZO_PWD}" != "${PWD}" ]; then
-    _ZO_PWD="${PWD}"
-    zoxide add
-  fi
+    if [ -z "${_ZO_PWD}" ]; then
+        _ZO_PWD="${PWD}"
+    elif [ "${_ZO_PWD}" != "${PWD}" ]; then
+        _ZO_PWD="${PWD}"
+        zoxide add
+    fi
 }
 
 case "$PROMPT_COMMAND" in
-  *_zoxide_hook*) ;;
-  *) PROMPT_COMMAND="_zoxide_hook${PROMPT_COMMAND:+;${PROMPT_COMMAND}}" ;;
+    *_zoxide_hook*) ;;
+    *) PROMPT_COMMAND="_zoxide_hook${PROMPT_COMMAND:+;${PROMPT_COMMAND}}" ;;
 esac
 "#;
 
@@ -243,7 +246,7 @@ end
 
 const ZSH_HOOK_PWD: &str = r#"
 _zoxide_hook() {
-  zoxide add
+    zoxide add
 }
 
 chpwd_functions=(${chpwd_functions[@]} "_zoxide_hook")

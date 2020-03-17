@@ -23,7 +23,7 @@ pub fn main() -> Result<()> {
     let opt = Zoxide::from_args();
     let env = envy::prefixed("_ZO_")
         .from_env::<Env>()
-        .with_context(|| "Could not parse environment variables")?;
+        .with_context(|| "could not parse environment variables")?;
 
     match opt {
         Zoxide::Add(add) => add.run(&env)?,

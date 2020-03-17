@@ -1,6 +1,6 @@
 use crate::env::Env;
 use crate::util;
-use anyhow::Result;
+use anyhow::{bail, Result};
 use std::path::Path;
 use structopt::StructOpt;
 
@@ -15,14 +15,15 @@ pub struct Query {
 impl Query {
     pub fn run(mut self, env: &Env) -> Result<()> {
         let path_opt = if self.interactive {
-            self.query_interactive(env)
+            self.query_interactive(env)?
         } else {
-            self.query(env)
-        }?;
+            self.query(env)?
+        };
 
-        if let Some(path) = path_opt {
-            println!("query: {}", path.trim());
-        }
+        match path_opt {
+            Some(path) => println!("query: {}", path.trim()),
+            None => bail!("no match found"),
+        };
 
         Ok(())
     }
@@ -41,10 +42,10 @@ impl Query {
         let now = util::get_current_time()?;
 
         if let Some(dir) = util::get_db(env)?.query(&self.keywords, now) {
-            return Ok(Some(dir.path));
+            Ok(Some(dir.path))
+        } else {
+            Ok(None)
         }
-
-        Ok(None)
     }
 
     fn query_interactive(&mut self, env: &Env) -> Result<Option<String>> {

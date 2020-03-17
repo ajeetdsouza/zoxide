@@ -1,17 +1,12 @@
 use crate::dir::Dir;
 use crate::types::{Epoch, Rank};
 use anyhow::{anyhow, bail, Context, Result};
-use fs2::FileExt;
-use std::fs::{self, File, OpenOptions};
+use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, BufWriter};
 use std::path::{Path, PathBuf};
 
 pub struct DB {
     path: PathBuf,
-    path_tmp: PathBuf,
-
-    file_tmp: File,
-
     dirs: Vec<Dir>,
     modified: bool,
 }
@@ -19,19 +14,6 @@ pub struct DB {
 impl DB {
     pub fn open<P: AsRef<Path>>(path: P) -> Result<DB> {
         let path = path.as_ref().to_path_buf();
-
-        let mut path_tmp = path.clone();
-        path_tmp.set_file_name(".zo.tmp");
-
-        let file_tmp = OpenOptions::new()
-            .write(true)
-            .create(true)
-            .open(&path_tmp)
-            .with_context(|| anyhow!("could not open temporary database file"))?;
-
-        file_tmp
-            .lock_exclusive()
-            .with_context(|| anyhow!("could not lock temporary database file"))?;
 
         let dirs = match File::open(&path) {
             Ok(file) => {
@@ -47,8 +29,6 @@ impl DB {
 
         Ok(DB {
             path,
-            path_tmp,
-            file_tmp,
             dirs,
             modified: false,
         })
@@ -56,14 +36,16 @@ impl DB {
 
     pub fn save(&mut self) -> Result<()> {
         if self.modified {
-            self.file_tmp
-                .set_len(0)
-                .with_context(|| "could not truncate temporary database file")?;
+            let path_tmp = self.get_path_tmp();
 
-            let writer = BufWriter::new(&self.file_tmp);
+            let file_tmp = File::create(&path_tmp)
+                .with_context(|| anyhow!("could not open temporary database file"))?;
+
+            let writer = BufWriter::new(&file_tmp);
             bincode::serialize_into(writer, &self.dirs)
                 .with_context(|| anyhow!("could not serialize database"))?;
-            fs::rename(&self.path_tmp, &self.path)
+
+            fs::rename(&path_tmp, &self.path)
                 .with_context(|| anyhow!("could not move temporary database file"))?;
         }
 
@@ -247,6 +229,12 @@ If you wish to merge the two, specify the `--merge` flag."
         }
 
         Ok(())
+    }
+
+    fn get_path_tmp(&self) -> PathBuf {
+        let mut path_tmp = self.path.clone();
+        path_tmp.set_file_name(".zo.tmp");
+        path_tmp
     }
 
     fn remove_invalid(&mut self) {

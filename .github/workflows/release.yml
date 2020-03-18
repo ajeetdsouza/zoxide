@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target: ["x86_64-unknown-linux-gnu", "x86_64-unknown-linux-musl"]
+        target: ["x86_64-unknown-linux-gnu", "x86_64-unknown-linux-musl", "armv7-unknown-linux-musleabihf"]
     steps:
       - uses: actions/checkout@master
       - uses: actions-rs/cargo@v1
@@ -71,6 +71,18 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: "zoxide-x86_64-unknown-linux-musl/zoxide"
           asset_name: "zoxide-x86_64-unknown-linux-musl"
+          asset_content_type: application/octet-stream
+
+      - uses: actions/download-artifact@v1
+        with:
+          name: "zoxide-armv7-unknown-linux-musleabihf"
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: "zoxide-armv7-unknown-linux-musleabihf/zoxide"
+          asset_name: "zoxide-armv7-unknown-linux-musleabihf"
           asset_content_type: application/octet-stream
 
       - uses: actions/download-artifact@v1

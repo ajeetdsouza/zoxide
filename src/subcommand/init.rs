@@ -29,6 +29,7 @@ impl Init {
         let config = match self.shell {
             Shell::bash => BASH_CONFIG,
             Shell::fish => FISH_CONFIG,
+            Shell::posix => POSIX_CONFIG,
             Shell::zsh => ZSH_CONFIG,
         };
 
@@ -43,7 +44,11 @@ impl Init {
         match self.hook {
             Hook::none => (),
             Hook::prompt => writeln!(handle, "{}", config.hook.prompt).unwrap(),
-            Hook::pwd => writeln!(handle, "{}", config.hook.pwd).unwrap(),
+            Hook::pwd => {
+                if let Some(pwd_hook) = config.hook.pwd {
+                    writeln!(handle, "{}", pwd_hook).unwrap();
+                }
+            }
         };
     }
 }
@@ -54,6 +59,7 @@ arg_enum! {
     enum Shell {
         bash,
         fish,
+        posix,
         zsh,
     }
 }
@@ -73,7 +79,7 @@ const BASH_CONFIG: ShellConfig = ShellConfig {
     alias: BASH_ALIAS,
     hook: HookConfig {
         prompt: BASH_HOOK_PROMPT,
-        pwd: BASH_HOOK_PWD,
+        pwd: Some(BASH_HOOK_PWD),
     },
 };
 
@@ -82,7 +88,16 @@ const FISH_CONFIG: ShellConfig = ShellConfig {
     alias: FISH_ALIAS,
     hook: HookConfig {
         prompt: FISH_HOOK_PROMPT,
-        pwd: FISH_HOOK_PWD,
+        pwd: Some(FISH_HOOK_PWD),
+    },
+};
+
+const POSIX_CONFIG: ShellConfig = ShellConfig {
+    z: POSIX_Z,
+    alias: POSIX_ALIAS,
+    hook: HookConfig {
+        prompt: POSIX_HOOK_PROMPT,
+        pwd: None,
     },
 };
 
@@ -91,7 +106,7 @@ const ZSH_CONFIG: ShellConfig = ShellConfig {
     alias: ZSH_ALIAS,
     hook: HookConfig {
         prompt: ZSH_HOOK_PROMPT,
-        pwd: ZSH_HOOK_PWD,
+        pwd: Some(ZSH_HOOK_PWD),
     },
 };
 
@@ -103,7 +118,7 @@ struct ShellConfig {
 
 struct HookConfig {
     prompt: &'static str,
-    pwd: &'static str,
+    pwd: Option<&'static str>,
 }
 
 const BASH_Z: &str = r#"
@@ -119,12 +134,17 @@ z() {
     if [ "$#" -eq 0 ]; then
         _z_cd ~ || return "$?"
     elif [ "$#" -eq 1 ] && [ "$1" = '-' ]; then
-        _z_cd ~- || return "$?"
+        if [ -n "$OLDPWD" ]; then
+            _z_cd "$OLDPWD" || return "$?"
+        else
+            echo "zoxide: \$OLDPWD is not set"
+            return 1
+        fi
     else
-        result="$(zoxide query $@)" || return "$?"
+        result="$(zoxide query "$@")" || return "$?"
         case "$result" in
             "query: "*)
-                _z_cd "${result:7}" || return "$?"
+                _z_cd "${result#query: }" || return "$?"
                 ;;
             *)
                 if [ -n "$result" ]; then
@@ -177,6 +197,8 @@ function z
 end
 "#;
 
+const POSIX_Z: &str = BASH_Z;
+
 const ZSH_Z: &str = BASH_Z;
 
 const BASH_ALIAS: &str = r#"
@@ -192,6 +214,8 @@ abbr -a za 'zoxide add'
 abbr -a zq 'zoxide query'
 abbr -a zr 'zoxide remove'
 "#;
+
+const POSIX_ALIAS: &str = BASH_ALIAS;
 
 const ZSH_ALIAS: &str = BASH_ALIAS;
 
@@ -210,6 +234,17 @@ const FISH_HOOK_PROMPT: &str = r#"
 function _zoxide_hook --on-event fish_prompt
     zoxide add
 end
+"#;
+
+const POSIX_HOOK_PROMPT: &str = r#"
+_zoxide_hook() {
+    zoxide add
+}
+
+case "$PS1" in
+    *\$\(_zoxide_hook\)*) ;;
+    *) PS1="\$(_zoxide_hook)${PS1}" ;;
+esac
 "#;
 
 const ZSH_HOOK_PROMPT: &str = r#"

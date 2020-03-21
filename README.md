@@ -15,6 +15,7 @@ A cd command that learns your habits
     - [zsh](#zsh)
     - [bash](#bash)
     - [fish](#fish)
+    - [POSIX](#posix)
 - [Configuration](#configuration)
   - [`init` flags](#init-flags)
   - [Environment variables](#environment-variables)
@@ -88,6 +89,20 @@ Add the following line to your `~/.config/fish/config.fish`:
 ```sh
 zoxide init fish | source
 ```
+
+#### POSIX
+
+Add the following line to your shell's configuration file (or, run it manually):
+
+``` sh
+eval "$(zoxide init posix)"
+```
+
+NOTE: If you modify your `PS1` at any point, you may need to re-run the above command. This is due
+to the fact that we store our hook in `PS1`, in order to be evaluated every time the prompt is
+displayed.
+
+NOTE: There is no PWD hook provided for POSIX shells.
 
 ## Configuration
 

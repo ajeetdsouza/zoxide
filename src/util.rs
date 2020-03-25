@@ -3,6 +3,7 @@ use crate::dir::Dir;
 use crate::env::Env;
 use crate::types::Epoch;
 use anyhow::{anyhow, bail, Context, Result};
+use std::cmp::{Ordering, PartialOrd};
 use std::io::{Read, Write};
 use std::process::{Command, Stdio};
 use std::time::SystemTime;
@@ -41,7 +42,12 @@ pub fn fzf_helper(now: Epoch, mut dirs: Vec<Dir>) -> Result<Option<String>> {
         dir.rank = dir.get_frecency(now);
     }
 
-    dirs.sort_by_key(|dir| std::cmp::Reverse(dir.rank as i64));
+    dirs.sort_unstable_by(|dir1, dir2| {
+        dir1.rank
+            .partial_cmp(&dir2.rank)
+            .unwrap_or(Ordering::Equal)
+            .reverse()
+    });
 
     for dir in dirs.iter() {
         // ensure that frecency fits in 4 characters

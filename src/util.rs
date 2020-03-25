@@ -45,15 +45,8 @@ pub fn fzf_helper(now: Epoch, mut dirs: Vec<Dir>) -> Result<Option<String>> {
 
     for dir in dirs.iter() {
         // ensure that frecency fits in 4 characters
-        let frecency = if dir.rank > 9999.0 {
-            9999
-        } else if dir.rank > 0.0 {
-            dir.rank as i32
-        } else {
-            0
-        };
-
-        writeln!(fzf_stdin, "{:>4}        {}", frecency, dir.path)
+        let frecency = clamp(dir.rank, 0.0, 9999.0);
+        writeln!(fzf_stdin, "{:>4.0}        {}", frecency, dir.path)
             .with_context(|| anyhow!("could not write into fzf stdin"))?;
     }
 
@@ -88,4 +81,19 @@ pub fn fzf_helper(now: Epoch, mut dirs: Vec<Dir>) -> Result<Option<String>> {
         // unknown
         _ => bail!("fzf returned an unknown error"),
     }
+}
+
+// FIXME: replace with f64::clamp once it is stable <https://github.com/rust-lang/rust/issues/44095>
+#[must_use = "method returns a new number and does not mutate the original value"]
+#[inline]
+pub fn clamp(val: f64, min: f64, max: f64) -> f64 {
+    assert!(min <= max);
+    let mut x = val;
+    if x < min {
+        x = min;
+    }
+    if x > max {
+        x = max;
+    }
+    x
 }

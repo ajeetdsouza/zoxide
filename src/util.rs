@@ -22,9 +22,19 @@ pub fn path_to_bytes<P: AsRef<Path>>(path: &P) -> Option<&[u8]> {
 }
 
 pub fn get_db() -> Result<DB> {
-    let mut path = config::zo_data()?;
-    path.push("db.zo");
-    DB::open(path)
+    let mut db_file = config::zo_data_dir()?;
+    db_file.push("db.zo");
+
+    // FIXME: fallback to old database location; remove in next breaking version
+    if let Some(mut old_db) = dirs::home_dir() {
+        old_db.push(".zo");
+
+        if old_db.is_file() && !db_file.is_file() {
+            return DB::open_and_migrate(old_db, db_file);
+        }
+    }
+
+    DB::open(db_file)
 }
 
 pub fn get_current_time() -> Result<Epoch> {

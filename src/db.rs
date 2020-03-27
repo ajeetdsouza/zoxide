@@ -48,7 +48,7 @@ impl DB {
         })
     }
 
-    pub fn open_old<P1, P2>(path_old: P1, path: P2) -> Result<DB>
+    pub fn open_and_migrate<P1, P2>(path_old: P1, path: P2) -> Result<DB>
     where
         P1: AsRef<Path>,
         P2: AsRef<Path>,

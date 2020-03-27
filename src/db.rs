@@ -54,10 +54,10 @@ impl DB {
         Ok(())
     }
 
-    pub fn migrate<P: AsRef<Path>>(&mut self, path: P, merge: bool) -> Result<()> {
+    pub fn import<P: AsRef<Path>>(&mut self, path: P, merge: bool) -> Result<()> {
         if !self.dirs.is_empty() && !merge {
             bail!(indoc!(
-                "To prevent conflicts, you can only migrate from z with an empty zoxide database!
+                "To prevent conflicts, you can only import from z with an empty zoxide database!
                 If you wish to merge the two, specify the `--merge` flag."
             ));
         }

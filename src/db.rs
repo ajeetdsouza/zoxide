@@ -1,6 +1,8 @@
 use crate::dir::Dir;
 use crate::types::{Epoch, Rank};
+
 use anyhow::{anyhow, bail, Context, Result};
+use indoc::indoc;
 use std::fs::{self, File};
 use std::io::{self, BufRead, BufReader, BufWriter};
 use std::path::{Path, PathBuf};
@@ -18,12 +20,11 @@ impl DB {
         let dirs = match File::open(&path) {
             Ok(file) => {
                 let reader = BufReader::new(&file);
-                bincode::deserialize_from(reader)
-                    .with_context(|| anyhow!("could not deserialize database"))?
+                bincode::deserialize_from(reader).context("could not deserialize database")?
             }
             Err(err) => match err.kind() {
                 io::ErrorKind::NotFound => Vec::<Dir>::new(),
-                _ => return Err(err).with_context(|| anyhow!("could not open database file")),
+                _ => return Err(err).context("could not open database file"),
             },
         };
 
@@ -38,15 +39,13 @@ impl DB {
         if self.modified {
             let path_tmp = self.get_path_tmp();
 
-            let file_tmp = File::create(&path_tmp)
-                .with_context(|| anyhow!("could not open temporary database file"))?;
+            let file_tmp =
+                File::create(&path_tmp).context("could not open temporary database file")?;
 
             let writer = BufWriter::new(&file_tmp);
-            bincode::serialize_into(writer, &self.dirs)
-                .with_context(|| anyhow!("could not serialize database"))?;
+            bincode::serialize_into(writer, &self.dirs).context("could not serialize database")?;
 
-            fs::rename(&path_tmp, &self.path)
-                .with_context(|| anyhow!("could not move temporary database file"))?;
+            fs::rename(&path_tmp, &self.path).context("could not move temporary database file")?;
         }
 
         Ok(())
@@ -54,14 +53,13 @@ impl DB {
 
     pub fn migrate<P: AsRef<Path>>(&mut self, path: P, merge: bool) -> Result<()> {
         if !self.dirs.is_empty() && !merge {
-            bail!(
+            bail!(indoc!(
                 "To prevent conflicts, you can only migrate from z with an empty zoxide database!
-If you wish to merge the two, specify the `--merge` flag."
-            );
+                If you wish to merge the two, specify the `--merge` flag."
+            ));
         }
 
-        let z_db_file =
-            File::open(path).with_context(|| anyhow!("could not open z database file"))?;
+        let z_db_file = File::open(path).context("could not open z database file")?;
         let reader = BufReader::new(z_db_file);
 
         for (idx, read_line) in reader.lines().enumerate() {
@@ -104,22 +102,11 @@ If you wish to merge the two, specify the `--merge` flag."
                             continue;
                         }
                     };
-                    let path_str = match path_abs.to_str() {
-                        Some(path) => path,
-                        None => {
-                            eprintln!(
-                                "invalid unicode in path '{}' at line {}",
-                                path_abs.display(),
-                                line_number
-                            );
-                            continue;
-                        }
-                    };
 
                     if merge {
                         // If the path exists in the database, add the ranks and set the epoch to
                         // the largest of the parsed epoch and the already present epoch.
-                        if let Some(dir) = self.dirs.iter_mut().find(|dir| dir.path == path_str) {
+                        if let Some(dir) = self.dirs.iter_mut().find(|dir| dir.path == path_abs) {
                             dir.rank += rank;
                             dir.last_accessed = Epoch::max(epoch, dir.last_accessed);
 
@@ -130,7 +117,7 @@ If you wish to merge the two, specify the `--merge` flag."
                     // FIXME: When we switch to PathBuf for storing directories inside Dir, just
                     // pass `PathBuf::from(path_str)`
                     self.dirs.push(Dir {
-                        path: path_str.to_string(),
+                        path: path_abs,
                         rank,
                         last_accessed: epoch,
                     });
@@ -154,13 +141,9 @@ If you wish to merge the two, specify the `--merge` flag."
             .canonicalize()
             .with_context(|| anyhow!("could not access directory: {}", path.as_ref().display()))?;
 
-        let path_str = path_abs
-            .to_str()
-            .ok_or_else(|| anyhow!("invalid unicode in path: {}", path_abs.display()))?;
-
-        match self.dirs.iter_mut().find(|dir| dir.path == path_str) {
+        match self.dirs.iter_mut().find(|dir| dir.path == path_abs) {
             None => self.dirs.push(Dir {
-                path: path_str.to_string(),
+                path: path_abs,
                 last_accessed: now,
                 rank: 1.0,
             }),
@@ -186,20 +169,19 @@ If you wish to merge the two, specify the `--merge` flag."
     }
 
     pub fn query(&mut self, keywords: &[String], now: Epoch) -> Option<Dir> {
-        loop {
-            let (idx, dir) = self
-                .dirs
-                .iter()
-                .enumerate()
-                .filter(|(_, dir)| dir.is_match(keywords))
-                .max_by_key(|(_, dir)| dir.get_frecency(now) as i64)?;
+        let (idx, dir) = self
+            .dirs
+            .iter()
+            .enumerate()
+            .filter(|(_, dir)| dir.is_match(&keywords))
+            .max_by_key(|(_, dir)| dir.get_frecency(now) as i64)?;
 
-            if dir.is_dir() {
-                return Some(dir.to_owned());
-            } else {
-                self.dirs.remove(idx);
-                self.modified = true;
-            }
+        if dir.is_dir() {
+            Some(dir.to_owned())
+        } else {
+            self.dirs.swap_remove(idx);
+            self.modified = true;
+            self.query(keywords, now)
         }
     }
 
@@ -219,12 +201,8 @@ If you wish to merge the two, specify the `--merge` flag."
             Err(_) => path.as_ref().to_path_buf(),
         };
 
-        let path_str = path_abs
-            .to_str()
-            .ok_or_else(|| anyhow!("invalid unicode in path"))?;
-
-        if let Some(idx) = self.dirs.iter().position(|dir| dir.path == path_str) {
-            self.dirs.remove(idx);
+        if let Some(idx) = self.dirs.iter().position(|dir| dir.path == path_abs) {
+            self.dirs.swap_remove(idx);
             self.modified = true;
         }
 

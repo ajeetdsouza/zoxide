@@ -5,16 +5,16 @@ use anyhow::Result;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
-#[structopt(about = "Migrate from z database")]
-pub struct Migrate {
+#[structopt(about = "Import from z database")]
+pub struct Import {
     path: String,
 
     #[structopt(long, help = "Merge entries into existing database")]
     merge: bool,
 }
 
-impl Migrate {
+impl Import {
     pub fn run(&self, env: &Env) -> Result<()> {
-        util::get_db(env)?.migrate(&self.path, self.merge)
+        util::get_db(env)?.import(&self.path, self.merge)
     }
 }

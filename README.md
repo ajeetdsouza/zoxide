@@ -60,10 +60,10 @@ If you want the interactive fuzzy selection feature, you will also need to insta
 
 ### Step 2: Adding `zoxide` to your shell
 
-If you currently use `z`, `z.lua`, or `zsh-z`, you may want to first migrate your existing database to `zoxide`:
+If you currently use `z`, `z.lua`, or `zsh-z`, you may want to first import your existing database into `zoxide`:
 
 ```sh
-zoxide migrate /path/to/db
+zoxide import /path/to/db
 ```
 
 #### zsh

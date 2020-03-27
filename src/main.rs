@@ -14,8 +14,8 @@ use structopt::StructOpt;
 #[structopt(about = "A cd command that learns your habits")]
 enum Zoxide {
     Add(subcommand::Add),
+    Import(subcommand::Import),
     Init(subcommand::Init),
-    Migrate(subcommand::Migrate),
     Query(subcommand::Query),
     Remove(subcommand::Remove),
 }
@@ -28,8 +28,8 @@ pub fn main() -> Result<()> {
 
     match opt {
         Zoxide::Add(add) => add.run(&env)?,
+        Zoxide::Import(import) => import.run(&env)?,
         Zoxide::Init(init) => init.run()?,
-        Zoxide::Migrate(migrate) => migrate.run(&env)?,
         Zoxide::Query(query) => query.run(&env)?,
         Zoxide::Remove(remove) => remove.run(&env)?,
     };

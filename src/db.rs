@@ -20,7 +20,10 @@ impl DB {
         let dirs = match File::open(&path) {
             Ok(file) => {
                 let reader = BufReader::new(&file);
-                bincode::deserialize_from(reader).context("could not deserialize database")?
+                bincode::config()
+                    .limit(8 * 1024 * 1024) // only databases upto 8 MiB are supported
+                    .deserialize_from(reader)
+                    .context("could not deserialize database")?
             }
             Err(err) => match err.kind() {
                 io::ErrorKind::NotFound => Vec::<Dir>::new(),

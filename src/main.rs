@@ -6,6 +6,7 @@ mod types;
 mod util;
 
 use crate::env::Env;
+
 use anyhow::{Context, Result};
 use structopt::StructOpt;
 
@@ -23,7 +24,7 @@ pub fn main() -> Result<()> {
     let opt = Zoxide::from_args();
     let env = envy::prefixed("_ZO_")
         .from_env::<Env>()
-        .with_context(|| "could not parse environment variables")?;
+        .context("could not parse environment variables")?;
 
     match opt {
         Zoxide::Add(add) => add.run(&env)?,

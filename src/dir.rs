@@ -1,36 +1,49 @@
 use crate::types::{Epoch, Rank};
+
 use serde::{Deserialize, Serialize};
-use std::path::Path;
+use std::path::PathBuf;
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct Dir {
-    pub path: String,
+    pub path: PathBuf,
     pub rank: Rank,
     pub last_accessed: Epoch,
 }
 
 impl Dir {
     pub fn is_dir(&self) -> bool {
-        Path::new(&self.path).is_dir()
+        self.path.is_dir()
     }
 
+    #[cfg(unix)]
     pub fn is_match(&self, query: &[String]) -> bool {
-        let path = self.path.to_ascii_lowercase();
+        use bstr::ByteSlice;
+        use std::os::unix::ffi::OsStrExt;
 
-        if let Some(query_name) = query.last().and_then(|word| Path::new(word).file_name()) {
-            if let Some(path_name) = Path::new(&path).file_name() {
-                // `unwrap()` here should be safe because the values are already encoded as UTF-8
-                let query_name = query_name.to_str().unwrap();
-                let path_name = path_name.to_str().unwrap();
+        let path_bytes = self.path.as_os_str().as_bytes().to_lowercase();
+        let mut subpath = path_bytes.as_slice();
 
-                if !path_name.contains(&query_name) {
-                    return false;
-                }
+        for subquery in query.iter() {
+            let subquery_bytes = subquery.as_bytes();
+            match subpath.find(subquery_bytes) {
+                Some(idx) => subpath = &subpath[idx + subquery_bytes.len()..],
+                None => return false,
             }
         }
 
-        let mut subpath = path.as_str();
-        for subquery in query {
+        true
+    }
+
+    #[cfg(not(unix))]
+    pub fn is_match(&self, query: &[String]) -> bool {
+        let path_str = match self.path.to_str() {
+            Some(path_str) => path_str.to_lowercase(),
+            None => return false, // silently ignore invalid UTF-8
+        };
+
+        let mut subpath = path_str.as_str();
+
+        for subquery in query.iter() {
             match subpath.find(subquery) {
                 Some(idx) => subpath = &subpath[idx + subquery.len()..],
                 None => return false,

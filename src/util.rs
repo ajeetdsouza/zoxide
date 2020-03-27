@@ -2,11 +2,24 @@ use crate::db::DB;
 use crate::dir::Dir;
 use crate::env::Env;
 use crate::types::Epoch;
+
 use anyhow::{anyhow, bail, Context, Result};
 use std::cmp::{Ordering, PartialOrd};
 use std::io::{Read, Write};
+use std::path::Path;
 use std::process::{Command, Stdio};
 use std::time::SystemTime;
+
+#[cfg(unix)]
+pub fn path_to_bytes<P: AsRef<Path>>(path: &P) -> Option<&[u8]> {
+    use std::os::unix::ffi::OsStrExt;
+    Some(path.as_ref().as_os_str().as_bytes())
+}
+
+#[cfg(not(unix))]
+pub fn path_to_bytes<P: AsRef<Path>>(path: &P) -> Option<&[u8]> {
+    Some(path.as_ref().to_str()?.as_bytes())
+}
 
 pub fn get_db(env: &Env) -> Result<DB> {
     let path = env
@@ -19,19 +32,19 @@ pub fn get_db(env: &Env) -> Result<DB> {
 pub fn get_current_time() -> Result<Epoch> {
     let current_time = SystemTime::now()
         .duration_since(SystemTime::UNIX_EPOCH)
-        .with_context(|| "system clock set to invalid time")?
+        .context("system clock set to invalid time")?
         .as_secs();
 
     Ok(current_time as Epoch)
 }
 
-pub fn fzf_helper(now: Epoch, mut dirs: Vec<Dir>) -> Result<Option<String>> {
+pub fn fzf_helper(now: Epoch, mut dirs: Vec<Dir>) -> Result<Option<Vec<u8>>> {
     let mut fzf = Command::new("fzf")
         .arg("-n2..")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
-        .with_context(|| anyhow!("could not launch fzf"))?;
+        .context("could not launch fzf")?;
 
     let fzf_stdin = fzf
         .stdin
@@ -52,8 +65,15 @@ pub fn fzf_helper(now: Epoch, mut dirs: Vec<Dir>) -> Result<Option<String>> {
     for dir in dirs.iter() {
         // ensure that frecency fits in 4 characters
         let frecency = clamp(dir.rank, 0.0, 9999.0);
-        writeln!(fzf_stdin, "{:>4.0}        {}", frecency, dir.path)
-            .with_context(|| anyhow!("could not write into fzf stdin"))?;
+
+        if let Some(path_bytes) = path_to_bytes(&dir.path) {
+            (|| {
+                write!(fzf_stdin, "{:>4.0}        ", frecency)?;
+                fzf_stdin.write_all(path_bytes)?;
+                fzf_stdin.write_all(b"\n")
+            })()
+            .context("could not write into fzf stdin")?;
+        }
     }
 
     let fzf_stdout = fzf
@@ -61,17 +81,16 @@ pub fn fzf_helper(now: Epoch, mut dirs: Vec<Dir>) -> Result<Option<String>> {
         .as_mut()
         .ok_or_else(|| anyhow!("could not connect to fzf stdout"))?;
 
-    let mut output = String::new();
+    let mut buffer = Vec::new();
     fzf_stdout
-        .read_to_string(&mut output)
-        .with_context(|| anyhow!("could not read from fzf stdout"))?;
+        .read_to_end(&mut buffer)
+        .context("could not read from fzf stdout")?;
 
-    let status = fzf.wait().with_context(|| "could not wait on fzf")?;
-
+    let status = fzf.wait().context("wait failed on fzf")?;
     match status.code() {
         // normal exit
-        Some(0) => match output.get(12..) {
-            Some(path) => Ok(Some(path.to_string())),
+        Some(0) => match buffer.get(12..buffer.len() - 1) {
+            Some(path) => Ok(Some(path.to_vec())),
             None => bail!("fzf returned invalid output"),
         },
 

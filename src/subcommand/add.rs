@@ -1,7 +1,8 @@
 use crate::env::Env;
 use crate::types::Rank;
 use crate::util;
-use anyhow::{anyhow, Context, Result};
+
+use anyhow::{Context, Result};
 use std::env;
 use structopt::StructOpt;
 
@@ -20,8 +21,8 @@ impl Add {
         match &self.path {
             Some(path) => db.add(path, maxage, now),
             None => {
-                let current_dir = env::current_dir()
-                    .with_context(|| anyhow!("unable to fetch current directory"))?;
+                let current_dir =
+                    env::current_dir().context("unable to fetch current directory")?;
                 db.add(current_dir, maxage, now)
             }
         }

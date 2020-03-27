@@ -117,8 +117,6 @@ impl DB {
                         };
                     }
 
-                    // FIXME: When we switch to PathBuf for storing directories inside Dir, just
-                    // pass `PathBuf::from(path_str)`
                     self.dirs.push(Dir {
                         path: path_abs,
                         rank,

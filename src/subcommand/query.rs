@@ -1,4 +1,3 @@
-use crate::env::Env;
 use crate::util;
 
 use anyhow::{bail, Result};
@@ -15,11 +14,11 @@ pub struct Query {
 }
 
 impl Query {
-    pub fn run(mut self, env: &Env) -> Result<()> {
+    pub fn run(mut self) -> Result<()> {
         let path_opt = if self.interactive {
-            self.query_interactive(env)?
+            self.query_interactive()?
         } else {
-            self.query(env)?
+            self.query()?
         };
 
         match path_opt {
@@ -36,7 +35,7 @@ impl Query {
         Ok(())
     }
 
-    fn query(&mut self, env: &Env) -> Result<Option<Vec<u8>>> {
+    fn query(&mut self) -> Result<Option<Vec<u8>>> {
         if let [path] = self.keywords.as_slice() {
             if Path::new(path).is_dir() {
                 return Ok(Some(path.as_bytes().to_vec()));
@@ -49,7 +48,7 @@ impl Query {
             *keyword = keyword.to_lowercase();
         }
 
-        if let Some(dir) = util::get_db(env)?.query(&self.keywords, now) {
+        if let Some(dir) = util::get_db()?.query(&self.keywords, now) {
             // `path_to_bytes` is guaranteed to succeed here since
             // the path has already been queried successfully
             let path_bytes = util::path_to_bytes(&dir.path).unwrap();
@@ -59,14 +58,14 @@ impl Query {
         }
     }
 
-    fn query_interactive(&mut self, env: &Env) -> Result<Option<Vec<u8>>> {
+    fn query_interactive(&mut self) -> Result<Option<Vec<u8>>> {
         let now = util::get_current_time()?;
 
         for keyword in &mut self.keywords {
             *keyword = keyword.to_lowercase();
         }
 
-        let dirs = util::get_db(env)?.query_all(&self.keywords);
+        let dirs = util::get_db()?.query_all(&self.keywords);
         util::fzf_helper(now, dirs)
     }
 }

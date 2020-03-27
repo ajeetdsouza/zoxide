@@ -163,11 +163,11 @@ impl DB {
             for dir in &mut self.dirs {
                 dir.rank *= factor;
             }
+
+            self.dirs.retain(|dir| dir.rank >= 1.0);
         }
 
-        self.dirs.retain(|dir| dir.rank >= 1.0);
         self.modified = true;
-
         Ok(())
     }
 
@@ -214,7 +214,7 @@ impl DB {
 
     fn get_path_tmp(&self) -> PathBuf {
         let mut path_tmp = self.path.clone();
-        path_tmp.set_file_name(".zo.tmp");
+        path_tmp.set_file_name("db.zo.tmp");
         path_tmp
     }
 

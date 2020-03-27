@@ -1,13 +1,11 @@
+mod config;
 mod db;
 mod dir;
-mod env;
 mod subcommand;
 mod types;
 mod util;
 
-use crate::env::Env;
-
-use anyhow::{Context, Result};
+use anyhow::Result;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
@@ -22,16 +20,13 @@ enum Zoxide {
 
 pub fn main() -> Result<()> {
     let opt = Zoxide::from_args();
-    let env = envy::prefixed("_ZO_")
-        .from_env::<Env>()
-        .context("could not parse environment variables")?;
 
     match opt {
-        Zoxide::Add(add) => add.run(&env)?,
-        Zoxide::Import(import) => import.run(&env)?,
+        Zoxide::Add(add) => add.run()?,
+        Zoxide::Import(import) => import.run()?,
         Zoxide::Init(init) => init.run()?,
-        Zoxide::Query(query) => query.run(&env)?,
-        Zoxide::Remove(remove) => remove.run(&env)?,
+        Zoxide::Query(query) => query.run()?,
+        Zoxide::Remove(remove) => remove.run()?,
     };
 
     Ok(())

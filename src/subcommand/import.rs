@@ -1,4 +1,3 @@
-use crate::env::Env;
 use crate::util;
 
 use anyhow::Result;
@@ -14,7 +13,7 @@ pub struct Import {
 }
 
 impl Import {
-    pub fn run(&self, env: &Env) -> Result<()> {
-        util::get_db(env)?.import(&self.path, self.merge)
+    pub fn run(&self) -> Result<()> {
+        util::get_db()?.import(&self.path, self.merge)
     }
 }

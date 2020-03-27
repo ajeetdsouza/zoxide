@@ -1,6 +1,6 @@
+use crate::config;
 use crate::db::DB;
 use crate::dir::Dir;
-use crate::env::Env;
 use crate::types::Epoch;
 
 use anyhow::{anyhow, bail, Context, Result};
@@ -21,11 +21,9 @@ pub fn path_to_bytes<P: AsRef<Path>>(path: &P) -> Option<&[u8]> {
     Some(path.as_ref().to_str()?.as_bytes())
 }
 
-pub fn get_db(env: &Env) -> Result<DB> {
-    let path = env
-        .data
-        .as_ref()
-        .ok_or_else(|| anyhow!("could not locate database file"))?;
+pub fn get_db() -> Result<DB> {
+    let mut path = config::zo_data()?;
+    path.push("db.zo");
     DB::open(path)
 }
 

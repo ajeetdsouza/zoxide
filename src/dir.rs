@@ -1,7 +1,8 @@
-use crate::types::{Epoch, Rank};
-
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
+
+pub use f64 as Rank;
+pub use i64 as Epoch; // use a signed integer so subtraction can be performed on it
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct Dir {

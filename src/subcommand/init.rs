@@ -1,6 +1,7 @@
 use clap::arg_enum;
-use std::io::{self, Write};
 use structopt::StructOpt;
+
+use std::io::{self, Write};
 
 #[derive(Debug, StructOpt)]
 #[structopt(about = "Generates shell configuration")]

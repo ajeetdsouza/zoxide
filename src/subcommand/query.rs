@@ -1,9 +1,10 @@
 use crate::util;
 
 use anyhow::{bail, Result};
+use structopt::StructOpt;
+
 use std::io::{self, Write};
 use std::path::Path;
-use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 #[structopt(about = "Search for a directory")]

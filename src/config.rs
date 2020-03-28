@@ -1,6 +1,7 @@
 use crate::types::Rank;
 
 use anyhow::{bail, Context, Result};
+
 use std::env;
 use std::fs;
 use std::path::PathBuf;
@@ -23,6 +24,13 @@ pub fn zo_data() -> Result<PathBuf> {
 
     fs::create_dir_all(&path).context("could not create _ZO_DATA directory")?;
     Ok(path)
+}
+
+pub fn zo_exclude_dirs() -> Vec<PathBuf> {
+    match env::var_os("_ZO_EXCLUDE_DIRS") {
+        Some(dirs_osstr) => env::split_paths(&dirs_osstr).collect(),
+        None => Vec::new(),
+    }
 }
 
 pub fn zo_maxage() -> Result<Rank> {

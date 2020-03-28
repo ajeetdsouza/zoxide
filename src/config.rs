@@ -1,10 +1,15 @@
-use crate::types::Rank;
+use crate::db::DBVersion;
+use crate::dir::Rank;
 
 use anyhow::{bail, Context, Result};
 
 use std::env;
 use std::fs;
 use std::path::PathBuf;
+
+pub const DB_MAX_SIZE: u64 = 8 * 1024 * 1024; // 8 MiB
+
+pub const DB_VERSION: DBVersion = 3;
 
 pub fn zo_data() -> Result<PathBuf> {
     let path = match env::var_os("_ZO_DATA") {

@@ -3,10 +3,12 @@ use crate::util;
 use anyhow::Result;
 use structopt::StructOpt;
 
+use std::path::PathBuf;
+
 #[derive(Debug, StructOpt)]
 #[structopt(about = "Remove a directory")]
 pub struct Remove {
-    path: String,
+    path: PathBuf,
 }
 
 impl Remove {

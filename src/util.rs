@@ -1,9 +1,9 @@
 use crate::config;
 use crate::db::DB;
-use crate::dir::Dir;
-use crate::types::Epoch;
+use crate::dir::{Dir, Epoch};
 
 use anyhow::{anyhow, bail, Context, Result};
+
 use std::cmp::{Ordering, PartialOrd};
 use std::io::{Read, Write};
 use std::path::Path;

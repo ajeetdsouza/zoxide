@@ -2,7 +2,6 @@ mod config;
 mod db;
 mod dir;
 mod subcommand;
-mod types;
 mod util;
 
 use anyhow::Result;

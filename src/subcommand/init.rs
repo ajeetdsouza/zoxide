@@ -38,21 +38,20 @@ impl Init {
         let stdout = io::stdout();
         let mut handle = stdout.lock();
 
-        writeln!(handle, "{}", config.z)?;
+        // If any `writeln!` call fails to write to stdout, we assume the user's
+        // computer is on fire and panic.
+        writeln!(handle, "{}", config.z).unwrap();
         if !self.no_define_aliases {
-            writeln!(handle, "{}", config.alias)?;
+            writeln!(handle, "{}", config.alias).unwrap();
         }
 
         match self.hook {
             Hook::none => (),
-            Hook::prompt => writeln!(handle, "{}", config.hook.prompt)?,
-            Hook::pwd => {
-                if let Some(pwd_hook) = config.hook.pwd {
-                    writeln!(handle, "{}", pwd_hook)?;
-                } else {
-                    bail!("PWD hooks are currently unsupported on this shell.");
-                }
-            }
+            Hook::prompt => writeln!(handle, "{}", config.hook.prompt).unwrap(),
+            Hook::pwd => match config.hook.pwd {
+                Some(pwd_hook) => writeln!(handle, "{}", pwd_hook).unwrap(),
+                None => bail!("PWD hooks are currently unsupported on this shell."),
+            },
         }
 
         Ok(())

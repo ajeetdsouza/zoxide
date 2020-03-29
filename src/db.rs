@@ -2,7 +2,6 @@ use crate::config;
 use crate::dir::{Dir, Epoch, Rank};
 
 use anyhow::{anyhow, bail, Context, Result};
-use indoc::indoc;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -96,10 +95,10 @@ impl DB {
 
     pub fn import<P: AsRef<Path>>(&mut self, path: P, merge: bool) -> Result<()> {
         if !self.data.dirs.is_empty() && !merge {
-            bail!(indoc!(
-                "To prevent conflicts, you can only import from z with an empty zoxide database!
-                If you wish to merge the two, specify the `--merge` flag."
-            ));
+            bail!(
+                "To prevent conflicts, you can only import from z with an empty zoxide database!\n\
+                 If you wish to merge the two, specify the `--merge` flag."
+            );
         }
 
         let z_db_file = File::open(path).context("could not open z database file")?;

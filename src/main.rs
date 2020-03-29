@@ -27,7 +27,7 @@ pub fn main() -> Result<()> {
 
     match opt {
         Zoxide::Add(add) => add.run(&env)?,
-        Zoxide::Init(init) => init.run(),
+        Zoxide::Init(init) => init.run()?,
         Zoxide::Migrate(migrate) => migrate.run(&env)?,
         Zoxide::Query(query) => query.run(&env)?,
         Zoxide::Remove(remove) => remove.run(&env)?,

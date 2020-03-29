@@ -1,6 +1,8 @@
+use anyhow::{bail, Result};
 use clap::arg_enum;
-use std::io::{self, Write};
 use structopt::StructOpt;
+
+use std::io::{self, Write};
 
 #[derive(Debug, StructOpt)]
 #[structopt(about = "Generates shell configuration")]
@@ -25,7 +27,7 @@ pub struct Init {
 }
 
 impl Init {
-    pub fn run(&self) {
+    pub fn run(&self) -> Result<()> {
         let config = match self.shell {
             Shell::bash => BASH_CONFIG,
             Shell::fish => FISH_CONFIG,
@@ -36,20 +38,24 @@ impl Init {
         let stdout = io::stdout();
         let mut handle = stdout.lock();
 
-        writeln!(handle, "{}", config.z).unwrap();
+        writeln!(handle, "{}", config.z)?;
         if !self.no_define_aliases {
-            writeln!(handle, "{}", config.alias).unwrap();
+            writeln!(handle, "{}", config.alias)?;
         }
 
         match self.hook {
             Hook::none => (),
-            Hook::prompt => writeln!(handle, "{}", config.hook.prompt).unwrap(),
+            Hook::prompt => writeln!(handle, "{}", config.hook.prompt)?,
             Hook::pwd => {
                 if let Some(pwd_hook) = config.hook.pwd {
-                    writeln!(handle, "{}", pwd_hook).unwrap();
+                    writeln!(handle, "{}", pwd_hook)?;
+                } else {
+                    bail!("PWD hooks are currently unsupported on this shell.");
                 }
             }
-        };
+        }
+
+        Ok(())
     }
 }
 

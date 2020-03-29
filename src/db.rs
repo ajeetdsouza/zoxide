@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use std::cmp::Ordering;
-use std::fs::{self, File};
+use std::fs::{self, File, OpenOptions};
 use std::io::{self, BufRead, BufReader, BufWriter};
 use std::path::{Path, PathBuf};
 
@@ -77,8 +77,12 @@ impl DB {
         if self.modified {
             let path_tmp = self.get_path_tmp();
 
-            let file_tmp =
-                File::create(&path_tmp).context("could not open temporary database file")?;
+            let file_tmp = OpenOptions::new()
+                .write(true)
+                // ensure that we are not overwriting an existing file_tmp
+                .create_new(true)
+                .open(&path_tmp)
+                .context("could not open temporary database file")?;
 
             let writer = BufWriter::new(&file_tmp);
             bincode::serialize_into(writer, &self.data).context("could not serialize database")?;

@@ -4,6 +4,7 @@ use crate::dir::{Dir, Epoch, Rank};
 use anyhow::{anyhow, bail, Context, Result};
 use indoc::indoc;
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use std::cmp::Ordering;
 use std::fs::{self, File};
@@ -81,10 +82,13 @@ impl DB {
                 File::create(&path_tmp).context("could not open temporary database file")?;
 
             let writer = BufWriter::new(&file_tmp);
-            bincode::serialize_into(writer, &self.data)
-                .context("could not serialize database")?;
+            bincode::serialize_into(writer, &self.data).context("could not serialize database")?;
 
-            fs::rename(&path_tmp, &self.path).context("could not move temporary database file")?;
+            if let Err(e) = fs::rename(&path_tmp, &self.path) {
+                fs::remove_file(&path_tmp)
+                    .context("could not move or delete temporary database file")?;
+                return Err(e).context("could not move temporary database file");
+            }
         }
 
         Ok(())
@@ -259,8 +263,11 @@ impl DB {
     }
 
     fn get_path_tmp(&self) -> PathBuf {
+        let file_name = format!(".{}.zo", Uuid::new_v4());
+
         let mut path_tmp = self.path.clone();
-        path_tmp.set_file_name("db.zo.tmp");
+        path_tmp.set_file_name(file_name);
+
         path_tmp
     }
 }

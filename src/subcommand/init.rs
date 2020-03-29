@@ -243,7 +243,7 @@ end
 
 const POSIX_HOOK_PROMPT: &str = r#"
 _zoxide_hook() {
-    zoxide add
+    zoxide add > /dev/null
 }
 
 case "$PS1" in

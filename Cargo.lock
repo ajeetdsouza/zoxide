@@ -425,7 +425,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "zoxide"
-version = "0.2.2"
+version = "0.3.0"
 dependencies = [
  "anyhow 1.0.27 (registry+https://github.com/rust-lang/crates.io-index)",
  "bincode 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",

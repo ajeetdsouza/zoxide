@@ -13,6 +13,7 @@ use std::time::SystemTime;
 #[cfg(unix)]
 pub fn path_to_bytes<P: AsRef<Path>>(path: &P) -> Option<&[u8]> {
     use std::os::unix::ffi::OsStrExt;
+
     Some(path.as_ref().as_os_str().as_bytes())
 }
 
@@ -123,12 +124,12 @@ pub fn fzf_helper(now: Epoch, mut dirs: Vec<Dir>) -> Result<Option<Vec<u8>>> {
 #[inline]
 pub fn clamp(val: f64, min: f64, max: f64) -> f64 {
     assert!(min <= max);
-    let mut x = val;
-    if x < min {
-        x = min;
+
+    if val < min {
+        min
+    } else if val > max {
+        max
+    } else {
+        val
     }
-    if x > max {
-        x = max;
-    }
-    x
 }

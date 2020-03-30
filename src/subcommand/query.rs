@@ -49,14 +49,14 @@ impl Query {
             *keyword = keyword.to_lowercase();
         }
 
-        if let Some(dir) = util::get_db()?.query(&self.keywords, now) {
+        let path_opt = util::get_db()?.query(&self.keywords, now).map(|dir| {
             // `path_to_bytes` is guaranteed to succeed here since
             // the path has already been queried successfully
             let path_bytes = util::path_to_bytes(&dir.path).unwrap();
-            Ok(Some(path_bytes.to_vec()))
-        } else {
-            Ok(None)
-        }
+            path_bytes.to_vec()
+        });
+
+        Ok(path_opt)
     }
 
     fn query_interactive(&mut self) -> Result<Option<Vec<u8>>> {

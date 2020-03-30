@@ -16,6 +16,7 @@ pub struct DB {
     data: DBData,
     modified: bool,
     path: PathBuf,
+    // FIXME: remove after next breaking version
     path_old: Option<PathBuf>,
 }
 
@@ -36,7 +37,7 @@ impl DB {
         };
 
         if data.version != config::DB_VERSION {
-            bail!("this database version ({}) is unsupported", data.version);
+            bail!("database version '{}' is unsupported", data.version);
         }
 
         Ok(DB {
@@ -47,6 +48,7 @@ impl DB {
         })
     }
 
+    // FIXME: remove after next breaking version
     pub fn open_and_migrate<P1, P2>(path_old: P1, path: P2) -> Result<DB>
     where
         P1: AsRef<Path>,
@@ -79,7 +81,6 @@ impl DB {
 
             let file_tmp = OpenOptions::new()
                 .write(true)
-                // ensure that we are not overwriting an existing file_tmp
                 .create_new(true)
                 .open(&path_tmp)
                 .context("could not open temporary database file")?;
@@ -280,6 +281,7 @@ impl Drop for DB {
         if let Err(e) = self.save() {
             eprintln!("{:#}", e);
         } else if let Some(path_old) = &self.path_old {
+            // FIXME: remove this branch after next breaking release
             if let Err(e) = fs::remove_file(path_old).context("could not remove old database") {
                 eprintln!("{:#}", e);
             }

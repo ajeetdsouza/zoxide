@@ -13,14 +13,13 @@ pub const DB_VERSION: DBVersion = 3;
 pub fn zo_data_dir() -> Result<PathBuf> {
     let data_dir = match env::var_os("_ZO_DATA_DIR") {
         Some(data_osstr) => PathBuf::from(data_osstr),
-        None => {
-            if let Some(mut data_dir) = dirs::data_local_dir() {
+        None => match dirs::data_local_dir() {
+            Some(mut data_dir) => {
                 data_dir.push("zoxide");
                 data_dir
-            } else {
-                bail!("could not find database directory, please set _ZO_DATA_DIR manually");
             }
-        }
+            None => bail!("could not find database directory, please set _ZO_DATA_DIR manually"),
+        },
     };
 
     // This will fail when `data_dir` points to a file or a broken symlink, but

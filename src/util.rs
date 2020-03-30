@@ -1,36 +1,61 @@
+use crate::config;
 use crate::db::DB;
-use crate::dir::Dir;
-use crate::env::Env;
-use crate::types::Epoch;
+use crate::dir::{Dir, Epoch};
+
 use anyhow::{anyhow, bail, Context, Result};
+
+use std::cmp::{Ordering, PartialOrd};
 use std::io::{Read, Write};
+use std::path::Path;
 use std::process::{Command, Stdio};
 use std::time::SystemTime;
 
-pub fn get_db(env: &Env) -> Result<DB> {
-    let path = env
-        .data
-        .as_ref()
-        .ok_or_else(|| anyhow!("could not locate database file"))?;
-    DB::open(path)
+#[cfg(unix)]
+pub fn path_to_bytes<P: AsRef<Path>>(path: &P) -> Option<&[u8]> {
+    use std::os::unix::ffi::OsStrExt;
+
+    Some(path.as_ref().as_os_str().as_bytes())
+}
+
+#[cfg(not(unix))]
+pub fn path_to_bytes<P: AsRef<Path>>(path: &P) -> Option<&[u8]> {
+    Some(path.as_ref().to_str()?.as_bytes())
+}
+
+pub fn get_db() -> Result<DB> {
+    let mut db_path = config::zo_data_dir()?;
+    db_path.push("db.zo");
+
+    // FIXME: fallback to old database location; remove in next breaking version
+    if !db_path.is_file() {
+        if let Some(mut old_db_path) = dirs::home_dir() {
+            old_db_path.push(".zo");
+
+            if old_db_path.is_file() {
+                return DB::open_and_migrate(old_db_path, db_path);
+            }
+        }
+    }
+
+    DB::open(db_path)
 }
 
 pub fn get_current_time() -> Result<Epoch> {
     let current_time = SystemTime::now()
         .duration_since(SystemTime::UNIX_EPOCH)
-        .with_context(|| "system clock set to invalid time")?
+        .context("system clock set to invalid time")?
         .as_secs();
 
     Ok(current_time as Epoch)
 }
 
-pub fn fzf_helper(now: Epoch, mut dirs: Vec<Dir>) -> Result<Option<String>> {
+pub fn fzf_helper(now: Epoch, mut dirs: Vec<Dir>) -> Result<Option<Vec<u8>>> {
     let mut fzf = Command::new("fzf")
         .arg("-n2..")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
-        .with_context(|| anyhow!("could not launch fzf"))?;
+        .context("could not launch fzf")?;
 
     let fzf_stdin = fzf
         .stdin
@@ -41,20 +66,25 @@ pub fn fzf_helper(now: Epoch, mut dirs: Vec<Dir>) -> Result<Option<String>> {
         dir.rank = dir.get_frecency(now);
     }
 
-    dirs.sort_by_key(|dir| std::cmp::Reverse(dir.rank as i64));
+    dirs.sort_unstable_by(|dir1, dir2| {
+        dir1.rank
+            .partial_cmp(&dir2.rank)
+            .unwrap_or(Ordering::Equal)
+            .reverse()
+    });
 
     for dir in dirs.iter() {
         // ensure that frecency fits in 4 characters
-        let frecency = if dir.rank > 9999.0 {
-            9999
-        } else if dir.rank > 0.0 {
-            dir.rank as i32
-        } else {
-            0
-        };
+        let frecency = clamp(dir.rank, 0.0, 9999.0);
 
-        writeln!(fzf_stdin, "{:>4}        {}", frecency, dir.path)
-            .with_context(|| anyhow!("could not write into fzf stdin"))?;
+        if let Some(path_bytes) = path_to_bytes(&dir.path) {
+            (|| {
+                write!(fzf_stdin, "{:>4.0}        ", frecency)?;
+                fzf_stdin.write_all(path_bytes)?;
+                fzf_stdin.write_all(b"\n")
+            })()
+            .context("could not write into fzf stdin")?;
+        }
     }
 
     let fzf_stdout = fzf
@@ -62,17 +92,16 @@ pub fn fzf_helper(now: Epoch, mut dirs: Vec<Dir>) -> Result<Option<String>> {
         .as_mut()
         .ok_or_else(|| anyhow!("could not connect to fzf stdout"))?;
 
-    let mut output = String::new();
+    let mut buffer = Vec::new();
     fzf_stdout
-        .read_to_string(&mut output)
-        .with_context(|| anyhow!("could not read from fzf stdout"))?;
+        .read_to_end(&mut buffer)
+        .context("could not read from fzf stdout")?;
 
-    let status = fzf.wait().with_context(|| "could not wait on fzf")?;
-
+    let status = fzf.wait().context("wait failed on fzf")?;
     match status.code() {
         // normal exit
-        Some(0) => match output.get(12..) {
-            Some(path) => Ok(Some(path.to_string())),
+        Some(0) => match buffer.get(12..buffer.len() - 1) {
+            Some(path) => Ok(Some(path.to_vec())),
             None => bail!("fzf returned invalid output"),
         },
 
@@ -87,5 +116,20 @@ pub fn fzf_helper(now: Epoch, mut dirs: Vec<Dir>) -> Result<Option<String>> {
 
         // unknown
         _ => bail!("fzf returned an unknown error"),
+    }
+}
+
+// FIXME: replace with f64::clamp once it is stable <https://github.com/rust-lang/rust/issues/44095>
+#[must_use = "method returns a new number and does not mutate the original value"]
+#[inline]
+pub fn clamp(val: f64, min: f64, max: f64) -> f64 {
+    assert!(min <= max);
+
+    if val < min {
+        min
+    } else if val > max {
+        max
+    } else {
+        val
     }
 }

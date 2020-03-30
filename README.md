@@ -22,7 +22,10 @@ A cd command that learns your habits
 
 ## Introduction
 
-`zoxide` is a blazing fast alternative to `cd`, inspired by [`z`](https://github.com/rupa/z) and [`z.lua`](https://github.com/skywind3000/z.lua). It keeps track of the directories you use most frequently, and uses a ranking algorithm to navigate to the best match.
+`zoxide` is a blazing fast alternative to `cd`, inspired by
+[`z`](https://github.com/rupa/z) and [`z.lua`](https://github.com/skywind3000/z.lua).
+It keeps track of the directories you use most frequently, and uses a ranking algorithm
+to navigate to the best match.
 
 ## Examples
 
@@ -56,14 +59,16 @@ Otherwise, try the install script:
 curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/ajeetdsouza/zoxide/master/install.sh | sh
 ```
 
-If you want the interactive fuzzy selection feature, you will also need to install [`fzf`](https://github.com/junegunn/fzf.git).
+If you want the interactive fuzzy selection feature, you will also need to install
+[`fzf`](https://github.com/junegunn/fzf.git).
 
 ### Step 2: Adding `zoxide` to your shell
 
-If you currently use `z`, `z.lua`, or `zsh-z`, you may want to first migrate your existing database to `zoxide`:
+If you currently use `z`, `z.lua`, or `zsh-z`, you may want to first import
+your existing database into `zoxide`:
 
 ```sh
-zoxide migrate /path/to/db
+zoxide import /path/to/db
 ```
 
 #### zsh
@@ -92,17 +97,17 @@ zoxide init fish | source
 
 #### POSIX
 
-Add the following line to your shell's configuration file (or, run it manually):
+Add the following line to your shell's configuration file:
 
-``` sh
+```sh
 eval "$(zoxide init posix)"
 ```
 
 NOTE: If you modify your `PS1` at any point, you may need to re-run the above command. This is due
-to the fact that we store our hook in `PS1`, in order to be evaluated every time the prompt is
+to the fact that the hook is stored in `PS1`, in order to be evaluated every time the prompt is
 displayed.
 
-NOTE: There is no PWD hook provided for POSIX shells.
+NOTE: PWD hooks are currently not supported for POSIX shells.
 
 ## Configuration
 
@@ -110,12 +115,18 @@ NOTE: There is no PWD hook provided for POSIX shells.
 
 - `--no-define-aliases`: don't define extra aliases like `zi`, `zq`, `za`, and `zr`
 - `--hook <HOOK>`: change the event that adds a new entry to the database (default: `prompt`)
-  - `none`: never add entries - this will make `zoxide` useless unless you manually configure a hook
+  - `none`: never add entries (this will make `zoxide` useless unless you manually configure a hook)
   - `prompt`: add an entry at every prompt
   - `pwd`: add an entry whenever you change directories
 
 ### Environment variables
 
+- `$_ZO_DATA_DIR`: directory where `zoxide` will store its data files (default:
+  platform-specific; see the [`dirs` documentation] for more information)
 - `$_ZO_ECHO`: `z` will print the matched directory before navigating to it
-- `$_ZO_DATA`: sets the location of the database (default: `~/.zo`)
+- `$_ZO_EXCLUDE_DIRS`: list of directories separated by platform-specific
+  characters ("`:`" on Linux and macOS, and "`;`" on Windows) to be excluded from
+  the database
 - `$_ZO_MAXAGE`: sets the maximum total rank after which entries start getting deleted
+
+[`dirs` documentation]: https://docs.rs/dirs/latest/dirs/fn.data_local_dir.html

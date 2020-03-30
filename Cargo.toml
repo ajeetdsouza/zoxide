@@ -13,13 +13,16 @@ license = "MIT"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.26"
+anyhow = "1.0.27"
 bincode = "1.2.1"
 clap = "2.33.0"
 dirs = "2.0.2"
-envy = "0.4.1"
-serde = { version = "1.0.104", features = ["derive"] }
-structopt = "0.3.11"
+serde = { version = "1.0.105", features = ["derive"] }
+structopt = "0.3.12"
+uuid = { version = "0.8.1", features = ["v4"] }
+
+[target.'cfg(unix)'.dependencies]
+bstr = "0.2.12"
 
 [profile.release]
 codegen-units = 1

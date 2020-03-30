@@ -1,36 +1,77 @@
-use crate::dir::Dir;
-use crate::types::{Epoch, Rank};
+use crate::config;
+use crate::dir::{Dir, Epoch, Rank};
+
 use anyhow::{anyhow, bail, Context, Result};
-use std::fs::{self, File};
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
+
+use std::cmp::Ordering;
+use std::fs::{self, File, OpenOptions};
 use std::io::{self, BufRead, BufReader, BufWriter};
 use std::path::{Path, PathBuf};
 
+pub use i32 as DBVersion;
+
 pub struct DB {
-    path: PathBuf,
-    dirs: Vec<Dir>,
+    data: DBData,
     modified: bool,
+    path: PathBuf,
+    // FIXME: remove after next breaking version
+    path_old: Option<PathBuf>,
 }
 
 impl DB {
     pub fn open<P: AsRef<Path>>(path: P) -> Result<DB> {
-        let path = path.as_ref().to_path_buf();
-
-        let dirs = match File::open(&path) {
+        let data = match File::open(&path) {
             Ok(file) => {
                 let reader = BufReader::new(&file);
-                bincode::deserialize_from(reader)
-                    .with_context(|| anyhow!("could not deserialize database"))?
+                bincode::config()
+                    .limit(config::DB_MAX_SIZE)
+                    .deserialize_from(reader)
+                    .context("could not deserialize database")?
             }
             Err(err) => match err.kind() {
-                io::ErrorKind::NotFound => Vec::<Dir>::new(),
-                _ => return Err(err).with_context(|| anyhow!("could not open database file")),
+                io::ErrorKind::NotFound => DBData::default(),
+                _ => return Err(err).context("could not open database file"),
             },
         };
 
+        if data.version != config::DB_VERSION {
+            bail!("database version '{}' is unsupported", data.version);
+        }
+
         Ok(DB {
-            path,
-            dirs,
+            data,
             modified: false,
+            path: path.as_ref().to_path_buf(),
+            path_old: None,
+        })
+    }
+
+    // FIXME: remove after next breaking version
+    pub fn open_and_migrate<P1, P2>(path_old: P1, path: P2) -> Result<DB>
+    where
+        P1: AsRef<Path>,
+        P2: AsRef<Path>,
+    {
+        let file = File::open(&path_old).context("could not open old database file")?;
+        let reader = BufReader::new(&file);
+
+        let dirs = bincode::config()
+            .limit(config::DB_MAX_SIZE)
+            .deserialize_from(reader)
+            .context("could not deserialize old database")?;
+
+        let data = DBData {
+            version: config::DB_VERSION,
+            dirs,
+        };
+
+        Ok(DB {
+            data,
+            modified: true,
+            path: path.as_ref().to_path_buf(),
+            path_old: Some(path_old.as_ref().to_path_buf()),
         })
     }
 
@@ -38,30 +79,34 @@ impl DB {
         if self.modified {
             let path_tmp = self.get_path_tmp();
 
-            let file_tmp = File::create(&path_tmp)
-                .with_context(|| anyhow!("could not open temporary database file"))?;
+            let file_tmp = OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(&path_tmp)
+                .context("could not open temporary database file")?;
 
             let writer = BufWriter::new(&file_tmp);
-            bincode::serialize_into(writer, &self.dirs)
-                .with_context(|| anyhow!("could not serialize database"))?;
+            bincode::serialize_into(writer, &self.data).context("could not serialize database")?;
 
-            fs::rename(&path_tmp, &self.path)
-                .with_context(|| anyhow!("could not move temporary database file"))?;
+            if let Err(e) = fs::rename(&path_tmp, &self.path) {
+                fs::remove_file(&path_tmp)
+                    .context("could not move or delete temporary database file")?;
+                return Err(e).context("could not move temporary database file");
+            }
         }
 
         Ok(())
     }
 
-    pub fn migrate<P: AsRef<Path>>(&mut self, path: P, merge: bool) -> Result<()> {
-        if !self.dirs.is_empty() && !merge {
+    pub fn import<P: AsRef<Path>>(&mut self, path: P, merge: bool) -> Result<()> {
+        if !self.data.dirs.is_empty() && !merge {
             bail!(
-                "To prevent conflicts, you can only migrate from z with an empty zoxide database!
-If you wish to merge the two, specify the `--merge` flag."
+                "To prevent conflicts, you can only import from z with an empty zoxide database!\n\
+                 If you wish to merge the two, specify the `--merge` flag."
             );
         }
 
-        let z_db_file =
-            File::open(path).with_context(|| anyhow!("could not open z database file"))?;
+        let z_db_file = File::open(path).context("could not open z database file")?;
         let reader = BufReader::new(z_db_file);
 
         for (idx, read_line) in reader.lines().enumerate() {
@@ -104,22 +149,13 @@ If you wish to merge the two, specify the `--merge` flag."
                             continue;
                         }
                     };
-                    let path_str = match path_abs.to_str() {
-                        Some(path) => path,
-                        None => {
-                            eprintln!(
-                                "invalid unicode in path '{}' at line {}",
-                                path_abs.display(),
-                                line_number
-                            );
-                            continue;
-                        }
-                    };
 
                     if merge {
                         // If the path exists in the database, add the ranks and set the epoch to
                         // the largest of the parsed epoch and the already present epoch.
-                        if let Some(dir) = self.dirs.iter_mut().find(|dir| dir.path == path_str) {
+                        if let Some(dir) =
+                            self.data.dirs.iter_mut().find(|dir| dir.path == path_abs)
+                        {
                             dir.rank += rank;
                             dir.last_accessed = Epoch::max(epoch, dir.last_accessed);
 
@@ -127,10 +163,8 @@ If you wish to merge the two, specify the `--merge` flag."
                         };
                     }
 
-                    // FIXME: When we switch to PathBuf for storing directories inside Dir, just
-                    // pass `PathBuf::from(path_str)`
-                    self.dirs.push(Dir {
-                        path: path_str.to_string(),
+                    self.data.dirs.push(Dir {
+                        path: path_abs,
                         rank,
                         last_accessed: epoch,
                     });
@@ -154,13 +188,9 @@ If you wish to merge the two, specify the `--merge` flag."
             .canonicalize()
             .with_context(|| anyhow!("could not access directory: {}", path.as_ref().display()))?;
 
-        let path_str = path_abs
-            .to_str()
-            .ok_or_else(|| anyhow!("invalid unicode in path: {}", path_abs.display()))?;
-
-        match self.dirs.iter_mut().find(|dir| dir.path == path_str) {
-            None => self.dirs.push(Dir {
-                path: path_str.to_string(),
+        match self.data.dirs.iter_mut().find(|dir| dir.path == path_abs) {
+            None => self.data.dirs.push(Dir {
+                path: path_abs,
                 last_accessed: now,
                 rank: 1.0,
             }),
@@ -170,43 +200,52 @@ If you wish to merge the two, specify the `--merge` flag."
             }
         };
 
-        let sum_age = self.dirs.iter().map(|dir| dir.rank).sum::<Rank>();
+        let sum_age = self.data.dirs.iter().map(|dir| dir.rank).sum::<Rank>();
 
         if sum_age > max_age {
             let factor = 0.9 * max_age / sum_age;
-            for dir in &mut self.dirs {
+            for dir in &mut self.data.dirs {
                 dir.rank *= factor;
             }
+
+            self.data.dirs.retain(|dir| dir.rank >= 1.0);
         }
 
-        self.dirs.retain(|dir| dir.rank >= 1.0);
         self.modified = true;
-
         Ok(())
     }
 
     pub fn query(&mut self, keywords: &[String], now: Epoch) -> Option<Dir> {
-        loop {
-            let (idx, dir) = self
-                .dirs
-                .iter()
-                .enumerate()
-                .filter(|(_, dir)| dir.is_match(keywords))
-                .max_by_key(|(_, dir)| dir.get_frecency(now) as i64)?;
+        let (idx, dir, _) = self
+            .data
+            .dirs
+            .iter()
+            .enumerate()
+            .filter(|(_, dir)| dir.is_match(&keywords))
+            .map(|(idx, dir)| (idx, dir, dir.get_frecency(now)))
+            .max_by(|(_, _, frecency1), (_, _, frecency2)| {
+                frecency1.partial_cmp(frecency2).unwrap_or(Ordering::Equal)
+            })?;
 
-            if dir.is_dir() {
-                return Some(dir.to_owned());
-            } else {
-                self.dirs.remove(idx);
-                self.modified = true;
-            }
+        if dir.is_dir() {
+            Some(dir.to_owned())
+        } else {
+            self.data.dirs.swap_remove(idx);
+            self.modified = true;
+            self.query(keywords, now)
         }
     }
 
     pub fn query_all(&mut self, keywords: &[String]) -> Vec<Dir> {
-        self.remove_invalid();
+        let orig_len = self.data.dirs.len();
+        self.data.dirs.retain(Dir::is_dir);
 
-        self.dirs
+        if orig_len != self.data.dirs.len() {
+            self.modified = true;
+        }
+
+        self.data
+            .dirs
             .iter()
             .filter(|dir| dir.is_match(&keywords))
             .cloned()
@@ -219,12 +258,8 @@ If you wish to merge the two, specify the `--merge` flag."
             Err(_) => path.as_ref().to_path_buf(),
         };
 
-        let path_str = path_abs
-            .to_str()
-            .ok_or_else(|| anyhow!("invalid unicode in path"))?;
-
-        if let Some(idx) = self.dirs.iter().position(|dir| dir.path == path_str) {
-            self.dirs.remove(idx);
+        if let Some(idx) = self.data.dirs.iter().position(|dir| dir.path == path_abs) {
+            self.data.dirs.swap_remove(idx);
             self.modified = true;
         }
 
@@ -232,18 +267,12 @@ If you wish to merge the two, specify the `--merge` flag."
     }
 
     fn get_path_tmp(&self) -> PathBuf {
+        let file_name = format!(".{}.zo", Uuid::new_v4());
+
         let mut path_tmp = self.path.clone();
-        path_tmp.set_file_name(".zo.tmp");
+        path_tmp.set_file_name(file_name);
+
         path_tmp
-    }
-
-    fn remove_invalid(&mut self) {
-        let orig_len = self.dirs.len();
-        self.dirs.retain(Dir::is_dir);
-
-        if orig_len != self.dirs.len() {
-            self.modified = true;
-        }
     }
 }
 
@@ -251,6 +280,26 @@ impl Drop for DB {
     fn drop(&mut self) {
         if let Err(e) = self.save() {
             eprintln!("{:#}", e);
+        } else if let Some(path_old) = &self.path_old {
+            // FIXME: remove this branch after next breaking release
+            if let Err(e) = fs::remove_file(path_old).context("could not remove old database") {
+                eprintln!("{:#}", e);
+            }
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+struct DBData {
+    version: DBVersion,
+    dirs: Vec<Dir>,
+}
+
+impl Default for DBData {
+    fn default() -> DBData {
+        DBData {
+            version: config::DB_VERSION,
+            dirs: Vec::new(),
         }
     }
 }

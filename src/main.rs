@@ -8,7 +8,10 @@ use anyhow::Result;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
-#[structopt(about = "A cd command that learns your habits")]
+#[structopt(
+    about = "A cd command that learns your habits",
+    version = concat!(env!("CARGO_PKG_VERSION"), env!("GIT_HASH"))
+)]
 enum Zoxide {
     Add(subcommand::Add),
     Import(subcommand::Import),

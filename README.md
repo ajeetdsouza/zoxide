@@ -130,3 +130,22 @@ NOTE: PWD hooks are currently not supported for POSIX shells.
 - `$_ZO_MAXAGE`: sets the maximum total rank after which entries start getting deleted
 
 [`dirs` documentation]: https://docs.rs/dirs/latest/dirs/fn.data_local_dir.html
+
+## Notes
+
+If you recently updated `zoxide` from an older version to `v0.3` and are 
+seeing the following error:
+
+```
+Error: could not deserialize old database
+
+Caused by:
+    io error: failed to fill whole buffer
+```
+
+It is because v0.2 and v0.3 databases are incompatible. There is a script to 
+automatically migrate your database to the new format, but it seems to be 
+failing on some systems.
+
+For a quick fix, you can try removing the old database file: `rm ~/.zo`
+

@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+
+use std::path::{Path, PathBuf};
 
 pub use f64 as Rank;
 pub use i64 as Epoch; // use a signed integer so subtraction can be performed on it
@@ -19,10 +20,27 @@ impl Dir {
     #[cfg(unix)]
     pub fn is_match(&self, query: &[String]) -> bool {
         use bstr::ByteSlice;
+
+        use std::ffi::OsStr;
         use std::os::unix::ffi::OsStrExt;
 
-        let path_bytes = self.path.as_os_str().as_bytes().to_lowercase();
-        let mut subpath = path_bytes.as_slice();
+        let path_lower = self.path.as_os_str().as_bytes().to_lowercase();
+
+        if let Some(query_name) = query
+            .last()
+            .and_then(|query_last| Path::new(query_last).file_name())
+        {
+            if let Some(dir_name) = Path::new(OsStr::from_bytes(&path_lower)).file_name() {
+                let dir_name_bytes = dir_name.as_bytes();
+                let query_name_bytes = query_name.as_bytes();
+
+                if !dir_name_bytes.contains_str(query_name_bytes) {
+                    return false;
+                }
+            }
+        }
+
+        let mut subpath = path_lower.as_slice();
 
         for subquery in query.iter() {
             let subquery_bytes = subquery.as_bytes();
@@ -37,12 +55,27 @@ impl Dir {
 
     #[cfg(not(unix))]
     pub fn is_match(&self, query: &[String]) -> bool {
-        let path_str = match self.path.to_str() {
+        let path_lower = match self.path.to_str() {
             Some(path_str) => path_str.to_lowercase(),
             None => return false, // silently ignore invalid UTF-8
         };
 
-        let mut subpath = path_str.as_str();
+        let mut subpath = path_lower.as_str();
+
+        if let Some(query_name) = query
+            .last()
+            .and_then(|query_last| Path::new(query_last).file_name())
+        {
+            if let Some(dir_name) = Path::new(&path_lower).file_name() {
+                // unwrap is safe here because we've already handled invalid UTF-8
+                let dir_name_str = dir_name.to_str().unwrap();
+                let query_name_str = query_name.to_str().unwrap();
+
+                if !dir_name_str.contains(query_name_str) {
+                    return false;
+                }
+            }
+        }
 
         for subquery in query.iter() {
             match subpath.find(subquery) {

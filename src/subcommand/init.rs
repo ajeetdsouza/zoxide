@@ -142,61 +142,53 @@ z() {
         if [ -n "$OLDPWD" ]; then
             _z_cd "$OLDPWD" || return "$?"
         else
-            echo "zoxide: \$OLDPWD is not set"
+            echo 'zoxide: $OLDPWD is not set'
             return 1
         fi
     else
         result="$(zoxide query "$@")" || return "$?"
-        case "$result" in
-            "query: "*)
-                _z_cd "${result#query: }" || return "$?"
-                ;;
-            *)
-                if [ -n "$result" ]; then
-                    echo "$result"
-                fi
-                ;;
-        esac
+        if [ -d "$result" ]; then
+            _z_cd "$result" || return "$?"
+        elif [ -n "$result" ]; then
+            echo "$result"
+        fi
     fi
 }
 "#;
 
 const FISH_Z: &str = r#"
 function _z_cd
-    cd "$argv"
-    or return "$status"
+    cd $argv
+    or return $status
 
     commandline -f repaint
 
-    if [ -n "$_ZO_ECHO" ]
-        echo "$PWD"
+    if test -n "$_ZO_ECHO"
+        echo $PWD
     end
 end
 
 function z
-    set argc (count "$argv")
+    set argc (count $argv)
 
-    if [ "$argc" -eq 0 ]
-        _z_cd "$HOME"
-        or return "$status"
+    if test $argc -eq 0
+        _z_cd $HOME
+        or return $status
 
-    else if [ "$argc" -eq 1 ]; and [ "$argv[1]" = '-' ]
-        _z_cd '-'
-        or return "$status"
+    else if test $argc -eq 1 -a $argv[1] = '-'
+        _z_cd -
+        or return $status
 
     else
-        # TODO: use string-collect from fish 3.1.0 once it has wider adoption
+        # FIXME: use string-collect from fish 3.1.0 once it has wider adoption
         set -l IFS ''
         set -l result (zoxide query $argv)
 
-        switch "$result"
-            case 'query: *'
-                _z_cd (string sub -s 8 "$result")
-                or return "$status"
-            case '*'
-                if [ -n "$result" ]
-                    echo "$result"
-                end
+        if test -d $result
+            _z_cd $result
+            or return $status
+        else if test -n "$result"
+            echo $result
         end
     end
 end

@@ -26,7 +26,6 @@ impl Query {
             Some(path) => {
                 let stdout = io::stdout();
                 let mut handle = stdout.lock();
-                handle.write_all(b"query: ").unwrap();
                 handle.write_all(&path).unwrap();
                 handle.write_all(b"\n").unwrap();
             }

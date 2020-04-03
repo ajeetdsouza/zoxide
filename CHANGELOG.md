@@ -10,6 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Version output displays `git` revision information.
+- `--z-cmd` flag for `zoxide init` to rename the `z` command to something else.
+
+### Changed
+
+- Query output no longer has the `query:` prefix, so `$(zq)` can now be used as an argument to commands.
+
+### Fixed
+
+- Queries now also include checks for if the top level directory matches.
 
 ## [0.3.0] - 2020-03-30
 

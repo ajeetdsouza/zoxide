@@ -62,6 +62,10 @@ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/ajeetdsou
 If you want the interactive fuzzy selection feature, you will also need to install
 [`fzf`](https://github.com/junegunn/fzf.git).
 
+#### Packaging status
+
+Fedora/CentOS [COPR](https://copr.fedorainfracloud.org/coprs/atim/zoxide/): `sudo dnf copr enable atim/zoxide -y && sudo dnf install zoxide`
+
 ### Step 2: Adding `zoxide` to your shell
 
 If you currently use `z`, `z.lua`, or `zsh-z`, you may want to first import

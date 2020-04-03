@@ -12,7 +12,14 @@ pub struct Init {
 
     #[structopt(
         long,
-        help = "Prevents zoxide from defining any aliases other than 'z'"
+        help = "Changes the name of the 'z' command",
+        default_value = "z"
+    )]
+    z_cmd: String,
+
+    #[structopt(
+        long,
+        help = "Prevents zoxide from defining any commands other than 'z'"
     )]
     no_define_aliases: bool,
 
@@ -40,9 +47,12 @@ impl Init {
 
         // If any `writeln!` call fails to write to stdout, we assume the user's
         // computer is on fire and panic.
-        writeln!(handle, "{}", config.z).unwrap();
+        let z = config.z;
+        writeln!(handle, "{}", z(&self.z_cmd)).unwrap();
+
         if !self.no_define_aliases {
-            writeln!(handle, "{}", config.alias).unwrap();
+            let alias = config.alias;
+            writeln!(handle, "{}", alias(&self.z_cmd)).unwrap();
         }
 
         match self.hook {
@@ -80,8 +90,8 @@ arg_enum! {
 }
 
 const BASH_CONFIG: ShellConfig = ShellConfig {
-    z: BASH_Z,
-    alias: BASH_ALIAS,
+    z: bash_z,
+    alias: bash_alias,
     hook: HookConfig {
         prompt: BASH_HOOK_PROMPT,
         pwd: Some(BASH_HOOK_PWD),
@@ -89,8 +99,8 @@ const BASH_CONFIG: ShellConfig = ShellConfig {
 };
 
 const FISH_CONFIG: ShellConfig = ShellConfig {
-    z: FISH_Z,
-    alias: FISH_ALIAS,
+    z: fish_z,
+    alias: fish_alias,
     hook: HookConfig {
         prompt: FISH_HOOK_PROMPT,
         pwd: Some(FISH_HOOK_PWD),
@@ -98,8 +108,8 @@ const FISH_CONFIG: ShellConfig = ShellConfig {
 };
 
 const POSIX_CONFIG: ShellConfig = ShellConfig {
-    z: POSIX_Z,
-    alias: POSIX_ALIAS,
+    z: posix_z,
+    alias: posix_alias,
     hook: HookConfig {
         prompt: POSIX_HOOK_PROMPT,
         pwd: None,
@@ -107,8 +117,8 @@ const POSIX_CONFIG: ShellConfig = ShellConfig {
 };
 
 const ZSH_CONFIG: ShellConfig = ShellConfig {
-    z: ZSH_Z,
-    alias: ZSH_ALIAS,
+    z: zsh_z,
+    alias: zsh_alias,
     hook: HookConfig {
         prompt: ZSH_HOOK_PROMPT,
         pwd: Some(ZSH_HOOK_PWD),
@@ -116,8 +126,8 @@ const ZSH_CONFIG: ShellConfig = ShellConfig {
 };
 
 struct ShellConfig {
-    z: &'static str,
-    alias: &'static str,
+    z: fn(&str) -> String,
+    alias: fn(&str) -> String,
     hook: HookConfig,
 }
 
@@ -126,37 +136,9 @@ struct HookConfig {
     pwd: Option<&'static str>,
 }
 
-const BASH_Z: &str = r#"
-_z_cd() {
-    cd "$@" || return "$?"
-
-    if [ -n "$_ZO_ECHO" ]; then
-        echo "$PWD"
-    fi
-}
-
-z() {
-    if [ "$#" -eq 0 ]; then
-        _z_cd ~ || return "$?"
-    elif [ "$#" -eq 1 ] && [ "$1" = '-' ]; then
-        if [ -n "$OLDPWD" ]; then
-            _z_cd "$OLDPWD" || return "$?"
-        else
-            echo 'zoxide: $OLDPWD is not set'
-            return 1
-        fi
-    else
-        result="$(zoxide query "$@")" || return "$?"
-        if [ -d "$result" ]; then
-            _z_cd "$result" || return "$?"
-        elif [ -n "$result" ]; then
-            echo "$result"
-        fi
-    fi
-}
-"#;
-
-const FISH_Z: &str = r#"
+fn fish_z(z_cmd: &str) -> String {
+    format!(
+        r#"
 function _z_cd
     cd $argv
     or return $status
@@ -168,7 +150,7 @@ function _z_cd
     end
 end
 
-function z
+function {}
     set argc (count $argv)
 
     if test $argc -eq 0
@@ -192,29 +174,75 @@ function z
         end
     end
 end
-"#;
+"#,
+        z_cmd
+    )
+}
 
-const POSIX_Z: &str = BASH_Z;
+fn posix_z(z_cmd: &str) -> String {
+    format!(
+        r#"
+_z_cd() {{
+    cd "$@" || return "$?"
 
-const ZSH_Z: &str = BASH_Z;
+    if [ -n "$_ZO_ECHO" ]; then
+        echo "$PWD"
+    fi
+}}
 
-const BASH_ALIAS: &str = r#"
-alias zi='z -i'
-alias za='zoxide add'
-alias zq='zoxide query'
-alias zr='zoxide remove'
-"#;
+{}() {{
+    if [ "$#" -eq 0 ]; then
+        _z_cd ~ || return "$?"
+    elif [ "$#" -eq 1 ] && [ "$1" = '-' ]; then
+        if [ -n "$OLDPWD" ]; then
+            _z_cd "$OLDPWD" || return "$?"
+        else
+            echo 'zoxide: $OLDPWD is not set'
+            return 1
+        fi
+    else
+        result="$(zoxide query "$@")" || return "$?"
+        if [ -d "$result" ]; then
+            _z_cd "$result" || return "$?"
+        elif [ -n "$result" ]; then
+            echo "$result"
+        fi
+    fi
+}}
+"#,
+        z_cmd
+    )
+}
 
-const FISH_ALIAS: &str = r#"
-abbr -a zi 'z -i'
+use posix_z as bash_z;
+use posix_z as zsh_z;
+
+fn fish_alias(z_cmd: &str) -> String {
+    format!(
+        r#"
+abbr -a zi '{} -i'
 abbr -a za 'zoxide add'
 abbr -a zq 'zoxide query'
 abbr -a zr 'zoxide remove'
-"#;
+"#,
+        z_cmd
+    )
+}
 
-const POSIX_ALIAS: &str = BASH_ALIAS;
+fn posix_alias(z_cmd: &str) -> String {
+    format!(
+        r#"
+alias zi='{} -i'
+alias za='zoxide add'
+alias zq='zoxide query'
+alias zr='zoxide remove'
+"#,
+        z_cmd
+    )
+}
 
-const ZSH_ALIAS: &str = BASH_ALIAS;
+use posix_alias as bash_alias;
+use posix_alias as zsh_alias;
 
 const BASH_HOOK_PROMPT: &str = r#"
 _zoxide_hook() {

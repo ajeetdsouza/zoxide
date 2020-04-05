@@ -93,6 +93,8 @@ impl DB {
                     .context("could not move or delete temporary database file")?;
                 return Err(e).context("could not move temporary database file");
             }
+
+            self.modified = false;
         }
 
         Ok(())

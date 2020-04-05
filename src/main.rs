@@ -1,11 +1,16 @@
 mod config;
 mod db;
 mod dir;
+mod error;
 mod subcommand;
 mod util;
 
+use crate::error::SilentExit;
+
 use anyhow::Result;
 use structopt::StructOpt;
+
+use std::process;
 
 #[derive(Debug, StructOpt)]
 #[structopt(about = "A cd command that learns your habits", version = env!("ZOXIDE_VERSION"))]
@@ -20,13 +25,16 @@ enum Zoxide {
 pub fn main() -> Result<()> {
     let opt = Zoxide::from_args();
 
-    match opt {
-        Zoxide::Add(add) => add.run()?,
-        Zoxide::Import(import) => import.run()?,
-        Zoxide::Init(init) => init.run()?,
-        Zoxide::Query(query) => query.run()?,
-        Zoxide::Remove(remove) => remove.run()?,
+    let res = match opt {
+        Zoxide::Add(add) => add.run(),
+        Zoxide::Import(import) => import.run(),
+        Zoxide::Init(init) => init.run(),
+        Zoxide::Query(query) => query.run(),
+        Zoxide::Remove(remove) => remove.run(),
     };
 
-    Ok(())
+    res.map_err(|e| match e.downcast::<SilentExit>() {
+        Ok(SilentExit { code }) => process::exit(code),
+        Err(e) => e,
+    })
 }

@@ -1,6 +1,7 @@
 use crate::config;
 use crate::db::DB;
 use crate::dir::{Dir, Epoch};
+use crate::error::SilentExit;
 
 use anyhow::{anyhow, bail, Context, Result};
 
@@ -109,6 +110,7 @@ where
         Some(2) => bail!("fzf returned an error"),
 
         // terminated by a signal
+        Some(code @ 130) => bail!(SilentExit { code }),
         Some(128..=254) | None => bail!("fzf was terminated"),
 
         // unknown

@@ -113,11 +113,12 @@ NOTE: PWD hooks are currently not supported for POSIX shells.
 
 ### `init` flags
 
-- `--no-define-aliases`: don't define extra aliases like `zi`, `zq`, `za`, and `zr`
 - `--hook <HOOK>`: change the event that adds a new entry to the database (default: `prompt`)
   - `none`: never add entries (this will make `zoxide` useless unless you manually configure a hook)
   - `prompt`: add an entry at every prompt
   - `pwd`: add an entry whenever you change directories
+- `--no-define-aliases`: don't define extra aliases like `zi`, `zq`, `za`, and `zr`
+- `--z-cmd`: rename the `z` command to something else
 
 ### Environment variables
 
@@ -148,4 +149,3 @@ automatically migrate your database to the new format, but it seems to be
 failing on some systems.
 
 For a quick fix, you can try removing the old database file: `rm ~/.zo`
-

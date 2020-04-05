@@ -15,7 +15,7 @@ pub struct Query {
 }
 
 impl Query {
-    pub fn run(mut self) -> Result<()> {
+    pub fn run(&self) -> Result<()> {
         let path_opt = if self.interactive {
             self.query_interactive()?
         } else {
@@ -35,7 +35,7 @@ impl Query {
         Ok(())
     }
 
-    fn query(&mut self) -> Result<Option<Vec<u8>>> {
+    fn query(&self) -> Result<Option<Vec<u8>>> {
         if let [path] = self.keywords.as_slice() {
             if Path::new(path).is_dir() {
                 return Ok(Some(path.as_bytes().to_vec()));
@@ -44,11 +44,13 @@ impl Query {
 
         let now = util::get_current_time()?;
 
-        for keyword in &mut self.keywords {
-            *keyword = keyword.to_lowercase();
-        }
+        let keywords = self
+            .keywords
+            .iter()
+            .map(|keyword| keyword.to_lowercase())
+            .collect::<Vec<_>>();
 
-        let path_opt = util::get_db()?.query(&self.keywords, now).map(|dir| {
+        let path_opt = util::get_db()?.query(&keywords, now).map(|dir| {
             // `path_to_bytes` is guaranteed to succeed here since
             // the path has already been queried successfully
             let path_bytes = util::path_to_bytes(&dir.path).unwrap();
@@ -58,14 +60,17 @@ impl Query {
         Ok(path_opt)
     }
 
-    fn query_interactive(&mut self) -> Result<Option<Vec<u8>>> {
+    fn query_interactive(&self) -> Result<Option<Vec<u8>>> {
         let now = util::get_current_time()?;
 
-        for keyword in &mut self.keywords {
-            *keyword = keyword.to_lowercase();
-        }
+        let keywords = self
+            .keywords
+            .iter()
+            .map(|keyword| keyword.to_lowercase())
+            .collect::<Vec<_>>();
 
-        let dirs = util::get_db()?.query_all(&self.keywords);
+        let mut db = util::get_db()?;
+        let dirs = db.query_all(&keywords);
         util::fzf_helper(now, dirs)
     }
 }

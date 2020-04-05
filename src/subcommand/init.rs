@@ -45,8 +45,6 @@ impl Init {
         let stdout = io::stdout();
         let mut handle = stdout.lock();
 
-        // If any `writeln!` call fails to write to stdout, we assume the user's
-        // computer is on fire and panic.
         let z = config.z;
         writeln!(handle, "{}", z(&self.z_cmd)).unwrap();
 

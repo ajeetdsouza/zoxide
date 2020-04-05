@@ -121,7 +121,7 @@ impl DB {
                 continue;
             };
 
-            let split_line = line.rsplitn(3, '|').collect::<Vec<&str>>();
+            let split_line = line.rsplitn(3, '|').collect::<Vec<_>>();
 
             match split_line.as_slice() {
                 [epoch_str, rank_str, path_str] => {
@@ -215,7 +215,7 @@ impl DB {
         Ok(())
     }
 
-    pub fn query(&mut self, keywords: &[String], now: Epoch) -> Option<Dir> {
+    pub fn query(&mut self, keywords: &[String], now: Epoch) -> Option<&Dir> {
         let (idx, dir, _) = self
             .data
             .dirs
@@ -228,7 +228,8 @@ impl DB {
             })?;
 
         if dir.is_dir() {
-            Some(dir.to_owned())
+            // FIXME: change this to Some(dir) once the MIR borrow checker comes to stable Rust
+            Some(&self.data.dirs[idx])
         } else {
             self.data.dirs.swap_remove(idx);
             self.modified = true;
@@ -236,7 +237,7 @@ impl DB {
         }
     }
 
-    pub fn query_all(&mut self, keywords: &[String]) -> Vec<Dir> {
+    pub fn query_all<'a>(&'a mut self, keywords: &'a [String]) -> impl Iterator<Item = &'a Dir> {
         let orig_len = self.data.dirs.len();
         self.data.dirs.retain(Dir::is_dir);
 
@@ -247,15 +248,17 @@ impl DB {
         self.data
             .dirs
             .iter()
-            .filter(|dir| dir.is_match(&keywords))
-            .cloned()
-            .collect()
+            .filter(move |dir| dir.is_match(keywords))
     }
 
     pub fn remove<P: AsRef<Path>>(&mut self, path: P) -> Result<()> {
+        let path_canonicalized;
         let path_abs = match path.as_ref().canonicalize() {
-            Ok(path_abs) => path_abs,
-            Err(_) => path.as_ref().to_path_buf(),
+            Ok(path_abs) => {
+                path_canonicalized = path_abs;
+                &path_canonicalized
+            }
+            Err(_) => path.as_ref(),
         };
 
         if let Some(idx) = self.data.dirs.iter().position(|dir| dir.path == path_abs) {

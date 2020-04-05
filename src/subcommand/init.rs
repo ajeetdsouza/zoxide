@@ -201,7 +201,7 @@ _z_cd() {{
             return 1
         fi
     else
-        result="$(zoxide query "$@")" || return "$?"
+        result=$(zoxide query "$@") || return "$?"
         if [ -d "$result" ]; then
             _z_cd "$result" || return "$?"
         elif [ -n "$result" ]; then

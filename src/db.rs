@@ -239,7 +239,13 @@ impl DB {
         }
     }
 
-    pub fn query_all<'a>(&'a mut self, keywords: &'a [String]) -> impl Iterator<Item = &'a Dir> {
+    pub fn query_many<'a>(&'a mut self, keywords: &'a [String]) -> impl Iterator<Item = &'a Dir> {
+        self.query_all()
+            .iter()
+            .filter(move |dir| dir.is_match(keywords))
+    }
+
+    pub fn query_all(&mut self) -> &[Dir] {
         let orig_len = self.data.dirs.len();
         self.data.dirs.retain(Dir::is_dir);
 
@@ -247,28 +253,34 @@ impl DB {
             self.modified = true;
         }
 
-        self.data
-            .dirs
-            .iter()
-            .filter(move |dir| dir.is_match(keywords))
+        self.data.dirs.as_slice()
     }
 
     pub fn remove<P: AsRef<Path>>(&mut self, path: P) -> Result<()> {
-        let path_canonicalized;
-        let path_abs = match path.as_ref().canonicalize() {
-            Ok(path_abs) => {
-                path_canonicalized = path_abs;
-                &path_canonicalized
-            }
-            Err(_) => path.as_ref(),
-        };
+        if let Ok(path_abs) = path.as_ref().canonicalize() {
+            self.remove_exact(path_abs)
+                .or_else(|_| self.remove_exact(path))
+        } else {
+            self.remove_exact(path)
+        }
+    }
 
-        if let Some(idx) = self.data.dirs.iter().position(|dir| dir.path == path_abs) {
+    pub fn remove_exact<P: AsRef<Path>>(&mut self, path: P) -> Result<()> {
+        if let Some(idx) = self
+            .data
+            .dirs
+            .iter()
+            .position(|dir| dir.path == path.as_ref())
+        {
             self.data.dirs.swap_remove(idx);
             self.modified = true;
+            Ok(())
+        } else {
+            bail!(
+                "could not find path in database: {}",
+                path.as_ref().display()
+            )
         }
-
-        Ok(())
     }
 
     fn get_path_tmp(&self) -> PathBuf {

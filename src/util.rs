@@ -12,15 +12,35 @@ use std::process::{Command, Stdio};
 use std::time::SystemTime;
 
 #[cfg(unix)]
-pub fn path_to_bytes<P: AsRef<Path>>(path: &P) -> Option<&[u8]> {
+pub fn path_to_bytes<P: AsRef<Path>>(path: &P) -> Result<&[u8]> {
     use std::os::unix::ffi::OsStrExt;
 
-    Some(path.as_ref().as_os_str().as_bytes())
+    Ok(path.as_ref().as_os_str().as_bytes())
 }
 
 #[cfg(not(unix))]
-pub fn path_to_bytes<P: AsRef<Path>>(path: &P) -> Option<&[u8]> {
-    Some(path.as_ref().to_str()?.as_bytes())
+pub fn path_to_bytes<P: AsRef<Path>>(path: &P) -> Result<&[u8]> {
+    match path.as_ref().to_str() {
+        Some(path_str) => Ok(path_str.as_bytes()),
+        None => bail!("invalid Unicode in path"),
+    }
+}
+
+#[cfg(unix)]
+pub fn bytes_to_path(bytes: &[u8]) -> Result<&Path> {
+    use std::ffi::OsStr;
+    use std::os::unix::ffi::OsStrExt;
+
+    Ok(Path::new(OsStr::from_bytes(bytes)))
+}
+
+#[cfg(not(unix))]
+pub fn bytes_to_path(bytes: &[u8]) -> Result<&Path> {
+    use std::str;
+
+    str::from_utf8(bytes)
+        .map(Path::new)
+        .context("invalid Unicode in path")
 }
 
 pub fn get_db() -> Result<DB> {
@@ -75,7 +95,7 @@ where
 
     for &(dir, frecency) in dir_frecencies.iter() {
         // ensure that frecency fits in 4 characters
-        if let Some(path_bytes) = path_to_bytes(&dir.path) {
+        if let Ok(path_bytes) = path_to_bytes(&dir.path) {
             (|| {
                 write!(fzf_stdin, "{:>4}        ", frecency)?;
                 fzf_stdin.write_all(path_bytes)?;

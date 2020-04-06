@@ -219,9 +219,14 @@ fn fish_alias(z_cmd: &str) -> String {
     format!(
         r#"
 abbr -a zi '{} -i'
+
 abbr -a za 'zoxide add'
+
 abbr -a zq 'zoxide query'
+abbr -a zqi 'zoxide query -i'
+
 abbr -a zr 'zoxide remove'
+abbr -a zri 'zoxide remove -i'
 "#,
         z_cmd
     )
@@ -231,9 +236,14 @@ fn posix_alias(z_cmd: &str) -> String {
     format!(
         r#"
 alias zi='{} -i'
+
 alias za='zoxide add'
+
 alias zq='zoxide query'
+alias zqi='zoxide query -i'
+
 alias zr='zoxide remove'
+alias zri='zoxide remove -i'
 "#,
         z_cmd
     )

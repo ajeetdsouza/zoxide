@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- Interactive mode for removing entries (`zoxide remove -i`).
+- Aliases for interactive `query` and `remove` (`zqi` and `zri` respectively)
+
+### Changed
+
+- `zoxide remove` now throws an error if there was no match in the database.
+- Interactive mode in `zoxide` no longer throws an error if `fzf` exits gracefully.
+
 ## [0.3.1] - 2020-04-03
 
 ### Added

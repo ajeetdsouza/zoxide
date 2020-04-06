@@ -70,7 +70,7 @@ impl Query {
             .collect::<Vec<_>>();
 
         let mut db = util::get_db()?;
-        let dirs = db.query_all(&keywords);
+        let dirs = db.query_many(&keywords);
         util::fzf_helper(now, dirs)
     }
 }

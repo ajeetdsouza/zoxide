@@ -1,3 +1,4 @@
+import os.path
 import ranger.api
 import ranger.core.fm
 import ranger.ext.signals
@@ -22,15 +23,24 @@ ranger.api.hook_init = hook_init
 class z(ranger.api.commands.Command):
     def execute(self):
         try:
-            output = subprocess.check_output(["zoxide", "query"] + self.args[1:])
-            output = output.decode("utf-8")
+            zoxide = subprocess.Popen(
+                ["zoxide", "query"] + self.args[1:],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            stdout, stderr = zoxide.communicate()
 
-            directory = output.strip()
-            self.fm.cd(directory)
-            self.fm.notify(directory)
-        except subprocess.CalledProcessError as e:
-            if e.returncode == 1:
-                pass
+            if zoxide.returncode == 0:
+                output = stdout.decode("utf-8").strip()
+                if output:
+                    self.fm.notify(output)
+                    if os.path.isdir(output):
+                        self.fm.cd(output)
+                else:
+                    self.fm.notify("zoxide: unexpected exit", bad=True)
+            else:
+                output = stderr.decode("utf-8").strip() or "zoxide: unknown error"
+                self.fm.notify(output, bad=True)
+
         except Exception as e:
             self.fm.notify(e, bad=True)
-

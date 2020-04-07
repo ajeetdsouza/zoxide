@@ -25,14 +25,12 @@ class z(ranger.api.commands.Command):
             output = subprocess.check_output(["zoxide", "query"] + self.args[1:])
             output = output.decode("utf-8")
 
-            query_prefix = "query: "
-
-            if output.startswith(query_prefix):
-                directory = output[len(query_prefix) :].strip()
-                self.fm.cd(directory)
-                self.fm.notify(directory)
-            else:
-                self.fm.notify("no match found", bad=True)
-
+            directory = output.strip()
+            self.fm.cd(directory)
+            self.fm.notify(directory)
+        except subprocess.CalledProcessError as e:
+            if e.returncode == 1:
+                pass
         except Exception as e:
             self.fm.notify(e, bad=True)
+

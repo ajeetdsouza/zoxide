@@ -74,9 +74,11 @@ pub fn fzf_helper<'a, I>(now: Epoch, dirs: I) -> Result<Option<Vec<u8>>>
 where
     I: IntoIterator<Item = &'a Dir>,
 {
+    let fzf_args = config::zo_fzf_args()?;
+
     let mut fzf = Command::new("fzf")
         .args(&["-n2..", "--no-sort"])
-        .args(config::zo_fzf_extra_args()?)
+        .args(fzf_args)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()

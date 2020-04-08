@@ -1,8 +1,7 @@
 use crate::db::DBVersion;
 use crate::dir::Rank;
 
-use anyhow::{bail, Context, Result};
-use shlex;
+use anyhow::{anyhow, bail, Context, Result};
 
 use std::env;
 use std::fs;
@@ -37,6 +36,14 @@ pub fn zo_exclude_dirs() -> Vec<PathBuf> {
     }
 }
 
+pub fn zo_fzf_args() -> Result<Vec<String>> {
+    match env::var("_ZO_FZF_ARGS") {
+        Ok(fzf_args) => shlex::split(&fzf_args).ok_or_else(|| anyhow!("could not parse _ZO_FZF_ARGS")),
+        Err(env::VarError::NotPresent) => Ok(Vec::new()),
+        Err(e) => Err(e).context("invalid Unicode in _ZO_FZF_ARGS"),
+    }
+}
+
 pub fn zo_maxage() -> Result<Rank> {
     match env::var_os("_ZO_MAXAGE") {
         Some(maxage_osstr) => match maxage_osstr.to_str() {
@@ -50,21 +57,5 @@ pub fn zo_maxage() -> Result<Rank> {
             None => bail!("invalid Unicode in _ZO_MAXAGE"),
         },
         None => Ok(1000.0),
-    }
-}
-
-pub fn zo_fzf_extra_args() -> Result<Vec<String>> {
-    match env::var_os("_ZO_FZF_EXTRA_ARGS") {
-        Some(fzf_args_osstr) => match fzf_args_osstr.to_str() {
-            Some(fzf_args) => {
-                if let Some(args) = shlex::split(fzf_args) {
-                    Ok(args)
-                } else {
-                    bail!("Error parsing _ZO_FZF_EXTRA_ARGS");
-                }
-            }
-            None => bail!("invalid Unicode in _ZO_FZF_EXTRA_ARGS"),
-        },
-        None => Ok(vec![]),
     }
 }

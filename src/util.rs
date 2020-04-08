@@ -76,6 +76,7 @@ where
 {
     let mut fzf = Command::new("fzf")
         .args(&["-n2..", "--no-sort"])
+        .args(config::zo_fzf_extra_args()?)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()

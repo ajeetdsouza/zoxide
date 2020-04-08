@@ -129,6 +129,7 @@ NOTE: PWD hooks are currently not supported for POSIX shells.
   characters ("`:`" on Linux and macOS, and "`;`" on Windows) to be excluded from
   the database
 - `$_ZO_MAXAGE`: sets the maximum total rank after which entries start getting deleted
+- `$_ZO_FZF_EXTRA_ARGS`: extra arguments to pass to fzf, e.g. `--height 25`
 
 [`dirs` documentation]: https://docs.rs/dirs/latest/dirs/fn.data_local_dir.html
 

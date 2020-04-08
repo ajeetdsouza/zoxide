@@ -18,6 +18,7 @@ bincode = "1.2.1"
 clap = "2.33.0"
 dirs = "2.0.2"
 serde = { version = "1.0.106", features = ["derive"] }
+shlex = "0.1.1"
 structopt = "0.3.12"
 uuid = { version = "0.8.1", features = ["v4"] }
 

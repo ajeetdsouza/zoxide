@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `zoxide remove` now throws an error if there was no match in the database.
 - Interactive mode in `zoxide` no longer throws an error if `fzf` exits gracefully.
+- Canonicalize to regular paths instead of UNC paths on Windows.
 
 ## [0.3.1] - 2020-04-03
 

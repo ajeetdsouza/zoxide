@@ -17,6 +17,7 @@ anyhow = "1.0.28"
 bincode = "1.2.1"
 clap = "2.33.0"
 dirs = "2.0.2"
+dunce = "1.0.0"
 serde = { version = "1.0.106", features = ["derive"] }
 structopt = "0.3.12"
 uuid = { version = "0.8.1", features = ["v4"] }

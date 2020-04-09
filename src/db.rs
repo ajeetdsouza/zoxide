@@ -144,7 +144,7 @@ impl DB {
                             continue;
                         }
                     };
-                    let path_abs = match dunce::canonicalize(Path::new(path_str)) {
+                    let path_abs = match dunce::canonicalize(path_str) {
                         Ok(path) => path,
                         Err(e) => {
                             eprintln!("invalid path '{}' at line {}: {}", path_str, line_number, e);

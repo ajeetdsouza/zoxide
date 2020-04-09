@@ -1,5 +1,6 @@
 use crate::config;
 use crate::dir::{Dir, Epoch, Rank};
+use crate::util;
 
 use anyhow::{anyhow, bail, Context, Result};
 use serde::{Deserialize, Serialize};
@@ -188,6 +189,7 @@ impl DB {
         let path_abs = path
             .as_ref()
             .canonicalize()
+            .and_then(|path| Ok(util::remove_verbatim_disk_in_path(path)))
             .with_context(|| anyhow!("could not access directory: {}", path.as_ref().display()))?;
 
         match self.data.dirs.iter_mut().find(|dir| dir.path == path_abs) {

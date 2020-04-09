@@ -7,7 +7,7 @@ use anyhow::{anyhow, bail, Context, Result};
 
 use std::cmp::Reverse;
 use std::io::{Read, Write};
-use std::path::Path;
+use std::path::{Component, Path, PathBuf, Prefix};
 use std::process::{Command, Stdio};
 use std::time::SystemTime;
 
@@ -24,6 +24,28 @@ pub fn path_to_bytes<P: AsRef<Path>>(path: &P) -> Result<&[u8]> {
         Some(path_str) => Ok(path_str.as_bytes()),
         None => bail!("invalid Unicode in path"),
     }
+}
+
+#[cfg(not(windows))]
+pub fn remove_verbatim_disk_in_path(path: PathBuf) -> PathBuf {
+    path
+}
+
+#[cfg(windows)]
+pub fn remove_verbatim_disk_in_path(path: PathBuf) -> PathBuf {
+    let mut new_path = PathBuf::new();
+    for component in path.components() {
+        if let Component::Prefix(prefix) = component {
+            if let Prefix::VerbatimDisk(drive) = prefix.kind() {
+                new_path.push(format!("{}:", drive as char));
+                continue;
+            }
+        }
+
+        new_path.push(component);
+    }
+
+    new_path
 }
 
 #[cfg(unix)]

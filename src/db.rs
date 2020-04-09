@@ -1,6 +1,5 @@
 use crate::config;
 use crate::dir::{Dir, Epoch, Rank};
-use crate::util;
 
 use anyhow::{anyhow, bail, Context, Result};
 use serde::{Deserialize, Serialize};
@@ -145,7 +144,7 @@ impl DB {
                             continue;
                         }
                     };
-                    let path_abs = match Path::new(path_str).canonicalize() {
+                    let path_abs = match dunce::canonicalize(Path::new(path_str)) {
                         Ok(path) => path,
                         Err(e) => {
                             eprintln!("invalid path '{}' at line {}: {}", path_str, line_number, e);
@@ -186,10 +185,7 @@ impl DB {
     }
 
     pub fn add<P: AsRef<Path>>(&mut self, path: P, max_age: Rank, now: Epoch) -> Result<()> {
-        let path_abs = path
-            .as_ref()
-            .canonicalize()
-            .and_then(|path| Ok(util::remove_verbatim_disk_in_path(path)))
+        let path_abs = dunce::canonicalize(&path)
             .with_context(|| anyhow!("could not access directory: {}", path.as_ref().display()))?;
 
         match self.data.dirs.iter_mut().find(|dir| dir.path == path_abs) {
@@ -259,7 +255,7 @@ impl DB {
     }
 
     pub fn remove<P: AsRef<Path>>(&mut self, path: P) -> Result<()> {
-        if let Ok(path_abs) = path.as_ref().canonicalize() {
+        if let Ok(path_abs) = dunce::canonicalize(&path) {
             self.remove_exact(path_abs)
                 .or_else(|_| self.remove_exact(path))
         } else {

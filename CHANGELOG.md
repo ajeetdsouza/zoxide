@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Interactive mode for removing entries (`zoxide remove -i`).
 - Aliases for interactive `query` and `remove` (`zqi` and `zri` respectively)
-- Specify additional arguments to `fzf` with `$_ZO_FZF_ARGS`.
+- Specify additional arguments to `fzf` with `$_ZO_FZF_OPTS`.
 
 ### Changed
 

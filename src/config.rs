@@ -37,10 +37,10 @@ pub fn zo_exclude_dirs() -> Vec<PathBuf> {
 }
 
 pub fn zo_fzf_args() -> Result<Vec<String>> {
-    match env::var("_ZO_FZF_ARGS") {
-        Ok(fzf_args) => shlex::split(&fzf_args).ok_or_else(|| anyhow!("could not parse _ZO_FZF_ARGS")),
+    match env::var("_ZO_FZF_OPTS") {
+        Ok(fzf_args) => shlex::split(&fzf_args).ok_or_else(|| anyhow!("could not parse _ZO_FZF_OPTS")),
         Err(env::VarError::NotPresent) => Ok(Vec::new()),
-        Err(e) => Err(e).context("invalid Unicode in _ZO_FZF_ARGS"),
+        Err(e) => Err(e).context("invalid Unicode in _ZO_FZF_OPTS"),
     }
 }
 

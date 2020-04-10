@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- When no match is found, `fish` stays in the current directory.
+- When no match is found, `fish` no longer `cd`s to the user's home.
 
 ## [0.3.1] - 2020-04-03
 

@@ -160,15 +160,11 @@ function {}
         or return $status
 
     else
-        # FIXME: use string-collect from fish 3.1.0 once it has wider adoption
-        set -l IFS ''
         set -l result (zoxide query $argv)
 
-        if test -d $result
+        if begin; test -d $result; and string length -q -- $result; end
             _z_cd $result
             or return $status
-        else if test -n "$result"
-            echo $result
         end
     end
 end

@@ -53,6 +53,12 @@ If you have Rust, this should be as simple as:
 cargo install zoxide -f
 ```
 
+If you are on Arch:
+
+```sh
+yay -S zoxide
+```
+
 Otherwise, try the install script:
 
 ```sh

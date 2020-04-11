@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Interactive mode in `zoxide` no longer throws an error if `fzf` exits gracefully.
 - Canonicalize to regular paths instead of UNC paths on Windows.
 
+### Fixed
+
+- `fish` no longer `cd`s to the user's home when no match is found.
+
 ## [0.3.1] - 2020-04-03
 
 ### Added

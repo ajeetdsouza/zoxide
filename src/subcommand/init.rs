@@ -164,7 +164,7 @@ function {}
         set -l IFS ''
         set -l result (zoxide query $argv)
 
-        if test -d $result
+        if test -d $result; and string length -q -- $result
             _z_cd $result
             or return $status
         else if test -n "$result"

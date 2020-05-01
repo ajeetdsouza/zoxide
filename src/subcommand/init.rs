@@ -27,7 +27,7 @@ pub struct Init {
         long,
         help = "Chooses event on which an entry is added to the database",
         possible_values = &Hook::variants(),
-        default_value = "prompt",
+        default_value = "pwd",
         case_insensitive = true
     )]
     hook: Hook,
@@ -58,7 +58,7 @@ impl Init {
             Hook::prompt => writeln!(handle, "{}", config.hook.prompt).unwrap(),
             Hook::pwd => match config.hook.pwd {
                 Some(pwd_hook) => writeln!(handle, "{}", pwd_hook).unwrap(),
-                None => bail!("PWD hooks are currently unsupported on this shell."),
+                None => bail!("PWD hooks are currently unsupported on this shell. Use `--hook prompt` to change this."),
             },
         }
 

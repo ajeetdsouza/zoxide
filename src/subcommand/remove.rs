@@ -3,13 +3,10 @@ use crate::util;
 use anyhow::Result;
 use structopt::StructOpt;
 
-use std::path::PathBuf;
-
 #[derive(Debug, StructOpt)]
 #[structopt(about = "Remove a directory")]
 pub struct Remove {
-    #[structopt(required_unless("interactive"))]
-    path: Option<PathBuf>,
+    query: Vec<String>,
     #[structopt(short, long, help = "Opens an interactive selection menu using fzf")]
     interactive: bool,
 }
@@ -18,7 +15,7 @@ impl Remove {
     pub fn run(&self) -> Result<()> {
         if self.interactive {
             let mut db = util::get_db()?;
-            let dirs = db.query_all();
+            let dirs = db.query_many(&self.query);
             let now = util::get_current_time()?;
 
             if let Some(path_bytes) = util::fzf_helper(now, dirs)? {
@@ -28,9 +25,17 @@ impl Remove {
 
             Ok(())
         } else {
-            // structopt guarantees that unwrap is safe here
-            let path = self.path.as_ref().unwrap();
-            util::get_db()?.remove(path)
+            match self.query.as_slice() {
+                [path] => util::get_db()?.remove(path),
+                _ => clap::Error::with_description(
+                    &format!(
+                        "remove requires 1 value in non-interactive mode, but {} were provided",
+                        self.query.len()
+                    ),
+                    clap::ErrorKind::WrongNumberOfValues,
+                )
+                .exit(),
+            }
         }
     }
 }

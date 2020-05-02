@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Interactive mode in `zoxide` no longer throws an error if `fzf` exits gracefully.
 - Canonicalize to regular paths instead of UNC paths on Windows.
 - `zoxide init` now uses PWD hooks by default for better performance.
+- `$_ZO_ECHO` now only works when set to `1`.
 
 ### Fixed
 

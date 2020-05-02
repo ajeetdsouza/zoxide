@@ -292,7 +292,7 @@ _zoxide_hook() {
 }
 "#;
 
-fn bash_hook_pwd() -> Result<Cow<'static, str>> {
+const fn bash_hook_pwd() -> Result<Cow<'static, str>> {
     const HOOK_PWD: &str = r#"
 _zoxide_hook() {
     if [ -z "${_ZO_PWD}" ]; then
@@ -312,7 +312,7 @@ esac
     Ok(Cow::Borrowed(HOOK_PWD))
 }
 
-fn fish_hook_pwd() -> Result<Cow<'static, str>> {
+const fn fish_hook_pwd() -> Result<Cow<'static, str>> {
     const HOOK_PWD: &str = r#"
 function _zoxide_hook --on-variable PWD
     zoxide add
@@ -376,13 +376,14 @@ case "$PS1" in
     *\$\(_zoxide_hook\)*) ;;
     *) PS1="\$(_zoxide_hook)${{PS1}}" ;;
 esac"#,
-        tmp_path_str, pwd_path_str,
+        posix_quote(tmp_path_str),
+        posix_quote(pwd_path_str),
     );
 
     Ok(Cow::Owned(hook_pwd))
 }
 
-fn zsh_hook_pwd() -> Result<Cow<'static, str>> {
+const fn zsh_hook_pwd() -> Result<Cow<'static, str>> {
     const HOOK_PWD: &str = r#"
 _zoxide_hook() {
     zoxide add
@@ -392,4 +393,21 @@ chpwd_functions=(${chpwd_functions[@]} "_zoxide_hook")
 "#;
 
     Ok(Cow::Borrowed(HOOK_PWD))
+}
+
+fn posix_quote(string: &str) -> String {
+    let mut quoted = String::with_capacity(string.len() + 2);
+    quoted.push('\'');
+
+    for ch in string.chars() {
+        match ch {
+            '\\' => quoted.push_str(r"\\"),
+            '\'' => quoted.push_str(r"'\''"),
+            _ => quoted.push(ch),
+        }
+    }
+
+    quoted.push('\'');
+
+    quoted
 }

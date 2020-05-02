@@ -1,7 +1,9 @@
-use anyhow::{bail, Result};
+use anyhow::{anyhow, Result};
 use clap::arg_enum;
 use structopt::StructOpt;
+use uuid::Uuid;
 
+use std::borrow::Cow;
 use std::io::{self, Write};
 
 #[derive(Debug, StructOpt)]
@@ -56,10 +58,10 @@ impl Init {
         match self.hook {
             Hook::none => (),
             Hook::prompt => writeln!(handle, "{}", config.hook.prompt).unwrap(),
-            Hook::pwd => match config.hook.pwd {
-                Some(pwd_hook) => writeln!(handle, "{}", pwd_hook).unwrap(),
-                None => bail!("PWD hooks are currently unsupported on this shell. Use `--hook prompt` to change this."),
-            },
+            Hook::pwd => {
+                let hook_pwd = config.hook.pwd;
+                writeln!(handle, "{}", hook_pwd()?).unwrap();
+            }
         }
 
         Ok(())
@@ -92,7 +94,7 @@ const BASH_CONFIG: ShellConfig = ShellConfig {
     alias: bash_alias,
     hook: HookConfig {
         prompt: BASH_HOOK_PROMPT,
-        pwd: Some(BASH_HOOK_PWD),
+        pwd: bash_hook_pwd,
     },
 };
 
@@ -101,7 +103,7 @@ const FISH_CONFIG: ShellConfig = ShellConfig {
     alias: fish_alias,
     hook: HookConfig {
         prompt: FISH_HOOK_PROMPT,
-        pwd: Some(FISH_HOOK_PWD),
+        pwd: fish_hook_pwd,
     },
 };
 
@@ -110,7 +112,7 @@ const POSIX_CONFIG: ShellConfig = ShellConfig {
     alias: posix_alias,
     hook: HookConfig {
         prompt: POSIX_HOOK_PROMPT,
-        pwd: None,
+        pwd: posix_hook_pwd,
     },
 };
 
@@ -119,7 +121,7 @@ const ZSH_CONFIG: ShellConfig = ShellConfig {
     alias: zsh_alias,
     hook: HookConfig {
         prompt: ZSH_HOOK_PROMPT,
-        pwd: Some(ZSH_HOOK_PWD),
+        pwd: zsh_hook_pwd,
     },
 };
 
@@ -131,7 +133,7 @@ struct ShellConfig {
 
 struct HookConfig {
     prompt: &'static str,
-    pwd: Option<&'static str>,
+    pwd: fn() -> Result<Cow<'static, str>>,
 }
 
 fn fish_z(z_cmd: &str) -> String {
@@ -271,7 +273,7 @@ end
 
 const POSIX_HOOK_PROMPT: &str = r#"
 _zoxide_hook() {
-    zoxide add > /dev/null
+    zoxide add
 }
 
 case "$PS1" in
@@ -290,7 +292,8 @@ _zoxide_hook() {
 }
 "#;
 
-const BASH_HOOK_PWD: &str = r#"
+fn bash_hook_pwd() -> Result<Cow<'static, str>> {
+    const HOOK_PWD: &str = r#"
 _zoxide_hook() {
     if [ -z "${_ZO_PWD}" ]; then
         _ZO_PWD="${PWD}"
@@ -306,16 +309,87 @@ case "$PROMPT_COMMAND" in
 esac
 "#;
 
-const FISH_HOOK_PWD: &str = r#"
+    Ok(Cow::Borrowed(HOOK_PWD))
+}
+
+fn fish_hook_pwd() -> Result<Cow<'static, str>> {
+    const HOOK_PWD: &str = r#"
 function _zoxide_hook --on-variable PWD
     zoxide add
 end
 "#;
 
-const ZSH_HOOK_PWD: &str = r#"
+    Ok(Cow::Borrowed(HOOK_PWD))
+}
+
+fn posix_hook_pwd() -> Result<Cow<'static, str>> {
+    let mut tmp_path = std::env::temp_dir();
+    tmp_path.push("zoxide");
+
+    let tmp_path_str = tmp_path
+        .to_str()
+        .ok_or_else(|| anyhow!("invalid Unicode in zoxide tmp path"))?;
+
+    let pwd_path = tmp_path.join(format!("pwd-{}", Uuid::new_v4()));
+
+    let pwd_path_str = pwd_path
+        .to_str()
+        .ok_or_else(|| anyhow!("invalid Unicode in zoxide pwd path"))?;
+
+    let hook_pwd = format!(
+        r#"
+# PWD hooks in POSIX use a temporary file, located at `$_ZO_PWD_PATH`, to track
+# changes in the current directory. These files are removed upon restart,
+# but they should ideally also be cleaned up once the shell exits using traps.
+#
+# This can be done as follows:
+#
+# trap '_zoxide_cleanup' EXIT HUP KILL TERM
+# trap '_zoxide_cleanup; trap - INT; kill -s INT "$$"' INT
+# trap '_zoxide_cleanup; trap - QUIT; kill -s QUIT "$$"' QUIT
+#
+# By default, traps are not set up because they override all previous traps.
+# It is therefore up to the user to add traps to their shell configuration.
+
+_ZO_TMP_PATH={}
+_ZO_PWD_PATH={}
+
+_zoxide_cleanup() {{
+    rm -f "$_ZO_PWD_PATH"
+}}
+
+_zoxide_setpwd() {{
+    mkdir -p "$_ZO_TMP_PATH"
+    echo "$PWD" > "$_ZO_PWD_PATH"
+}}
+
+_zoxide_setpwd
+
+_zoxide_hook() {{
+    _ZO_OLDPWD="$(cat "$_ZO_PWD_PATH")"
+    if [ -z "$_ZO_OLDPWD" ] || [ "$_ZO_OLDPWD" != "$PWD" ]; then
+        _zoxide_setpwd && zoxide add > /dev/null
+    fi
+}}
+
+case "$PS1" in
+    *\$\(_zoxide_hook\)*) ;;
+    *) PS1="\$(_zoxide_hook)${{PS1}}" ;;
+esac"#,
+        tmp_path_str, pwd_path_str,
+    );
+
+    Ok(Cow::Owned(hook_pwd))
+}
+
+fn zsh_hook_pwd() -> Result<Cow<'static, str>> {
+    const HOOK_PWD: &str = r#"
 _zoxide_hook() {
     zoxide add
 }
 
 chpwd_functions=(${chpwd_functions[@]} "_zoxide_hook")
 "#;
+
+    Ok(Cow::Borrowed(HOOK_PWD))
+}

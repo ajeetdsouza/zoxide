@@ -10,13 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Interactive mode for removing entries (`zoxide remove -i`).
-- Aliases for interactive `query` and `remove` (`zqi` and `zri` respectively)
+- Aliases for interactive `query` and `remove` (`zqi` and `zri` respectively).
+- PWD hooks for POSIX shells.
 
 ### Changed
 
 - `zoxide remove` now throws an error if there was no match in the database.
 - Interactive mode in `zoxide` no longer throws an error if `fzf` exits gracefully.
 - Canonicalize to regular paths instead of UNC paths on Windows.
+- `zoxide init` now uses PWD hooks by default for better performance.
 
 ### Fixed
 

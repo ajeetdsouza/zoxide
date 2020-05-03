@@ -14,7 +14,7 @@ pub struct Init {
 
     #[structopt(
         long,
-        help = "Changes the name of the 'z' command",
+        help = "Renames the 'z' command and corresponding aliases",
         alias = "z-cmd",
         default_value = "z"
     )]
@@ -22,9 +22,10 @@ pub struct Init {
 
     #[structopt(
         long,
+        alias = "no-define-aliases",
         help = "Prevents zoxide from defining any commands other than 'z'"
     )]
-    no_define_aliases: bool,
+    no_aliases: bool,
 
     #[structopt(
         long,
@@ -51,7 +52,7 @@ impl Init {
         let z = config.z;
         writeln!(handle, "{}", z(&self.cmd)).unwrap();
 
-        if !self.no_define_aliases {
+        if !self.no_aliases {
             let alias = config.alias;
             writeln!(handle, "{}", alias(&self.cmd)).unwrap();
         }

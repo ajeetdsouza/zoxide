@@ -1,8 +1,8 @@
 [package]
 name = "zoxide"
-version = "0.3.1"
+version = "0.4.0"
 authors = ["Ajeet D'Souza <98ajeet@gmail.com>"]
-description = "A cd command that learns your habits"
+description = "A faster way to navigate your filesystem"
 repository = "https://github.com/ajeetdsouza/zoxide/"
 edition = "2018"
 

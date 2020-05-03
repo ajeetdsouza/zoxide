@@ -52,15 +52,15 @@ _z_cd() {{
 fn alias(z_cmd: &str) -> String {
     format!(
         r#"
-alias zi='{} -i'
+alias {0}i='{0} -i'
 
-alias za='zoxide add'
+alias {0}a='zoxide add'
 
-alias zq='zoxide query'
-alias zqi='zoxide query -i'
+alias {0}q='zoxide query'
+alias {0}qi='zoxide query -i'
 
-alias zr='zoxide remove'
-alias zri='zoxide remove -i'
+alias {0}r='zoxide remove'
+alias {0}ri='zoxide remove -i'
 "#,
         z_cmd
     )

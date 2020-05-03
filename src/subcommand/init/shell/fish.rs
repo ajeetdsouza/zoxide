@@ -1,4 +1,4 @@
-use super::{ShellConfig, HookConfig};
+use super::{HookConfig, ShellConfig};
 
 use anyhow::Result;
 

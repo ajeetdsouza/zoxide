@@ -15,9 +15,10 @@ pub struct Init {
     #[structopt(
         long,
         help = "Changes the name of the 'z' command",
+        alias = "z-cmd",
         default_value = "z"
     )]
-    z_cmd: String,
+    cmd: String,
 
     #[structopt(
         long,
@@ -48,11 +49,11 @@ impl Init {
         let mut handle = stdout.lock();
 
         let z = config.z;
-        writeln!(handle, "{}", z(&self.z_cmd)).unwrap();
+        writeln!(handle, "{}", z(&self.cmd)).unwrap();
 
         if !self.no_define_aliases {
             let alias = config.alias;
-            writeln!(handle, "{}", alias(&self.z_cmd)).unwrap();
+            writeln!(handle, "{}", alias(&self.cmd)).unwrap();
         }
 
         match self.hook {

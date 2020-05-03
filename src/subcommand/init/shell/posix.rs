@@ -14,7 +14,7 @@ pub const CONFIG: ShellConfig = ShellConfig {
     },
 };
 
-fn z(z_cmd: &str) -> String {
+fn z(cmd: &str) -> String {
     format!(
         r#"
 _z_cd() {{
@@ -45,11 +45,11 @@ _z_cd() {{
     fi
 }}
 "#,
-        z_cmd
+        cmd
     )
 }
 
-fn alias(z_cmd: &str) -> String {
+fn alias(cmd: &str) -> String {
     format!(
         r#"
 alias {0}i='{0} -i'
@@ -62,7 +62,7 @@ alias {0}qi='zoxide query -i'
 alias {0}r='zoxide remove'
 alias {0}ri='zoxide remove -i'
 "#,
-        z_cmd
+        cmd
     )
 }
 

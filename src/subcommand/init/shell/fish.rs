@@ -59,15 +59,15 @@ end
 fn alias(z_cmd: &str) -> String {
     format!(
         r#"
-abbr -a zi '{} -i'
+abbr -a {0}i '{0} -i'
 
-abbr -a za 'zoxide add'
+abbr -a {0}a 'zoxide add'
 
-abbr -a zq 'zoxide query'
-abbr -a zqi 'zoxide query -i'
+abbr -a {0}q 'zoxide query'
+abbr -a {0}qi 'zoxide query -i'
 
-abbr -a zr 'zoxide remove'
-abbr -a zri 'zoxide remove -i'
+abbr -a {0}r 'zoxide remove'
+abbr -a {0}ri 'zoxide remove -i'
 "#,
         z_cmd
     )

@@ -47,17 +47,6 @@ pub fn get_db() -> Result<DB> {
     let mut db_path = config::zo_data_dir()?;
     db_path.push("db.zo");
 
-    // FIXME: fallback to old database location; remove in next breaking version
-    if !db_path.is_file() {
-        if let Some(mut old_db_path) = dirs::home_dir() {
-            old_db_path.push(".zo");
-
-            if old_db_path.is_file() {
-                return DB::open_and_migrate(old_db_path, db_path);
-            }
-        }
-    }
-
     DB::open(db_path)
 }
 
@@ -94,7 +83,6 @@ where
     dir_frecencies.sort_unstable_by_key(|&(dir, frecency)| Reverse((frecency, &dir.path)));
 
     for &(dir, frecency) in dir_frecencies.iter() {
-        // ensure that frecency fits in 4 characters
         if let Ok(path_bytes) = path_to_bytes(&dir.path) {
             (|| {
                 write!(fzf_stdin, "{:>4}        ", frecency)?;

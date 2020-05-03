@@ -13,7 +13,7 @@ use structopt::StructOpt;
 use std::process;
 
 #[derive(Debug, StructOpt)]
-#[structopt(about = "A cd command that learns your habits", version = env!("ZOXIDE_VERSION"))]
+#[structopt(about, version = env!("ZOXIDE_VERSION"))]
 enum Zoxide {
     Add(subcommand::Add),
     Import(subcommand::Import),

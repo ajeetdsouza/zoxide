@@ -16,8 +16,6 @@ pub struct DB {
     data: DBData,
     modified: bool,
     path: PathBuf,
-    // FIXME: remove after next breaking version
-    path_old: Option<PathBuf>,
 }
 
 impl DB {
@@ -44,34 +42,6 @@ impl DB {
             data,
             modified: false,
             path: path.as_ref().to_path_buf(),
-            path_old: None,
-        })
-    }
-
-    // FIXME: remove after next breaking version
-    pub fn open_and_migrate<P1, P2>(path_old: P1, path: P2) -> Result<DB>
-    where
-        P1: AsRef<Path>,
-        P2: AsRef<Path>,
-    {
-        let file = File::open(&path_old).context("could not open old database file")?;
-        let reader = BufReader::new(&file);
-
-        let dirs = bincode::config()
-            .limit(config::DB_MAX_SIZE)
-            .deserialize_from(reader)
-            .context("could not deserialize old database")?;
-
-        let data = DBData {
-            version: config::DB_VERSION,
-            dirs,
-        };
-
-        Ok(DB {
-            data,
-            modified: true,
-            path: path.as_ref().to_path_buf(),
-            path_old: Some(path_old.as_ref().to_path_buf()),
         })
     }
 
@@ -295,11 +265,6 @@ impl Drop for DB {
     fn drop(&mut self) {
         if let Err(e) = self.save() {
             eprintln!("{:#}", e);
-        } else if let Some(path_old) = &self.path_old {
-            // FIXME: remove this branch after next breaking release
-            if let Err(e) = fs::remove_file(path_old).context("could not remove old database") {
-                eprintln!("{:#}", e);
-            }
         }
     }
 }

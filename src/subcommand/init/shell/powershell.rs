@@ -18,12 +18,9 @@ fn z(cmd: &str) -> String {
         r#"
 function {} {{
     function z_cd($dir) {{
-        try {{
-            Set-Location $dir -ea Stop
-            if ($env:_ZO_ECHO -eq "1") {{
-                Write-Host "$PWD"
-            }}
-        }} catch {{
+        Set-Location $dir -ea Stop
+        if ($env:_ZO_ECHO -eq "1") {{
+            Write-Host "$PWD"
         }}
     }}
 
@@ -35,7 +32,7 @@ function {} {{
     }}
     else {{
         $result = zoxide query @args
-        if ($LASTEXITCODE -eq 0 -and ((Test-Path $result) -eq $true)) {{
+        if ($LASTEXITCODE -eq 0 -and $result -is [string] -and (Test-Path $result)) {{
             z_cd $result
         }} else {{
             $result
@@ -74,8 +71,12 @@ function prompt {
 
 const fn hook_pwd() -> Result<Cow<'static, str>> {
     const HOOK_PWD: &str = r#"
-$ExecutionContext.InvokeCommand.LocationChangedAction = {
-    $null = zoxide add
+if ($PSVersionTable.PSVersion.Major -ge 6) {
+    $ExecutionContext.InvokeCommand.LocationChangedAction = {
+        $null = zoxide add
+    }
+} else {
+    Write-Error "pwd hook requires pwsh - use 'zoxide init powershell --hook prompt'"
 }
 "#;
 

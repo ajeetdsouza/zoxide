@@ -35,8 +35,10 @@ function {} {{
     }}
     else {{
         $result = zoxide query @args
-        if ($LASTEXITCODE -eq 0) {{
+        if ($LASTEXITCODE -eq 0 -and ((Test-Path $result) -eq $true)) {{
             z_cd $result
+        }} else {{
+            $result
         }}
     }}
 }}

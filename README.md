@@ -15,6 +15,7 @@ A faster way to navigate your filesystem
     - [bash](#bash)
     - [fish](#fish)
     - [POSIX](#posix-shells)
+    - [PowerShell](#powershell)
     - [zsh](#zsh)
 - [Configuration](#configuration)
   - [`init` flags](#init-flags)
@@ -116,6 +117,17 @@ Add the following line to your `~/.zshrc`:
 
 ```sh
 eval "$(zoxide init zsh)"
+```
+
+#### PowerShell
+
+Add the following line to your profile:
+
+```powershell
+Invoke-Expression (& {
+    $hook = if ($PSVersionTable.PSVersion.Major -lt 6) { 'prompt' } else { 'pwd' }
+    (zoxide init --hook $hook powershell) -join "`n"
+})
 ```
 
 ## Configuration

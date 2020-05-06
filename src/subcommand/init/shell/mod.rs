@@ -1,6 +1,7 @@
 pub mod bash;
 pub mod fish;
 pub mod posix;
+pub mod powershell;
 pub mod zsh;
 
 use anyhow::Result;

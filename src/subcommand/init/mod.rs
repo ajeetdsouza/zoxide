@@ -43,6 +43,7 @@ impl Init {
             Shell::bash => shell::bash::CONFIG,
             Shell::fish => shell::fish::CONFIG,
             Shell::posix => shell::posix::CONFIG,
+            Shell::powershell => shell::powershell::CONFIG,
             Shell::zsh => shell::zsh::CONFIG,
         };
 
@@ -77,6 +78,7 @@ arg_enum! {
         bash,
         fish,
         posix,
+        powershell,
         zsh,
     }
 }

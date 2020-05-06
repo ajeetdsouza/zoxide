@@ -13,7 +13,7 @@ pub const CONFIG: ShellConfig = ShellConfig {
     },
 };
 
-fn z(z_cmd: &str) -> String {
+fn z(cmd: &str) -> String {
     format!(
         r#"
 function {} {{
@@ -43,24 +43,24 @@ function {} {{
     }}
 }}
 "#,
-        z_cmd
+        cmd
     )
 }
 
-fn alias(z_cmd: &str) -> String {
+fn alias(cmd: &str) -> String {
     format!(
         r#"
-function zi {{ {} -i @args }}
+function {0}i {{ {0} -i @args }}
 
-function za {{ zoxide add @args }}
+function {0}a {{ zoxide add @args }}
 
-function zq {{ zoxide query @args }}
-function zqi {{ zoxide query -i @args }}
+function {0}q {{ zoxide query @args }}
+function {0}qi {{ zoxide query -i @args }}
 
-function zr {{ zoxide remove @args }}
-function zri {{ zoxide remove -i @args }}
+function {0}r {{ zoxide remove @args }}
+function {0}ri {{ zoxide remove -i @args }}
 "#,
-        z_cmd
+        cmd
     )
 }
 

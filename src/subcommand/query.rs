@@ -1,6 +1,8 @@
+use crate::db::Db;
 use crate::util;
 
 use anyhow::{bail, Result};
+use float_ord::FloatOrd;
 use structopt::StructOpt;
 
 use std::io::{self, Write};
@@ -19,7 +21,8 @@ impl Query {
         let path_opt = if self.interactive {
             self.query_interactive()?
         } else {
-            self.query()?
+            let mut db = util::get_db()?;
+            self.query(&mut db)?
         };
 
         match path_opt {
@@ -35,7 +38,8 @@ impl Query {
         Ok(())
     }
 
-    fn query(&self) -> Result<Option<Vec<u8>>> {
+    fn query(&self, db: &mut Db) -> Result<Option<Vec<u8>>> {
+        // if the input is already a valid path, simply return it
         if let [path] = self.keywords.as_slice() {
             if Path::new(path).is_dir() {
                 return Ok(Some(path.as_bytes().to_vec()));
@@ -50,14 +54,28 @@ impl Query {
             .map(|keyword| keyword.to_lowercase())
             .collect::<Vec<_>>();
 
-        let path_opt = util::get_db()?.query(&keywords, now).map(|dir| {
-            // `path_to_bytes` is guaranteed to succeed here since
-            // the path has already been queried successfully
-            let path_bytes = util::path_to_bytes(&dir.path).unwrap();
-            path_bytes.to_vec()
-        });
+        db.dirs
+            .sort_unstable_by_key(|dir| FloatOrd(dir.get_frecency(now)));
 
-        Ok(path_opt)
+        // Iterating in reverse order ensures that the directory indices do not
+        // change as we remove them.
+        for idx in (0..db.dirs.len()).rev() {
+            let dir = &db.dirs[idx];
+            if !dir.is_match(&keywords) {
+                continue;
+            }
+
+            if !dir.is_valid() {
+                db.dirs.swap_remove(idx);
+                db.modified = true;
+                continue;
+            }
+
+            let path = util::path_to_bytes(&dir.path)?.to_vec();
+            return Ok(Some(path));
+        }
+
+        Ok(None)
     }
 
     fn query_interactive(&self) -> Result<Option<Vec<u8>>> {

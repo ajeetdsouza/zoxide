@@ -4,7 +4,6 @@ use anyhow::{bail, Context, Result};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use std::cmp::Ordering;
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, BufRead, BufReader, Write};
 use std::path::{Path, PathBuf};
@@ -15,9 +14,9 @@ pub use i32 as DBVersion;
 struct DbVersion(u32);
 
 pub struct Db {
+    pub dirs: Vec<Dir>,
+    pub modified: bool,
     data_dir: PathBuf,
-    dirs: Vec<Dir>,
-    modified: bool,
 }
 
 impl Db {
@@ -34,9 +33,9 @@ impl Db {
             Ok(buffer) => buffer,
             Err(e) if e.kind() == io::ErrorKind::NotFound => {
                 return Ok(Db {
-                    data_dir,
-                    modified: false,
                     dirs: Vec::new(),
+                    modified: false,
+                    data_dir,
                 })
             }
             Err(e) => {
@@ -48,9 +47,9 @@ impl Db {
 
         if buffer.is_empty() {
             return Ok(Db {
-                data_dir,
-                modified: false,
                 dirs: Vec::new(),
+                modified: false,
+                data_dir,
             });
         }
 
@@ -87,9 +86,9 @@ impl Db {
         };
 
         Ok(Db {
-            data_dir,
-            modified: false,
             dirs,
+            modified: false,
+            data_dir,
         })
     }
 
@@ -271,27 +270,6 @@ impl Db {
         Ok(())
     }
 
-    pub fn query(&mut self, keywords: &[String], now: Epoch) -> Option<&Dir> {
-        let (idx, dir, _) = self
-            .dirs
-            .iter()
-            .enumerate()
-            .filter(|(_, dir)| dir.is_match(&keywords))
-            .map(|(idx, dir)| (idx, dir, dir.get_frecency(now)))
-            .max_by(|(_, _, frecency1), (_, _, frecency2)| {
-                frecency1.partial_cmp(frecency2).unwrap_or(Ordering::Equal)
-            })?;
-
-        if dir.is_dir() {
-            // FIXME: change this to Some(dir) once the MIR borrow checker comes to stable Rust
-            Some(&self.dirs[idx])
-        } else {
-            self.dirs.swap_remove(idx);
-            self.modified = true;
-            self.query(keywords, now)
-        }
-    }
-
     pub fn query_many<'a>(&'a mut self, keywords: &'a [String]) -> impl Iterator<Item = &'a Dir> {
         self.query_all()
             .iter()
@@ -300,7 +278,7 @@ impl Db {
 
     pub fn query_all(&mut self) -> &[Dir] {
         let orig_len = self.dirs.len();
-        self.dirs.retain(Dir::is_dir);
+        self.dirs.retain(Dir::is_valid);
 
         if orig_len != self.dirs.len() {
             self.modified = true;

@@ -13,8 +13,8 @@ pub struct Dir {
 }
 
 impl Dir {
-    pub fn is_dir(&self) -> bool {
-        self.path.is_dir()
+    pub fn is_valid(&self) -> bool {
+        self.rank.is_finite() && self.rank >= 1.0 && self.path.is_dir()
     }
 
     #[cfg(unix)]

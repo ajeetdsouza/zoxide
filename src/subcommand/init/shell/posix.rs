@@ -1,6 +1,6 @@
 use super::{HookConfig, ShellConfig};
 
-use anyhow::{anyhow, Result};
+use anyhow::{Context, Result};
 use uuid::Uuid;
 
 use std::borrow::Cow;
@@ -83,13 +83,13 @@ fn hook_pwd() -> Result<Cow<'static, str>> {
 
     let tmp_path_str = tmp_path
         .to_str()
-        .ok_or_else(|| anyhow!("invalid Unicode in zoxide tmp path"))?;
+        .context("invalid Unicode in zoxide tmp path")?;
 
     let pwd_path = tmp_path.join(format!("pwd-{}", Uuid::new_v4()));
 
     let pwd_path_str = pwd_path
         .to_str()
-        .ok_or_else(|| anyhow!("invalid Unicode in zoxide pwd path"))?;
+        .context("invalid Unicode in zoxide pwd path")?;
 
     let hook_pwd = format!(
         r#"

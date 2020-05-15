@@ -1,9 +1,9 @@
 use crate::config;
-use crate::db::DB;
+use crate::db::Db;
 use crate::dir::{Dir, Epoch};
 use crate::error::SilentExit;
 
-use anyhow::{anyhow, bail, Context, Result};
+use anyhow::{bail, Context, Result};
 
 use std::cmp::Reverse;
 use std::io::{Read, Write};
@@ -43,11 +43,9 @@ pub fn bytes_to_path(bytes: &[u8]) -> Result<&Path> {
         .context("invalid Unicode in path")
 }
 
-pub fn get_db() -> Result<DB> {
-    let mut db_path = config::zo_data_dir()?;
-    db_path.push("db.zo");
-
-    DB::open(db_path)
+pub fn get_db() -> Result<Db> {
+    let data_dir = config::zo_data_dir()?;
+    Db::open(data_dir)
 }
 
 pub fn get_current_time() -> Result<Epoch> {
@@ -73,7 +71,7 @@ where
     let fzf_stdin = fzf
         .stdin
         .as_mut()
-        .ok_or_else(|| anyhow!("could not connect to fzf stdin"))?;
+        .context("could not connect to fzf stdin")?;
 
     let mut dir_frecencies = dirs
         .into_iter()
@@ -96,7 +94,7 @@ where
     let fzf_stdout = fzf
         .stdout
         .as_mut()
-        .ok_or_else(|| anyhow!("could not connect to fzf stdout"))?;
+        .context("could not connect to fzf stdout")?;
 
     let mut buffer = Vec::new();
     fzf_stdout

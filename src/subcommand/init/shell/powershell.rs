@@ -82,4 +82,3 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
 
     Ok(Cow::Borrowed(HOOK_PWD))
 }
-

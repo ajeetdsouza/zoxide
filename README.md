@@ -48,6 +48,14 @@ zr /foo     # remove /foo from the database
 
 ### Step 1: Installing `zoxide`
 
+#### Fedora 32+
+
+```sh
+sudo dnf install zoxide
+```
+
+#### Cargo
+
 If you have Rust, this should be as simple as:
 
 ```sh

@@ -1,6 +1,6 @@
 use crate::config;
 use crate::db::{Dir, Rank};
-use crate::util;
+use crate::util::{get_current_time, get_db, path_to_str};
 
 use anyhow::{Context, Result};
 use structopt::StructOpt;
@@ -20,9 +20,7 @@ impl Add {
             Some(path) => path,
             None => {
                 current_dir = env::current_dir().context("unable to fetch current directory")?;
-                current_dir.to_str().with_context(|| {
-                    format!("invalid utf-8 sequence in path: {}", current_dir.display())
-                })?
+                path_to_str(&current_dir)?
             }
         };
 
@@ -42,12 +40,10 @@ fn add(path: &str) -> Result<()> {
         return Ok(());
     }
 
-    let path_abs_str = path_abs
-        .to_str()
-        .with_context(|| format!("invalid utf-8 sequence in path: {}", path_abs.display()))?;
+    let path_abs_str = path_to_str(&path_abs)?;
 
-    let mut db = util::get_db()?;
-    let now = util::get_current_time()?;
+    let mut db = get_db()?;
+    let now = get_current_time()?;
 
     let maxage = config::zo_maxage()?;
 

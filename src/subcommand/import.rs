@@ -1,5 +1,5 @@
 use crate::db::{Db, Dir};
-use crate::util;
+use crate::util::{get_db, path_to_str};
 
 use anyhow::{bail, Context, Result};
 use structopt::StructOpt;
@@ -23,7 +23,7 @@ impl Import {
 }
 
 fn import<P: AsRef<Path>>(path: P, merge: bool) -> Result<()> {
-    let mut db = util::get_db()?;
+    let mut db = get_db()?;
 
     if !db.dirs.is_empty() && !merge {
         bail!(
@@ -70,9 +70,7 @@ fn import_line(db: &mut Db, line: &str) -> Result<()> {
     let path_abs = dunce::canonicalize(path_str)
         .with_context(|| format!("could not resolve path: {}", path_str))?;
 
-    let path_abs_str = path_abs
-        .to_str()
-        .with_context(|| format!("invalid utf-8 sequence in path: {}", path_abs.display()))?;
+    let path_abs_str = path_to_str(&path_abs)?;
 
     // If the path exists in the database, add the ranks and set the epoch to
     // the largest of the parsed epoch and the already present epoch.

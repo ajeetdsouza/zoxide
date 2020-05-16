@@ -3,6 +3,7 @@ use crate::db::{Db, Epoch};
 
 use anyhow::{Context, Result};
 
+use std::path::Path;
 use std::time::SystemTime;
 
 pub fn get_db() -> Result<Db> {
@@ -17,4 +18,11 @@ pub fn get_current_time() -> Result<Epoch> {
         .as_secs();
 
     Ok(current_time as Epoch)
+}
+
+pub fn path_to_str<P: AsRef<Path>>(path: &P) -> Result<&str> {
+    let path = path.as_ref();
+
+    path.to_str()
+        .with_context(|| format!("invalid utf-8 sequence in path: {}", path.display()))
 }

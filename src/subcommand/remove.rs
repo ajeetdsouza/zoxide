@@ -1,5 +1,5 @@
 use crate::fzf::Fzf;
-use crate::util;
+use crate::util::{get_current_time, get_db, path_to_str};
 
 use anyhow::{bail, Context, Result};
 use structopt::StructOpt;
@@ -34,7 +34,7 @@ impl Remove {
 }
 
 fn remove(path: &str) -> Result<()> {
-    let mut db = util::get_db()?;
+    let mut db = get_db()?;
 
     if let Some(idx) = db.dirs.iter().position(|dir| &dir.path == path) {
         db.dirs.swap_remove(idx);
@@ -44,10 +44,7 @@ fn remove(path: &str) -> Result<()> {
 
     let path_abs =
         dunce::canonicalize(path).with_context(|| format!("could not resolve path: {}", path))?;
-
-    let path_abs_str = path_abs
-        .to_str()
-        .with_context(|| format!("invalid utf-8 sequence in path: {}", path_abs.display()))?;
+    let path_abs_str = path_to_str(&path_abs)?;
 
     if let Some(idx) = db.dirs.iter().position(|dir| dir.path == path_abs_str) {
         db.dirs.swap_remove(idx);
@@ -59,8 +56,8 @@ fn remove(path: &str) -> Result<()> {
 }
 
 fn remove_interactive(keywords: &[String]) -> Result<()> {
-    let mut db = util::get_db()?;
-    let now = util::get_current_time()?;
+    let mut db = get_db()?;
+    let now = get_current_time()?;
 
     let keywords = keywords
         .iter()

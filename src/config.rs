@@ -1,4 +1,4 @@
-use crate::dir::Rank;
+use crate::db::Rank;
 
 use anyhow::{bail, Context, Result};
 
@@ -36,13 +36,13 @@ pub fn zo_maxage() -> Result<Rank> {
     match env::var_os("_ZO_MAXAGE") {
         Some(maxage_osstr) => match maxage_osstr.to_str() {
             Some(maxage_str) => {
-                let maxage = maxage_str
-                    .parse::<i64>()
-                    .context("unable to parse _ZO_MAXAGE as integer")?;
+                let maxage = maxage_str.parse::<u64>().with_context(|| {
+                    format!("unable to parse _ZO_MAXAGE as integer: {}", maxage_str)
+                })?;
 
                 Ok(maxage as Rank)
             }
-            None => bail!("invalid Unicode in _ZO_MAXAGE"),
+            None => bail!("invalid utf-8 sequence in _ZO_MAXAGE"),
         },
         None => Ok(1000.0),
     }

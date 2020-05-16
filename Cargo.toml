@@ -23,9 +23,6 @@ serde = { version = "1.0.106", features = ["derive"] }
 structopt = "0.3.12"
 uuid = { version = "0.8.1", features = ["v4"] }
 
-[target.'cfg(unix)'.dependencies]
-bstr = "0.2.12"
-
 [profile.release]
 codegen-units = 1
 lto = "fat"

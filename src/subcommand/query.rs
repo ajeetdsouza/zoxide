@@ -1,11 +1,10 @@
-use crate::db::Db;
+use crate::fzf::Fzf;
 use crate::util;
 
 use anyhow::{bail, Result};
 use float_ord::FloatOrd;
 use structopt::StructOpt;
 
-use std::io::{self, Write};
 use std::path::Path;
 
 #[derive(Debug, StructOpt)]
@@ -19,76 +18,86 @@ pub struct Query {
 impl Query {
     pub fn run(&self) -> Result<()> {
         let path_opt = if self.interactive {
-            self.query_interactive()?
+            query_interactive(&self.keywords)?
         } else {
-            let mut db = util::get_db()?;
-            self.query(&mut db)?
+            query(&self.keywords)?
         };
 
         match path_opt {
-            Some(path) => {
-                let stdout = io::stdout();
-                let mut handle = stdout.lock();
-                handle.write_all(&path).unwrap();
-                handle.write_all(b"\n").unwrap();
-            }
+            Some(path) => println!("{}", path),
             None => bail!("no match found"),
         };
 
         Ok(())
     }
+}
 
-    fn query(&self, db: &mut Db) -> Result<Option<Vec<u8>>> {
-        // if the input is already a valid path, simply return it
-        if let [path] = self.keywords.as_slice() {
-            if Path::new(path).is_dir() {
-                return Ok(Some(path.as_bytes().to_vec()));
-            }
+fn query(keywords: &[String]) -> Result<Option<String>> {
+    // if the input is already a valid path, simply return it
+    if let [path] = keywords {
+        if Path::new(path).is_dir() {
+            return Ok(Some(path.to_string()));
         }
-
-        let now = util::get_current_time()?;
-
-        let keywords = self
-            .keywords
-            .iter()
-            .map(|keyword| keyword.to_lowercase())
-            .collect::<Vec<_>>();
-
-        db.dirs
-            .sort_unstable_by_key(|dir| FloatOrd(dir.get_frecency(now)));
-
-        // Iterating in reverse order ensures that the directory indices do not
-        // change as we remove them.
-        for idx in (0..db.dirs.len()).rev() {
-            let dir = &db.dirs[idx];
-            if !dir.is_match(&keywords) {
-                continue;
-            }
-
-            if !dir.is_valid() {
-                db.dirs.swap_remove(idx);
-                db.modified = true;
-                continue;
-            }
-
-            let path = util::path_to_bytes(&dir.path)?.to_vec();
-            return Ok(Some(path));
-        }
-
-        Ok(None)
     }
 
-    fn query_interactive(&self) -> Result<Option<Vec<u8>>> {
-        let now = util::get_current_time()?;
+    let mut db = util::get_db()?;
+    let now = util::get_current_time()?;
 
-        let keywords = self
-            .keywords
-            .iter()
-            .map(|keyword| keyword.to_lowercase())
-            .collect::<Vec<_>>();
+    let keywords = keywords
+        .iter()
+        .map(|keyword| keyword.to_lowercase())
+        .collect::<Vec<_>>();
 
-        let mut db = util::get_db()?;
-        let dirs = db.query_many(&keywords);
-        util::fzf_helper(now, dirs)
+    db.dirs
+        .sort_unstable_by_key(|dir| FloatOrd(dir.get_frecency(now)));
+
+    // Iterating in reverse order ensures that the directory indices do not
+    // change as we remove them.
+    for idx in (0..db.dirs.len()).rev() {
+        let dir = &db.dirs[idx];
+        if !dir.is_match(&keywords) {
+            continue;
+        }
+
+        if !dir.is_valid() {
+            db.dirs.swap_remove(idx);
+            db.modified = true;
+            continue;
+        }
+
+        let path = &dir.path;
+        return Ok(Some(path.to_string()));
     }
+
+    Ok(None)
+}
+
+fn query_interactive(keywords: &[String]) -> Result<Option<String>> {
+    let keywords = keywords
+        .iter()
+        .map(|keyword| keyword.to_lowercase())
+        .collect::<Vec<_>>();
+
+    let mut db = util::get_db()?;
+    let now = util::get_current_time()?;
+
+    let mut fzf = Fzf::new()?;
+
+    for idx in (0..db.dirs.len()).rev() {
+        let dir = &db.dirs[idx];
+
+        if !dir.is_match(&keywords) {
+            continue;
+        }
+
+        if !dir.is_valid() {
+            db.dirs.swap_remove(idx);
+            db.modified = true;
+            continue;
+        }
+
+        fzf.write_dir(&dir, now);
+    }
+
+    fzf.wait_selection()
 }

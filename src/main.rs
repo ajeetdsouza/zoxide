@@ -1,7 +1,9 @@
+#![forbid(unsafe_code)]
+
 mod config;
 mod db;
-mod dir;
 mod error;
+mod fzf;
 mod subcommand;
 mod util;
 

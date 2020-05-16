@@ -48,15 +48,15 @@ zr /foo     # remove /foo from the database
 
 ### Step 1: Installing `zoxide`
 
-#### Fedora 32+
+#### Fedora 32+ [![Fedora](https://img.shields.io/fedora/v/zoxide)](https://src.fedoraproject.org/rpms/rust-zoxide)
 
 ```sh
-sudo dnf install zoxide
+dnf install zoxide
 ```
 
-#### Cargo
+#### Cargo [![crates.io](https://img.shields.io/crates/v/zoxide)](https://crates.io/crates/zoxide)
 
-If you have Rust, this should be as simple as:
+If you have Cargo installed, this should be as simple as:
 
 ```sh
 cargo install zoxide -f

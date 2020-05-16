@@ -34,15 +34,12 @@ pub fn zo_exclude_dirs() -> Vec<PathBuf> {
 
 pub fn zo_maxage() -> Result<Rank> {
     match env::var_os("_ZO_MAXAGE") {
-        Some(maxage_osstr) => match maxage_osstr.to_str() {
-            Some(maxage_str) => {
-                let maxage = maxage_str.parse::<u64>().with_context(|| {
-                    format!("unable to parse _ZO_MAXAGE as integer: {}", maxage_str)
-                })?;
-
-                Ok(maxage as Rank)
-            }
-            None => bail!("invalid utf-8 sequence in _ZO_MAXAGE"),
+        Some(maxage_osstr) => {
+            let maxage_str = maxage_osstr.to_str().context("invalid utf-8 sequence in _ZO_MAXAGE")?;
+            let maxage = maxage_str.parse::<u64>().with_context(|| {
+                format!("unable to parse _ZO_MAXAGE as integer: {}", maxage_str)
+            })?;
+            Ok(maxage as Rank)
         },
         None => Ok(1000.0),
     }

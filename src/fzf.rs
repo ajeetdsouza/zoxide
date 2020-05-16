@@ -43,7 +43,7 @@ impl Fzf {
     }
 
     pub fn wait_selection(mut self) -> Result<Option<String>> {
-        // unwrap() here is safe since we have captured `stdin`
+        // unwrap() is safe here since we have captured `stdin`
         let stdin = self.child.stdin.as_mut().unwrap();
 
         self.lines.sort_unstable_by(|line1, line2| line2.cmp(line1));

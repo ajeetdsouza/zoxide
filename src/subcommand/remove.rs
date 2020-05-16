@@ -33,17 +33,17 @@ impl Remove {
     }
 }
 
-fn remove(path: &str) -> Result<()> {
+fn remove(path_str: &str) -> Result<()> {
     let mut db = get_db()?;
 
-    if let Some(idx) = db.dirs.iter().position(|dir| &dir.path == path) {
+    if let Some(idx) = db.dirs.iter().position(|dir| &dir.path == path_str) {
         db.dirs.swap_remove(idx);
         db.modified = true;
         return Ok(());
     }
 
-    let path_abs =
-        dunce::canonicalize(path).with_context(|| format!("could not resolve path: {}", path))?;
+    let path_abs = dunce::canonicalize(path_str)
+        .with_context(|| format!("could not resolve path: {}", path_str))?;
     let path_abs_str = path_to_str(&path_abs)?;
 
     if let Some(idx) = db.dirs.iter().position(|dir| dir.path == path_abs_str) {
@@ -52,7 +52,7 @@ fn remove(path: &str) -> Result<()> {
         return Ok(());
     }
 
-    bail!("could not find path in database: {}", path)
+    bail!("could not find path in database: {}", path_str)
 }
 
 fn remove_interactive(keywords: &[String]) -> Result<()> {

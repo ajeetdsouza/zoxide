@@ -194,6 +194,7 @@ impl Dir {
             .and_then(|query_last| Path::new(query_last).file_name())
         {
             if let Some(dir_name) = Path::new(&path_lower).file_name() {
+                // <https://github.com/rust-lang/rust/issues/49802>
                 // unwrap is safe here because we've already handled invalid UTF-8
                 let dir_name_str = dir_name.to_str().unwrap();
                 let query_name_str = query_name.to_str().unwrap();

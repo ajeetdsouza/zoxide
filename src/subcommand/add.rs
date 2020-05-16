@@ -6,11 +6,12 @@ use anyhow::{Context, Result};
 use structopt::StructOpt;
 
 use std::env;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, StructOpt)]
 #[structopt(about = "Add a new directory or increment its rank")]
 pub struct Add {
-    path: Option<String>,
+    path: Option<PathBuf>,
 }
 
 impl Add {
@@ -20,36 +21,37 @@ impl Add {
             Some(path) => path,
             None => {
                 current_dir = env::current_dir().context("unable to fetch current directory")?;
-                path_to_str(&current_dir)?
+                &current_dir
             }
         };
 
-        add(path)
+        add(&path)
     }
 }
 
-fn add(path: &str) -> Result<()> {
-    let path_abs = dunce::canonicalize(path)
-        .with_context(|| format!("could not resolve directory: {}", path))?;
+fn add<P: AsRef<Path>>(path: P) -> Result<()> {
+    let path = path.as_ref();
+    let path = dunce::canonicalize(path)
+        .with_context(|| format!("could not resolve directory: {}", path.display()))?;
 
     let exclude_dirs = config::zo_exclude_dirs();
     if exclude_dirs
         .iter()
-        .any(|excluded_path| excluded_path == &path_abs)
+        .any(|excluded_path| excluded_path == &path)
     {
         return Ok(());
     }
 
-    let path_abs_str = path_to_str(&path_abs)?;
+    let path_str = path_to_str(&path)?;
 
     let mut db = get_db()?;
     let now = get_current_time()?;
 
     let maxage = config::zo_maxage()?;
 
-    match db.dirs.iter_mut().find(|dir| dir.path == path_abs_str) {
+    match db.dirs.iter_mut().find(|dir| dir.path == path_str) {
         None => db.dirs.push(Dir {
-            path: path_abs_str.to_string(),
+            path: path_str.to_string(),
             last_accessed: now,
             rank: 1.0,
         }),

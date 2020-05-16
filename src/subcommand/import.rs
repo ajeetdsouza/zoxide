@@ -67,19 +67,19 @@ fn import_line(db: &mut Db, line: &str) -> Result<()> {
         .parse::<f64>()
         .with_context(|| format!("invalid rank: {}", rank_str))?;
 
-    let path_abs = dunce::canonicalize(path_str)
+    let path = dunce::canonicalize(path_str)
         .with_context(|| format!("could not resolve path: {}", path_str))?;
 
-    let path_abs_str = path_to_str(&path_abs)?;
+    let path_str = path_to_str(&path)?;
 
     // If the path exists in the database, add the ranks and set the epoch to
     // the largest of the parsed epoch and the already present epoch.
-    if let Some(dir) = db.dirs.iter_mut().find(|dir| dir.path == path_abs_str) {
+    if let Some(dir) = db.dirs.iter_mut().find(|dir| dir.path == path_str) {
         dir.rank += rank;
         dir.last_accessed = epoch.max(dir.last_accessed);
     } else {
         db.dirs.push(Dir {
-            path: path_abs_str.to_string(),
+            path: path_str.to_string(),
             rank,
             last_accessed: epoch,
         });

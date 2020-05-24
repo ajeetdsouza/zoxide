@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 set -u
 
@@ -134,7 +134,7 @@ cargo_build() {
 		ensure curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 		# shellcheck source=/dev/null
-		source "$HOME/.cargo/env"
+		. "$HOME/.cargo/env"
 	fi
 
 	RUSTFLAGS="-C target-cpu=native" ensure cargo install zoxide

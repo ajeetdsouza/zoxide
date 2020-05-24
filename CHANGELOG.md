@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [0.4.1] - 2020-05-25
 
 ### Added
 
@@ -13,11 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- Support for non-UTF8 paths.
-
-### Removed
-
 - Backward compatibility with `v0.2.x` databases.
+- Support for paths with invalid UTF-8.
 
 ## [0.4.0] - 2020-05-03
 
@@ -135,6 +132,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions pipeline to build and upload releases.
 - Support for the `zsh` shell.
 
+[0.4.1]: https://github.com/ajeetdsouza/zoxide/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/ajeetdsouza/zoxide/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/ajeetdsouza/zoxide/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/ajeetdsouza/zoxide/compare/v0.2.2...v0.3.0

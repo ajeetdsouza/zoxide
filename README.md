@@ -11,7 +11,8 @@ A faster way to navigate your filesystem
 - [Examples](#examples)
 - [Getting started](#getting-started)
   - [Installing `zoxide`](#step-1-installing-zoxide)
-  - [Adding `zoxide` to your shell](#step-2-adding-zoxide-to-your-shell)
+  - [Installing `fzf` (optional)](#step-2-installing-fzf-optional)
+  - [Adding `zoxide` to your shell](#step-3-adding-zoxide-to-your-shell)
     - [bash](#bash)
     - [fish](#fish)
     - [POSIX](#posix-shells)
@@ -48,30 +49,67 @@ zr /foo     # remove /foo from the database
 
 ### Step 1: Installing `zoxide`
 
-#### Fedora 32+ [![Fedora](https://img.shields.io/fedora/v/zoxide)](https://src.fedoraproject.org/rpms/rust-zoxide)
+#### On Arch Linux [![Arch Linux](https://img.shields.io/aur/version/zoxide)](https://aur.archlinux.org/packages/zoxide)
+
+```sh
+yay -S zoxide
+```
+
+#### On Fedora 32+ [![Fedora](https://img.shields.io/fedora/v/zoxide)](https://src.fedoraproject.org/rpms/rust-zoxide)
 
 ```sh
 dnf install zoxide
 ```
 
-#### Cargo [![crates.io](https://img.shields.io/crates/v/zoxide)](https://crates.io/crates/zoxide)
+#### On FreeBSD
 
-If you have Cargo installed, this should be as simple as:
+```sh
+pkg install zoxide
+```
+
+#### On macOS / Linux (using Homebrew / Linuxbrew)
+
+```
+brew tap ajeetdsouza/zoxide
+brew install zoxide
+```
+
+#### On NixOS
+
+```sh
+nix-env -iA nixpkgs.zoxide
+```
+
+#### On OpenBSD
+
+```sh
+pkg_add zoxide
+```
+
+#### Other (using Cargo) [![crates.io](https://img.shields.io/crates/v/zoxide)](https://crates.io/crates/zoxide)
 
 ```sh
 cargo install zoxide -f
 ```
 
-Otherwise, try the install script:
+#### Other (using precompiled binary)
+
+Use the installation script:
 
 ```sh
 curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/ajeetdsouza/zoxide/master/install.sh | sh
 ```
 
-If you want the interactive fuzzy selection feature, you will also need to install
-[`fzf`](https://github.com/junegunn/fzf.git).
+Alternatively, you can also download a precompiled binary from the
+[releases](https://github.com/ajeetdsouza/zoxide/releases) page and add it to
+your `PATH`.
 
-### Step 2: Adding `zoxide` to your shell
+### Step 2: Installing `fzf` (optional)
+
+If you want to use interactive fuzzy selection, you will also need to install
+[`fzf`](https://github.com/junegunn/fzf#installation).
+
+### Step 3: Adding `zoxide` to your shell
 
 If you currently use `z`, `z.lua`, or `zsh-z`, you may want to first import
 your existing database into `zoxide`:
@@ -119,14 +157,6 @@ NOTE: If you modify your `PS1` at any point, you may need to re-run the above
 command. This is due to the fact that the hook is stored in `PS1`, in order to
 be evaluated every time the prompt is displayed.
 
-#### zsh
-
-Add the following line to your `~/.zshrc`:
-
-```sh
-eval "$(zoxide init zsh)"
-```
-
 #### PowerShell
 
 Add the following line to your profile:
@@ -136,6 +166,14 @@ Invoke-Expression (& {
     $hook = if ($PSVersionTable.PSVersion.Major -lt 6) { 'prompt' } else { 'pwd' }
     (zoxide init --hook $hook powershell) -join "`n"
 })
+```
+
+#### zsh
+
+Add the following line to your `~/.zshrc`:
+
+```sh
+eval "$(zoxide init zsh)"
 ```
 
 ## Configuration

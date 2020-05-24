@@ -62,7 +62,7 @@ impl Fzf {
             Some(0) => {
                 let path_bytes = output
                     .stdout
-                    .get(12..output.stdout.len() - 1)
+                    .get(12..output.stdout.len().saturating_sub(1))
                     .context("fzf returned invalid output")?;
 
                 let path_str =

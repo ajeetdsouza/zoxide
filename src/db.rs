@@ -23,9 +23,9 @@ impl Db {
         fs::create_dir_all(&data_dir)
             .with_context(|| format!("unable to create data directory: {}", data_dir.display()))?;
 
-        let file_path = Self::get_path(&data_dir);
+        let path = Self::get_path(&data_dir);
 
-        let buffer = match fs::read(&file_path) {
+        let buffer = match fs::read(&path) {
             Ok(buffer) => buffer,
             Err(e) if e.kind() == io::ErrorKind::NotFound => {
                 return Ok(Db {
@@ -35,9 +35,8 @@ impl Db {
                 })
             }
             Err(e) => {
-                return Err(e).with_context(|| {
-                    format!("could not read from database: {}", file_path.display())
-                })
+                return Err(e)
+                    .with_context(|| format!("could not read from database: {}", path.display()))
             }
         };
 
@@ -54,7 +53,7 @@ impl Db {
             as _;
 
         if buffer.len() < version_size {
-            bail!("database is corrupted: {}", file_path.display());
+            bail!("database is corrupted: {}", path.display());
         }
 
         let (buffer_version, buffer_dirs) = buffer.split_at(version_size);
@@ -63,21 +62,18 @@ impl Db {
         deserializer.limit(Self::MAX_SIZE);
 
         let version = deserializer.deserialize(buffer_version).with_context(|| {
-            format!(
-                "could not deserialize database version: {}",
-                file_path.display(),
-            )
+            format!("could not deserialize database version: {}", path.display())
         })?;
 
         let dirs = match version {
-            Self::CURRENT_VERSION => deserializer.deserialize(buffer_dirs).with_context(|| {
-                format!("could not deserialize database: {}", file_path.display())
-            })?,
+            Self::CURRENT_VERSION => deserializer
+                .deserialize(buffer_dirs)
+                .with_context(|| format!("could not deserialize database: {}", path.display()))?,
             DbVersion(version_num) => bail!(
                 "zoxide {} does not support schema v{}: {}",
                 env!("ZOXIDE_VERSION"),
                 version_num,
-                file_path.display(),
+                path.display(),
             ),
         };
 
@@ -189,19 +185,15 @@ impl Dir {
     pub fn is_match(&self, query: &[String]) -> bool {
         let path_lower = self.path.to_lowercase();
 
-        if let Some(query_name) = query
-            .last()
-            .and_then(|query_last| Path::new(query_last).file_name())
-        {
-            if let Some(dir_name) = Path::new(&path_lower).file_name() {
-                // <https://github.com/rust-lang/rust/issues/49802>
-                // unwrap is safe here because we've already handled invalid UTF-8
-                let dir_name_str = dir_name.to_str().unwrap();
-                let query_name_str = query_name.to_str().unwrap();
+        let get_filenames = || {
+            let query_name = Path::new(query.last()?).file_name()?.to_str()?;
+            let dir_name = Path::new(&path_lower).file_name()?.to_str()?;
+            Some((query_name, dir_name))
+        };
 
-                if !dir_name_str.contains(query_name_str) {
-                    return false;
-                }
+        if let Some((query_name, dir_name)) = get_filenames() {
+            if !dir_name.contains(query_name) {
+                return false;
             }
         }
 

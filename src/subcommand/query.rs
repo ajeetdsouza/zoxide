@@ -51,8 +51,6 @@ fn query(keywords: &[String]) -> Result<Option<String>> {
     db.dirs
         .sort_unstable_by_key(|dir| FloatOrd(dir.get_frecency(now)));
 
-    // Iterating in reverse order ensures that the directory indices do not
-    // change as we remove them.
     for idx in (0..db.dirs.len()).rev() {
         let dir = &db.dirs[idx];
         if !dir.is_match(&keywords) {

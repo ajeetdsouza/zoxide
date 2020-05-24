@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- Support for non-UTF8 paths.
+
+### Removed
+
 - Backward compatibility with `v0.2.x` databases.
 
 ## [0.4.0] - 2020-05-03

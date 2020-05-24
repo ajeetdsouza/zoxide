@@ -1,7 +1,7 @@
 use crate::fzf::Fzf;
-use crate::util::{get_current_time, get_db, path_to_str};
+use crate::util::{canonicalize, get_current_time, get_db, path_to_str};
 
-use anyhow::{bail, Context, Result};
+use anyhow::{bail, Result};
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
@@ -16,43 +16,40 @@ impl Remove {
     pub fn run(&self) -> Result<()> {
         if self.interactive {
             remove_interactive(&self.query)
+        } else if let [path] = self.query.as_slice() {
+            remove(&path)
         } else {
-            if let &[path] = &self.query.as_slice() {
-                remove(&path)
-            } else {
-                clap::Error::with_description(
-                    &format!(
-                        "remove requires 1 value in non-interactive mode, but {} were provided",
-                        self.query.len()
-                    ),
-                    clap::ErrorKind::WrongNumberOfValues,
-                )
-                .exit();
-            }
+            clap::Error::with_description(
+                &format!(
+                    "remove requires 1 value in non-interactive mode, but {} were provided",
+                    self.query.len()
+                ),
+                clap::ErrorKind::WrongNumberOfValues,
+            )
+            .exit();
         }
     }
 }
 
-fn remove(path_str: &str) -> Result<()> {
+fn remove(path: &str) -> Result<()> {
     let mut db = get_db()?;
 
-    if let Some(idx) = db.dirs.iter().position(|dir| &dir.path == path_str) {
+    if let Some(idx) = db.dirs.iter().position(|dir| dir.path == path) {
         db.dirs.swap_remove(idx);
         db.modified = true;
         return Ok(());
     }
 
-    let path_abs = dunce::canonicalize(path_str)
-        .with_context(|| format!("could not resolve path: {}", path_str))?;
-    let path_abs_str = path_to_str(&path_abs)?;
+    let path = canonicalize(&path)?;
+    let path = path_to_str(&path)?;
 
-    if let Some(idx) = db.dirs.iter().position(|dir| dir.path == path_abs_str) {
+    if let Some(idx) = db.dirs.iter().position(|dir| dir.path == path) {
         db.dirs.swap_remove(idx);
         db.modified = true;
         return Ok(());
     }
 
-    bail!("could not find path in database: {}", path_str)
+    bail!("could not find path in database: {}", path)
 }
 
 fn remove_interactive(keywords: &[String]) -> Result<()> {

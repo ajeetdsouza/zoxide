@@ -1,5 +1,5 @@
 use crate::db::{Db, Dir};
-use crate::util::{get_db, path_to_str};
+use crate::util::{canonicalize, get_db, path_to_str};
 
 use anyhow::{bail, Context, Result};
 use structopt::StructOpt;
@@ -23,6 +23,7 @@ impl Import {
 }
 
 fn import<P: AsRef<Path>>(path: P, merge: bool) -> Result<()> {
+    let path = path.as_ref();
     let mut db = get_db()?;
 
     if !db.dirs.is_empty() && !merge {
@@ -33,7 +34,7 @@ fn import<P: AsRef<Path>>(path: P, merge: bool) -> Result<()> {
     }
 
     let buffer = fs::read_to_string(&path)
-        .with_context(|| format!("could not read z database: {}", path.as_ref().display()))?;
+        .with_context(|| format!("could not read z database: {}", path.display()))?;
 
     for (idx, line) in buffer.lines().enumerate() {
         if let Err(e) = import_line(&mut db, line) {
@@ -51,13 +52,13 @@ fn import<P: AsRef<Path>>(path: P, merge: bool) -> Result<()> {
 fn import_line(db: &mut Db, line: &str) -> Result<()> {
     let mut split_line = line.rsplitn(3, '|');
 
-    let (path_str, epoch_str, rank_str) = (|| {
+    let (path, epoch_str, rank_str) = (|| {
         let epoch_str = split_line.next()?;
         let rank_str = split_line.next()?;
-        let path_str = split_line.next()?;
-        Some((path_str, epoch_str, rank_str))
+        let path = split_line.next()?;
+        Some((path, epoch_str, rank_str))
     })()
-    .context("invalid entry")?;
+    .with_context(|| format!("invalid entry: {}", line))?;
 
     let epoch = epoch_str
         .parse::<i64>()
@@ -67,19 +68,17 @@ fn import_line(db: &mut Db, line: &str) -> Result<()> {
         .parse::<f64>()
         .with_context(|| format!("invalid rank: {}", rank_str))?;
 
-    let path = dunce::canonicalize(path_str)
-        .with_context(|| format!("could not resolve path: {}", path_str))?;
-
-    let path_str = path_to_str(&path)?;
+    let path = canonicalize(&path)?;
+    let path = path_to_str(&path)?;
 
     // If the path exists in the database, add the ranks and set the epoch to
-    // the largest of the parsed epoch and the already present epoch.
-    if let Some(dir) = db.dirs.iter_mut().find(|dir| dir.path == path_str) {
+    // the more recent of the parsed epoch and the already present epoch.
+    if let Some(dir) = db.dirs.iter_mut().find(|dir| dir.path == path) {
         dir.rank += rank;
         dir.last_accessed = epoch.max(dir.last_accessed);
     } else {
         db.dirs.push(Dir {
-            path: path_str.to_string(),
+            path: path.to_string(),
             rank,
             last_accessed: epoch,
         });

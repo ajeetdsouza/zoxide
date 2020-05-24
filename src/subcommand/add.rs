@@ -1,6 +1,6 @@
 use crate::config;
-use crate::db::{Dir, Rank};
-use crate::util::{get_current_time, get_db, path_to_str};
+use crate::db::{Db, Dir, Rank};
+use crate::util::{canonicalize, get_current_time, get_db, path_to_str};
 
 use anyhow::{Context, Result};
 use structopt::StructOpt;
@@ -31,27 +31,20 @@ impl Add {
 
 fn add<P: AsRef<Path>>(path: P) -> Result<()> {
     let path = path.as_ref();
-    let path = dunce::canonicalize(path)
-        .with_context(|| format!("could not resolve directory: {}", path.display()))?;
+    let path = canonicalize(&path)?;
 
-    let exclude_dirs = config::zo_exclude_dirs();
-    if exclude_dirs
-        .iter()
-        .any(|excluded_path| excluded_path == &path)
-    {
+    if config::zo_exclude_dirs().contains(&path) {
         return Ok(());
     }
 
-    let path_str = path_to_str(&path)?;
-
     let mut db = get_db()?;
     let now = get_current_time()?;
-
+    let path = path_to_str(&path)?;
     let maxage = config::zo_maxage()?;
 
-    match db.dirs.iter_mut().find(|dir| dir.path == path_str) {
+    match db.dirs.iter_mut().find(|dir| dir.path == path) {
         None => db.dirs.push(Dir {
-            path: path_str.to_string(),
+            path: path.to_string(),
             last_accessed: now,
             rank: 1.0,
         }),
@@ -61,6 +54,13 @@ fn add<P: AsRef<Path>>(path: P) -> Result<()> {
         }
     };
 
+    age(&mut db, maxage);
+    db.modified = true;
+
+    Ok(())
+}
+
+fn age(db: &mut Db, maxage: Rank) {
     let sum_age = db.dirs.iter().map(|dir| dir.rank).sum::<Rank>();
 
     if sum_age > maxage {
@@ -76,8 +76,4 @@ fn add<P: AsRef<Path>>(path: P) -> Result<()> {
             }
         }
     }
-
-    db.modified = true;
-
-    Ok(())
 }

@@ -67,7 +67,10 @@ abbr -a {0}q 'zoxide query'
 abbr -a {0}qi 'zoxide query -i'
 
 abbr -a {0}r 'zoxide remove'
-abbr -a {0}ri 'zoxide remove -i'
+function {0}ri
+    set result (zoxide query -i $argv)
+    and zoxide remove $result
+end
 "#,
         cmd
     )

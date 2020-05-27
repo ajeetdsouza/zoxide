@@ -55,7 +55,12 @@ function {0}q {{ zoxide query @args }}
 function {0}qi {{ zoxide query -i @args }}
 
 function {0}r {{ zoxide remove @args }}
-function {0}ri {{ zoxide remove -i @args }}
+function {0}ri {{
+    $result = zoxide query -i @args
+    if ($LASTEXITCODE -eq 0) {{
+        zoxide remove $result
+    }}
+}}
 "#,
         cmd
     )

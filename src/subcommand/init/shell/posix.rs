@@ -62,7 +62,9 @@ alias {0}q='zoxide query'
 alias {0}qi='zoxide query -i'
 
 alias {0}r='zoxide remove'
-alias {0}ri='zoxide remove -i'
+{0}ri() {{
+    result=$(zoxide query -i "$@") && zoxide remove "$result"
+}}
 "#,
         cmd
     )

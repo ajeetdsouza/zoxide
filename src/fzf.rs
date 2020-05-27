@@ -46,7 +46,7 @@ impl Fzf {
         // unwrap() is safe here since we have captured `stdin`
         let stdin = self.child.stdin.as_mut().unwrap();
 
-        self.lines.sort_unstable_by(|line1, line2| line2.cmp(line1));
+        self.lines.sort_unstable();
 
         for line in self.lines.iter() {
             writeln!(stdin, "{}", line).context("could not write into fzf stdin")?;

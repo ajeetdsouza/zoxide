@@ -28,22 +28,16 @@ _z_cd() {{
 
 {}() {{
     if [ "$#" -eq 0 ]; then
-        _z_cd ~ || return "$?"
+        _z_cd ~
     elif [ "$#" -eq 1 ] && [ "$1" = '-' ]; then
         if [ -n "$OLDPWD" ]; then
-            _z_cd "$OLDPWD" || return "$?"
+            _z_cd "$OLDPWD"
         else
             echo 'zoxide: $OLDPWD is not set'
             return 1
         fi
     else
-        _zoxide_result="$(zoxide query "$@")" || return "$?"
-        if [ -d "$_zoxide_result" ]; then
-            _z_cd "$_zoxide_result" || return "$?"
-        elif [ -n "$_zoxide_result" ]; then
-            echo "$_zoxide_result"
-        fi
-        unset _zoxide_result
+        _zoxide_result="$(zoxide query -- "$@")" && _z_cd "$_zoxide_result"
     fi
 }}
 "#,
@@ -63,7 +57,7 @@ alias {0}qi='zoxide query -i'
 
 alias {0}r='zoxide remove'
 {0}ri() {{
-    result=$(zoxide query -i "$@") && zoxide remove "$result"
+    _zoxide_result="$(zoxide query -i -- "$@")" && zoxide remove "$_zoxide_result"
 }}
 "#,
         cmd

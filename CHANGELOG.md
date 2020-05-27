@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `zri` is now a shell function.
 
+### Removed
+
+- Help menus for `z` and `zri`.
+
 ## [0.4.1] - 2020-05-25
 
 ### Added

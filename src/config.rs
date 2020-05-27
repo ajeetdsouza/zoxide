@@ -20,7 +20,8 @@ pub fn zo_data_dir() -> Result<PathBuf> {
 
     // This will fail when `data_dir` points to a file or a broken symlink, but
     // will no-op on a valid symlink (to a directory), or an actual directory.
-    fs::create_dir_all(&data_dir).context("could not create data directory")?;
+    fs::create_dir_all(&data_dir)
+        .with_context(|| format!("could not create data directory: {}", data_dir.display()))?;
 
     Ok(data_dir)
 }

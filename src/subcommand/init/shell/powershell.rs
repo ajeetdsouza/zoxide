@@ -31,11 +31,9 @@ function {} {{
         z_cd -
     }}
     else {{
-        $_zoxide_result = zoxide query @args
-        if ($LASTEXITCODE -eq 0 -and $_zoxide_result -is [string] -and (Test-Path $_zoxide_result)) {{
+        $_zoxide_result = zoxide query -- @args
+        if ($LASTEXITCODE -eq 0) {{
             z_cd $_zoxide_result
-        }} else {{
-            $_zoxide_result
         }}
     }}
 }}
@@ -56,9 +54,9 @@ function {0}qi {{ zoxide query -i @args }}
 
 function {0}r {{ zoxide remove @args }}
 function {0}ri {{
-    $result = zoxide query -i @args
+    $_zoxide_result = zoxide query -i -- @args
     if ($LASTEXITCODE -eq 0) {{
-        zoxide remove $result
+        zoxide remove $_zoxide_result
     }}
 }}
 "#,

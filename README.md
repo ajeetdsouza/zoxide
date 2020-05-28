@@ -55,6 +55,13 @@ zr /foo     # remove /foo from the database
 yay -S zoxide
 ```
 
+#### On CentOS
+
+```sh
+dnf copr enable atim/zoxide
+dnf install zoxide
+```
+
 #### On Fedora 32+ [![Fedora](https://img.shields.io/fedora/v/zoxide)](https://src.fedoraproject.org/rpms/rust-zoxide)
 
 ```sh

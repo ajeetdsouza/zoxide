@@ -27,7 +27,7 @@ function _z_cd
     end
 end
 
-function {}
+function {0}
     set argc (count $argv)
 
     if test $argc -eq 0
@@ -39,6 +39,11 @@ function {}
         and _z_cd $_zoxide_result
     end
 end
+
+function {0}i
+    set -l result (zoxide query -i -- $argv)
+    and _z_cd $result
+end
 "#,
         cmd
     )
@@ -47,8 +52,6 @@ end
 fn alias(cmd: &str) -> String {
     format!(
         r#"
-abbr -a {0}i '{0} -i'
-
 abbr -a {0}a 'zoxide add'
 
 abbr -a {0}q 'zoxide query'

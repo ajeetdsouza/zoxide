@@ -26,7 +26,7 @@ _z_cd() {{
     fi
 }}
 
-{}() {{
+{0}() {{
     if [ "$#" -eq 0 ]; then
         _z_cd ~
     elif [ "$#" -eq 1 ] && [ "$1" = '-' ]; then
@@ -40,6 +40,10 @@ _z_cd() {{
         _zoxide_result="$(zoxide query -- "$@")" && _z_cd "$_zoxide_result"
     fi
 }}
+
+{0}i() {{
+    result="$(zoxide query -i -- "$@")" && _z_cd "$result"
+}}
 "#,
         cmd
     )
@@ -48,8 +52,6 @@ _z_cd() {{
 fn alias(cmd: &str) -> String {
     format!(
         r#"
-alias {0}i='{0} -i'
-
 alias {0}a='zoxide add'
 
 alias {0}q='zoxide query'

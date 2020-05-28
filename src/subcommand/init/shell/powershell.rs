@@ -16,25 +16,32 @@ pub const CONFIG: ShellConfig = ShellConfig {
 fn z(cmd: &str) -> String {
     format!(
         r#"
-function {} {{
-    function z_cd($dir) {{
-        Set-Location $dir -ea Stop
-        if ($env:_ZO_ECHO -eq "1") {{
-            Write-Host "$PWD"
-        }}
+function _z_cd($dir) {{
+    Set-Location $dir -ea Stop
+    if ($env:_ZO_ECHO -eq "1") {{
+        Write-Host "$PWD"
     }}
+}}
 
+function {0} {{
     if ($args.Length -eq 0) {{
-        z_cd ~
+        _z_cd ~
     }}
     elseif ($args.Length -eq 1 -and $args[0] -eq '-') {{
-        z_cd -
+        _z_cd -
     }}
     else {{
         $_zoxide_result = zoxide query -- @args
         if ($LASTEXITCODE -eq 0) {{
-            z_cd $_zoxide_result
+            _z_cd $_zoxide_result
         }}
+    }}
+}}
+
+function {0}i {{
+    $result = zoxide query -i -- @args
+    if ($LASTEXITCODE -eq 0) {{
+        _z_cd $result
     }}
 }}
 "#,
@@ -45,8 +52,6 @@ function {} {{
 fn alias(cmd: &str) -> String {
     format!(
         r#"
-function {0}i {{ {0} -i @args }}
-
 function {0}a {{ zoxide add @args }}
 
 function {0}q {{ zoxide query @args }}

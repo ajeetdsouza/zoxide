@@ -4,6 +4,7 @@ use anyhow::{bail, Context, Result};
 
 use std::env;
 use std::fs;
+use std::ffi::OsString;
 use std::path::PathBuf;
 
 pub fn zo_data_dir() -> Result<PathBuf> {
@@ -31,6 +32,10 @@ pub fn zo_exclude_dirs() -> Vec<PathBuf> {
         Some(dirs_osstr) => env::split_paths(&dirs_osstr).collect(),
         None => Vec::new(),
     }
+}
+
+pub fn zo_fzf_opts() -> Option<OsString> {
+    env::var_os("_ZO_FZF_OPTS")
 }
 
 pub fn zo_maxage() -> Result<Rank> {

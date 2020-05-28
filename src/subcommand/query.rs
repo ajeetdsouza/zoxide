@@ -94,7 +94,7 @@ fn query_interactive(keywords: &[String]) -> Result<Option<String>> {
             continue;
         }
 
-        fzf.write_dir(&dir, now);
+        fzf.write_dir(dir, now);
     }
 
     fzf.wait_selection()

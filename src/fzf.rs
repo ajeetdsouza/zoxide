@@ -1,3 +1,4 @@
+use crate::config::zo_fzf_opts;
 use crate::db::{Dir, Epoch};
 use crate::error::SilentExit;
 
@@ -14,12 +15,17 @@ pub struct Fzf {
 
 impl Fzf {
     pub fn new() -> Result<Self> {
-        let child = Command::new("fzf")
+        let mut command = Command::new("fzf");
+        command
             .args(&["-n2..", "--no-sort"])
             .stdin(Stdio::piped())
-            .stdout(Stdio::piped())
-            .spawn()
-            .context("could not launch fzf")?;
+            .stdout(Stdio::piped());
+
+        if let Some(fzf_opts) = zo_fzf_opts() {
+            command.env("FZF_DEFAULT_OPTS", fzf_opts);
+        }
+
+        let child = command.spawn().context("could not launch fzf")?;
 
         Ok(Fzf {
             child,

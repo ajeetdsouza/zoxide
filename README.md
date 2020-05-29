@@ -204,6 +204,7 @@ eval "$(zoxide init zsh)"
 - `$_ZO_ECHO`: when set to `1`, `z` will print the matched directory before navigating to it
 - `$_ZO_EXCLUDE_DIRS`: list of directories separated by platform-specific characters
   ("`:`" on Linux/macOS, "`;`" on Windows) to be excluded from the database
+- `$_ZO_FZF_OPTS`: custom flags to pass to `fzf`
 - `$_ZO_MAXAGE`: sets the maximum total rank after which entries start getting deleted
 
 [`dirs` documentation]: https://docs.rs/dirs/latest/dirs/fn.data_local_dir.html

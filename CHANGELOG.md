@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- `$_ZO_FZF_OPTS` to specify custom options for `fzf`
+- `zoxide query --list` to list all matches
+
 ### Changed
 
 - `zri` is now a shell function.

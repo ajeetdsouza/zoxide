@@ -6,30 +6,24 @@ use structopt::StructOpt;
 
 use std::io::{self, Write};
 
+/// Generates shell configuration
 #[derive(Debug, StructOpt)]
-#[structopt(about = "Generates shell configuration")]
+#[structopt()]
 pub struct Init {
     #[structopt(possible_values = &Shell::variants(), case_insensitive = true)]
     shell: Shell,
 
-    #[structopt(
-        long,
-        help = "Renames the 'z' command and corresponding aliases",
-        alias = "z-cmd",
-        default_value = "z"
-    )]
+    /// Renames the 'z' command and corresponding aliases
+    #[structopt(long, alias = "z-cmd", default_value = "z")]
     cmd: String,
 
-    #[structopt(
-        long,
-        alias = "no-define-aliases",
-        help = "Prevents zoxide from defining any commands other than 'z'"
-    )]
+    /// Prevents zoxide from defining any commands other than 'z'
+    #[structopt(long, alias = "no-define-aliases")]
     no_aliases: bool,
 
+    /// Chooses event on which an entry is added to the database
     #[structopt(
         long,
-        help = "Chooses event on which an entry is added to the database",
         possible_values = &Hook::variants(),
         default_value = "pwd",
         case_insensitive = true

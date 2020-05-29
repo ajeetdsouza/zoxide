@@ -3,8 +3,9 @@ use crate::util::{canonicalize, get_db, path_to_str};
 use anyhow::{bail, Result};
 use structopt::StructOpt;
 
+/// Remove a directory
 #[derive(Debug, StructOpt)]
-#[structopt(about = "Remove a directory")]
+#[structopt()]
 pub struct Remove {
     path: String,
 }

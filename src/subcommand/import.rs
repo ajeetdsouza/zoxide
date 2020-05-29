@@ -7,12 +7,14 @@ use structopt::StructOpt;
 use std::fs;
 use std::path::{Path, PathBuf};
 
+/// Import from z database
 #[derive(Debug, StructOpt)]
-#[structopt(about = "Import from z database")]
+#[structopt()]
 pub struct Import {
     path: PathBuf,
 
-    #[structopt(long, help = "Merge entries into existing database")]
+    /// Merge entries into existing database
+    #[structopt(long)]
     merge: bool,
 }
 

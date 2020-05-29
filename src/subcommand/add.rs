@@ -8,8 +8,9 @@ use structopt::StructOpt;
 use std::env;
 use std::path::{Path, PathBuf};
 
+/// Add a new directory or increment its rank
 #[derive(Debug, StructOpt)]
-#[structopt(about = "Add a new directory or increment its rank")]
+#[structopt()]
 pub struct Add {
     path: Option<PathBuf>,
 }

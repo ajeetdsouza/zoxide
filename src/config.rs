@@ -3,8 +3,8 @@ use crate::db::Rank;
 use anyhow::{bail, Context, Result};
 
 use std::env;
-use std::fs;
 use std::ffi::OsString;
+use std::fs;
 use std::path::PathBuf;
 
 pub fn zo_data_dir() -> Result<PathBuf> {

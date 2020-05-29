@@ -1,4 +1,5 @@
 use anyhow::{bail, Context, Result};
+use float_ord::FloatOrd;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -149,6 +150,10 @@ impl Db {
         Ok(())
     }
 
+    pub fn matches<'a>(&'a mut self, now: Epoch, keywords: &[String]) -> DbMatches<'a> {
+        DbMatches::new(self, now, keywords)
+    }
+
     fn get_path<P: AsRef<Path>>(data_dir: P) -> PathBuf {
         data_dir.as_ref().join("db.zo")
     }
@@ -164,6 +169,49 @@ impl Drop for Db {
         if let Err(e) = self.save() {
             eprintln!("{:#}", e);
         }
+    }
+}
+
+/// Streaming iterator for matching entries
+pub struct DbMatches<'a> {
+    db: &'a mut Db,
+    idxs: std::iter::Rev<std::ops::Range<usize>>,
+    keywords: Vec<String>,
+}
+
+impl<'a> DbMatches<'a> {
+    pub fn new(db: &'a mut Db, now: Epoch, keywords: &[String]) -> DbMatches<'a> {
+        db.dirs
+            .sort_unstable_by_key(|dir| FloatOrd(dir.get_frecency(now)));
+
+        let idxs = (0..db.dirs.len()).rev();
+        let keywords = keywords
+            .iter()
+            .map(|keyword| keyword.to_lowercase())
+            .collect();
+
+        DbMatches { db, idxs, keywords }
+    }
+
+    pub fn next(&mut self) -> Option<&Dir> {
+        for idx in &mut self.idxs {
+            let dir = &self.db.dirs[idx];
+
+            if !dir.is_match(&self.keywords) {
+                continue;
+            }
+
+            if !dir.is_valid() {
+                self.db.dirs.swap_remove(idx);
+                self.db.modified = true;
+                continue;
+            }
+
+            let dir = &self.db.dirs[idx];
+            return Some(dir);
+        }
+
+        None
     }
 }
 

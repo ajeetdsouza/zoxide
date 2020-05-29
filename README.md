@@ -29,6 +29,8 @@ A faster way to navigate your filesystem
 It keeps track of the directories you use most frequently, and uses a ranking algorithm
 to navigate to the best match.
 
+![demo](./demo.gif)
+
 ## Examples
 
 ```sh

@@ -43,6 +43,6 @@ pub fn zo_maxage() -> Result<Rank> {
             })?;
             Ok(maxage as Rank)
         }
-        None => Ok(1000.0),
+        None => Ok(10000.0),
     }
 }

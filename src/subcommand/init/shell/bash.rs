@@ -15,7 +15,7 @@ pub const CONFIG: ShellConfig = ShellConfig {
 
 const HOOK_PROMPT: &str = r#"
 _zoxide_hook() {
-    zoxide add
+    zoxide add "$(pwd -L)"
 }
 
 case "$PROMPT_COMMAND" in
@@ -31,7 +31,7 @@ _zoxide_hook() {
         _ZO_PWD="${PWD}"
     elif [ "${_ZO_PWD}" != "${PWD}" ]; then
         _ZO_PWD="${PWD}"
-        zoxide add
+        zoxide add "$(pwd -L)"
     fi
 }
 

@@ -69,14 +69,14 @@ end
 
 const HOOK_PROMPT: &str = r#"
 function _zoxide_hook --on-event fish_prompt
-    zoxide add
+    zoxide add $(pwd -L)
 end
 "#;
 
 const fn hook_pwd() -> Result<Cow<'static, str>> {
     const HOOK_PWD: &str = r#"
 function _zoxide_hook --on-variable PWD
-    zoxide add
+    zoxide add "$(pwd -L)"
 end
 "#;
 

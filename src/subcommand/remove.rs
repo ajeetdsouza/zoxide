@@ -25,7 +25,7 @@ fn remove(path: &str) -> Result<()> {
         return Ok(());
     }
 
-    let path = util::canonicalize(&path)?;
+    let path = util::resolve_path(&path)?;
     let path = util::path_to_str(&path)?;
 
     if let Some(idx) = db.dirs.iter().position(|dir| dir.path == path) {

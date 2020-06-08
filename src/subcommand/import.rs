@@ -1,3 +1,4 @@
+use crate::config;
 use crate::db::{Db, Dir};
 use crate::util;
 
@@ -39,7 +40,7 @@ fn import<P: AsRef<Path>>(path: P, merge: bool) -> Result<()> {
         .with_context(|| format!("could not read z database: {}", path.display()))?;
 
     for (idx, line) in buffer.lines().enumerate() {
-        if let Err(e) = import_line(&mut db, line) {
+        if let Err(e) = import_line(&mut db, line, config::zo_resolve_symlinks()) {
             let line_num = idx + 1;
             eprintln!("Error on line {}: {}", line_num, e);
         }
@@ -51,7 +52,7 @@ fn import<P: AsRef<Path>>(path: P, merge: bool) -> Result<()> {
     Ok(())
 }
 
-fn import_line(db: &mut Db, line: &str) -> Result<()> {
+fn import_line(db: &mut Db, line: &str, resolve_symlinks: bool) -> Result<()> {
     let mut split_line = line.rsplitn(3, '|');
 
     let (path, epoch_str, rank_str) = (|| {
@@ -70,7 +71,11 @@ fn import_line(db: &mut Db, line: &str) -> Result<()> {
         .parse::<f64>()
         .with_context(|| format!("invalid rank: {}", rank_str))?;
 
-    let path = util::canonicalize(&path)?;
+    let path = if resolve_symlinks {
+        util::canonicalize(&path)?
+    } else {
+        util::resolve_path(&path)?
+    };
     let path = util::path_to_str(&path)?;
 
     // If the path exists in the database, add the ranks and set the epoch to

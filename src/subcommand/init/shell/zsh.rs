@@ -15,7 +15,7 @@ pub const CONFIG: ShellConfig = ShellConfig {
 
 const HOOK_PROMPT: &str = r#"
 _zoxide_hook() {
-    zoxide add
+    zoxide add "$(pwd -L)"
 }
 
 [[ -n "${precmd_functions[(r)_zoxide_hook]}" ]] || {
@@ -26,7 +26,7 @@ _zoxide_hook() {
 const fn hook_pwd() -> Result<Cow<'static, str>> {
     const HOOK_PWD: &str = r#"
 _zoxide_hook() {
-    zoxide add
+    zoxide add "$(pwd -L)"
 }
 
 chpwd_functions=(${chpwd_functions[@]} "_zoxide_hook")

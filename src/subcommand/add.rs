@@ -2,10 +2,9 @@ use crate::config;
 use crate::db::{Db, Dir, Rank};
 use crate::util;
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use structopt::StructOpt;
 
-use std::env;
 use std::path::{Path, PathBuf};
 
 /// Add a new directory or increment its rank
@@ -21,7 +20,7 @@ impl Add {
         let path = match &self.path {
             Some(path) => path,
             None => {
-                current_dir = env::current_dir().context("unable to fetch current directory")?;
+                current_dir = util::get_current_dir()?;
                 &current_dir
             }
         };
@@ -32,7 +31,11 @@ impl Add {
 
 fn add<P: AsRef<Path>>(path: P) -> Result<()> {
     let path = path.as_ref();
-    let path = util::canonicalize(&path)?;
+    let path = if config::zo_resolve_symlinks() {
+        util::canonicalize(&path)?
+    } else {
+        util::resolve_path(&path)?
+    };
 
     if config::zo_exclude_dirs().contains(&path) {
         return Ok(());

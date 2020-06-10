@@ -1,7 +1,8 @@
+use crate::db::Dir;
 use crate::fzf::Fzf;
 use crate::util;
 
-use anyhow::{bail, Result};
+use anyhow::{bail, Context, Result};
 use structopt::StructOpt;
 
 use std::io::{self, Write};
@@ -20,77 +21,110 @@ pub struct Query {
     /// List all matching directories
     #[structopt(short, long, conflicts_with = "interactive")]
     list: bool,
+
+    /// Display score along with result
+    #[structopt(short, long)]
+    score: bool,
 }
 
 impl Query {
     pub fn run(&self) -> Result<()> {
         if self.list {
-            return query_list(&self.keywords);
+            return self.query_list();
         }
 
         if self.interactive {
-            return query_interactive(&self.keywords);
+            return self.query_interactive();
         }
 
-        // if the input is already a valid path, simply return it
+        // if the input is already a valid path, simply print it as-is
         if let [path] = self.keywords.as_slice() {
             if Path::new(path).is_dir() {
-                println!("{}", path);
+                let dir = Dir {
+                    path: path.to_string(),
+                    rank: 0.0,
+                    last_accessed: 0,
+                };
+
+                if self.score {
+                    println!("{}", dir.display_score(0))
+                } else {
+                    println!("{}", dir.display());
+                }
+
                 return Ok(());
             }
         }
 
-        query(&self.keywords)
-    }
-}
-
-fn query(keywords: &[String]) -> Result<()> {
-    let mut db = util::get_db()?;
-    let now = util::get_current_time()?;
-
-    let mut matches = db.matches(now, keywords);
-
-    match matches.next() {
-        Some(dir) => println!("{}", dir.path),
-        None => bail!("no match found"),
+        self.query()
     }
 
-    Ok(())
-}
+    fn query(&self) -> Result<()> {
+        let mut db = util::get_db()?;
+        let now = util::get_current_time()?;
 
-fn query_interactive(keywords: &[String]) -> Result<()> {
-    let mut db = util::get_db()?;
-    let now = util::get_current_time()?;
+        let mut matches = db.matches(now, &self.keywords);
 
-    let mut fzf = Fzf::new()?;
+        match matches.next() {
+            Some(dir) => {
+                if self.score {
+                    println!("{}", dir.display_score(now))
+                } else {
+                    println!("{}", dir.display());
+                }
+            }
+            None => bail!("no match found"),
+        }
 
-    let mut matches = db.matches(now, keywords);
-
-    while let Some(dir) = matches.next() {
-        fzf.write_dir(dir, now);
+        Ok(())
     }
 
-    match fzf.wait_selection()? {
-        Some(path) => println!("{}", path),
-        None => bail!("no match found"),
-    };
+    fn query_interactive(&self) -> Result<()> {
+        let mut db = util::get_db()?;
+        let now = util::get_current_time()?;
 
-    Ok(())
-}
+        let mut fzf = Fzf::new()?;
+        let mut matches = db.matches(now, &self.keywords);
 
-fn query_list(keywords: &[String]) -> Result<()> {
-    let mut db = util::get_db()?;
-    let now = util::get_current_time()?;
+        while let Some(dir) = matches.next() {
+            fzf.write(format!("{}", dir.display_score(now)))?;
+        }
 
-    let mut matches = db.matches(now, keywords);
+        match fzf.wait_select()? {
+            Some(selection) => {
+                if self.score {
+                    print!("{}", selection)
+                } else {
+                    let selection = selection
+                        .get(5..)
+                        .with_context(|| format!("fzf returned invalid output: {}", selection))?;
+                    print!("{}", selection)
+                }
+            }
+            None => bail!("no match found"),
+        };
 
-    let stdout = io::stdout();
-    let mut handle = stdout.lock();
-
-    while let Some(dir) = matches.next() {
-        let path = &dir.path;
-        writeln!(handle, "{}", path).unwrap();
+        Ok(())
     }
 
-    Ok(())
+    fn query_list(&self) -> Result<()> {
+        let mut db = util::get_db()?;
+        let now = util::get_current_time()?;
+
+        let mut matches = db.matches(now, &self.keywords);
+
+        let stdout = io::stdout();
+        let mut handle = stdout.lock();
+
+        while let Some(dir) = matches.next() {
+            if self.score {
+                writeln!(handle, "{}", dir.display_score(now))
+            } else {
+                writeln!(handle, "{}", dir.display())
+            }
+            .unwrap();
+        }
+
+        Ok(())
+    }
 }

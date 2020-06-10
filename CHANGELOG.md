@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `$_ZO_FZF_OPTS` to specify custom options for `fzf`
 - `zoxide query --list` to list all matches
+- `zoxide query --score` to show score along with result
 
 ### Changed
 

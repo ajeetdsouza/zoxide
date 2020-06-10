@@ -3,6 +3,7 @@ use float_ord::FloatOrd;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use std::fmt::{self, Display, Formatter};
 use std::fs::{self, OpenOptions};
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
@@ -182,7 +183,7 @@ pub struct DbMatches<'a> {
 impl<'a> DbMatches<'a> {
     pub fn new(db: &'a mut Db, now: Epoch, keywords: &[String]) -> DbMatches<'a> {
         db.dirs
-            .sort_unstable_by_key(|dir| FloatOrd(dir.get_frecency(now)));
+            .sort_unstable_by_key(|dir| FloatOrd(dir.get_score(now)));
 
         let idxs = (0..db.dirs.len()).rev();
         let keywords = keywords
@@ -257,7 +258,7 @@ impl Dir {
         true
     }
 
-    pub fn get_frecency(&self, now: Epoch) -> Rank {
+    pub fn get_score(&self, now: Epoch) -> Rank {
         const HOUR: Epoch = 60 * 60;
         const DAY: Epoch = 24 * HOUR;
         const WEEK: Epoch = 7 * DAY;
@@ -272,5 +273,47 @@ impl Dir {
         } else {
             self.rank * 0.25
         }
+    }
+
+    pub fn display(&self) -> DirDisplay {
+        DirDisplay { dir: self }
+    }
+
+    pub fn display_score(&self, now: Epoch) -> DirScoreDisplay {
+        DirScoreDisplay { dir: self, now }
+    }
+}
+
+pub struct DirDisplay<'a> {
+    dir: &'a Dir,
+}
+
+impl Display for DirDisplay<'_> {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}", self.dir.path)
+    }
+}
+
+pub struct DirScoreDisplay<'a> {
+    dir: &'a Dir,
+    now: Epoch,
+}
+
+impl Display for DirScoreDisplay<'_> {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        const SCORE_MIN: Rank = 0.0;
+        const SCORE_MAX: Rank = 9999.0;
+
+        let score = self.dir.get_score(self.now);
+
+        let score_clamped = if score > SCORE_MAX {
+            SCORE_MAX
+        } else if score > SCORE_MIN {
+            score
+        } else {
+            SCORE_MIN
+        };
+
+        write!(f, "{:>4.0} {}", score_clamped, self.dir.path)
     }
 }

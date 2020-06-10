@@ -1,23 +1,20 @@
 use crate::config::zo_fzf_opts;
-use crate::db::{Dir, Epoch};
 use crate::error::SilentExit;
 
 use anyhow::{bail, Context, Result};
 
 use std::io::Write;
 use std::process::{Child, Command, Stdio};
-use std::str;
 
 pub struct Fzf {
     child: Child,
-    lines: Vec<String>,
 }
 
 impl Fzf {
     pub fn new() -> Result<Self> {
         let mut command = Command::new("fzf");
         command
-            .args(&["-n2..", "--no-sort"])
+            .arg("-n2..")
             .stdin(Stdio::piped())
             .stdout(Stdio::piped());
 
@@ -27,37 +24,16 @@ impl Fzf {
 
         let child = command.spawn().context("could not launch fzf")?;
 
-        Ok(Fzf {
-            child,
-            lines: Vec::new(),
-        })
+        Ok(Fzf { child })
     }
 
-    pub fn write_dir(&mut self, dir: &Dir, now: Epoch) {
-        let frecency = dir.get_frecency(now);
-
-        let frecency_scaled = if frecency > 9999.0 {
-            9999
-        } else if frecency > 0.0 {
-            frecency as u32
-        } else {
-            0
-        };
-
-        self.lines
-            .push(format!("{:>4}        {}", frecency_scaled, dir.path));
-    }
-
-    pub fn wait_selection(mut self) -> Result<Option<String>> {
+    pub fn write(&mut self, line: String) -> Result<()> {
         // unwrap() is safe here since we have captured `stdin`
         let stdin = self.child.stdin.as_mut().unwrap();
+        writeln!(stdin, "{}", line).context("could not write into fzf stdin")
+    }
 
-        self.lines.sort_unstable();
-
-        for line in self.lines.iter() {
-            writeln!(stdin, "{}", line).context("could not write into fzf stdin")?;
-        }
-
+    pub fn wait_select(self) -> Result<Option<String>> {
         let output = self
             .child
             .wait_with_output()
@@ -65,17 +41,9 @@ impl Fzf {
 
         match output.status.code() {
             // normal exit
-            Some(0) => {
-                let path_bytes = output
-                    .stdout
-                    .get(12..output.stdout.len().saturating_sub(1))
-                    .context("fzf returned invalid output")?;
-
-                let path_str =
-                    str::from_utf8(path_bytes).context("invalid utf-8 sequence in fzf output")?;
-
-                Ok(Some(path_str.to_string()))
-            }
+            Some(0) => String::from_utf8(output.stdout)
+                .context("invalid utf-8 sequence in fzf output")
+                .map(Some),
 
             // no match
             Some(1) => Ok(None),

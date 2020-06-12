@@ -41,11 +41,11 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --release --target x86_64-pc-windows-msvc
+          args: --release --target x86_64-pc-windows-gnu
       - uses: actions/upload-artifact@v1.0.0
         with:
-          name: "zoxide-x86_64-pc-windows-msvc"
-          path: "target/x86_64-pc-windows-msvc/release/zoxide"
+          name: "zoxide-x86_64-pc-windows-gnu.exe"
+          path: "target/x86_64-pc-windows-gnu/release/zoxide.exe"
           
   release-upload:
     needs:
@@ -113,12 +113,12 @@ jobs:
 
       - uses: actions/download-artifact@v1
         with:
-          name: "zoxide-x86_64-pc-windows-msvc"
+          name: "zoxide-x86_64-pc-windows-gnu.exe"
       - uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: "zoxide-x86_64-pc-windows-msvc/zoxide"
-          asset_name: "zoxide-x86_64-pc-windows-msvc"
+          asset_path: "zoxide-x86_64-pc-windows-gnu/zoxide"
+          asset_name: "zoxide-x86_64-pc-windows-gnu.exe"
           asset_content_type: application/octet-stream

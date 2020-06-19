@@ -37,12 +37,13 @@ _z_cd() {{
             return 1
         fi
     else
-        result="$(zoxide query "$@")" || return "$?"
-        if [ -d "$result" ]; then
-            _z_cd "$result" || return "$?"
-        elif [ -n "$result" ]; then
-            echo "$result"
+        _zoxide_result="$(zoxide query "$@")" || return "$?"
+        if [ -d "$_zoxide_result" ]; then
+            _z_cd "$_zoxide_result" || return "$?"
+        elif [ -n "$_zoxide_result" ]; then
+            echo "$_zoxide_result"
         fi
+        unset _zoxide_result
     fi
 }}
 "#,

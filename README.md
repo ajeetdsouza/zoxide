@@ -85,8 +85,7 @@ brew install zoxide
 
 #### On macOS (via MacPorts)
 
-```
-port selfupdate
+```sh
 port install zoxide
 ```
 

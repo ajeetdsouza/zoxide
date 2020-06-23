@@ -83,6 +83,13 @@ brew tap ajeetdsouza/zoxide
 brew install zoxide
 ```
 
+#### On macOS (via MacPorts)
+
+```
+port selfupdate
+port install zoxide
+```
+
 #### On NixOS
 
 ```sh

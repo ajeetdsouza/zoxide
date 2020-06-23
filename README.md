@@ -51,7 +51,7 @@ zr /foo     # remove /foo from the database
 
 ### Step 1: Installing `zoxide`
 
-#### On Arch Linux [![Arch Linux](https://img.shields.io/aur/version/zoxide)](https://aur.archlinux.org/packages/zoxide)
+#### On Arch Linux [![Arch Linux](https://repology.org/badge/version-for-repo/aur/zoxide.svg?header=aur)](https://aur.archlinux.org/packages/zoxide)
 
 ```sh
 yay -S zoxide
@@ -64,50 +64,44 @@ dnf copr enable atim/zoxide
 dnf install zoxide
 ```
 
-#### On Fedora 32+ [![Fedora](https://img.shields.io/fedora/v/zoxide)](https://src.fedoraproject.org/rpms/rust-zoxide)
+#### On Fedora 32+ [![Fedora](https://repology.org/badge/version-for-repo/fedora_rawhide/zoxide.svg?header=fedora)](https://src.fedoraproject.org/rpms/rust-zoxide)
 
 ```sh
 dnf install zoxide
 ```
 
-#### On FreeBSD
+#### On FreeBSD [![FreeBSD](https://repology.org/badge/version-for-repo/freebsd/zoxide.svg?header=freebsd)](https://www.freshports.org/sysutils/zoxide/)
 
 ```sh
 pkg install zoxide
 ```
 
-#### On macOS / Linux (using Homebrew / Linuxbrew)
+#### On macOS / Linux (via Homebrew / Linuxbrew)
 
-```
+```sh
 brew tap ajeetdsouza/zoxide
 brew install zoxide
 ```
 
-#### On macOS (via MacPorts)
+#### On macOS (via MacPorts) [![MacPorts](https://repology.org/badge/version-for-repo/macports/zoxide.svg?header=macports)](https://ports.macports.org/port/zoxide/summary)
 
 ```sh
 port install zoxide
 ```
 
-#### On NixOS
+#### On NixOS [![nixpkgs unstable](https://repology.org/badge/version-for-repo/nix_unstable/zoxide.svg?header=nixpkgs%20unstable)](https://nixos.org/nixos/packages.html?attr=zoxide&channel=nixpkgs-unstable)
 
 ```sh
 nix-env -iA nixpkgs.zoxide
 ```
 
-#### On OpenBSD
-
-```sh
-pkg_add zoxide
-```
-
-#### Other (using Cargo) [![crates.io](https://img.shields.io/crates/v/zoxide)](https://crates.io/crates/zoxide)
+#### Other (via Cargo) [![crates.io package](https://repology.org/badge/version-for-repo/crates_io/zoxide.svg?header=crates.io)](https://crates.io/crates/zoxide)
 
 ```sh
 cargo install zoxide -f
 ```
 
-#### Other (using precompiled binary)
+#### Other (via precompiled binary) [![GitHub releases](https://img.shields.io/github/v/release/ajeetdsouza/zoxide?color=blue&label=github%20releases&sort=semver)](https://github.com/ajeetdsouza/zoxide/releases)
 
 Use the installation script:
 

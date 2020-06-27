@@ -1,5 +1,5 @@
 use super::{HookConfig, ShellConfig};
-use crate::util::path_to_str;
+use crate::util;
 
 use anyhow::Result;
 use uuid::Uuid;
@@ -80,10 +80,10 @@ esac
 fn hook_pwd() -> Result<Cow<'static, str>> {
     let mut tmp_path = std::env::temp_dir();
     tmp_path.push("zoxide");
-    let tmp_path_str = path_to_str(&tmp_path)?;
+    let tmp_path_str = util::path_to_str(&tmp_path)?;
 
     let pwd_path = tmp_path.join(format!("pwd-{}", Uuid::new_v4()));
-    let pwd_path_str = path_to_str(&pwd_path)?;
+    let pwd_path_str = util::path_to_str(&pwd_path)?;
 
     let hook_pwd = format!(
         r#"

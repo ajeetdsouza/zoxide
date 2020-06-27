@@ -1,4 +1,4 @@
-use crate::util::{canonicalize, get_db, path_to_str};
+use crate::util;
 
 use anyhow::{bail, Result};
 use structopt::StructOpt;
@@ -17,7 +17,7 @@ impl Remove {
 }
 
 fn remove(path: &str) -> Result<()> {
-    let mut db = get_db()?;
+    let mut db = util::get_db()?;
 
     if let Some(idx) = db.dirs.iter().position(|dir| dir.path == path) {
         db.dirs.swap_remove(idx);
@@ -25,8 +25,8 @@ fn remove(path: &str) -> Result<()> {
         return Ok(());
     }
 
-    let path = canonicalize(&path)?;
-    let path = path_to_str(&path)?;
+    let path = util::canonicalize(&path)?;
+    let path = util::path_to_str(&path)?;
 
     if let Some(idx) = db.dirs.iter().position(|dir| dir.path == path) {
         db.dirs.swap_remove(idx);

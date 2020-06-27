@@ -31,11 +31,11 @@ function {} {{
         z_cd -
     }}
     else {{
-        $result = zoxide query @args
-        if ($LASTEXITCODE -eq 0 -and $result -is [string] -and (Test-Path $result)) {{
-            z_cd $result
+        $_zoxide_result = zoxide query @args
+        if ($LASTEXITCODE -eq 0 -and $_zoxide_result -is [string] -and (Test-Path $_zoxide_result)) {{
+            z_cd $_zoxide_result
         }} else {{
-            $result
+            $_zoxide_result
         }}
     }}
 }}

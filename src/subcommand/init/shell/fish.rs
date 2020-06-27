@@ -41,13 +41,13 @@ function {}
     else
         # FIXME: use string-collect from fish 3.1.0 once it has wider adoption
         set -l IFS ''
-        set -l result (zoxide query $argv)
+        set -l _zoxide_result (zoxide query $argv)
 
-        if test -d $result; and string length -q -- $result
-            _z_cd $result
+        if test -d $_zoxide_result; and string length -q -- $_zoxide_result
+            _z_cd $_zoxide_result
             or return $status
-        else if test -n "$result"
-            echo $result
+        else if test -n "$_zoxide_result"
+            echo $_zoxide_result
         end
     end
 end

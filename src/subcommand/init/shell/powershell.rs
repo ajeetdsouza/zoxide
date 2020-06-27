@@ -39,9 +39,9 @@ function {0} {{
 }}
 
 function {0}i {{
-    $result = zoxide query -i -- @args
+    $_zoxide_result = zoxide query -i -- @args
     if ($LASTEXITCODE -eq 0) {{
-        _z_cd $result
+        _z_cd $_zoxide_result
     }}
 }}
 "#,

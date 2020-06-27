@@ -1,6 +1,6 @@
 use crate::config;
 use crate::db::{Db, Dir, Rank};
-use crate::util::{canonicalize, get_current_time, get_db, path_to_str};
+use crate::util;
 
 use anyhow::{Context, Result};
 use structopt::StructOpt;
@@ -32,15 +32,15 @@ impl Add {
 
 fn add<P: AsRef<Path>>(path: P) -> Result<()> {
     let path = path.as_ref();
-    let path = canonicalize(&path)?;
+    let path = util::canonicalize(&path)?;
 
     if config::zo_exclude_dirs().contains(&path) {
         return Ok(());
     }
 
-    let mut db = get_db()?;
-    let now = get_current_time()?;
-    let path = path_to_str(&path)?;
+    let mut db = util::get_db()?;
+    let now = util::get_current_time()?;
+    let path = util::path_to_str(&path)?;
     let maxage = config::zo_maxage()?;
 
     match db.dirs.iter_mut().find(|dir| dir.path == path) {

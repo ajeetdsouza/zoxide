@@ -1,5 +1,5 @@
 use crate::db::{Db, Dir};
-use crate::util::{canonicalize, get_db, path_to_str};
+use crate::util;
 
 use anyhow::{bail, Context, Result};
 use structopt::StructOpt;
@@ -26,7 +26,7 @@ impl Import {
 
 fn import<P: AsRef<Path>>(path: P, merge: bool) -> Result<()> {
     let path = path.as_ref();
-    let mut db = get_db()?;
+    let mut db = util::get_db()?;
 
     if !db.dirs.is_empty() && !merge {
         bail!(
@@ -70,8 +70,8 @@ fn import_line(db: &mut Db, line: &str) -> Result<()> {
         .parse::<f64>()
         .with_context(|| format!("invalid rank: {}", rank_str))?;
 
-    let path = canonicalize(&path)?;
-    let path = path_to_str(&path)?;
+    let path = util::canonicalize(&path)?;
+    let path = util::path_to_str(&path)?;
 
     // If the path exists in the database, add the ranks and set the epoch to
     // the more recent of the parsed epoch and the already present epoch.

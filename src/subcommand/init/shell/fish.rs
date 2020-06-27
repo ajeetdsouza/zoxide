@@ -41,8 +41,8 @@ function {0}
 end
 
 function {0}i
-    set -l result (zoxide query -i -- $argv)
-    and _z_cd $result
+    set -l _zoxide_result (zoxide query -i -- $argv)
+    and _z_cd $_zoxide_result
 end
 "#,
         cmd

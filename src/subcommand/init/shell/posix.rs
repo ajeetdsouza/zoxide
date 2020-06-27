@@ -42,7 +42,7 @@ _z_cd() {{
 }}
 
 {0}i() {{
-    result="$(zoxide query -i -- "$@")" && _z_cd "$result"
+    _zoxide_result="$(zoxide query -i -- "$@")" && _z_cd "$_zoxide_result"
 }}
 "#,
         cmd

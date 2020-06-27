@@ -76,10 +76,9 @@ dnf install zoxide
 pkg install zoxide
 ```
 
-#### On macOS / Linux (via Homebrew / Linuxbrew)
+#### On macOS / Linux (via Homebrew / Linuxbrew) [![Homebrew](https://repology.org/badge/version-for-repo/homebrew/zoxide.svg?header=homebrew)](https://formulae.brew.sh/formula/zoxide)
 
 ```sh
-brew tap ajeetdsouza/zoxide
 brew install zoxide
 ```
 

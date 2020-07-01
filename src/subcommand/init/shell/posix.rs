@@ -68,7 +68,7 @@ alias {0}r='zoxide remove'
 
 const HOOK_PROMPT: &str = r#"
 _zoxide_hook() {
-    zoxide add
+    zoxide add "$(pwd -L)"
 }
 
 case "$PS1" in
@@ -117,7 +117,7 @@ _zoxide_setpwd
 _zoxide_hook() {{
     _ZO_OLDPWD="$(cat "$_ZO_PWD_PATH")"
     if [ -z "$_ZO_OLDPWD" ] || [ "$_ZO_OLDPWD" != "$PWD" ]; then
-        _zoxide_setpwd && zoxide add > /dev/null
+        _zoxide_setpwd && zoxide add "$(pwd -L)" > /dev/null
     fi
 }}
 

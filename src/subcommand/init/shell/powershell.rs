@@ -72,7 +72,7 @@ function {0}ri {{
 const HOOK_PROMPT: &str = r#"
 $PreZoxidePrompt = $function:prompt
 function prompt {
-    $null = zoxide add
+    $null = zoxide add $(Get-Location)
     & $PreZoxidePrompt
 }
 "#;
@@ -81,7 +81,7 @@ const fn hook_pwd() -> Result<Cow<'static, str>> {
     const HOOK_PWD: &str = r#"
 if ($PSVersionTable.PSVersion.Major -ge 6) {
     $ExecutionContext.InvokeCommand.LocationChangedAction = {
-        $null = zoxide add
+        $null = zoxide add $(Get-Location)
     }
 } else {
     Write-Error "pwd hook requires pwsh - use 'zoxide init powershell --hook prompt'"

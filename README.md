@@ -206,5 +206,6 @@ eval "$(zoxide init zsh)"
   ("`:`" on Linux/macOS, "`;`" on Windows) to be excluded from the database
 - `$_ZO_FZF_OPTS`: custom flags to pass to `fzf`
 - `$_ZO_MAXAGE`: sets the maximum total age after which entries start getting deleted
+- `$_ZO_RESOLVE_SYMLINKS`: when set to `1`, `z add` will resolve symlinks.
 
 [`dirs` documentation]: https://docs.rs/dirs/latest/dirs/fn.data_local_dir.html

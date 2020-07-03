@@ -10,13 +10,13 @@ jobs:
       matrix:
         target: ["x86_64-unknown-linux-gnu", "x86_64-unknown-linux-musl", "armv7-unknown-linux-musleabihf"]
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
       - uses: actions-rs/cargo@v1
         with:
           use-cross: true
           command: build
           args: --release --target ${{ matrix.target }}
-      - uses: actions/upload-artifact@v1.0.0
+      - uses: actions/upload-artifact@v2
         with:
           name: "zoxide-${{ matrix.target }}"
           path: "target/${{ matrix.target }}/release/zoxide"
@@ -24,12 +24,12 @@ jobs:
   build-darwin:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
       - uses: actions-rs/cargo@v1
         with:
           command: build
           args: --release --target x86_64-apple-darwin
-      - uses: actions/upload-artifact@v1.0.0
+      - uses: actions/upload-artifact@v2
         with:
           name: "zoxide-x86_64-apple-darwin"
           path: "target/x86_64-apple-darwin/release/zoxide"
@@ -37,14 +37,14 @@ jobs:
   build-windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
       - uses: actions-rs/cargo@v1
         with:
           command: build
           args: --release --target x86_64-pc-windows-msvc
-      - uses: actions/upload-artifact@v1.0.0
+      - uses: actions/upload-artifact@v2
         with:
-          name: "zoxide-x86_64-pc-windows-msvc.exe"
+          name: "zoxide-x86_64-pc-windows-msvc"
           path: "target/x86_64-pc-windows-msvc/release/zoxide.exe"
           
   release-upload:
@@ -54,18 +54,21 @@ jobs:
       - build-windows
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
+
       - id: create_release
-        uses: actions/create-release@latest
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
 
-      - uses: actions/download-artifact@v1
-        with:
-          name: "zoxide-x86_64-unknown-linux-gnu"
+      - uses: actions/download-artifact@v2
+
+      - name: Display structure of downloaded files
+        run: ls -lR
+
       - uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -75,9 +78,6 @@ jobs:
           asset_name: "zoxide-x86_64-unknown-linux-gnu"
           asset_content_type: application/octet-stream
 
-      - uses: actions/download-artifact@v1
-        with:
-          name: "zoxide-x86_64-unknown-linux-musl"
       - uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -87,9 +87,6 @@ jobs:
           asset_name: "zoxide-x86_64-unknown-linux-musl"
           asset_content_type: application/octet-stream
 
-      - uses: actions/download-artifact@v1
-        with:
-          name: "zoxide-armv7-unknown-linux-musleabihf"
       - uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -99,9 +96,6 @@ jobs:
           asset_name: "zoxide-armv7-unknown-linux-musleabihf"
           asset_content_type: application/octet-stream
 
-      - uses: actions/download-artifact@v1
-        with:
-          name: "zoxide-x86_64-apple-darwin"
       - uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -111,14 +105,11 @@ jobs:
           asset_name: "zoxide-x86_64-apple-darwin"
           asset_content_type: application/octet-stream
 
-      - uses: actions/download-artifact@v1
-        with:
-          name: "zoxide-x86_64-pc-windows-msvc.exe"
       - uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: "zoxide-x86_64-pc-windows-msvc/zoxide"
+          asset_path: "zoxide-x86_64-pc-windows-msvc/zoxide.exe"
           asset_name: "zoxide-x86_64-pc-windows-msvc.exe"
           asset_content_type: application/octet-stream

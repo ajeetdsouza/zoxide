@@ -1,6 +1,6 @@
 [package]
 name = "zoxide"
-version = "0.4.1"
+version = "0.4.2"
 authors = ["Ajeet D'Souza <98ajeet@gmail.com>"]
 description = "A faster way to navigate your filesystem"
 repository = "https://github.com/ajeetdsouza/zoxide/"
@@ -25,4 +25,4 @@ uuid = { version = "0.8.1", features = ["v4"] }
 
 [profile.release]
 codegen-units = 1
-lto = "fat"
+lto = true

@@ -15,7 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Increased default value of `$_ZO_MAXAGE` to `10000`.
 - `zri` is now a shell function.
+- Symlinks are treated as separate directories by default, this can be changed by setting `_ZO_RESOLVE_SYMLINKS=1`.
 
 ### Removed
 

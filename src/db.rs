@@ -1,4 +1,5 @@
 use anyhow::{bail, Context, Result};
+use bincode::Options;
 use float_ord::FloatOrd;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -50,7 +51,12 @@ impl Db {
             });
         }
 
-        let version_size = bincode::serialized_size(&Self::CURRENT_VERSION)
+        let deserializer = &mut bincode::options()
+            .with_fixint_encoding()
+            .with_limit(Self::MAX_SIZE);
+
+        let version_size = deserializer
+            .serialized_size(&Self::CURRENT_VERSION)
             .context("could not determine size of database version field")?
             as _;
 
@@ -59,9 +65,6 @@ impl Db {
         }
 
         let (buffer_version, buffer_dirs) = buffer.split_at(version_size);
-
-        let mut deserializer = bincode::config();
-        deserializer.limit(Self::MAX_SIZE);
 
         let version = deserializer.deserialize(buffer_version).with_context(|| {
             format!("could not deserialize database version: {}", path.display())

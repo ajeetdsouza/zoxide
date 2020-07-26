@@ -64,6 +64,12 @@ dnf copr enable atim/zoxide
 dnf install zoxide
 ```
 
+#### On DragonFly BSD [![DPorts](https://repology.org/badge/version-for-repo/dports/zoxide.svg?header=dports)](https://github.com/DragonFlyBSD/DPorts/tree/master/sysutils/zoxide)
+
+```sh
+pkg install zoxide
+```
+
 #### On Fedora 32+ [![Fedora](https://repology.org/badge/version-for-repo/fedora_rawhide/zoxide.svg?header=fedora)](https://src.fedoraproject.org/rpms/rust-zoxide)
 
 ```sh
@@ -92,6 +98,12 @@ port install zoxide
 
 ```sh
 nix-env -iA nixpkgs.zoxide
+```
+
+#### On Void Linux [![Void Linux](https://repology.org/badge/version-for-repo/void_x86_64/zoxide.svg?header=void%20linux)](https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide)
+
+```sh
+xbps-install -S zoxide
 ```
 
 #### Other (via Cargo) [![crates.io package](https://repology.org/badge/version-for-repo/crates_io/zoxide.svg?header=crates.io)](https://crates.io/crates/zoxide)

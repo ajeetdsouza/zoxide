@@ -106,6 +106,12 @@ nix-env -iA nixpkgs.zoxide
 xbps-install -S zoxide
 ```
 
+#### On Windows (via [Scoop](https://github.com/lukesampson/scoop)) [![Scoop](https://repology.org/badge/version-for-repo/scoop/zoxide.svg?header=scoop)](https://github.com/ScoopInstaller/Main/tree/master/bucket/zoxide.json)
+
+```powershell
+scoop install zoxide
+```
+
 #### Other (via Cargo) [![crates.io package](https://repology.org/badge/version-for-repo/crates_io/zoxide.svg?header=crates.io)](https://crates.io/crates/zoxide)
 
 ```sh

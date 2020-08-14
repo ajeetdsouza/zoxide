@@ -73,7 +73,7 @@ _zoxide_hook() {
 
 case "$PS1" in
     *\$\(_zoxide_hook\)*) ;;
-    *) PS1="\$(_zoxide_hook)${PS1}" ;;
+    *) PS1="${PS1}\$(_zoxide_hook)" ;;
 esac
 "#;
 
@@ -123,7 +123,7 @@ _zoxide_hook() {{
 
 case "$PS1" in
     *\$\(_zoxide_hook\)*) ;;
-    *) PS1="\$(_zoxide_hook)${{PS1}}" ;;
+    *) PS1="${{PS1}}\$(_zoxide_hook)" ;;
 esac"#,
         quote(tmp_path_str),
         quote(pwd_path_str),

@@ -20,7 +20,7 @@ _zoxide_hook() {
 
 case "$PROMPT_COMMAND" in
     *_zoxide_hook*) ;;
-    *) PROMPT_COMMAND="_zoxide_hook${PROMPT_COMMAND:+;${PROMPT_COMMAND}}" ;;
+    *) PROMPT_COMMAND="${PROMPT_COMMAND:+${PROMPT_COMMAND};}_zoxide_hook" ;;
 esac
 "#;
 

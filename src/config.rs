@@ -53,6 +53,13 @@ pub fn zo_maxage() -> Result<Rank> {
     }
 }
 
+pub fn zo_echo() -> bool {
+    match env::var_os("_ZO_ECHO") {
+        Some(var) => var == "1",
+        None => false,
+    }
+}
+
 pub fn zo_resolve_symlinks() -> bool {
     match env::var_os("_ZO_RESOLVE_SYMLINKS") {
         Some(var) => var == "1",

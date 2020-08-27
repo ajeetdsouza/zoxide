@@ -1,10 +1,14 @@
-mod shell;
+mod bash;
+mod fish;
+mod posix;
+mod powershell;
+mod zsh;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use clap::arg_enum;
 use structopt::StructOpt;
 
-use std::io::{self, Write};
+use std::io;
 
 /// Generates shell configuration
 #[derive(Debug, StructOpt)]
@@ -17,7 +21,7 @@ pub struct Init {
     #[structopt(long, alias = "z-cmd", default_value = "z")]
     cmd: String,
 
-    /// Prevents zoxide from defining any commands other than 'z'
+    /// Prevents zoxide from defining any commands
     #[structopt(long, alias = "no-define-aliases")]
     no_aliases: bool,
 
@@ -33,35 +37,17 @@ pub struct Init {
 
 impl Init {
     pub fn run(&self) -> Result<()> {
-        let config = match self.shell {
-            Shell::bash => shell::bash::CONFIG,
-            Shell::fish => shell::fish::CONFIG,
-            Shell::posix => shell::posix::CONFIG,
-            Shell::powershell => shell::powershell::CONFIG,
-            Shell::zsh => shell::zsh::CONFIG,
-        };
-
         let stdout = io::stdout();
         let mut handle = stdout.lock();
 
-        let z = config.z;
-        writeln!(handle, "{}", z(&self.cmd)).unwrap();
-
-        if !self.no_aliases {
-            let alias = config.alias;
-            writeln!(handle, "{}", alias(&self.cmd)).unwrap();
+        match self.shell {
+            Shell::bash => bash::run(&mut handle, self),
+            Shell::fish => fish::run(&mut handle, self),
+            Shell::posix => posix::run(&mut handle, self),
+            Shell::powershell => powershell::run(&mut handle, self),
+            Shell::zsh => zsh::run(&mut handle, self),
         }
-
-        match self.hook {
-            Hook::none => (),
-            Hook::prompt => writeln!(handle, "{}", config.hook.prompt).unwrap(),
-            Hook::pwd => {
-                let hook_pwd = config.hook.pwd;
-                writeln!(handle, "{}", hook_pwd()?).unwrap();
-            }
-        }
-
-        Ok(())
+        .context("could not initialize zoxide")
     }
 }
 

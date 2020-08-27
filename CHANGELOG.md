@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- `zoxide init` now defines `__zoxide_z*` functions that can be aliased as needed.
+
+### Changed
+
+- `zoxide init --no-aliases` no longer generates `z` or `zi`.
+
 ## [0.4.3] - 2020-07-04
 
 ### Fixed

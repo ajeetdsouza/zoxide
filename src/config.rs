@@ -27,10 +27,18 @@ pub fn zo_data_dir() -> Result<PathBuf> {
     Ok(data_dir)
 }
 
-pub fn zo_exclude_dirs() -> Vec<PathBuf> {
+pub fn zo_exclude_dirs() -> Result<Vec<glob::Pattern>> {
     match env::var_os("_ZO_EXCLUDE_DIRS") {
-        Some(dirs_osstr) => env::split_paths(&dirs_osstr).collect(),
-        None => Vec::new(),
+        Some(dirs_osstr) => env::split_paths(&dirs_osstr)
+            .map(|path| {
+                let pattern = path
+                    .to_str()
+                    .context("invalid utf-8 sequence in _ZO_EXCLUDE_DIRS")?;
+                glob::Pattern::new(&pattern)
+                    .with_context(|| format!("invalid glob in _ZO_EXCLUDE_DIRS: {}", pattern))
+            })
+            .collect(),
+        None => Ok(Vec::new()),
     }
 }
 

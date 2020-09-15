@@ -37,7 +37,10 @@ fn add<P: AsRef<Path>>(path: P) -> Result<()> {
         util::resolve_path(&path)?
     };
 
-    if config::zo_exclude_dirs().contains(&path) {
+    if config::zo_exclude_dirs()?
+        .iter()
+        .any(|pattern| pattern.matches_path(&path))
+    {
         return Ok(());
     }
 

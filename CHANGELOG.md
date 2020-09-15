@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `zoxide init` now defines `__zoxide_z*` functions that can be aliased as needed.
+- `$_ZO_EXCLUDE_DIRS` now supports globs.
 
 ### Changed
 

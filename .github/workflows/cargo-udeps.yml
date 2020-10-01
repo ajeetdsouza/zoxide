@@ -18,4 +18,5 @@ jobs:
         with:
           crate: cargo-udeps
           version: latest
+          use-tool-cache: true
       - run: cargo udeps --all-features --all-targets --workspace

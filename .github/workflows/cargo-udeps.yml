@@ -1,0 +1,21 @@
+name: cargo-udeps
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  udeps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: cargo-udeps
+          version: latest
+      - run: cargo udeps --all-features --all-targets --workspace

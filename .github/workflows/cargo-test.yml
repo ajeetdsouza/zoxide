@@ -8,6 +8,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - run: sudo apt update
+      - run: sudo apt install bash dash fish shellcheck xonsh zsh
+      - run: sudo snap install powershell --classic
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:

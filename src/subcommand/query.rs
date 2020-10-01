@@ -84,9 +84,8 @@ impl Query {
         let now = util::get_current_time()?;
 
         let mut fzf = Fzf::new()?;
-        let mut matches = db.matches(now, &self.keywords);
 
-        while let Some(dir) = matches.next() {
+        for dir in db.matches(now, &self.keywords) {
             fzf.write(format!("{}", dir.display_score(now)))?;
         }
 
@@ -111,12 +110,10 @@ impl Query {
         let mut db = util::get_db()?;
         let now = util::get_current_time()?;
 
-        let mut matches = db.matches(now, &self.keywords);
-
         let stdout = io::stdout();
         let mut handle = stdout.lock();
 
-        while let Some(dir) = matches.next() {
+        for dir in db.matches(now, &self.keywords) {
             if self.score {
                 writeln!(handle, "{}", dir.display_score(now))
             } else {

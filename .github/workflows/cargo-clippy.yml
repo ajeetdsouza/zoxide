@@ -17,5 +17,5 @@ jobs:
           components: clippy
       - uses: actions-rs/clippy-check@v1
         with:
-          args: --workspace --all-targets --all-features -- -D clippy::all
+          args: --workspace --all-targets --all-features -- -D warnings -D clippy::all
           token: ${{ secrets.GITHUB_TOKEN }}

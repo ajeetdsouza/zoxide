@@ -1,19 +1,21 @@
-name: cargo-bloat
+name: cargo-clippy
 
 on:
   push:
   pull_request:
 
 jobs:
-  bloat:
+  clippy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: stable
+          toolchain: nightly
           override: true
-      - uses: orf/cargo-bloat-action@v1
+          components: clippy
+      - uses: actions-rs/clippy-check@v1
         with:
+          args: --workspace --all-targets --all-features -- -D clippy::all
           token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,4 +1,4 @@
-name: cargo-fmt
+name: cargo-test
 
 on:
   push:
@@ -14,8 +14,7 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
-          components: rustfmt
       - uses: actions-rs/cargo@v1
         with:
-          command: fmt
-          args: --all -- --check
+          command: test
+          args: --workspace --all-features --no-fail-fast

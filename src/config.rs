@@ -1,10 +1,9 @@
-use crate::db::Rank;
-
 use anyhow::{bail, Context, Result};
+use dirs_next as dirs;
+use zoxide_engine::dir::Rank;
 
 use std::env;
 use std::ffi::OsString;
-use std::fs;
 use std::path::PathBuf;
 
 pub fn zo_data_dir() -> Result<PathBuf> {
@@ -18,11 +17,6 @@ pub fn zo_data_dir() -> Result<PathBuf> {
             None => bail!("could not find database directory, please set _ZO_DATA_DIR manually"),
         },
     };
-
-    // This will fail when `data_dir` points to a file or a broken symlink, but
-    // will no-op on a valid symlink (to a directory), or an actual directory.
-    fs::create_dir_all(&data_dir)
-        .with_context(|| format!("could not create data directory: {}", data_dir.display()))?;
 
     Ok(data_dir)
 }

@@ -1,5 +1,7 @@
+use std::process::Command;
+
 fn main() {
-    let git_describe = std::process::Command::new("git")
+    let git_describe = Command::new("git")
         .args(&["describe", "--tags", "--broken"])
         .output()
         .ok()

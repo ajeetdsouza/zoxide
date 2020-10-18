@@ -1,0 +1,142 @@
+{%- let SECTION = "# =============================================================================\n#" -%}
+{%- let NOT_CONFIGURED = "# -- not configured --" -%}
+
+{{ SECTION }}
+# Utility functions for zoxide.
+#
+
+# pwd based on the value of _ZO_RESOLVE_SYMLINKS.
+function __zoxide_pwd() {
+{%- if resolve_symlinks %}
+    pwd -P
+{%- else %}
+    pwd -L
+{%- endif %}
+}
+
+# cd + custom logic based on the value of _ZO_ECHO.
+function __zoxide_cd() {
+    # shellcheck disable=SC2164
+    cd "$@" {%- if echo %} && __zoxide_pwd {%- endif %}
+}
+
+{{ SECTION }}
+# Hook configuration for zoxide.
+#
+
+# Hook to add new entries to the database.
+{%- match hook %}
+{%- when Hook::None %}
+{{ NOT_CONFIGURED }}
+
+{%- when Hook::Prompt %}
+function __zoxide_hook() {
+    zoxide add "$(__zoxide_pwd)"
+}
+
+{%- when Hook::Pwd %}
+function __zoxide_hook() {
+    local -r __zoxide_pwd_tmp="$(__zoxide_pwd)"
+    if [ -z "$__zoxide_pwd_old" ]; then
+        __zoxide_pwd_old="$__zoxide_pwd_tmp"
+    elif [ "$__zoxide_pwd_old" != "$__zoxide_pwd_tmp" ]; then
+        __zoxide_pwd_old="$__zoxide_pwd_tmp"
+        zoxide add "$__zoxide_pwd_old"
+    fi
+}
+{%- endmatch %}
+
+# Initialize hook.
+{%- if hook == Hook::None %}
+{{ NOT_CONFIGURED }}
+
+{%- else %}
+case "$PROMPT_COMMAND" in
+    *__zoxide_hook*) ;;
+    *) PROMPT_COMMAND="${PROMPT_COMMAND:+${PROMPT_COMMAND};}__zoxide_hook" ;;
+esac
+
+{%- endif %}
+
+{{ SECTION }}
+# When using zoxide with --no-aliases, alias these internal functions as
+# desired.
+#
+
+# Jump to a directory using only keywords.
+function __zoxide_z() {
+    if [ "$#" -eq 0 ]; then
+        __zoxide_cd ~
+    elif [ "$#" -eq 1 ] && [ "$1" = '-' ]; then
+        if [ -n "$OLDPWD" ]; then
+            __zoxide_cd "$OLDPWD"
+        else
+            echo "zoxide: \\$OLDPWD is not set"
+            return 1
+        fi
+    else
+        local __zoxide_result
+        __zoxide_result="$(zoxide query -- "$@")" && __zoxide_cd "$__zoxide_result"
+    fi
+}
+
+# Jump to a directory using interactive search.
+function __zoxide_zi() {
+    local __zoxide_result
+    __zoxide_result="$(zoxide query -i -- "$@")" && __zoxide_cd "$__zoxide_result"
+}
+
+# Add a new entry to the database.
+function __zoxide_za() {
+    zoxide add "$@"
+}
+
+# Query an entry from the database using only keywords.
+function __zoxide_zq() {
+    zoxide query "$@"
+}
+
+# Query an entry from the database using interactive selection.
+function __zoxide_zqi() {
+    zoxide query -i "$@"
+}
+
+# Remove an entry from the database using the exact path.
+function __zoxide_zr() {
+    zoxide remove "$@"
+}
+
+# Remove an entry from the database using interactive selection.
+function __zoxide_zri() {
+    local __zoxide_result
+    __zoxide_result="$(zoxide query -i -- "$@")" && zoxide remove "$__zoxide_result"
+}
+
+{{ SECTION }}
+# Convenient aliases for zoxide. Disable these using --no-aliases.
+#
+
+{%- match cmd %}
+{%- when Some with (cmd) %}
+
+alias {{cmd}}='__zoxide_z'
+alias {{cmd}}i='__zoxide_zi'
+
+alias {{cmd}}a='__zoxide_za'
+
+alias {{cmd}}q='__zoxide_zq'
+alias {{cmd}}qi='__zoxide_zqi'
+
+alias {{cmd}}r='__zoxide_zr'
+alias {{cmd}}ri='__zoxide_zri'
+
+{%- when None %}
+{{ NOT_CONFIGURED }}
+
+{%- endmatch %}
+
+{{ SECTION }}
+# To initialize zoxide with bash, add the following line to your bash
+# configuration file (usually ~/.bashrc):
+#
+# eval "$(zoxide init bash)"

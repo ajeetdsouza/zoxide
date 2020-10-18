@@ -1,17 +1,21 @@
-use crate::config;
-use crate::db::{Db, Epoch};
+use zoxide_engine::Epoch;
 
 use anyhow::{bail, Context, Result};
+
 use std::env;
 use std::path::{Component, Path, PathBuf};
 use std::time::SystemTime;
 
-pub fn get_db() -> Result<Db> {
-    let data_dir = config::zo_data_dir()?;
-    Db::open(data_dir)
+pub fn canonicalize<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
+    dunce::canonicalize(path)
+        .with_context(|| format!("could not resolve path: {}", path.as_ref().display()))
 }
 
-pub fn get_current_time() -> Result<Epoch> {
+pub fn current_dir() -> Result<PathBuf> {
+    env::current_dir().context("could not get current directory")
+}
+
+pub fn current_time() -> Result<Epoch> {
     let current_time = SystemTime::now()
         .duration_since(SystemTime::UNIX_EPOCH)
         .context("system clock set to invalid time")?
@@ -20,9 +24,10 @@ pub fn get_current_time() -> Result<Epoch> {
     Ok(current_time as _)
 }
 
-pub fn canonicalize<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
+pub fn path_to_str<P: AsRef<Path>>(path: &P) -> Result<&str> {
     let path = path.as_ref();
-    dunce::canonicalize(path).with_context(|| format!("could not resolve path: {}", path.display()))
+    path.to_str()
+        .with_context(|| format!("invalid UTF-8 in path: {}", path.display()))
 }
 
 /// Resolves the absolute version of a path.
@@ -31,7 +36,7 @@ pub fn canonicalize<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
 /// character.
 /// If path is relative, use the current directory to build the absolute path.
 #[cfg(any(unix, windows))]
-pub fn resolve_path<P: AsRef<Path>>(path: P) -> Result<PathBuf> {
+pub fn resolve_path<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
     let path = path.as_ref();
     let base_path;
 
@@ -46,7 +51,7 @@ pub fn resolve_path<P: AsRef<Path>>(path: P) -> Result<PathBuf> {
                 stack.push(root);
             }
             _ => {
-                base_path = get_current_dir()?;
+                base_path = current_dir()?;
                 stack.extend(base_path.components());
             }
         }
@@ -73,7 +78,7 @@ pub fn resolve_path<P: AsRef<Path>>(path: P) -> Result<PathBuf> {
         }
 
         fn get_drive_relative(drive_letter: u8) -> Result<PathBuf> {
-            let path = get_current_dir()?;
+            let path = current_dir()?;
             if Some(drive_letter) == get_drive_letter(&path) {
                 return Ok(path);
             }
@@ -124,7 +129,7 @@ pub fn resolve_path<P: AsRef<Path>>(path: P) -> Result<PathBuf> {
                 stack.extend(base_path.components());
             }
             _ => {
-                base_path = get_current_dir()?;
+                base_path = current_dir()?;
                 stack.extend(base_path.components());
             }
         }
@@ -148,14 +153,4 @@ pub fn resolve_path<P: AsRef<Path>>(path: P) -> Result<PathBuf> {
         bail!("could not resolve path: {}", result.display());
     }
     Ok(result)
-}
-
-pub fn get_current_dir() -> Result<PathBuf> {
-    env::current_dir().context("could not get current path")
-}
-
-pub fn path_to_str<P: AsRef<Path>>(path: &P) -> Result<&str> {
-    let path = path.as_ref();
-    path.to_str()
-        .with_context(|| format!("invalid utf-8 sequence in path: {}", path.display()))
 }

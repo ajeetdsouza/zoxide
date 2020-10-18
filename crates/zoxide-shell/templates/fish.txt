@@ -1,0 +1,139 @@
+{%- let SECTION = "# =============================================================================\n#" -%}
+{%- let NOT_CONFIGURED = "# -- not configured --" -%}
+
+{{ SECTION }}
+# Utility functions for zoxide.
+#
+
+# pwd based on the value of _ZO_RESOLVE_SYMLINKS.
+function __zoxide_pwd
+{%- if resolve_symlinks %}
+    pwd -P
+{%- else %}
+    pwd -L
+{%- endif %}
+end
+
+# cd + custom logic based on the value of _ZO_ECHO.
+function __zoxide_cd
+    cd $argv
+    {%- if echo %}
+    and __zoxide_pwd
+    {%- endif %}
+    and commandline -f repaint
+end
+
+{{ SECTION }}
+# Hook configuration for zoxide.
+#
+
+# Initialize hook to add new entries to the database.
+{%- match hook %}
+{%- when Hook::None %}
+function __zoxide_hook
+
+{%- when Hook::Prompt %}
+function __zoxide_hook --on-event fish_prompt
+
+{%- when Hook::Pwd %}
+function __zoxide_hook --on-variable PWD
+
+{%- endmatch %}
+    zoxide add (__zoxide_pwd)
+end
+
+{{ SECTION }}
+# When using zoxide with --no-aliases, alias these internal functions as
+# desired.
+#
+
+# Jump to a directory using only keywords.
+function __zoxide_z
+    set argc (count $argv)
+    if test $argc -eq 0
+        __zoxide_cd $HOME
+    else if begin; test $argc -eq 1; and test $argv[1] = '-'; end
+        __zoxide_cd -
+    else
+        set -l __zoxide_result (zoxide query -- $argv)
+        and __zoxide_cd $__zoxide_result
+    end
+end
+
+# Jump to a directory using interactive search.
+function __zoxide_zi
+    set -l __zoxide_result (zoxide query -i -- $argv)
+    and __zoxide_cd $__zoxide_result
+end
+
+# Add a new entry to the database.
+function __zoxide_za
+    zoxide add $argv
+end
+
+# Query an entry from the database using only keywords.
+function __zoxide_zq
+    zoxide query $argv
+end
+
+# Query an entry from the database using interactive selection.
+function __zoxide_zqi
+    zoxide query -i $argv
+end
+
+# Remove an entry from the database using the exact path.
+function __zoxide_zr
+    zoxide remove $argv
+end
+
+# Remove an entry from the database using interactive selection.
+function __zoxide_zri
+    set -l __zoxide_result (zoxide query -i -- $argv)
+    and zoxide remove $__zoxide_result
+end
+
+{{ SECTION }}
+# Convenient aliases for zoxide. Disable these using --no-aliases.
+#
+
+{%- match cmd %}
+{%- when Some with (cmd) %}
+
+function {{cmd}}
+    __zoxide_z $argv
+end
+
+function {{cmd}}i
+    __zoxide_zi $argv
+end
+
+function {{cmd}}a
+    __zoxide_za $argv
+end
+
+function {{cmd}}q
+    __zoxide_zq $argv
+end
+
+function {{cmd}}qi
+    __zoxide_zqi $argv
+end
+
+function {{cmd}}r
+    __zoxide_zr $argv
+end
+
+function {{cmd}}ri
+    __zoxide_zri $argv
+end
+
+{%- when None %}
+{{ NOT_CONFIGURED }}
+
+{%- endmatch %}
+
+{{ SECTION }}
+# To initialize zoxide with fish, add the following line to your fish
+# configuration file (usually ~/.config/fish/config.fish):
+#
+# zoxide init fish | source

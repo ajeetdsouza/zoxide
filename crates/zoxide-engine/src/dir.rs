@@ -25,7 +25,7 @@ impl Dir {
         const DAY: Epoch = 24 * HOUR;
         const WEEK: Epoch = 7 * DAY;
 
-        let duration = now - self.last_accessed;
+        let duration = now.saturating_sub(self.last_accessed);
         if duration < HOUR {
             self.rank * 4.0
         } else if duration < DAY {
@@ -39,4 +39,4 @@ impl Dir {
 }
 
 pub type Rank = f64;
-pub type Epoch = i64; // use a signed integer so subtraction can be performed on it
+pub type Epoch = u64;

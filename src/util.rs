@@ -21,7 +21,7 @@ pub fn current_time() -> Result<Epoch> {
         .context("system clock set to invalid time")?
         .as_secs();
 
-    Ok(current_time as _)
+    Ok(current_time)
 }
 
 pub fn path_to_str<P: AsRef<Path>>(path: &P) -> Result<&str> {

@@ -163,9 +163,9 @@ pub fn main() -> Result<()> {
 
             match shell {
                 Shell::Bash => zs::Bash(opts).generate(handle),
-                Shell::Fish => zs::Bash(opts).generate(handle),
-                Shell::Posix => zs::Bash(opts).generate(handle),
-                Shell::Powershell => zs::Bash(opts).generate(handle),
+                Shell::Fish => zs::Fish(opts).generate(handle),
+                Shell::Posix => zs::Posix(opts).generate(handle),
+                Shell::Powershell => zs::PowerShell(opts).generate(handle),
                 Shell::Xonsh => zs::Xonsh(opts).generate(handle),
                 Shell::Zsh => zs::Zsh(opts).generate(handle),
             }?;

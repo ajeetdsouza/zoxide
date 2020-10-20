@@ -27,7 +27,7 @@ pub fn zo_exclude_dirs() -> Result<Vec<glob::Pattern>> {
             .map(|path| {
                 let pattern = path
                     .to_str()
-                    .context("invalid utf-8 sequence in _ZO_EXCLUDE_DIRS")?;
+                    .context("invalid unicode in _ZO_EXCLUDE_DIRS")?;
                 glob::Pattern::new(&pattern)
                     .with_context(|| format!("invalid glob in _ZO_EXCLUDE_DIRS: {}", pattern))
             })
@@ -45,7 +45,7 @@ pub fn zo_maxage() -> Result<Rank> {
         Some(maxage_osstr) => {
             let maxage_str = maxage_osstr
                 .to_str()
-                .context("invalid utf-8 sequence in _ZO_MAXAGE")?;
+                .context("invalid unicode in _ZO_MAXAGE")?;
             let maxage = maxage_str.parse::<u64>().with_context(|| {
                 format!("unable to parse _ZO_MAXAGE as integer: {}", maxage_str)
             })?;

@@ -5,6 +5,10 @@
 import os
 {%- endif %}
 import os.path
+import subprocess
+import sys
+
+from subprocess import CalledProcessError
 
 {{ SECTION }}
 # Utility functions for zoxide.
@@ -55,15 +59,34 @@ def __zoxide_z(keywords: [str]):
     elif len(keywords) == 1 and os.path.isdir(keywords[0]):
         __zoxide_cd(keywords[0])
     else:
-        __zoxide_result = $(zoxide query -- @(keywords))[:-1]
-        if __zoxide_result:
-            __zoxide_cd(__zoxide_result)
+        try:
+            __zoxide_cmd = subprocess.run(["zoxide", "query", "--"] + keywords, check=True, stdout=subprocess.PIPE)
+        except CalledProcessError as e:
+            return e.returncode
+
+        try:
+            __zoxide_result = __zoxide_cmd.stdout[:-1].decode("utf-8")
+        except UnicodeDecodeError:
+            print(f"zoxide: invalid unicode in result: {__zoxide_result}", file=sys.stderr)
+            return 1
+
+        __zoxide_cd(__zoxide_result)
 
 # Jump to a directory using interactive search.
 def __zoxide_zi(keywords: [str]):
-    __zoxide_result = $(zoxide query -- @(keywords))[:-1]
-    if __zoxide_result:
-        __zoxide_cd(__zoxide_result)
+    try:
+        __zoxide_cmd = subprocess.run(["zoxide", "query", "-i", "--"] + keywords, check=True, stdout=subprocess.PIPE)
+    except CalledProcessError as e:
+        return e.returncode
+
+    try:
+        __zoxide_result = __zoxide_cmd.stdout[:-1].decode("utf-8")
+    except UnicodeDecodeError:
+        print(f"zoxide: invalid unicode in result: {__zoxide_result}", file=sys.stderr)
+        return 1
+
+    __zoxide_cd(__zoxide_result)
+
 
 # Add a new entry to the database.
 def __zoxide_za(args: [str]):
@@ -83,9 +106,18 @@ def __zoxide_zr(args: [str]):
 
 # Remove an entry from the database using interactive selection.
 def __zoxide_zri(keywords: [str]):
-    __zoxide_result = $(zoxide query -- @(keywords))[:-1]
-    if __zoxide_result:
-        zoxide remove @(__zoxide_result)
+    try:
+        __zoxide_cmd = subprocess.run(["zoxide", "query", "--"] + keywords, check=True, stdout=subprocess.PIPE)
+    except CalledProcessError as e:
+        return e.returncode
+
+    try:
+        __zoxide_result = __zoxide_cmd.stdout[:-1].decode("utf-8")
+    except UnicodeDecodeError:
+        print(f"zoxide: invalid unicode in result: {__zoxide_result}", file=sys.stderr)
+        return 1
+
+    zoxide remove @(__zoxide_result)
 
 {{ SECTION }}
 # Convenient aliases for zoxide. Disable these using --no-aliases.

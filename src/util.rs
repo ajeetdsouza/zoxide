@@ -27,7 +27,7 @@ pub fn current_time() -> Result<Epoch> {
 pub fn path_to_str<P: AsRef<Path>>(path: &P) -> Result<&str> {
     let path = path.as_ref();
     path.to_str()
-        .with_context(|| format!("invalid UTF-8 in path: {}", path.display()))
+        .with_context(|| format!("invalid unicode in path: {}", path.display()))
 }
 
 /// Resolves the absolute version of a path.

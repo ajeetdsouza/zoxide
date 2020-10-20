@@ -5,7 +5,7 @@ use anyhow::{bail, Context, Result};
 use bincode::Options;
 use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
-use tempfile::NamedTempFile;
+use tempfile::{NamedTempFile, PersistError};
 
 use std::cmp::Reverse;
 use std::fs;
@@ -100,10 +100,24 @@ impl Store {
         })()
         .context("could not serialize store")?;
 
-        let mut file = NamedTempFile::new_in(&self.data_dir).unwrap();
+        let mut file = NamedTempFile::new_in(&self.data_dir).with_context(|| {
+            format!(
+                "could not create temporary store in: {}",
+                self.data_dir.display()
+            )
+        })?;
+
         let _ = file.as_file().set_len(buffer_size);
-        file.write_all(&buffer).unwrap();
-        file.persist(Self::get_path(&self.data_dir)).unwrap();
+        file.write_all(&buffer).with_context(|| {
+            format!(
+                "could not write to temporary store: {}",
+                file.path().display()
+            )
+        })?;
+
+        let path = Self::get_path(&self.data_dir);
+        persist(file, &path)
+            .with_context(|| format!("could not replace store: {}", path.display()))?;
 
         self.modified = false;
         Ok(())
@@ -184,3 +198,29 @@ impl Drop for Store {
 
 #[derive(Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct StoreVersion(pub u32);
+
+fn persist<P: AsRef<Path>>(mut file: NamedTempFile, path: P) -> Result<(), PersistError> {
+    if cfg!(windows) {
+        use std::thread;
+        use std::time::Duration;
+
+        // File renames on Windows are not atomic and sometimes fail with `PermissionDenied`.
+        // This is extremely unlikely unless it's running in a loop on multiple threads.
+        // Nevertheless, we guard against it by retrying the rename a fixed number of times.
+        const MAX_TRIES: usize = 10;
+        for _ in 0..MAX_TRIES {
+            match file.persist(&path) {
+                Ok(_) => break,
+                Err(e) if e.error.kind() == io::ErrorKind::PermissionDenied => {
+                    file = e.file;
+                    thread::sleep(Duration::from_millis(50));
+                }
+                Err(e) => return Err(e),
+            }
+        }
+    } else {
+        file.persist(&path)?;
+    }
+
+    Ok(())
+}

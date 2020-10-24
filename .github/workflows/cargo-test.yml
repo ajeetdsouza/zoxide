@@ -15,6 +15,7 @@ jobs:
       - run: sudo apt update
       - run: sudo add-apt-repository universe
       - run: sudo apt install bash dash fish powershell shellcheck xonsh zsh
+      - run: sudo snap install shfmt
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:

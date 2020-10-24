@@ -106,16 +106,47 @@ function __zoxide_zri() {
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-alias {{cmd}}='__zoxide_z'
-alias {{cmd}}i='__zoxide_zi'
+# Remove definitions.
+function __zoxide_unset() {
+    \unalias "$@" &>{{ Opts::DEVNULL }}
+    \unfunction "$@" &>{{ Opts::DEVNULL }}
+    \unset "$@" &>{{ Opts::DEVNULL }}
+}
 
-alias {{cmd}}a='__zoxide_za'
+__zoxide_unset '{{cmd}}'
+function {{cmd}}() {
+    __zoxide_z "$@"
+}
 
-alias {{cmd}}q='__zoxide_zq'
-alias {{cmd}}qi='__zoxide_zqi'
+__zoxide_unset '{{cmd}}i'
+function {{cmd}}i() {
+    __zoxide_zi "$@"
+}
 
-alias {{cmd}}r='__zoxide_zr'
-alias {{cmd}}ri='__zoxide_zri'
+__zoxide_unset '{{cmd}}a'
+function {{cmd}}a() {
+    __zoxide_za "$@"
+}
+
+__zoxide_unset '{{cmd}}q'
+function {{cmd}}q() {
+    __zoxide_zq "$@"
+}
+
+__zoxide_unset '{{cmd}}qi'
+function {{cmd}}qi() {
+    __zoxide_zqi "$@"
+}
+
+__zoxide_unset '{{cmd}}r'
+function {{cmd}}r() {
+    __zoxide_zr "$@"
+}
+
+__zoxide_unset '{{cmd}}ri'
+function {{cmd}}ri() {
+    __zoxide_zri "$@"
+}
 
 {%- when None %}
 {{ NOT_CONFIGURED }}

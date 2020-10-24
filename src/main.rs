@@ -20,9 +20,10 @@ fn env_help() -> &'static str {
         format!(
             "\
 ENVIRONMENT VARIABLES:
-    _ZO_DATA_DIR            Path for zoxide data files (current: `{data_dir}`)
+    _ZO_DATA_DIR            Path for zoxide data files
+                            [current: {data_dir}]
     _ZO_ECHO                Prints the matched directory before navigating to it when set to 1
-    _ZO_EXCLUDE_DIRS        List of directories to be excluded, separated by `{split_paths_separator}`
+    _ZO_EXCLUDE_DIRS        List of directory globs to be excluded, separated by '{split_paths_separator}'
     _ZO_FZF_OPTS            Custom flags to pass to fzf
     _ZO_MAXAGE              Maximum total age after which entries start getting deleted
     _ZO_RESOLVE_SYMLINKS    Resolve symlinks when storing paths",
@@ -37,7 +38,6 @@ ENVIRONMENT VARIABLES:
 #[clap(
     about,
     author,
-    global_setting(AppSettings::ColoredHelp),
     global_setting(AppSettings::GlobalVersion),
     global_setting(AppSettings::VersionlessSubcommands),
     version = env!("ZOXIDE_VERSION"))]

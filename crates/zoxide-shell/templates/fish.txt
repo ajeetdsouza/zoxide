@@ -5,6 +5,8 @@
 # Utility functions for zoxide.
 #
 
+# Remove definitions.
+
 # pwd based on the value of _ZO_RESOLVE_SYMLINKS.
 function __zoxide_pwd
 {%- if resolve_symlinks %}
@@ -99,30 +101,44 @@ end
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
+# Remove definitions.
+function __zoxide_unset
+    set --erase $argv > {{ Opts::DEVNULL }} 2>&1
+    abbr --erase $argv > {{ Opts::DEVNULL }} 2>&1
+    functions --erase $argv > {{ Opts::DEVNULL }} 2>&1
+end
+
+__zoxide_unset '{{cmd}}'
 function {{cmd}}
     __zoxide_z $argv
 end
 
+__zoxide_unset '{{cmd}}i'
 function {{cmd}}i
     __zoxide_zi $argv
 end
 
+__zoxide_unset '{{cmd}}a'
 function {{cmd}}a
     __zoxide_za $argv
 end
 
+__zoxide_unset '{{cmd}}q'
 function {{cmd}}q
     __zoxide_zq $argv
 end
 
+__zoxide_unset '{{cmd}}qi'
 function {{cmd}}qi
     __zoxide_zqi $argv
 end
 
+__zoxide_unset '{{cmd}}r'
 function {{cmd}}r
     __zoxide_zr $argv
 end
 
+__zoxide_unset '{{cmd}}ri'
 function {{cmd}}ri
     __zoxide_zri $argv
 end

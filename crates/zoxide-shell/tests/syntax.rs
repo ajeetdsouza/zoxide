@@ -125,6 +125,36 @@ fn test_shellcheck_sh() {
 }
 
 #[test]
+fn test_shfmt_bash() {
+    for opts in opts() {
+        let source = crate::Bash(opts).render().unwrap();
+        Command::new("shfmt")
+            .args(&["-d", "-s", "-ln", "bash", "-i", "4", "-ci", "-"])
+            .write_stdin(source.as_bytes())
+            .write_stdin(b"\n".as_ref())
+            .assert()
+            .success()
+            .stdout("")
+            .stderr("");
+    }
+}
+
+#[test]
+fn test_shfmt_posix() {
+    for opts in opts() {
+        let source = crate::Posix(opts).render().unwrap();
+        Command::new("shfmt")
+            .args(&["-d", "-s", "-ln", "posix", "-i", "4", "-ci", "-"])
+            .write_stdin(source.as_bytes())
+            .write_stdin(b"\n".as_ref())
+            .assert()
+            .success()
+            .stdout("")
+            .stderr("");
+    }
+}
+
+#[test]
 fn test_xonsh() {
     for opts in opts() {
         let source = crate::Xonsh(opts).render().unwrap();

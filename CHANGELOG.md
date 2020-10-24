@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `zoxide init --no-aliases` no longer generates `z` or `zi`.
 
+### Fixed
+
+- Clobber conflicting alias definitions in Bash/POSIX/Zsh shells.
+
 ### Removed
 
 - Deprecated PWD hooks for POSIX shells.

@@ -119,16 +119,48 @@ __zoxide_zri() {
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-alias {{cmd}}='__zoxide_z'
-alias {{cmd}}i='__zoxide_zi'
+# Remove definitions.
+__zoxide_unset() {
+    # shellcheck disable=SC1001
+    \unset -f "$@" >{{ Opts::DEVNULL }} 2>&1
+    # shellcheck disable=SC1001
+    \unset -v "$@" >{{ Opts::DEVNULL }} 2>&1
+}
 
-alias {{cmd}}a='__zoxide_za'
+__zoxide_unset '{{cmd}}'
+{{cmd}}() {
+    __zoxide_z "$@"
+}
 
-alias {{cmd}}q='__zoxide_zq'
-alias {{cmd}}qi='__zoxide_zqi'
+__zoxide_unset '{{cmd}}i'
+{{cmd}}i() {
+    __zoxide_zi "$@"
+}
 
-alias {{cmd}}r='__zoxide_zr'
-alias {{cmd}}ri='__zoxide_zri'
+__zoxide_unset '{{cmd}}a'
+{{cmd}}a() {
+    __zoxide_za "$@"
+}
+
+__zoxide_unset '{{cmd}}q'
+{{cmd}}q() {
+    __zoxide_zq "$@"
+}
+
+__zoxide_unset '{{cmd}}qi'
+{{cmd}}qi() {
+    __zoxide_zqi "$@"
+}
+
+__zoxide_unset '{{cmd}}r'
+{{cmd}}r() {
+    __zoxide_zr "$@"
+}
+
+__zoxide_unset '{{cmd}}ri'
+{{cmd}}ri() {
+    __zoxide_zri "$@"
+}
 
 {%- when None %}
 {{ NOT_CONFIGURED }}

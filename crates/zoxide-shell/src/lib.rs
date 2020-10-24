@@ -31,6 +31,10 @@ pub struct Opts<'a> {
     pub resolve_symlinks: bool,
 }
 
+impl Opts<'_> {
+    pub const DEVNULL: &'static str = if cfg!(windows) { "NUL" } else { "/dev/null" };
+}
+
 #[derive(Debug, Template)]
 #[template(path = "bash.txt")]
 pub struct Bash<'a>(pub &'a Opts<'a>);

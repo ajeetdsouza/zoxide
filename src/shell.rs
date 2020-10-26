@@ -41,6 +41,7 @@ pub enum Hook {
     Pwd,
 }
 
+#[cfg(unix)]
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  test:
+  test-linux:
     runs-on: ubuntu-18.04
     steps:
       - run: sudo apt update
@@ -16,6 +16,19 @@ jobs:
       - run: sudo add-apt-repository universe
       - run: sudo apt install bash dash fish powershell shellcheck xonsh zsh
       - run: sudo snap install shfmt
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --all-features --no-fail-fast
+  test-windows:
+    runs-on: windows-latest
+    steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:

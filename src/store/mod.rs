@@ -246,7 +246,11 @@ mod tests {
 
     #[test]
     fn test_add() {
-        let path = "/foo/bar";
+        let path = if cfg!(windows) {
+            r"C:\foo\bar"
+        } else {
+            "/foo/bar"
+        };
         let now = 946684800;
 
         let data_dir = tempfile::tempdir().unwrap();
@@ -267,7 +271,11 @@ mod tests {
 
     #[test]
     fn test_remove() {
-        let path = "/foo/bar";
+        let path = if cfg!(windows) {
+            r"C:\foo\bar"
+        } else {
+            "/foo/bar"
+        };
         let now = 946684800;
 
         let data_dir = tempfile::tempdir().unwrap();

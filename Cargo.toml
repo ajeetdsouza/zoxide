@@ -25,7 +25,7 @@ tempfile = "3.1.0"
 [target.'cfg(windows)'.dependencies]
 rand = "0.7.3"
 
-[dev-dependencies]
+[target.'cfg(unix)'.dev-dependencies]
 assert_cmd = "1.0.1"
 
 [profile.release]

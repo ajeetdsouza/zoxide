@@ -56,6 +56,8 @@ function __zoxide_z
         __zoxide_cd $HOME
     else if begin; test $argc -eq 1; and test $argv[1] = '-'; end
         __zoxide_cd -
+    else if begin; test $argc -eq 1; and test -d $argv[1]; end
+        __zoxide_cd $argv[1]
     else
         set -l __zoxide_result (zoxide query -- $argv)
         and __zoxide_cd $__zoxide_result
@@ -90,8 +92,7 @@ end
 
 # Remove an entry from the database using interactive selection.
 function __zoxide_zri
-    set -l __zoxide_result (zoxide query -i -- $argv)
-    and zoxide remove $__zoxide_result
+    zoxide remove -i $argv
 end
 
 {{ SECTION }}

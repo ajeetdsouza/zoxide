@@ -1,12 +1,18 @@
 {%- let SECTION = "# =============================================================================\n#" -%}
 {%- let NOT_CONFIGURED = "# -- not configured --" -%}
 
+{% if hook == Hook::Pwd -%}
+echo "\
+zoxide: PWD hooks are not supported on POSIX shells.
+        Use '--hook prompt' when initializing zoxide."
+{%- endif %}
+
 {{ SECTION }}
 # Utility functions for zoxide.
 #
 
 # pwd based on the value of _ZO_RESOLVE_SYMLINKS.
-function __zoxide_pwd() {
+__zoxide_pwd() {
 {%- if resolve_symlinks %}
     pwd -P
 {%- else %}
@@ -15,7 +21,7 @@ function __zoxide_pwd() {
 }
 
 # cd + custom logic based on the value of _ZO_ECHO.
-function __zoxide_cd() {
+__zoxide_cd() {
     # shellcheck disable=SC2164
     cd "$@" {%- if echo %} && __zoxide_pwd {%- endif %}
 }
@@ -30,33 +36,30 @@ function __zoxide_cd() {
 {{ NOT_CONFIGURED }}
 
 {%- when Hook::Prompt %}
-function __zoxide_hook() {
+__zoxide_hook() {
     zoxide add "$(__zoxide_pwd)"
 }
 
 {%- when Hook::Pwd %}
-function __zoxide_hook() {
-    local -r __zoxide_pwd_tmp="$(__zoxide_pwd)"
-    if [ -z "$__zoxide_pwd_old" ]; then
-        __zoxide_pwd_old="$__zoxide_pwd_tmp"
-    elif [ "$__zoxide_pwd_old" != "$__zoxide_pwd_tmp" ]; then
-        __zoxide_pwd_old="$__zoxide_pwd_tmp"
-        zoxide add "$__zoxide_pwd_old"
-    fi
-}
+{{ NOT_CONFIGURED }}
+
 {%- endmatch %}
 
 # Initialize hook.
-{%- if hook == Hook::None %}
+{%- match hook %}
+{%- when Hook::None %}
 {{ NOT_CONFIGURED }}
 
-{%- else %}
-case "$PROMPT_COMMAND" in
-    *__zoxide_hook*) ;;
-    *) PROMPT_COMMAND="${PROMPT_COMMAND:+${PROMPT_COMMAND};}__zoxide_hook" ;;
+{%- when Hook::Prompt %}
+case "$PS1" in
+    *\$\(__zoxide_hook\)*) ;;
+    *) PS1="${PS1}\$(__zoxide_hook)" ;;
 esac
 
-{%- endif %}
+{%- when Hook::Pwd %}
+{{ NOT_CONFIGURED }}
+
+{%- endmatch %}
 
 {{ SECTION }}
 # When using zoxide with --no-aliases, alias these internal functions as
@@ -64,7 +67,7 @@ esac
 #
 
 # Jump to a directory using only keywords.
-function __zoxide_z() {
+__zoxide_z() {
     if [ "$#" -eq 0 ]; then
         __zoxide_cd ~
     elif [ "$#" -eq 1 ] && [ "$1" = '-' ]; then
@@ -74,42 +77,41 @@ function __zoxide_z() {
             echo "zoxide: \\$OLDPWD is not set"
             return 1
         fi
+    elif [ "$#" -eq 1 ] &&  [ -d "$1" ]; then
+        __zoxide_cd "$1"
     else
-        local __zoxide_result
         __zoxide_result="$(zoxide query -- "$@")" && __zoxide_cd "$__zoxide_result"
     fi
 }
 
 # Jump to a directory using interactive search.
-function __zoxide_zi() {
-    local __zoxide_result
+__zoxide_zi() {
     __zoxide_result="$(zoxide query -i -- "$@")" && __zoxide_cd "$__zoxide_result"
 }
 
 # Add a new entry to the database.
-function __zoxide_za() {
+__zoxide_za() {
     zoxide add "$@"
 }
 
 # Query an entry from the database using only keywords.
-function __zoxide_zq() {
+__zoxide_zq() {
     zoxide query "$@"
 }
 
 # Query an entry from the database using interactive selection.
-function __zoxide_zqi() {
+__zoxide_zqi() {
     zoxide query -i "$@"
 }
 
 # Remove an entry from the database using the exact path.
-function __zoxide_zr() {
+__zoxide_zr() {
     zoxide remove "$@"
 }
 
 # Remove an entry from the database using interactive selection.
-function __zoxide_zri() {
-    local __zoxide_result
-    __zoxide_result="$(zoxide query -i -- "$@")" && zoxide remove "$__zoxide_result"
+__zoxide_zri() {
+    zoxide remove -i "$@"
 }
 
 {{ SECTION }}
@@ -120,45 +122,45 @@ function __zoxide_zri() {
 {%- when Some with (cmd) %}
 
 # Remove definitions.
-function __zoxide_unset() {
+__zoxide_unset() {
     # shellcheck disable=SC1001
-    \unset -f "$@" &>{{ Opts::DEVNULL }}
+    \unset -f "$@" >{{ Opts::DEVNULL }} 2>&1
     # shellcheck disable=SC1001
-    \unset -v "$@" &>{{ Opts::DEVNULL }}
+    \unset -v "$@" >{{ Opts::DEVNULL }} 2>&1
 }
 
 __zoxide_unset '{{cmd}}'
-function {{cmd}}() {
+{{cmd}}() {
     __zoxide_z "$@"
 }
 
 __zoxide_unset '{{cmd}}i'
-function {{cmd}}i() {
+{{cmd}}i() {
     __zoxide_zi "$@"
 }
 
 __zoxide_unset '{{cmd}}a'
-function {{cmd}}a() {
+{{cmd}}a() {
     __zoxide_za "$@"
 }
 
 __zoxide_unset '{{cmd}}q'
-function {{cmd}}q() {
+{{cmd}}q() {
     __zoxide_zq "$@"
 }
 
 __zoxide_unset '{{cmd}}qi'
-function {{cmd}}qi() {
+{{cmd}}qi() {
     __zoxide_zqi "$@"
 }
 
 __zoxide_unset '{{cmd}}r'
-function {{cmd}}r() {
+{{cmd}}r() {
     __zoxide_zr "$@"
 }
 
 __zoxide_unset '{{cmd}}ri'
-function {{cmd}}ri() {
+{{cmd}}ri() {
     __zoxide_zri "$@"
 }
 
@@ -168,7 +170,7 @@ function {{cmd}}ri() {
 {%- endmatch %}
 
 {{ SECTION }}
-# To initialize zoxide with bash, add the following line to your bash
-# configuration file (usually ~/.bashrc):
+# To initialize zoxide with your POSIX shell, add the following line to your
+# shell configuration file:
 #
-# eval "$(zoxide init bash)"
+# eval "$(zoxide init posix --hook prompt)"

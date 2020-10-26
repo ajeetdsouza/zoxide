@@ -1,5 +1,5 @@
-use crate::dir::{Dir, Epoch, Rank};
-use crate::query::Query;
+mod dir;
+mod query;
 
 use anyhow::{bail, Context, Result};
 use bincode::Options;
@@ -11,6 +11,12 @@ use std::cmp::Reverse;
 use std::fs;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
+
+pub use dir::Dir;
+pub use query::Query;
+
+pub type Rank = f64;
+pub type Epoch = u64;
 
 #[derive(Debug)]
 pub struct Store {
@@ -199,28 +205,84 @@ impl Drop for Store {
 #[derive(Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct StoreVersion(pub u32);
 
+#[cfg(windows)]
 fn persist<P: AsRef<Path>>(mut file: NamedTempFile, path: P) -> Result<(), PersistError> {
-    if cfg!(windows) {
-        use std::thread;
-        use std::time::Duration;
+    use rand::distributions::{Distribution, Uniform};
+    use std::thread;
+    use std::time::Duration;
 
-        // File renames on Windows are not atomic and sometimes fail with `PermissionDenied`.
-        // This is extremely unlikely unless it's running in a loop on multiple threads.
-        // Nevertheless, we guard against it by retrying the rename a fixed number of times.
-        const MAX_TRIES: usize = 10;
-        for _ in 0..MAX_TRIES {
-            match file.persist(&path) {
-                Ok(_) => break,
-                Err(e) if e.error.kind() == io::ErrorKind::PermissionDenied => {
-                    file = e.file;
-                    thread::sleep(Duration::from_millis(50));
-                }
-                Err(e) => return Err(e),
+    // File renames on Windows are not atomic and sometimes fail with `PermissionDenied`.
+    // This is extremely unlikely unless it's running in a loop on multiple threads.
+    // Nevertheless, we guard against it by retrying the rename a fixed number of times.
+    const MAX_TRIES: usize = 10;
+    let mut rng = None;
+
+    for _ in 0..MAX_TRIES {
+        match file.persist(&path) {
+            Ok(_) => break,
+            Err(e) if e.error.kind() == io::ErrorKind::PermissionDenied => {
+                let mut rng = rng.get_or_insert_with(rand::thread_rng);
+                let between = Uniform::from(50..150);
+                let duration = Duration::from_millis(between.sample(&mut rng));
+                thread::sleep(duration);
+                file = e.file;
             }
+            Err(e) => return Err(e),
         }
-    } else {
-        file.persist(&path)?;
     }
 
     Ok(())
+}
+
+#[cfg(unix)]
+fn persist<P: AsRef<Path>>(file: NamedTempFile, path: P) -> Result<(), PersistError> {
+    file.persist(&path)?;
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_add() {
+        let path = "/foo/bar";
+        let now = 946684800;
+
+        let data_dir = tempfile::tempdir().unwrap();
+        {
+            let mut store = Store::open(data_dir.path()).unwrap();
+            store.add(path, now);
+            store.add(path, now);
+        }
+        {
+            let store = Store::open(data_dir.path()).unwrap();
+            assert_eq!(store.dirs.len(), 1);
+
+            let dir = &store.dirs[0];
+            assert_eq!(dir.path, path);
+            assert_eq!(dir.last_accessed, now);
+        }
+    }
+
+    #[test]
+    fn test_remove() {
+        let path = "/foo/bar";
+        let now = 946684800;
+
+        let data_dir = tempfile::tempdir().unwrap();
+        {
+            let mut store = Store::open(data_dir.path()).unwrap();
+            store.add(path, now);
+        }
+        {
+            let mut store = Store::open(data_dir.path()).unwrap();
+            assert!(store.remove(path));
+        }
+        {
+            let mut store = Store::open(data_dir.path()).unwrap();
+            assert!(store.dirs.is_empty());
+            assert!(!store.remove(path));
+        }
+    }
 }

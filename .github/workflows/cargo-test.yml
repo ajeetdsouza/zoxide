@@ -25,4 +25,4 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --workspace --all-features --no-fail-fast
+          args: --all-features --no-fail-fast

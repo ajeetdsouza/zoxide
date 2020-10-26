@@ -1,6 +1,6 @@
+use crate::store::Rank;
 use anyhow::{bail, Context, Result};
 use dirs_next as dirs;
-use zoxide_engine::dir::Rank;
 
 use std::env;
 use std::ffi::OsString;
@@ -19,6 +19,13 @@ pub fn zo_data_dir() -> Result<PathBuf> {
     };
 
     Ok(data_dir)
+}
+
+pub fn zo_echo() -> bool {
+    match env::var_os("_ZO_ECHO") {
+        Some(var) => var == "1",
+        None => false,
+    }
 }
 
 pub fn zo_exclude_dirs() -> Result<Vec<glob::Pattern>> {
@@ -52,13 +59,6 @@ pub fn zo_maxage() -> Result<Rank> {
             Ok(maxage as Rank)
         }
         None => Ok(10000.0),
-    }
-}
-
-pub fn zo_echo() -> bool {
-    match env::var_os("_ZO_ECHO") {
-        Some(var) => var == "1",
-        None => false,
     }
 }
 

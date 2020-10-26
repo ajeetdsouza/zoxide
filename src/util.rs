@@ -1,4 +1,4 @@
-use zoxide_engine::Epoch;
+use crate::store::Epoch;
 
 use anyhow::{bail, Context, Result};
 
@@ -35,7 +35,6 @@ pub fn path_to_str<P: AsRef<Path>>(path: &P) -> Result<&str> {
 /// If path is already absolute, the path is still processed to be cleaned, as it can contained ".." or "." (or other)
 /// character.
 /// If path is relative, use the current directory to build the absolute path.
-#[cfg(any(unix, windows))]
 pub fn resolve_path<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
     let path = path.as_ref();
     let base_path;
@@ -44,18 +43,7 @@ pub fn resolve_path<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
     let mut stack = Vec::new();
 
     // initialize root
-    if cfg!(unix) {
-        match components.peek() {
-            Some(Component::RootDir) => {
-                let root = components.next().unwrap();
-                stack.push(root);
-            }
-            _ => {
-                base_path = current_dir()?;
-                stack.extend(base_path.components());
-            }
-        }
-    } else if cfg!(windows) {
+    if cfg!(windows) {
         use std::path::Prefix;
 
         fn get_drive_letter<P: AsRef<Path>>(path: P) -> Option<u8> {
@@ -127,6 +115,17 @@ pub fn resolve_path<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
                 })?;
                 base_path = get_drive_path(drive_letter);
                 stack.extend(base_path.components());
+            }
+            _ => {
+                base_path = current_dir()?;
+                stack.extend(base_path.components());
+            }
+        }
+    } else {
+        match components.peek() {
+            Some(Component::RootDir) => {
+                let root = components.next().unwrap();
+                stack.push(root);
             }
             _ => {
                 base_path = current_dir()?;

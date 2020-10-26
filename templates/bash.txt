@@ -16,6 +16,7 @@ function __zoxide_pwd() {
 
 # cd + custom logic based on the value of _ZO_ECHO.
 function __zoxide_cd() {
+    # shellcheck disable=SC2164
     cd "$@" {%- if echo %} && __zoxide_pwd {%- endif %}
 }
 
@@ -24,24 +25,38 @@ function __zoxide_cd() {
 #
 
 # Hook to add new entries to the database.
-function __zoxide_hook() {
-    zoxide add "$(__zoxide_pwd)"
-}
-
-# Initialize hook.
 {%- match hook %}
 {%- when Hook::None %}
 {{ NOT_CONFIGURED }}
 
 {%- when Hook::Prompt %}
-[[ -n "${precmd_functions[(r)__zoxide_hook]}" ]] || {
-    precmd_functions+=(__zoxide_hook)
+function __zoxide_hook() {
+    zoxide add "$(__zoxide_pwd)"
 }
 
 {%- when Hook::Pwd %}
-chpwd_functions=(${chpwd_functions[@]} "__zoxide_hook")
-
+function __zoxide_hook() {
+    local -r __zoxide_pwd_tmp="$(__zoxide_pwd)"
+    if [ -z "$__zoxide_pwd_old" ]; then
+        __zoxide_pwd_old="$__zoxide_pwd_tmp"
+    elif [ "$__zoxide_pwd_old" != "$__zoxide_pwd_tmp" ]; then
+        __zoxide_pwd_old="$__zoxide_pwd_tmp"
+        zoxide add "$__zoxide_pwd_old"
+    fi
+}
 {%- endmatch %}
+
+# Initialize hook.
+{%- if hook == Hook::None %}
+{{ NOT_CONFIGURED }}
+
+{%- else %}
+case "$PROMPT_COMMAND" in
+    *__zoxide_hook*) ;;
+    *) PROMPT_COMMAND="${PROMPT_COMMAND:+${PROMPT_COMMAND};}__zoxide_hook" ;;
+esac
+
+{%- endif %}
 
 {{ SECTION }}
 # When using zoxide with --no-aliases, alias these internal functions as
@@ -95,8 +110,7 @@ function __zoxide_zr() {
 
 # Remove an entry from the database using interactive selection.
 function __zoxide_zri() {
-    local __zoxide_result
-    __zoxide_result="$(zoxide query -i -- "$@")" && zoxide remove "$__zoxide_result"
+    zoxide remove -i "$@"
 }
 
 {{ SECTION }}
@@ -108,9 +122,10 @@ function __zoxide_zri() {
 
 # Remove definitions.
 function __zoxide_unset() {
-    \unalias "$@" &>{{ Opts::DEVNULL }}
-    \unfunction "$@" &>{{ Opts::DEVNULL }}
-    \unset "$@" &>{{ Opts::DEVNULL }}
+    # shellcheck disable=SC1001
+    \unset -f "$@" &>{{ Opts::DEVNULL }}
+    # shellcheck disable=SC1001
+    \unset -v "$@" &>{{ Opts::DEVNULL }}
 }
 
 __zoxide_unset '{{cmd}}'
@@ -154,7 +169,7 @@ function {{cmd}}ri() {
 {%- endmatch %}
 
 {{ SECTION }}
-# To initialize zoxide with zsh, add the following line to your zsh
-# configuration file (usually ~/.zshrc):
+# To initialize zoxide with bash, add the following line to your bash
+# configuration file (usually ~/.bashrc):
 #
-# eval "$(zoxide init zsh)"
+# eval "$(zoxide init bash)"

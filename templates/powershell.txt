@@ -65,6 +65,9 @@ function __zoxide_z {
     elseif ($args.Length -eq 1 -and $args[0] -eq '-') {
         __zoxide_cd -
     }
+    elseif ($args.Length -eq 1 -and ( Test-Path $args[0] -PathType Container) ) {
+        __zoxide_cd $args[0]
+    }
     else {
         $__zoxide_result = zoxide query -- @args
         if ($LASTEXITCODE -eq 0) {
@@ -74,7 +77,7 @@ function __zoxide_z {
 }
 
 # Jump to a directory using interactive search.
-function zi {
+function __zoxide_zi {
     $__zoxide_result = zoxide query -i -- @args
     if ($LASTEXITCODE -eq 0) {
         __zoxide_cd $__zoxide_result
@@ -103,10 +106,7 @@ function __zoxide_zr {
 
 # Remove an entry from the database using interactive selection.
 function __zoxide_zri {
-    $_zoxide_result = zoxide query -i -- @args
-    if ($LASTEXITCODE -eq 0) {
-        zoxide remove $_zoxide_result
-    }
+    zoxide remove -i @args
 }
 
 {{ SECTION }}
@@ -136,11 +136,4 @@ Set-Alias {{cmd}}ri __zoxide_zri
 # To initialize zoxide with PowerShell, add the following line to your
 # PowerShell configuration file (the location is stored in $profile):
 #
-# Invoke-Expression (& {
-#     $hook = if ($PSVersionTable.PSVersion.Major -ge 6) {
-#         'pwd'
-#     } else {
-#         'prompt'
-#     }
-#     (zoxide init powershell --hook $hook) -join "`n"
-# })
+# Invoke-Expression (& { $hook = if ($PSVersionTable.PSVersion.Major -ge 6) { 'pwd' } else { 'prompt' } (zoxide init powershell --hook $hook) -join "`n" })

@@ -105,19 +105,8 @@ def __zoxide_zr(args: [str]):
     zoxide remove @(args)
 
 # Remove an entry from the database using interactive selection.
-def __zoxide_zri(keywords: [str]):
-    try:
-        __zoxide_cmd = subprocess.run(["zoxide", "query", "--"] + keywords, check=True, stdout=subprocess.PIPE)
-    except CalledProcessError as e:
-        return e.returncode
-
-    try:
-        __zoxide_result = __zoxide_cmd.stdout[:-1].decode("utf-8")
-    except UnicodeDecodeError:
-        print(f"zoxide: invalid unicode in result: {__zoxide_result}", file=sys.stderr)
-        return 1
-
-    zoxide remove @(__zoxide_result)
+def __zoxide_zri(args: [str]):
+    zoxide remove -i @(args)
 
 {{ SECTION }}
 # Convenient aliases for zoxide. Disable these using --no-aliases.

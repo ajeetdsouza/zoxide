@@ -5,13 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [0.5.0] - 2020-10-30
 
 ### Added
 
 - Inaccessible directories are no longer removed; zoxide can now remember paths on removable devices.
 - `$_ZO_EXCLUDE_DIRS` now supports globs.
 - `zoxide init` now defines `__zoxide_z*` functions that can be aliased as needed.
+- Support for the [xonsh](https://xon.sh/) shell.
+- `zoxide import` can now import from Autojump.
 
 ### Changed
 
@@ -19,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Clobber conflicting alias definitions in Bash/POSIX/Zsh shells.
+- Clobber conflicting alias definitions in bash/fish/zsh/POSIX shells.
 
 ### Removed
 
@@ -176,6 +178,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions pipeline to build and upload releases.
 - Support for the `zsh` shell.
 
+[0.5.0]: https://github.com/ajeetdsouza/zoxide/compare/v0.4.3...v0.5.0
 [0.4.3]: https://github.com/ajeetdsouza/zoxide/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/ajeetdsouza/zoxide/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/ajeetdsouza/zoxide/compare/v0.4.0...v0.4.1

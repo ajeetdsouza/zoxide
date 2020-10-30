@@ -1,4 +1,4 @@
-use crate::cmd::Cmd;
+use super::Cmd;
 use crate::config;
 use crate::fzf::Fzf;
 use crate::store::Query;
@@ -49,7 +49,11 @@ impl Cmd for Remove {
         };
 
         if !store.remove(path) {
-            bail!("path not found in store: {}", &path)
+            let path = util::resolve_path(&path)?;
+            let path = util::path_to_str(&path)?;
+            if !store.remove(path) {
+                bail!("path not found in store: {}", &path)
+            }
         }
 
         Ok(())

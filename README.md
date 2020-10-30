@@ -17,6 +17,7 @@ A faster way to navigate your filesystem
     - [fish](#fish)
     - [POSIX](#posix-shells)
     - [PowerShell](#powershell)
+    - [xonsh](#xonsh)
     - [zsh](#zsh)
 - [Configuration](#configuration)
   - [`init` flags](#init-flags)
@@ -168,21 +169,6 @@ Add the following line to your shell's configuration file:
 eval "$(zoxide init posix --hook prompt)"
 ```
 
-The `prompt` hook is recommended for POSIX shells because the default `pwd`
-hook creates a temporary file for every session, which are only deleted upon
-reboot. If you do want to use `pwd` hooks instead, you may want to set up traps
-to perform a cleanup once the shell exits:
-
-```sh
-trap '_zoxide_cleanup' EXIT HUP KILL TERM
-trap '_zoxide_cleanup; trap - INT; kill -s INT "$$"' INT
-trap '_zoxide_cleanup; trap - QUIT; kill -s QUIT "$$"' QUIT
-```
-
-NOTE: If you modify your `PS1` at any point, you may need to re-run the above
-command. This is due to the fact that the hook is stored in `PS1`, in order to
-be evaluated every time the prompt is displayed.
-
 #### PowerShell
 
 Add the following line to your profile:
@@ -192,6 +178,14 @@ Invoke-Expression (& {
     $hook = if ($PSVersionTable.PSVersion.Major -lt 6) { 'prompt' } else { 'pwd' }
     (zoxide init --hook $hook powershell) -join "`n"
 })
+```
+
+#### xonsh
+
+Add the following line to your profile (usually `~/.xonshrc`):
+
+```xonsh
+execx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')
 ```
 
 #### zsh

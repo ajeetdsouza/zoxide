@@ -1,5 +1,4 @@
 use super::Import;
-use crate::util;
 
 use crate::store::{Dir, Store};
 use anyhow::{Context, Result};
@@ -33,13 +32,6 @@ impl Import for Z {
                 })()
                 .with_context(|| format!("invalid entry: {}", line))?;
 
-                let path = if self.resolve_symlinks {
-                    util::canonicalize
-                } else {
-                    util::resolve_path
-                }(&path)?;
-                let path = util::path_to_str(&path)?;
-
                 let rank = rank
                     .parse()
                     .with_context(|| format!("invalid rank: {}", rank))?;
@@ -54,7 +46,7 @@ impl Import for Z {
                         dir.last_accessed = dir.last_accessed.max(last_accessed);
                     }
                     None => store.dirs.push(Dir {
-                        path: path.into(),
+                        path: path.to_string(),
                         rank,
                         last_accessed,
                     }),

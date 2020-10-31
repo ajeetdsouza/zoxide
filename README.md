@@ -1,3 +1,4 @@
+<!-- omit in toc -->
 # zoxide
 
 [![crates.io](https://img.shields.io/crates/v/zoxide)](https://crates.io/crates/zoxide)
@@ -5,20 +6,15 @@
 
 A faster way to navigate your filesystem
 
+<!-- omit in toc -->
 ## Table of contents
 
 - [Introduction](#introduction)
 - [Examples](#examples)
 - [Getting started](#getting-started)
-  - [Installing `zoxide`](#step-1-installing-zoxide)
-  - [Installing `fzf` (optional)](#step-2-installing-fzf-optional)
-  - [Adding `zoxide` to your shell](#step-3-adding-zoxide-to-your-shell)
-    - [bash](#bash)
-    - [fish](#fish)
-    - [POSIX](#posix-shells)
-    - [PowerShell](#powershell)
-    - [xonsh](#xonsh)
-    - [zsh](#zsh)
+  - [Step 1: Install zoxide](#step-1-install-zoxide)
+  - [Step 2: Install fzf (optional)](#step-2-install-fzf-optional)
+  - [Step 3: Add zoxide to your shell](#step-3-add-zoxide-to-your-shell)
 - [Configuration](#configuration)
   - [`init` flags](#init-flags)
   - [Environment variables](#environment-variables)
@@ -50,93 +46,63 @@ zr /foo     # remove /foo from the database
 
 ## Getting started
 
-### Step 1: Installing `zoxide`
+### Step 1: Install zoxide
 
-#### On Arch Linux [![Arch Linux](https://repology.org/badge/version-for-repo/aur/zoxide.svg?header=aur)](https://aur.archlinux.org/packages/zoxide)
-
-```sh
-yay -S zoxide
-```
-
-#### On CentOS
-
-```sh
-dnf copr enable atim/zoxide
-dnf install zoxide
-```
-
-#### On DragonFly BSD [![DPorts](https://repology.org/badge/version-for-repo/dports/zoxide.svg?header=dports)](https://github.com/DragonFlyBSD/DPorts/tree/master/sysutils/zoxide)
-
-```sh
-pkg install zoxide
-```
-
-#### On Fedora 32+ [![Fedora](https://repology.org/badge/version-for-repo/fedora_rawhide/zoxide.svg?header=fedora)](https://src.fedoraproject.org/rpms/rust-zoxide)
-
-```sh
-dnf install zoxide
-```
-
-#### On FreeBSD [![FreeBSD](https://repology.org/badge/version-for-repo/freebsd/zoxide.svg?header=freebsd)](https://www.freshports.org/sysutils/zoxide/)
-
-```sh
-pkg install zoxide
-```
-
-#### On macOS / Linux (via Homebrew / Linuxbrew) [![Homebrew](https://repology.org/badge/version-for-repo/homebrew/zoxide.svg?header=homebrew)](https://formulae.brew.sh/formula/zoxide)
-
-```sh
-brew install zoxide
-```
-
-#### On macOS (via MacPorts) [![MacPorts](https://repology.org/badge/version-for-repo/macports/zoxide.svg?header=macports)](https://ports.macports.org/port/zoxide/summary)
-
-```sh
-port install zoxide
-```
-
-#### On NixOS [![nixpkgs unstable](https://repology.org/badge/version-for-repo/nix_unstable/zoxide.svg?header=nixpkgs%20unstable)](https://nixos.org/nixos/packages.html?attr=zoxide&channel=nixpkgs-unstable)
-
-```sh
-nix-env -iA nixpkgs.zoxide
-```
-
-#### On Void Linux [![Void Linux](https://repology.org/badge/version-for-repo/void_x86_64/zoxide.svg?header=void%20linux)](https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide)
-
-```sh
-xbps-install -S zoxide
-```
-
-#### On Windows (via [Scoop](https://github.com/lukesampson/scoop)) [![Scoop](https://repology.org/badge/version-for-repo/scoop/zoxide.svg?header=scoop)](https://github.com/ScoopInstaller/Main/tree/master/bucket/zoxide.json)
-
-```powershell
-scoop install zoxide
-```
-
-#### Other (via Cargo) [![crates.io package](https://repology.org/badge/version-for-repo/crates_io/zoxide.svg?header=crates.io)](https://crates.io/crates/zoxide)
-
-```sh
-cargo install zoxide -f
-```
-
-#### Other (via precompiled binary) [![GitHub releases](https://img.shields.io/github/v/release/ajeetdsouza/zoxide?color=blue&label=github%20releases&sort=semver)](https://github.com/ajeetdsouza/zoxide/releases)
-
-Use the installation script:
+zoxide works across all major platforms. If your distribution isn't included in the list below, you can directly install the binary from GitHub:
 
 ```sh
 curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/ajeetdsouza/zoxide/master/install.sh | sh
 ```
 
-Alternatively, you can also download a precompiled binary from the
-[releases](https://github.com/ajeetdsouza/zoxide/releases) page and add it to
-your `PATH`.
+If you would rather not run a script, you can download the binary from the [Releases](https://github.com/ajeetdsouza/zoxide/releases) page and add it anywhere in your `$PATH`.
 
-### Step 2: Installing `fzf` (optional)
+<!-- omit in toc -->
+#### On Linux
 
-If you want to use interactive fuzzy selection, you will also need to install
-[`fzf`](https://github.com/junegunn/fzf#installation).
+| Distribution    | Repository            | Instructions                                              |
+| --------------- | --------------------- | --------------------------------------------------------- |
+| **Any**         | [crates.io]           | `cargo install zoxide`                                    |
+| **Any**         | [Linuxbrew]           | `brew install zoxide`                                     |
+| Arch Linux      | [AUR]                 | `yay -Sy zoxide`                                          |
+| CentOS          | [Copr]                | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide` |
+| Debian Unstable | [Debian Packages]     | `apt install zoxide`                                      |
+| Fedora          | [Fedora Packages]     | `dnf install zoxide`                                      |
+| NixOS           | [nixpkgs]             | `nix-env -iA nixpkgs.zoxide`                              |
+| Void Linux      | [Void Linux Packages] | `xbps-install -S zoxide`                                  |
 
-### Step 3: Adding `zoxide` to your shell
+<!-- omit in toc -->
+#### On macOS
+
+| Repository  | Instructions           |
+| ----------- | ---------------------- |
+| [crates.io] | `cargo install zoxide` |
+| [Homebrew]  | `brew install zoxide`  |
+| [MacPorts]  | `port install zoxide`  |
+
+<!-- omit in toc -->
+#### On Windows
+
+| Repository  | Instructions           |
+| ----------- | ---------------------- |
+| [crates.io] | `cargo install zoxide` |
+| [Scoop]     | `scoop install zoxide` |
+
+<!-- omit in toc -->
+#### On BSD
+
+| Distribution  | Repository   | Instructions           |
+| ------------- | ------------ | ---------------------- |
+| **Any**       | [crates.io]  | `cargo install zoxide` |
+| DragonFly BSD | [DPorts]     | `pkg install zoxide`   |
+| FreeBSD       | [FreshPorts] | `pkg install zoxide`   |
+
+### Step 2: Install fzf (optional)
+
+[fzf](https://github.com/junegunn/fzf) is a command-line fuzzy finder, used by
+zoxide for interactive selection. Installation instructions can be found
+[here](https://github.com/junegunn/fzf#installation).
+
+### Step 3: Add zoxide to your shell
 
 If you currently use `z`, `z.lua`, or `zsh-z`, you may want to first import
 your existing database into `zoxide`:
@@ -145,6 +111,7 @@ your existing database into `zoxide`:
 zoxide import /path/to/db
 ```
 
+<!-- omit in toc -->
 #### bash
 
 Add the following line to your `~/.bashrc`:
@@ -153,6 +120,7 @@ Add the following line to your `~/.bashrc`:
 eval "$(zoxide init bash)"
 ```
 
+<!-- omit in toc -->
 #### fish
 
 Add the following line to your `~/.config/fish/config.fish`:
@@ -161,14 +129,7 @@ Add the following line to your `~/.config/fish/config.fish`:
 zoxide init fish | source
 ```
 
-#### POSIX shells
-
-Add the following line to your shell's configuration file:
-
-```sh
-eval "$(zoxide init posix --hook prompt)"
-```
-
+<!-- omit in toc -->
 #### PowerShell
 
 Add the following line to your profile:
@@ -180,6 +141,7 @@ Invoke-Expression (& {
 })
 ```
 
+<!-- omit in toc -->
 #### xonsh
 
 Add the following line to your profile (usually `~/.xonshrc`):
@@ -188,12 +150,22 @@ Add the following line to your profile (usually `~/.xonshrc`):
 execx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')
 ```
 
+<!-- omit in toc -->
 #### zsh
 
 Add the following line to your `~/.zshrc`:
 
 ```sh
 eval "$(zoxide init zsh)"
+```
+
+<!-- omit in toc -->
+#### Any POSIX shell
+
+Add the following line to your shell's configuration file:
+
+```sh
+eval "$(zoxide init posix --hook prompt)"
 ```
 
 ## Configuration
@@ -219,5 +191,19 @@ eval "$(zoxide init zsh)"
 - `$_ZO_FZF_OPTS`: custom flags to pass to `fzf`
 - `$_ZO_MAXAGE`: sets the maximum total age after which entries start getting deleted
 - `$_ZO_RESOLVE_SYMLINKS`: when set to `1`, `z add` will resolve symlinks.
+
+[AUR]: https://aur.archlinux.org/packages/zoxide
+[Copr]: https://copr.fedorainfracloud.org/coprs/atim/zoxide/
+[crates.io]: https://crates.io/crates/zoxide
+[Debian Packages]: https://packages.debian.org/sid/zoxide
+[DPorts]: https://github.com/DragonFlyBSD/DPorts/tree/master/sysutils/zoxide
+[FreshPorts]: https://www.freshports.org/sysutils/zoxide/
+[Fedora Packages]: https://src.fedoraproject.org/rpms/rust-zoxide
+[Homebrew]: https://formulae.brew.sh/formula/zoxide
+[Linuxbrew]: https://formulae.brew.sh/formula-linux/zoxide
+[MacPorts]: https://ports.macports.org/port/zoxide/summary
+[nixpkgs]: https://nixos.org/nixos/packages.html?attr=zoxide&channel=nixpkgs-unstable
+[Scoop]: https://github.com/ScoopInstaller/Main/tree/master/bucket/zoxide.json
+[Void Linux Packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide
 
 [`dirs` documentation]: https://docs.rs/dirs/latest/dirs/fn.data_local_dir.html

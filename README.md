@@ -96,6 +96,13 @@ If you would rather not run a script, you can download the binary from the [Rele
 | DragonFly BSD | [DPorts]     | `pkg install zoxide`   |
 | FreeBSD       | [FreshPorts] | `pkg install zoxide`   |
 
+<!-- omit in toc -->
+#### On Android
+
+| Repository | Instructions           |
+| ---------- | ---------------------- |
+| [Termux]   | `pkg install zoxide`   |
+
 ### Step 2: Install fzf (optional)
 
 [fzf](https://github.com/junegunn/fzf) is a command-line fuzzy finder, used by
@@ -204,6 +211,7 @@ eval "$(zoxide init posix --hook prompt)"
 [MacPorts]: https://ports.macports.org/port/zoxide/summary
 [nixpkgs]: https://nixos.org/nixos/packages.html?attr=zoxide&channel=nixpkgs-unstable
 [Scoop]: https://github.com/ScoopInstaller/Main/tree/master/bucket/zoxide.json
+[Termux]: https://github.com/termux/termux-packages/tree/master/packages/zoxide
 [Void Linux Packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide
 
 [`dirs` documentation]: https://docs.rs/dirs/latest/dirs/fn.data_local_dir.html

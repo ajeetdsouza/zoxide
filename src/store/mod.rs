@@ -245,7 +245,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_add() {
+    fn add() {
         let path = if cfg!(windows) {
             r"C:\foo\bar"
         } else {
@@ -270,7 +270,7 @@ mod tests {
     }
 
     #[test]
-    fn test_remove() {
+    fn remove() {
         let path = if cfg!(windows) {
             r"C:\foo\bar"
         } else {

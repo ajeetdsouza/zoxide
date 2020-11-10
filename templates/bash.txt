@@ -74,7 +74,7 @@ function __zoxide_z() {
             echo "zoxide: \\$OLDPWD is not set"
             return 1
         fi
-    elif [ "$#" -eq 1 ] &&  [ -d "$1" ]; then
+    elif [ "$#" -eq 1 ] && [ -d "$1" ]; then
         __zoxide_cd "$1"
     else
         local __zoxide_result

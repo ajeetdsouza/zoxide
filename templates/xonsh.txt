@@ -1,30 +1,75 @@
 {%- let SECTION = "# =============================================================================\n#" -%}
 {%- let NOT_CONFIGURED = "# -- not configured --" -%}
 
-{%- if resolve_symlinks -%}
+"""Initialize zoxide on Xonsh."""
+
 import os
-{%- endif %}
 import os.path
 import subprocess
 import sys
-
+{%- if cmd.is_some() %}
+from builtins import aliases  # type: ignore # pylint: disable=no-name-in-module
+{%- endif %}
+{%- if hook != Hook::None %}
+from builtins import events  # type: ignore # pylint: disable=no-name-in-module
+{%- endif %}
 from subprocess import CalledProcessError
+from typing import AnyStr, List, Optional
+
+import xonsh.dirstack  # type: ignore
 
 {{ SECTION }}
 # Utility functions for zoxide.
 #
 
-# pwd based on the value of _ZO_RESOLVE_SYMLINKS.
+
 def __zoxide_pwd() -> str:
+    """pwd based on the value of _ZO_RESOLVE_SYMLINKS."""
 {%- if resolve_symlinks %}
-    return os.getcwd()
+    pwd = os.getcwd()
 {%- else %}
-    return $PWD
+    pwd = os.getenv("PWD")
+    if pwd is None:
+        raise Exception("$PWD not found in env")
+{%- endif %}
+    return pwd
+
+
+def __zoxide_cd(path: Optional[AnyStr] = None):
+    """cd + custom logic based on the value of _ZO_ECHO."""
+    if path is None:
+        args = []
+    elif isinstance(path, bytes):
+        args = [path.decode("utf-8")]
+    elif isinstance(path, str):
+        args = [path]
+    _, exc, _ = xonsh.dirstack.cd(args)
+    if exc is not None:
+        raise Exception(exc)
+{%- if echo %}
+    print(__zoxide_pwd())
 {%- endif %}
 
-# cd + custom logic based on the value of _ZO_ECHO.
-def __zoxide_cd(path: str):
-    cd @(path) {%- if echo %} and print(__zoxide_pwd()) {%- endif %}
+
+class ZoxideSilentException(Exception):
+    """Exit without complaining."""
+
+
+def __zoxide_errhandler(func):
+    """Print exception and exit with error code 1."""
+
+    def wrapper(args: List[str]):
+        try:
+            func(args)
+            return 0
+        except ZoxideSilentException:
+            return 1
+        except Exception as exc:  # pylint: disable=broad-except
+            print(f"zoxide: {exc}", file=sys.stderr)
+            return 1
+
+    return wrapper
+
 
 {{ SECTION }}
 # Hook configuration for zoxide.
@@ -36,77 +81,97 @@ def __zoxide_cd(path: str):
 {{ NOT_CONFIGURED }}
 
 {%- when Hook::Prompt %}
-@events.on_post_prompt
+@events.on_post_prompt  # type: ignore  # pylint:disable=undefined-variable
 
 {%- when Hook::Pwd %}
-@events.on_chdir
+@events.on_chdir  # type: ignore  # pylint:disable=undefined-variable
 
 {%- endmatch %}
-def __zoxide_hook(**kwargs):
-    zoxide add @(__zoxide_pwd())
+def __zoxide_hook(**_kwargs):
+    """Hook to add new entries to the database."""
+    pwd = __zoxide_pwd()
+    subprocess.run(["zoxide", "add", pwd], check=False)
+
 
 {{ SECTION }}
 # When using zoxide with --no-aliases, alias these internal functions as
 # desired.
 #
 
-# Jump to a directory using only keywords.
-def __zoxide_z(keywords: [str]):
-    if keywords == []:
-        __zoxide_cd($HOME)
-    elif keywords == ['-']:
-        __zoxide_cd('-')
-    elif len(keywords) == 1 and os.path.isdir(keywords[0]):
-        __zoxide_cd(keywords[0])
+
+@__zoxide_errhandler
+def __zoxide_z(args: List[str]):
+    """Jump to a directory using only keywords."""
+    if args == []:
+        __zoxide_cd()
+    elif args == ["-"]:
+        __zoxide_cd("-")
+    elif len(args) == 1 and os.path.isdir(args[0]):
+        __zoxide_cd(args[0])
     else:
         try:
-            __zoxide_cmd = subprocess.run(["zoxide", "query", "--"] + keywords, check=True, stdout=subprocess.PIPE)
-        except CalledProcessError as e:
-            return e.returncode
+            __zoxide_cmd = subprocess.run(
+                ["zoxide", "query", "--"] + args, check=True, stdout=subprocess.PIPE
+            )
+        except CalledProcessError as exc:
+            raise ZoxideSilentException() from exc
 
-        try:
-            __zoxide_result = __zoxide_cmd.stdout[:-1].decode("utf-8")
-        except UnicodeDecodeError:
-            print(f"zoxide: invalid unicode in result: {__zoxide_result}", file=sys.stderr)
-            return 1
-
+        __zoxide_result = __zoxide_cmd.stdout[:-1]
         __zoxide_cd(__zoxide_result)
 
-# Jump to a directory using interactive search.
-def __zoxide_zi(keywords: [str]):
-    try:
-        __zoxide_cmd = subprocess.run(["zoxide", "query", "-i", "--"] + keywords, check=True, stdout=subprocess.PIPE)
-    except CalledProcessError as e:
-        return e.returncode
 
+def __zoxide_zi(args: List[str]):
+    """Jump to a directory using interactive search."""
     try:
-        __zoxide_result = __zoxide_cmd.stdout[:-1].decode("utf-8")
-    except UnicodeDecodeError:
-        print(f"zoxide: invalid unicode in result: {__zoxide_result}", file=sys.stderr)
-        return 1
+        __zoxide_cmd = subprocess.run(
+            ["zoxide", "query", "-i", "--"] + args, check=True, stdout=subprocess.PIPE
+        )
+    except CalledProcessError as exc:
+        raise ZoxideSilentException() from exc
 
+    __zoxide_result = __zoxide_cmd.stdout[:-1]
     __zoxide_cd(__zoxide_result)
 
 
-# Add a new entry to the database.
-def __zoxide_za(args: [str]):
-    zoxide add @(args)
+def __zoxide_za(args: List[str]):
+    """Add a new entry to the database."""
+    try:
+        subprocess.run(["zoxide", "add"] + args, check=True)
+    except CalledProcessError as exc:
+        raise ZoxideSilentException from exc
 
-# Query an entry from the database using only keywords.
-def __zoxide_zq(args: [str]):
-    zoxide query @(args)
 
-# Query an entry from the database using interactive selection.
-def __zoxide_zqi(args: [str]):
-    zoxide query -i @(args)
+def __zoxide_zq(args: List[str]):
+    """Query an entry from the database using only keywords."""
+    try:
+        subprocess.run(["zoxide", "query"] + args, check=True)
+    except CalledProcessError as exc:
+        raise ZoxideSilentException from exc
 
-# Remove an entry from the database using the exact path.
-def __zoxide_zr(args: [str]):
-    zoxide remove @(args)
 
-# Remove an entry from the database using interactive selection.
-def __zoxide_zri(args: [str]):
-    zoxide remove -i @(args)
+def __zoxide_zqi(args: List[str]):
+    """Query an entry from the database using interactive selection."""
+    try:
+        subprocess.run(["zoxide", "query", "-i"] + args, check=True)
+    except CalledProcessError as exc:
+        raise ZoxideSilentException from exc
+
+
+def __zoxide_zr(args: List[str]):
+    """Remove an entry from the database using the exact path."""
+    try:
+        subprocess.run(["zoxide", "remove"] + args, check=True)
+    except CalledProcessError as exc:
+        raise ZoxideSilentException from exc
+
+
+def __zoxide_zri(args: List[str]):
+    """Remove an entry from the database using interactive selection."""
+    try:
+        subprocess.run(["zoxide", "remove", "-i"] + args, check=True)
+    except CalledProcessError as exc:
+        raise ZoxideSilentException from exc
+
 
 {{ SECTION }}
 # Convenient aliases for zoxide. Disable these using --no-aliases.
@@ -115,13 +180,13 @@ def __zoxide_zri(args: [str]):
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-aliases['{{cmd}}'] = __zoxide_z
-aliases['{{cmd}}i'] = __zoxide_zi
-aliases['{{cmd}}a'] = __zoxide_za
-aliases['{{cmd}}q'] = __zoxide_zq
-aliases['{{cmd}}qi'] = __zoxide_zqi
-aliases['{{cmd}}r'] = __zoxide_zr
-aliases['{{cmd}}ri'] = __zoxide_zri
+aliases["{{cmd}}"] = __zoxide_z
+aliases["{{cmd}}i"] = __zoxide_zi
+aliases["{{cmd}}a"] = __zoxide_za
+aliases["{{cmd}}q"] = __zoxide_zq
+aliases["{{cmd}}qi"] = __zoxide_zqi
+aliases["{{cmd}}r"] = __zoxide_zr
+aliases["{{cmd}}ri"] = __zoxide_zri
 
 {%- when None %}
 {{ NOT_CONFIGURED }}

@@ -14,8 +14,10 @@ jobs:
       - run: sudo dpkg -i packages-microsoft-prod.deb
       - run: sudo apt update
       - run: sudo add-apt-repository universe
-      - run: sudo apt install bash dash fish powershell shellcheck xonsh zsh
+      - run: sudo apt install bash dash fish powershell python3 python3-pip shellcheck xonsh zsh
       - run: sudo snap install shfmt
+      - run: sudo pip3 install --upgrade pip setuptools
+      - run: sudo pip3 install --upgrade black mypy pylint
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:

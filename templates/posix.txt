@@ -1,11 +1,12 @@
 {%- let SECTION = "# =============================================================================\n#" -%}
 {%- let NOT_CONFIGURED = "# -- not configured --" -%}
 
-{% if hook == Hook::Pwd -%}
+{%- if hook == Hook::Pwd -%}
 echo "\
 zoxide: PWD hooks are not supported on POSIX shells.
         Use '--hook prompt' when initializing zoxide."
-{%- endif %}
+
+{% endif -%}
 
 {{ SECTION }}
 # Utility functions for zoxide.
@@ -77,7 +78,7 @@ __zoxide_z() {
             echo "zoxide: \\$OLDPWD is not set"
             return 1
         fi
-    elif [ "$#" -eq 1 ] &&  [ -d "$1" ]; then
+    elif [ "$#" -eq 1 ] && [ -d "$1" ]; then
         __zoxide_cd "$1"
     else
         __zoxide_result="$(zoxide query -- "$@")" && __zoxide_cd "$__zoxide_result"

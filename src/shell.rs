@@ -9,7 +9,10 @@ pub struct Opts<'a> {
 }
 
 impl Opts<'_> {
-    pub const DEVNULL: &'static str = if cfg!(windows) { "NUL" } else { "/dev/null" };
+    #[cfg(unix)]
+    pub const DEVNULL: &'static str = "/dev/null";
+    #[cfg(windows)]
+    pub const DEVNULL: &'static str = "NUL";
 }
 
 macro_rules! make_template {
@@ -113,7 +116,7 @@ mod tests {
                     let opts = dbg!(&opts()[i]);
                     let source = Bash(opts).render().unwrap();
                     Command::new("shellcheck")
-                        .args(&["--shell", "bash", "-"])
+                        .args(&["--enable", "all", "--shell", "bash", "-"])
                         .write_stdin(source)
                         .assert()
                         .success()
@@ -186,7 +189,7 @@ mod tests {
                     let opts = dbg!(&opts()[i]);
                     let source = Posix(opts).render().unwrap();
                     Command::new("shellcheck")
-                        .args(&["--shell", "sh", "-"])
+                        .args(&["--enable", "all", "--shell", "sh", "-"])
                         .write_stdin(source)
                         .assert()
                         .success()

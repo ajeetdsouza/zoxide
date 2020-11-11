@@ -37,11 +37,11 @@ function __zoxide_hook() {
 {%- when Hook::Pwd %}
 function __zoxide_hook() {
     local -r __zoxide_pwd_tmp="$(__zoxide_pwd)"
-    if [ -z "$__zoxide_pwd_old" ]; then
-        __zoxide_pwd_old="$__zoxide_pwd_tmp"
-    elif [ "$__zoxide_pwd_old" != "$__zoxide_pwd_tmp" ]; then
-        __zoxide_pwd_old="$__zoxide_pwd_tmp"
-        zoxide add "$__zoxide_pwd_old"
+    if [ -z "${__zoxide_pwd_old}" ]; then
+        __zoxide_pwd_old="${__zoxide_pwd_tmp}"
+    elif [ "${__zoxide_pwd_old}" != "${__zoxide_pwd_tmp}" ]; then
+        __zoxide_pwd_old="${__zoxide_pwd_tmp}"
+        zoxide add "${__zoxide_pwd_old}"
     fi
 }
 {%- endmatch %}
@@ -51,7 +51,7 @@ function __zoxide_hook() {
 {{ NOT_CONFIGURED }}
 
 {%- else %}
-case "$PROMPT_COMMAND" in
+case "${PROMPT_COMMAND}" in
     *__zoxide_hook*) ;;
     *) PROMPT_COMMAND="${PROMPT_COMMAND:+${PROMPT_COMMAND};}__zoxide_hook" ;;
 esac
@@ -68,24 +68,25 @@ function __zoxide_z() {
     if [ "$#" -eq 0 ]; then
         __zoxide_cd ~
     elif [ "$#" -eq 1 ] && [ "$1" = '-' ]; then
-        if [ -n "$OLDPWD" ]; then
-            __zoxide_cd "$OLDPWD"
+        if [ -n "${OLDPWD}" ]; then
+            __zoxide_cd "${OLDPWD}"
         else
-            echo "zoxide: \\$OLDPWD is not set"
+            # shellcheck disable=SC2016
+            echo 'zoxide: $OLDPWD is not set'
             return 1
         fi
     elif [ "$#" -eq 1 ] && [ -d "$1" ]; then
         __zoxide_cd "$1"
     else
         local __zoxide_result
-        __zoxide_result="$(zoxide query -- "$@")" && __zoxide_cd "$__zoxide_result"
+        __zoxide_result="$(zoxide query -- "$@")" && __zoxide_cd "${__zoxide_result}"
     fi
 }
 
 # Jump to a directory using interactive search.
 function __zoxide_zi() {
     local __zoxide_result
-    __zoxide_result="$(zoxide query -i -- "$@")" && __zoxide_cd "$__zoxide_result"
+    __zoxide_result="$(zoxide query -i -- "$@")" && __zoxide_cd "${__zoxide_result}"
 }
 
 # Add a new entry to the database.

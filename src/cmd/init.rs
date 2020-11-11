@@ -73,11 +73,10 @@ enum Shell {
 fn env_help() -> &'static str {
     static ENV_HELP: OnceCell<String> = OnceCell::new();
     ENV_HELP.get_or_init(|| {
-        const PATH_SPLIT_SEPARATOR: u8 = if cfg!(any(target_os = "redox", target_os = "windows")) {
-            b';'
-        } else {
-            b':'
-        };
+        #[cfg(unix)]
+        const PATH_SPLIT_SEPARATOR: u8 = b':';
+        #[cfg(any(target_os = "redox", target_os = "windows"))]
+        const PATH_SPLIT_SEPARATOR: u8 = b'\\';
 
         format!(
             "\

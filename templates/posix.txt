@@ -52,7 +52,7 @@ __zoxide_hook() {
 {{ NOT_CONFIGURED }}
 
 {%- when Hook::Prompt %}
-case "$PS1" in
+case "${PS1}" in
     *\$\(__zoxide_hook\)*) ;;
     *) PS1="${PS1}\$(__zoxide_hook)" ;;
 esac
@@ -72,22 +72,23 @@ __zoxide_z() {
     if [ "$#" -eq 0 ]; then
         __zoxide_cd ~
     elif [ "$#" -eq 1 ] && [ "$1" = '-' ]; then
-        if [ -n "$OLDPWD" ]; then
-            __zoxide_cd "$OLDPWD"
+        if [ -n "${OLDPWD}" ]; then
+            __zoxide_cd "${OLDPWD}"
         else
-            echo "zoxide: \\$OLDPWD is not set"
+            # shellcheck disable=SC2016
+            echo 'zoxide: $OLDPWD is not set'
             return 1
         fi
     elif [ "$#" -eq 1 ] && [ -d "$1" ]; then
         __zoxide_cd "$1"
     else
-        __zoxide_result="$(zoxide query -- "$@")" && __zoxide_cd "$__zoxide_result"
+        __zoxide_result="$(zoxide query -- "$@")" && __zoxide_cd "${__zoxide_result}"
     fi
 }
 
 # Jump to a directory using interactive search.
 __zoxide_zi() {
-    __zoxide_result="$(zoxide query -i -- "$@")" && __zoxide_cd "$__zoxide_result"
+    __zoxide_result="$(zoxide query -i -- "$@")" && __zoxide_cd "${__zoxide_result}"
 }
 
 # Add a new entry to the database.

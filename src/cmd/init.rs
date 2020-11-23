@@ -85,7 +85,8 @@ ENVIRONMENT VARIABLES:
                             [current: {data_dir}]
     _ZO_ECHO                Prints the matched directory before navigating to it when set to 1
     _ZO_EXCLUDE_DIRS        List of directory globs to be excluded, separated by '{path_split_separator}'
-    _ZO_FZF_OPTS            Custom flags to pass to fzf
+    _ZO_FUZZY_FINDER_CMD    Fuzzy finder to use with `zi`. Available: `fzf` (default), `skim`.
+    _ZO_FZF_OPTS            Custom flags to pass to `fzf`. Useless when `skim` is used.
     _ZO_MAXAGE              Maximum total age after which entries start getting deleted
     _ZO_RESOLVE_SYMLINKS    Resolve symlinks when storing paths",
             data_dir=config::zo_data_dir().unwrap_or_else(|_| "none".into()).display(),

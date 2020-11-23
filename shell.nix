@@ -20,6 +20,7 @@ pkgs.mkShell {
     pkgs.dash
     pkgs.fish
     pkgs.fzf
+    pkgs.skim
     pkgs.git
     pkgs.powershell
     pkgs.shellcheck

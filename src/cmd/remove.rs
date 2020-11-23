@@ -1,6 +1,6 @@
 use super::Cmd;
 use crate::config;
-use crate::fzf::Fzf;
+use crate::fuzzy_finder::FuzzyFinder;
 use crate::store::Query;
 use crate::store::Store;
 use crate::util;
@@ -33,17 +33,18 @@ impl Cmd for Remove {
                 let query = Query::new(keywords);
                 let now = util::current_time()?;
 
-                let mut fzf = Fzf::new()?;
-                let handle = fzf.stdin();
+                let mut fuzzy_finder = FuzzyFinder::new()?;
+                let fuzzy_finder_cmd = fuzzy_finder.cmd_name();
+                let handle = fuzzy_finder.stdin();
                 for dir in store.iter_matches(&query, now) {
                     writeln!(handle, "{}", dir.display_score(now))
-                        .context("could not write to fzf")?;
+                        .with_context(|| format!("could not write to {}", fuzzy_finder_cmd))?;
                 }
 
-                selection = fzf.wait_select()?;
+                selection = fuzzy_finder.wait_select()?;
                 selection
                     .get(5..selection.len().saturating_sub(1))
-                    .context("fzf returned invalid output")?
+                    .with_context(|| format!("{} returned invalid output", fuzzy_finder_cmd))?
             }
             None => self.path.as_ref().unwrap(),
         };

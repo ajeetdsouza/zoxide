@@ -7,7 +7,7 @@ use std::process::{Child, ChildStdin, Command, Stdio};
 
 pub struct FuzzyFinder {
     child: Child,
-    fuzzy_finder: &'static str
+    fuzzy_finder: &'static str,
 }
 
 impl FuzzyFinder {
@@ -26,7 +26,9 @@ impl FuzzyFinder {
         }
 
         Ok(Self {
-            child: command.spawn().with_context(|| format!("could not launch {}", fuzzy_finder))?,
+            child: command
+                .spawn()
+                .with_context(|| format!("could not launch {}", fuzzy_finder))?,
             fuzzy_finder,
         })
     }
@@ -48,7 +50,8 @@ impl FuzzyFinder {
 
         match output.status.code() {
             // normal exit
-            Some(0) => String::from_utf8(output.stdout).with_context(|| format!("invalid unicode in {} output", fuzzy_finder)),
+            Some(0) => String::from_utf8(output.stdout)
+                .with_context(|| format!("invalid unicode in {} output", fuzzy_finder)),
 
             // no match
             Some(1) => bail!("no match found"),

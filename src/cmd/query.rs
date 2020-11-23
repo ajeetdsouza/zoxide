@@ -42,15 +42,16 @@ impl Cmd for Query {
             let fuzzy_finder_cmd = fuzzy_finder.cmd_name();
             let handle = fuzzy_finder.stdin();
             for dir in matches {
-                writeln!(handle, "{}", dir.display_score(now)).with_context(|| format!("could not write to {}", fuzzy_finder_cmd))?;
+                writeln!(handle, "{}", dir.display_score(now))
+                    .with_context(|| format!("could not write to {}", fuzzy_finder_cmd))?;
             }
             let selection = fuzzy_finder.wait_select()?;
             if self.score {
                 print!("{}", selection);
             } else {
-                let path = selection
-                    .get(5..)
-                    .with_context(|| format!("could not read selection from {}", fuzzy_finder_cmd))?;
+                let path = selection.get(5..).with_context(|| {
+                    format!("could not read selection from {}", fuzzy_finder_cmd)
+                })?;
                 print!("{}", path)
             }
         } else if self.list {

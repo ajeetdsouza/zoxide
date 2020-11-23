@@ -13,7 +13,9 @@ A faster way to navigate your filesystem
 - [Examples](#examples)
 - [Getting started](#getting-started)
   - [Step 1: Install zoxide](#step-1-install-zoxide)
-  - [Step 2: Install fzf (optional)](#step-2-install-fzf-optional)
+  - [Step 2: Install a fuzzy finder (optional)](#step-2-install-a-fuzzy-finder-optional)
+    - [Step 2.1: Install fzf (optional)](#step-2-1-install-fzf-optional)
+    - [Step 2.2: Install skim (optional)](#step-2-2-install-skim-optional)
   - [Step 3: Add zoxide to your shell](#step-3-add-zoxide-to-your-shell)
 - [Configuration](#configuration)
   - [`init` flags](#init-flags)
@@ -103,11 +105,24 @@ If you would rather not run a script, you can download the binary from the [Rele
 | ---------- | ---------------------- |
 | [Termux]   | `pkg install zoxide`   |
 
-### Step 2: Install fzf (optional)
+### Step 2: Install a fuzzy finder (optional)
 
-[fzf](https://github.com/junegunn/fzf) is a command-line fuzzy finder, used by
-zoxide for interactive selection. Installation instructions can be found
-[here](https://github.com/junegunn/fzf#installation).
+`zoxide` provides the `zi` command for interactive selection. This command
+needs a fuzzy finder to work. Both `fzf` (the default) and `skim` are
+supported and can configured through the `_ZO_FUZZY_FINDER_CMD` environnement
+variable.
+
+#### Step 2.1: Install fzf (optional)
+
+[fzf](https://github.com/junegunn/fzf) is a command-line fuzzy finder which is
+the default used by `zoxide` for interactive selection. Installation
+instructions can be found [here](https://github.com/junegunn/fzf#installation).
+
+#### Step 2.2: Install skim (optional)
+
+[skim](https://github.com/lotabout/skim) is another command line fuzzy finder
+which can be used with `zoxide` for interactive selection. Installation
+instructions can be found [here](https://github.com/lotabout/skim#installation).
 
 ### Step 3: Add zoxide to your shell
 
@@ -195,7 +210,8 @@ eval "$(zoxide init posix --hook prompt)"
 - `$_ZO_ECHO`: when set to `1`, `z` will print the matched directory before navigating to it
 - `$_ZO_EXCLUDE_DIRS`: list of directories separated by platform-specific characters
   ("`:`" on Linux/macOS, "`;`" on Windows) to be excluded from the database
-- `$_ZO_FZF_OPTS`: custom flags to pass to `fzf`
+- `_ZO_FUZZY_FINDER_CMD`: Fuzzy finder to use with `zi`. Available: `fzf` (default), `skim`.
+- `$_ZO_FZF_OPTS`: custom flags to pass to `fzf`. Useless when `skim` is used.
 - `$_ZO_MAXAGE`: sets the maximum total age after which entries start getting deleted
 - `$_ZO_RESOLVE_SYMLINKS`: when set to `1`, `z add` will resolve symlinks.
 

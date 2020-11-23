@@ -1,6 +1,6 @@
 use super::Cmd;
 use crate::config;
-use crate::fzf::Fzf;
+use crate::fuzzy_finder::FuzzyFinder;
 use crate::util;
 
 use crate::store::{self, Store};
@@ -38,18 +38,19 @@ impl Cmd for Query {
         let mut matches = store.iter_matches(&query, now);
 
         if self.interactive {
-            let mut fzf = Fzf::new()?;
-            let handle = fzf.stdin();
+            let mut fuzzy_finder = FuzzyFinder::new()?;
+            let fuzzy_finder_cmd = fuzzy_finder.cmd_name();
+            let handle = fuzzy_finder.stdin();
             for dir in matches {
-                writeln!(handle, "{}", dir.display_score(now)).context("could not write to fzf")?;
+                writeln!(handle, "{}", dir.display_score(now)).with_context(|| format!("could not write to {}", fuzzy_finder_cmd))?;
             }
-            let selection = fzf.wait_select()?;
+            let selection = fuzzy_finder.wait_select()?;
             if self.score {
                 print!("{}", selection);
             } else {
                 let path = selection
                     .get(5..)
-                    .context("could not read selection from fzf")?;
+                    .with_context(|| format!("could not read selection from {}", fuzzy_finder_cmd))?;
                 print!("{}", path)
             }
         } else if self.list {

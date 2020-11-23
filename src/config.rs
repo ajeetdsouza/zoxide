@@ -71,7 +71,7 @@ pub fn zo_resolve_symlinks() -> bool {
 
 pub fn zo_fuzzy_finder_cmd() -> &'static str {
     match env::var_os("_ZO_FUZZY_FINDER_CMD") {
-        Some(sk) if sk == "skim" => "skim",
+        Some(sk) if sk == "skim" => "sk",
         _ => "fzf",
     }
 }

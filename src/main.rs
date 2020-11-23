@@ -1,7 +1,7 @@
 mod cmd;
 mod config;
 mod error;
-mod fzf;
+mod fuzzy_finder;
 mod import;
 mod shell;
 mod store;

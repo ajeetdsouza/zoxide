@@ -95,6 +95,7 @@ If you would rather not run a script, you can download the binary from the [Rele
 | **Any**       | [crates.io]  | `cargo install zoxide` |
 | DragonFly BSD | [DPorts]     | `pkg install zoxide`   |
 | FreeBSD       | [FreshPorts] | `pkg install zoxide`   |
+| NetBSD        | [pkgsrc]     | `pkgin install zoxide` |
 
 <!-- omit in toc -->
 #### On Android
@@ -210,6 +211,7 @@ eval "$(zoxide init posix --hook prompt)"
 [Linuxbrew]: https://formulae.brew.sh/formula-linux/zoxide
 [MacPorts]: https://ports.macports.org/port/zoxide/summary
 [nixpkgs]: https://nixos.org/nixos/packages.html?attr=zoxide&channel=nixpkgs-unstable
+[pkgsrc]: https://pkgsrc.se/sysutils/zoxide
 [Scoop]: https://github.com/ScoopInstaller/Main/tree/master/bucket/zoxide.json
 [Termux]: https://github.com/termux/termux-packages/tree/master/packages/zoxide
 [Void Linux Packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide

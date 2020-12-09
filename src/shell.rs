@@ -104,7 +104,7 @@ mod tests {
                     let opts = dbg!(&opts()[i]);
                     let source = Bash(opts).render().unwrap();
                     Command::new("bash")
-                        .args(&["-c", &source])
+                        .args(&["-c", &source, "--noediting", "--noprofile", "--norc"])
                         .assert()
                         .success()
                         .stdout("")
@@ -145,7 +145,7 @@ mod tests {
                     let opts = dbg!(&opts()[i]);
                     let source = Fish(opts).render().unwrap();
                     Command::new("fish")
-                        .args(&["-c", &source])
+                        .args(&["--command", &source, "--private"])
                         .assert()
                         .success()
                         .stdout("")
@@ -159,7 +159,7 @@ mod tests {
                     let opts = dbg!(&opts()[i]);
                     let source = Posix(opts).render().unwrap();
                     let assert = Command::new("bash")
-                        .args(&["--posix", "-c", &source])
+                        .args(&["--posix", "-c", &source, "--noediting", "--noprofile", "--norc"])
                         .assert()
                         .success()
                         .stderr("");
@@ -218,7 +218,7 @@ mod tests {
                 let opts = dbg!(&opts()[i]);
                     let source = PowerShell(opts).render().unwrap();
                     Command::new("pwsh")
-                        .args(&["-c", &source])
+                        .args(&["-Command", &source, "-NoLogo", "-NonInteractive", "-NoProfile"])
                         .assert()
                         .success()
                         .stdout("")
@@ -269,7 +269,7 @@ mod tests {
                     let opts = dbg!(&opts()[i]);
                     let source = Xonsh(opts).render().unwrap();
                     Command::new("xonsh")
-                        .args(&["-c", &source])
+                        .args(&["-c", &source, "--no-rc"])
                         .assert()
                         .success()
                         .stdout("")
@@ -281,7 +281,7 @@ mod tests {
                     let opts = dbg!(&opts()[i]);
                     let source = Zsh(opts).render().unwrap();
                     Command::new("zsh")
-                        .args(&["-c", &source])
+                        .args(&["-c", &source, "--no-rcs"])
                         .assert()
                         .success()
                         .stdout("")

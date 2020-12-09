@@ -20,5 +20,5 @@ jobs:
           components: clippy
       - uses: actions-rs/clippy-check@v1
         with:
-          args: --all-targets --all-features -- -D warnings -D clippy::all
+          args: --all-targets --all-features --color=always -- -D warnings -D clippy::all
           token: ${{ secrets.GITHUB_TOKEN }}

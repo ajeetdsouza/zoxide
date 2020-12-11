@@ -143,9 +143,13 @@ mod tests {
                 #[test]
                 fn fish_fish_#i() {
                     let opts = dbg!(&opts()[i]);
+                    let home = tempfile::tempdir().unwrap();
+                    let home = home.path();
                     let source = Fish(opts).render().unwrap();
                     Command::new("fish")
                         .args(&["--command", &source, "--private"])
+                        .env_clear()
+                        .env("HOME", home)
                         .assert()
                         .success()
                         .stdout("")

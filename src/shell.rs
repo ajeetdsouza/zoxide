@@ -54,6 +54,8 @@ mod tests {
     use once_cell::sync::OnceCell;
     use seq_macro::seq;
 
+    use std::env;
+
     macro_rules! with_opts_size {
         ($macro:ident) => {
             $macro!(24);
@@ -94,6 +96,17 @@ mod tests {
 
             opts
         })
+    }
+
+    fn make_cmd(cmd: &str) -> Command {
+        let home = tempfile::tempdir().unwrap();
+        let home = home.path();
+        let path = env::var_os("PATH").unwrap_or_default();
+
+        let mut cmd = Command::new(cmd);
+        cmd.env_clear().env("HOME", home).env("PATH", path);
+
+        cmd
     }
 
     macro_rules! generate_tests {
@@ -143,13 +156,9 @@ mod tests {
                 #[test]
                 fn fish_fish_#i() {
                     let opts = dbg!(&opts()[i]);
-                    let home = tempfile::tempdir().unwrap();
-                    let home = home.path();
                     let source = Fish(opts).render().unwrap();
-                    Command::new("fish")
+                    make_cmd("fish")
                         .args(&["--command", &source, "--private"])
-                        .env_clear()
-                        .env("HOME", home)
                         .assert()
                         .success()
                         .stdout("")

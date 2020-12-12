@@ -54,6 +54,7 @@ mod tests {
     use once_cell::sync::OnceCell;
     use seq_macro::seq;
 
+    use std::collections::HashMap;
     use std::env;
 
     macro_rules! with_opts_size {
@@ -99,12 +100,17 @@ mod tests {
     }
 
     fn make_cmd(cmd: &str) -> Command {
-        let home = tempfile::tempdir().unwrap();
-        let home = home.path();
-        let path = env::var_os("PATH").unwrap_or_default();
+        let tempdir = tempfile::tempdir().unwrap();
+        let tempdir = tempdir.path().to_str().unwrap();
+
+        let mut vars = env::vars()
+            .filter(|(k, _)| k == "PATH" || k.starts_with("PYTHON"))
+            .collect::<HashMap<_, _>>();
+        vars.insert("HOME".to_string(), tempdir.to_string());
+        vars.insert("PYLINTHOME".to_string(), tempdir.to_string());
 
         let mut cmd = Command::new(cmd);
-        cmd.env_clear().env("HOME", home).env("PATH", path);
+        cmd.env_clear().envs(vars);
 
         cmd
     }
@@ -116,7 +122,7 @@ mod tests {
                 fn bash_bash_#i() {
                     let opts = dbg!(&opts()[i]);
                     let source = Bash(opts).render().unwrap();
-                    Command::new("bash")
+                    make_cmd("bash")
                         .args(&["-c", &source, "--noediting", "--noprofile", "--norc"])
                         .assert()
                         .success()
@@ -128,7 +134,7 @@ mod tests {
                 fn bash_shellcheck_#i() {
                     let opts = dbg!(&opts()[i]);
                     let source = Bash(opts).render().unwrap();
-                    Command::new("shellcheck")
+                    make_cmd("shellcheck")
                         .args(&["--enable", "all", "--shell", "bash", "-"])
                         .write_stdin(source)
                         .assert()
@@ -144,7 +150,7 @@ mod tests {
                     source.push('\n');
                     // FIXME: caused by <https://github.com/djc/askama/issues/377>
                     let source = source.as_str().trim_start();
-                    Command::new("shfmt")
+                    make_cmd("shfmt")
                         .args(&["-d", "-s", "-ln", "bash", "-i", "4", "-ci", "-"])
                         .write_stdin(source)
                         .assert()
@@ -171,7 +177,7 @@ mod tests {
                 fn posix_bashposix_#i() {
                     let opts = dbg!(&opts()[i]);
                     let source = Posix(opts).render().unwrap();
-                    let assert = Command::new("bash")
+                    let assert = make_cmd("bash")
                         .args(&["--posix", "-c", &source, "--noediting", "--noprofile", "--norc"])
                         .assert()
                         .success()
@@ -186,7 +192,7 @@ mod tests {
                 fn posix_dash_#i() {
                     let opts = dbg!(&opts()[i]);
                     let source = Posix(opts).render().unwrap();
-                    let assert = Command::new("dash")
+                    let assert = make_cmd("dash")
                         .args(&["-c", &source])
                         .assert()
                         .success()
@@ -201,7 +207,7 @@ mod tests {
                 fn posix_shellcheck_#i() {
                     let opts = dbg!(&opts()[i]);
                     let source = Posix(opts).render().unwrap();
-                    Command::new("shellcheck")
+                    make_cmd("shellcheck")
                         .args(&["--enable", "all", "--shell", "sh", "-"])
                         .write_stdin(source)
                         .assert()
@@ -217,7 +223,7 @@ mod tests {
                     source.push('\n');
                     // FIXME: caused by <https://github.com/djc/askama/issues/377>
                     let source = source.as_str().trim_start();
-                    Command::new("shfmt")
+                    make_cmd("shfmt")
                         .args(&["-d", "-s", "-ln", "posix", "-i", "4", "-ci", "-"])
                         .write_stdin(source)
                         .assert()
@@ -230,7 +236,7 @@ mod tests {
                 fn powershell_pwsh_#i() {
                 let opts = dbg!(&opts()[i]);
                     let source = PowerShell(opts).render().unwrap();
-                    Command::new("pwsh")
+                    make_cmd("pwsh")
                         .args(&["-Command", &source, "-NoLogo", "-NonInteractive", "-NoProfile"])
                         .assert()
                         .success()
@@ -243,7 +249,7 @@ mod tests {
                     let opts = dbg!(&opts()[i]);
                     let mut source = Xonsh(opts).render().unwrap();
                     source.push('\n');
-                    Command::new("black")
+                    make_cmd("black")
                         .args(&["--check", "--diff", "-"])
                         .write_stdin(source)
                         .assert()
@@ -255,7 +261,7 @@ mod tests {
                 fn xonsh_mypy_#i() {
                     let opts = dbg!(&opts()[i]);
                     let source = Xonsh(opts).render().unwrap();
-                    Command::new("mypy")
+                    make_cmd("mypy")
                         .args(&["--command", &source])
                         .assert()
                         .success()
@@ -267,7 +273,7 @@ mod tests {
                     let opts = dbg!(&opts()[i]);
                     let mut source = Xonsh(opts).render().unwrap();
                     source.push('\n');
-                    Command::new("pylint")
+                    make_cmd("pylint")
                         .args(&["--from-stdin", "zoxide"])
                         .write_stdin(source)
                         .assert()
@@ -281,7 +287,7 @@ mod tests {
                 fn xonsh_xonsh_#i() {
                     let opts = dbg!(&opts()[i]);
                     let source = Xonsh(opts).render().unwrap();
-                    Command::new("xonsh")
+                    make_cmd("xonsh")
                         .args(&["-c", &source, "--no-rc"])
                         .assert()
                         .success()
@@ -293,7 +299,7 @@ mod tests {
                 fn zsh_zsh_#i() {
                     let opts = dbg!(&opts()[i]);
                     let source = Zsh(opts).render().unwrap();
-                    Command::new("zsh")
+                    make_cmd("zsh")
                         .args(&["-c", &source, "--no-rcs"])
                         .assert()
                         .success()

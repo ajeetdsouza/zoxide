@@ -59,9 +59,7 @@ function __zoxide_z() {
             echo "zoxide: \\$OLDPWD is not set"
             return 1
         fi
-    elif [ "$#" -eq 1 ] &&  cd "$1" &>{{ Opts::DEVNULL }}; then
-        __zoxide_cd "$1"
-    else
+    elif ! { [ "$#" -eq 1 ] && __zoxide_cd "$1" &>{{ Opts::DEVNULL }}; }; then
         local __zoxide_result
         __zoxide_result="$(zoxide query -- "$@")" && __zoxide_cd "$__zoxide_result"
     fi

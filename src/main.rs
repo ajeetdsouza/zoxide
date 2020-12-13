@@ -17,6 +17,7 @@ use std::env;
 use std::process;
 
 pub fn main() -> Result<()> {
+    // Forcibly disable backtraces.
     env::remove_var("RUST_LIB_BACKTRACE");
     env::remove_var("RUST_BACKTRACE");
 

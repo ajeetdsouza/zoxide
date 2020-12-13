@@ -54,7 +54,6 @@ mod tests {
     use once_cell::sync::OnceCell;
     use seq_macro::seq;
 
-    use std::collections::HashMap;
     use std::env;
 
     macro_rules! with_opts_size {
@@ -101,13 +100,18 @@ mod tests {
 
     fn make_cmd(cmd: &str) -> Command {
         let tempdir = tempfile::tempdir().unwrap();
-        let tempdir = tempdir.path().to_str().unwrap();
+        let tempdir = tempdir.path();
 
-        let mut vars = env::vars()
-            .filter(|(k, _)| k == "PATH" || k.starts_with("PYTHON"))
-            .collect::<HashMap<_, _>>();
-        vars.insert("HOME".to_string(), tempdir.to_string());
-        vars.insert("PYLINTHOME".to_string(), tempdir.to_string());
+        let mut vars = vec![("HOME", tempdir.into()), ("PYLINTHOME", tempdir.into())];
+        if let Some(var) = env::var_os("PATH") {
+            vars.push(("PATH", var));
+        }
+        if let Some(var) = env::var_os("PYTHONNOUSERSITE") {
+            vars.push(("PYTHONNOUSERSITE", var));
+        }
+        if let Some(var) = env::var_os("PYTHONPATH") {
+            vars.push(("PYTHONPATH", var));
+        }
 
         let mut cmd = Command::new(cmd);
         cmd.env_clear().envs(vars);

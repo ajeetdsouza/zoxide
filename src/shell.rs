@@ -144,7 +144,12 @@ mod tests {
                 fn fish_fish_#i() {
                     let opts = dbg!(&opts()[i]);
                     let source = Fish(opts).render().unwrap();
+
+                    let tempdir = tempfile::tempdir().unwrap();
+                    let tempdir = tempdir.path().to_str().unwrap();
+
                     Command::new("fish")
+                        .env("HOME", tempdir) // fish needs a writeable $HOME directory
                         .args(&["--command", &source, "--private"])
                         .assert()
                         .success()

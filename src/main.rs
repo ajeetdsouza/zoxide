@@ -13,9 +13,13 @@ use crate::error::SilentExit;
 use anyhow::Result;
 use clap::Clap;
 
+use std::env;
 use std::process;
 
 pub fn main() -> Result<()> {
+    env::remove_var("RUST_LIB_BACKTRACE");
+    env::remove_var("RUST_BACKTRACE");
+
     App::parse()
         .run()
         .map_err(|e| match e.downcast::<SilentExit>() {

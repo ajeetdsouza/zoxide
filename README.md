@@ -63,6 +63,7 @@ If you would rather not run a script, you can download the binary from the [Rele
 | --------------- | --------------------- | --------------------------------------------------------- |
 | **Any**         | [crates.io]           | `cargo install zoxide`                                    |
 | **Any**         | [Linuxbrew]           | `brew install zoxide`                                     |
+| Alpine Linux    | [Alpine Linux Packages] (since Alpine 3.13) | `apk add zoxide`                    |
 | Arch Linux      | [AUR]                 | `yay -Sy zoxide-bin`                                      |
 | CentOS          | [Copr]                | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide` |
 | Debian Unstable | [Debian Packages]     | `apt install zoxide`                                      |
@@ -200,6 +201,7 @@ eval "$(zoxide init posix --hook prompt)"
 - `$_ZO_MAXAGE`: sets the maximum total age after which entries start getting deleted
 - `$_ZO_RESOLVE_SYMLINKS`: when set to `1`, `z add` will resolve symlinks.
 
+[Alpine Linux Packages]: https://pkgs.alpinelinux.org/package/edge/community/x86_64/zoxide
 [AUR]: https://aur.archlinux.org/packages/zoxide-bin
 [Copr]: https://copr.fedorainfracloud.org/coprs/atim/zoxide/
 [crates.io]: https://crates.io/crates/zoxide

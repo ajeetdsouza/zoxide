@@ -59,17 +59,17 @@ If you would rather not run a script, you can download the binary from the [Rele
 <!-- omit in toc -->
 #### On Linux
 
-| Distribution    | Repository            | Instructions                                              |
-| --------------- | --------------------- | --------------------------------------------------------- |
-| **Any**         | [crates.io]           | `cargo install zoxide`                                    |
-| **Any**         | [Linuxbrew]           | `brew install zoxide`                                     |
-| Alpine Linux    | [Alpine Linux Packages] (since Alpine 3.13) | `apk add zoxide`                    |
-| Arch Linux      | [AUR]                 | `yay -Sy zoxide-bin`                                      |
-| CentOS          | [Copr]                | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide` |
-| Debian Unstable | [Debian Packages]     | `apt install zoxide`                                      |
-| Fedora          | [Fedora Packages]     | `dnf install zoxide`                                      |
-| NixOS           | [nixpkgs]             | `nix-env -iA nixpkgs.zoxide`                              |
-| Void Linux      | [Void Linux Packages] | `xbps-install -S zoxide`                                  |
+| Distribution      | Repository              | Instructions                                              |
+| ----------------- | ----------------------- | --------------------------------------------------------- |
+| **Any**           | [crates.io]             | `cargo install zoxide`                                    |
+| **Any**           | [Linuxbrew]             | `brew install zoxide`                                     |
+| Alpine Linux Edge | [Alpine Linux Packages] | `apk add zoxide`                                          |
+| Arch Linux        | [AUR]                   | `yay -Sy zoxide-bin`                                      |
+| CentOS            | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide` |
+| Debian Unstable   | [Debian Packages]       | `apt install zoxide`                                      |
+| Fedora            | [Fedora Packages]       | `dnf install zoxide`                                      |
+| NixOS             | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                              |
+| Void Linux        | [Void Linux Packages]   | `xbps-install -S zoxide`                                  |
 
 <!-- omit in toc -->
 #### On macOS

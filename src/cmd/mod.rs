@@ -1,4 +1,5 @@
 mod add;
+mod export;
 mod import;
 mod init;
 mod query;
@@ -8,6 +9,7 @@ use anyhow::Result;
 use clap::{AppSettings, Clap};
 
 pub use add::Add;
+pub use export::Export;
 pub use import::Import;
 pub use init::Init;
 pub use query::Query;
@@ -21,6 +23,7 @@ pub trait Cmd {
 #[clap(about, author, global_setting(AppSettings::GlobalVersion), global_setting(AppSettings::VersionlessSubcommands), version = env!("ZOXIDE_VERSION"))]
 pub enum App {
     Add(Add),
+    Export(Export),
     Import(Import),
     Init(Init),
     Query(Query),
@@ -31,6 +34,7 @@ impl Cmd for App {
     fn run(&self) -> Result<()> {
         match self {
             App::Add(cmd) => cmd.run(),
+            App::Export(cmd) => cmd.run(),
             App::Import(cmd) => cmd.run(),
             App::Init(cmd) => cmd.run(),
             App::Query(cmd) => cmd.run(),

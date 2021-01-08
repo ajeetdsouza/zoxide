@@ -3,6 +3,7 @@ use super::Import;
 use crate::store::{Dir, Store};
 use anyhow::{Context, Result};
 
+use std::borrow::Cow;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
@@ -46,7 +47,7 @@ impl Import for Z {
                         dir.last_accessed = dir.last_accessed.max(last_accessed);
                     }
                     None => store.dirs.push(Dir {
-                        path: path.to_string(),
+                        path: Cow::Owned(path.into()),
                         rank,
                         last_accessed,
                     }),

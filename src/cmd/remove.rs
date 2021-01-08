@@ -1,8 +1,7 @@
 use super::Cmd;
 use crate::config;
 use crate::fzf::Fzf;
-use crate::store::Query;
-use crate::store::Store;
+use crate::store::{Query, StoreBuilder};
 use crate::util;
 
 use anyhow::{bail, Context, Result};
@@ -25,7 +24,8 @@ pub struct Remove {
 impl Cmd for Remove {
     fn run(&self) -> Result<()> {
         let data_dir = config::zo_data_dir()?;
-        let mut store = Store::open(&data_dir)?;
+        let mut store = StoreBuilder::new(data_dir);
+        let mut store = store.build()?;
 
         let selection;
         let path = match &self.interactive {

@@ -3,6 +3,7 @@ use super::Import;
 use crate::store::{Dir, Epoch, Store};
 use anyhow::{Context, Result};
 
+use std::borrow::Cow;
 use std::fs;
 use std::path::Path;
 
@@ -43,15 +44,10 @@ impl Import for Autojump {
         }
 
         let rank_sum = entries.iter().map(|(_, rank)| rank).sum::<f64>();
-        for (path, rank) in entries.iter() {
-            if store
-                .dirs
-                .iter_mut()
-                .find(|dir| &dir.path == path)
-                .is_none()
-            {
+        for &(path, rank) in entries.iter() {
+            if store.dirs.iter_mut().find(|dir| dir.path == path).is_none() {
                 store.dirs.push(Dir {
-                    path: path.to_string(),
+                    path: Cow::Owned(path.into()),
                     rank: rank / rank_sum,
                     last_accessed: self.now,
                 });

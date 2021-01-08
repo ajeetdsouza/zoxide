@@ -1,111 +1,32 @@
 mod dir;
 mod query;
 
-use anyhow::{bail, Context, Result};
-use bincode::Options;
+pub use dir::{Dir, DirList, Epoch, Rank};
+pub use query::Query;
+
+use anyhow::{Context, Result};
 use ordered_float::OrderedFloat;
-use serde::{Deserialize, Serialize};
 use tempfile::{NamedTempFile, PersistError};
 
+use std::borrow::Cow;
 use std::cmp::Reverse;
 use std::fs;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 
-pub use dir::Dir;
-pub use query::Query;
-
-pub type Rank = f64;
-pub type Epoch = u64;
-
-#[derive(Debug)]
-pub struct Store {
-    pub dirs: Vec<Dir>,
+pub struct Store<'a> {
+    pub dirs: DirList<'a>,
     pub modified: bool,
-    data_dir: PathBuf,
+    data_dir: &'a Path,
 }
 
-impl Store {
-    pub const CURRENT_VERSION: StoreVersion = StoreVersion(3);
-    const MAX_SIZE: u64 = 8 * 1024 * 1024; // 8 MiB
-
-    pub fn open<P: Into<PathBuf>>(data_dir: P) -> Result<Store> {
-        let data_dir = data_dir.into();
-        let path = Self::get_path(&data_dir);
-
-        let buffer = match fs::read(&path) {
-            Ok(buffer) => buffer,
-            Err(e) if e.kind() == io::ErrorKind::NotFound => {
-                fs::create_dir_all(&data_dir).with_context(|| {
-                    format!("unable to create data directory: {}", path.display())
-                })?;
-                return Ok(Store {
-                    dirs: Vec::new(),
-                    modified: false,
-                    data_dir,
-                });
-            }
-            Err(e) => {
-                Err(e).with_context(|| format!("could not read from store: {}", path.display()))?
-            }
-        };
-
-        let deserializer = &mut bincode::options()
-            .with_fixint_encoding()
-            .with_limit(Self::MAX_SIZE);
-
-        let version_size = deserializer
-            .serialized_size(&Self::CURRENT_VERSION)
-            .unwrap() as _;
-
-        if buffer.len() < version_size {
-            bail!("data store may be corrupted: {}", path.display());
-        }
-
-        let (buffer_version, buffer_dirs) = buffer.split_at(version_size);
-
-        let version = deserializer
-            .deserialize(buffer_version)
-            .with_context(|| format!("could not deserialize store version: {}", path.display()))?;
-
-        let dirs = match version {
-            Self::CURRENT_VERSION => deserializer
-                .deserialize(buffer_dirs)
-                .with_context(|| format!("could not deserialize store: {}", path.display()))?,
-            version => bail!(
-                "unsupported store version, got={}, supported={}: {}",
-                version.0,
-                Self::CURRENT_VERSION.0,
-                path.display()
-            ),
-        };
-
-        Ok(Store {
-            dirs,
-            modified: false,
-            data_dir,
-        })
-    }
-
+impl<'a> Store<'a> {
     pub fn save(&mut self) -> Result<()> {
         if !self.modified {
             return Ok(());
         }
 
-        let (buffer, buffer_size) = (|| -> bincode::Result<_> {
-            let version_size = bincode::serialized_size(&Self::CURRENT_VERSION)?;
-            let dirs_size = bincode::serialized_size(&self.dirs)?;
-
-            let buffer_size = version_size + dirs_size;
-            let mut buffer = Vec::with_capacity(buffer_size as _);
-
-            bincode::serialize_into(&mut buffer, &Self::CURRENT_VERSION)?;
-            bincode::serialize_into(&mut buffer, &self.dirs)?;
-
-            Ok((buffer, buffer_size))
-        })()
-        .context("could not serialize store")?;
-
+        let buffer = self.dirs.to_bytes()?;
         let mut file = NamedTempFile::new_in(&self.data_dir).with_context(|| {
             format!(
                 "could not create temporary store in: {}",
@@ -113,7 +34,10 @@ impl Store {
             )
         })?;
 
-        let _ = file.as_file().set_len(buffer_size);
+        // Preallocate enough space on the file, preventing copying later on.
+        // This optimization may fail on some filesystems, but it is safe to
+        // ignore it and proceed.
+        let _ = file.as_file().set_len(buffer.len() as _);
         file.write_all(&buffer).with_context(|| {
             format!(
                 "could not write to temporary store: {}",
@@ -121,7 +45,7 @@ impl Store {
             )
         })?;
 
-        let path = Self::get_path(&self.data_dir);
+        let path = store_path(&self.data_dir);
         persist(file, &path)
             .with_context(|| format!("could not replace store: {}", path.display()))?;
 
@@ -135,7 +59,7 @@ impl Store {
 
         match self.dirs.iter_mut().find(|dir| dir.path == path) {
             None => self.dirs.push(Dir {
-                path: path.into(),
+                path: Cow::Owned(path.into()),
                 last_accessed: now,
                 rank: 1.0,
             }),
@@ -148,13 +72,13 @@ impl Store {
         self.modified = true;
     }
 
-    pub fn iter_matches<'a>(
-        &'a mut self,
-        query: &'a Query,
+    pub fn iter_matches<'b>(
+        &'b mut self,
+        query: &'b Query,
         now: Epoch,
-    ) -> impl DoubleEndedIterator<Item = &'a Dir> {
+    ) -> impl DoubleEndedIterator<Item = &'b Dir> {
         self.dirs
-            .sort_unstable_by_key(|dir| Reverse(OrderedFloat(dir.get_score(now))));
+            .sort_unstable_by_key(|dir| Reverse(OrderedFloat(dir.score(now))));
         self.dirs.iter().filter(move |dir| dir.is_match(&query))
     }
 
@@ -188,22 +112,17 @@ impl Store {
             self.modified = true;
         }
     }
-
-    fn get_path<P: AsRef<Path>>(data_dir: P) -> PathBuf {
-        data_dir.as_ref().join("db.zo")
-    }
 }
 
-impl Drop for Store {
+impl Drop for Store<'_> {
     fn drop(&mut self) {
+        // Since the error can't be properly handled here,
+        // pretty-print it instead.
         if let Err(e) = self.save() {
             println!("Error: {}", e)
         }
     }
 }
-
-#[derive(Debug, Deserialize, Eq, PartialEq, Serialize)]
-pub struct StoreVersion(pub u32);
 
 #[cfg(windows)]
 fn persist<P: AsRef<Path>>(mut file: NamedTempFile, path: P) -> Result<(), PersistError> {
@@ -240,6 +159,62 @@ fn persist<P: AsRef<Path>>(file: NamedTempFile, path: P) -> Result<(), PersistEr
     Ok(())
 }
 
+pub struct StoreBuilder {
+    data_dir: PathBuf,
+    buffer: Vec<u8>,
+}
+
+impl StoreBuilder {
+    pub fn new<P: Into<PathBuf>>(data_dir: P) -> StoreBuilder {
+        StoreBuilder {
+            data_dir: data_dir.into(),
+            buffer: Vec::new(),
+        }
+    }
+
+    pub fn build(&mut self) -> Result<Store> {
+        // Read the entire store to memory. For smaller files, this is faster
+        // than mmap / streaming, and allows for zero-copy deserialization.
+        let path = store_path(&self.data_dir);
+        match fs::read(&path) {
+            Ok(buffer) => {
+                self.buffer = buffer;
+                let dirs = DirList::from_bytes(&self.buffer)
+                    .with_context(|| format!("could not deserialize store: {}", path.display()))?;
+                Ok(Store {
+                    dirs,
+                    modified: false,
+                    data_dir: &self.data_dir,
+                })
+            }
+            Err(e) if e.kind() == io::ErrorKind::NotFound => {
+                // Create data directory, but don't create any file yet.
+                // The file will be created later by [`Store::save`]
+                // if any data is modified.
+                fs::create_dir_all(&self.data_dir).with_context(|| {
+                    format!(
+                        "unable to create data directory: {}",
+                        self.data_dir.display()
+                    )
+                })?;
+                Ok(Store {
+                    dirs: DirList::new(),
+                    modified: false,
+                    data_dir: &self.data_dir,
+                })
+            }
+            Err(e) => {
+                Err(e).with_context(|| format!("could not read from store: {}", path.display()))
+            }
+        }
+    }
+}
+
+fn store_path<P: AsRef<Path>>(data_dir: P) -> PathBuf {
+    const STORE_FILENAME: &str = "db.zo";
+    data_dir.as_ref().join(STORE_FILENAME)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -255,12 +230,14 @@ mod tests {
 
         let data_dir = tempfile::tempdir().unwrap();
         {
-            let mut store = Store::open(data_dir.path()).unwrap();
+            let mut store = StoreBuilder::new(data_dir.path());
+            let mut store = store.build().unwrap();
             store.add(path, now);
             store.add(path, now);
         }
         {
-            let store = Store::open(data_dir.path()).unwrap();
+            let mut store = StoreBuilder::new(data_dir.path());
+            let store = store.build().unwrap();
             assert_eq!(store.dirs.len(), 1);
 
             let dir = &store.dirs[0];
@@ -280,15 +257,18 @@ mod tests {
 
         let data_dir = tempfile::tempdir().unwrap();
         {
-            let mut store = Store::open(data_dir.path()).unwrap();
+            let mut store = StoreBuilder::new(data_dir.path());
+            let mut store = store.build().unwrap();
             store.add(path, now);
         }
         {
-            let mut store = Store::open(data_dir.path()).unwrap();
+            let mut store = StoreBuilder::new(data_dir.path());
+            let mut store = store.build().unwrap();
             assert!(store.remove(path));
         }
         {
-            let mut store = Store::open(data_dir.path()).unwrap();
+            let mut store = StoreBuilder::new(data_dir.path());
+            let mut store = store.build().unwrap();
             assert!(store.dirs.is_empty());
             assert!(!store.remove(path));
         }

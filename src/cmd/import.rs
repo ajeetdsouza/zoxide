@@ -3,7 +3,7 @@ use crate::config;
 use crate::import::{Autojump, Import as _, Z};
 use crate::util;
 
-use crate::store::Store;
+use crate::store::StoreBuilder;
 use anyhow::{bail, Result};
 use clap::{ArgEnum, Clap};
 
@@ -27,7 +27,8 @@ impl Cmd for Import {
     fn run(&self) -> Result<()> {
         let data_dir = config::zo_data_dir()?;
 
-        let mut store = Store::open(&data_dir)?;
+        let mut store = StoreBuilder::new(data_dir);
+        let mut store = store.build()?;
         if !self.merge && !store.dirs.is_empty() {
             bail!("zoxide database is not empty, specify --merge to continue anyway")
         }

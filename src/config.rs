@@ -1,4 +1,5 @@
 use crate::store::Rank;
+
 use anyhow::{bail, Context, Result};
 use dirs_next as dirs;
 

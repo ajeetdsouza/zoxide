@@ -3,7 +3,7 @@ use crate::config;
 use crate::fzf::Fzf;
 use crate::util;
 
-use crate::store::{self, Store};
+use crate::store::{self, StoreBuilder};
 use anyhow::{Context, Result};
 use clap::Clap;
 
@@ -30,7 +30,8 @@ pub struct Query {
 impl Cmd for Query {
     fn run(&self) -> Result<()> {
         let data_dir = config::zo_data_dir()?;
-        let mut store = Store::open(&data_dir)?;
+        let mut store = StoreBuilder::new(data_dir);
+        let mut store = store.build()?;
 
         let query = store::Query::new(&self.keywords);
         let now = util::current_time()?;

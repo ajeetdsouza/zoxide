@@ -45,12 +45,7 @@ impl Import for Autojump {
 
         let rank_sum = entries.iter().map(|(_, rank)| rank).sum::<f64>();
         for &(path, rank) in entries.iter() {
-            if store
-                .dirs
-                .iter_mut()
-                .find(|dir| &dir.path == path)
-                .is_none()
-            {
+            if store.dirs.iter_mut().find(|dir| dir.path == path).is_none() {
                 store.dirs.push(Dir {
                     path: Cow::Owned(path.into()),
                     rank: rank / rank_sum,

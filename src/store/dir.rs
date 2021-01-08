@@ -19,7 +19,7 @@ impl DirList<'_> {
         DirList(Vec::new())
     }
 
-    pub fn from_bytes<'a>(bytes: &'a [u8]) -> Result<DirList<'a>> {
+    pub fn from_bytes(bytes: &[u8]) -> Result<DirList> {
         // Assume a maximum size for the store. This prevents bincode from throwing strange
         // errors when it encounters invalid data.
         const MAX_SIZE: u64 = 8 << 20; // 8 MiB

@@ -8,16 +8,16 @@
 # pwd based on the value of _ZO_RESOLVE_SYMLINKS.
 function __zoxide_pwd() {
 {%- if resolve_symlinks %}
-    pwd -P
+    \builtin pwd -P
 {%- else %}
-    pwd -L
+    \builtin pwd -L
 {%- endif %}
 }
 
 # cd + custom logic based on the value of _ZO_ECHO.
 function __zoxide_cd() {
     # shellcheck disable=SC2164
-    cd "$@" {%- if echo %} && __zoxide_pwd {%- endif %}
+    \builtin cd "$@" {%- if echo %} && __zoxide_pwd {%- endif %}
 }
 
 {{ SECTION }}
@@ -36,7 +36,7 @@ function __zoxide_hook() {
 
 {%- when Hook::Pwd %}
 function __zoxide_hook() {
-    local -r __zoxide_pwd_tmp="$(__zoxide_pwd)"
+    \builtin local -r __zoxide_pwd_tmp="$(__zoxide_pwd)"
     if [ -z "${__zoxide_pwd_old}" ]; then
         __zoxide_pwd_old="${__zoxide_pwd_tmp}"
     elif [ "${__zoxide_pwd_old}" != "${__zoxide_pwd_tmp}" ]; then
@@ -72,20 +72,20 @@ function __zoxide_z() {
             __zoxide_cd "${OLDPWD}"
         else
             # shellcheck disable=SC2016
-            echo 'zoxide: $OLDPWD is not set'
+            \builtin echo 'zoxide: $OLDPWD is not set'
             return 1
         fi
     elif [ "$#" -eq 1 ] && [ -d "$1" ]; then
         __zoxide_cd "$1"
     else
-        local __zoxide_result
+        \builtin local __zoxide_result
         __zoxide_result="$(zoxide query -- "$@")" && __zoxide_cd "${__zoxide_result}"
     fi
 }
 
 # Jump to a directory using interactive search.
 function __zoxide_zi() {
-    local __zoxide_result
+    \builtin local __zoxide_result
     __zoxide_result="$(zoxide query -i -- "$@")" && __zoxide_cd "${__zoxide_result}"
 }
 
@@ -124,9 +124,9 @@ function __zoxide_zri() {
 # Remove definitions.
 function __zoxide_unset() {
     # shellcheck disable=SC1001
-    \unset -f "$@" &>{{ Opts::DEVNULL }}
+    \builtin unset -f "$@" &>{{ Opts::DEVNULL }}
     # shellcheck disable=SC1001
-    \unset -v "$@" &>{{ Opts::DEVNULL }}
+    \builtin unset -v "$@" &>{{ Opts::DEVNULL }}
 }
 
 __zoxide_unset '{{cmd}}'

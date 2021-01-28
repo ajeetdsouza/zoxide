@@ -8,15 +8,15 @@
 # pwd based on the value of _ZO_RESOLVE_SYMLINKS.
 function __zoxide_pwd() {
 {%- if resolve_symlinks %}
-    pwd -P
+    \builtin pwd -P
 {%- else %}
-    pwd -L
+    \builtin pwd -L
 {%- endif %}
 }
 
 # cd + custom logic based on the value of _ZO_ECHO.
 function __zoxide_cd() {
-    cd "$@" {%- if echo %} && __zoxide_pwd {%- endif %}
+    \builtin cd "$@" {%- if echo %} && __zoxide_pwd {%- endif %}
 }
 
 {{ SECTION }}
@@ -56,20 +56,20 @@ function __zoxide_z() {
         if [ -n "$OLDPWD" ]; then
             __zoxide_cd "$OLDPWD"
         else
-            echo "zoxide: \\$OLDPWD is not set"
+            \builtin echo 'zoxide: \$OLDPWD is not set'
             return 1
         fi
     elif [ "$#" -eq 1 ] &&  [ -d "$1" ]; then
         __zoxide_cd "$1"
     else
-        local __zoxide_result
+        \builtin local __zoxide_result
         __zoxide_result="$(zoxide query -- "$@")" && __zoxide_cd "$__zoxide_result"
     fi
 }
 
 # Jump to a directory using interactive search.
 function __zoxide_zi() {
-    local __zoxide_result
+    \builtin local __zoxide_result
     __zoxide_result="$(zoxide query -i -- "$@")" && __zoxide_cd "$__zoxide_result"
 }
 
@@ -107,9 +107,9 @@ function __zoxide_zri() {
 
 # Remove definitions.
 function __zoxide_unset() {
-    \unalias "$@" &>{{ Opts::DEVNULL }}
-    \unfunction "$@" &>{{ Opts::DEVNULL }}
-    \unset "$@" &>{{ Opts::DEVNULL }}
+    \builtin unalias "$@" &>{{ Opts::DEVNULL }}
+    \builtin unfunction "$@" &>{{ Opts::DEVNULL }}
+    \builtin unset "$@" &>{{ Opts::DEVNULL }}
 }
 
 __zoxide_unset '{{cmd}}'

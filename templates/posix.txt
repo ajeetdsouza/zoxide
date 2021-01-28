@@ -2,7 +2,7 @@
 {%- let NOT_CONFIGURED = "# -- not configured --" -%}
 
 {%- if hook == Hook::Pwd -%}
-echo "\
+\echo "\
 zoxide: PWD hooks are not supported on POSIX shells.
         Use '--hook prompt' when initializing zoxide."
 
@@ -15,16 +15,16 @@ zoxide: PWD hooks are not supported on POSIX shells.
 # pwd based on the value of _ZO_RESOLVE_SYMLINKS.
 __zoxide_pwd() {
 {%- if resolve_symlinks %}
-    pwd -P
+    \pwd -P
 {%- else %}
-    pwd -L
+    \pwd -L
 {%- endif %}
 }
 
 # cd + custom logic based on the value of _ZO_ECHO.
 __zoxide_cd() {
     # shellcheck disable=SC2164
-    cd "$@" {%- if echo %} && __zoxide_pwd {%- endif %}
+    \cd "$@" {%- if echo %} && __zoxide_pwd {%- endif %}
 }
 
 {{ SECTION }}
@@ -76,7 +76,7 @@ __zoxide_z() {
             __zoxide_cd "${OLDPWD}"
         else
             # shellcheck disable=SC2016
-            echo 'zoxide: $OLDPWD is not set'
+            \echo 'zoxide: $OLDPWD is not set'
             return 1
         fi
     elif [ "$#" -eq 1 ] && [ -d "$1" ]; then

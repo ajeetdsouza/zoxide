@@ -114,10 +114,16 @@ zoxide for interactive selection. Installation instructions can be found
 ### Step 3: Add zoxide to your shell
 
 If you currently use `z`, `z.lua`, or `zsh-z`, you may want to first import
-your existing database into `zoxide`:
+your existing entries into `zoxide`:
 
 ```sh
 zoxide import /path/to/db
+```
+
+Alternatively, for `autojump`:
+
+```sh
+zoxide import --from autojump /path/to/db
 ```
 
 <!-- omit in toc -->

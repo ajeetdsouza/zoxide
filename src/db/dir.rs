@@ -6,8 +6,8 @@ use serde::{Deserialize, Serialize};
 
 use std::borrow::Cow;
 use std::fmt::{self, Display, Formatter};
+use std::fs;
 use std::ops::{Deref, DerefMut};
-use std::path::Path;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct DirList<'a>(#[serde(borrow)] Vec<Dir<'a>>);
@@ -20,9 +20,9 @@ impl DirList<'_> {
     }
 
     pub fn from_bytes(bytes: &[u8]) -> Result<DirList> {
-        // Assume a maximum size for the store. This prevents bincode from throwing strange
-        // errors when it encounters invalid data.
-        const MAX_SIZE: u64 = 8 << 20; // 8 MiB
+        // Assume a maximum size for the database. This prevents bincode from
+        // throwing strange errors when it encounters invalid data.
+        const MAX_SIZE: u64 = 32 << 20; // 32 MiB
         let deserializer = &mut bincode::options()
             .with_fixint_encoding()
             .with_limit(MAX_SIZE);
@@ -30,7 +30,7 @@ impl DirList<'_> {
         // Split bytes into sections.
         let version_size = deserializer.serialized_size(&Self::VERSION).unwrap() as _;
         if bytes.len() < version_size {
-            bail!("could not deserialize store: corrupted data");
+            bail!("could not deserialize database: corrupted data");
         }
         let (bytes_version, bytes_dirs) = bytes.split_at(version_size);
 
@@ -46,7 +46,7 @@ impl DirList<'_> {
                 ),
             }
         })()
-        .context("could not deserialize store")
+        .context("could not deserialize database")
     }
 
     pub fn to_bytes(&self) -> Result<Vec<u8>> {
@@ -62,7 +62,7 @@ impl DirList<'_> {
             bincode::serialize_into(&mut buffer, &self)?;
             Ok(buffer)
         })()
-        .context("could not serialize store")
+        .context("could not serialize database")
     }
 }
 
@@ -95,8 +95,14 @@ pub struct Dir<'a> {
 }
 
 impl Dir<'_> {
-    pub fn is_match(&self, query: &Query) -> bool {
-        query.matches(&self.path) && Path::new(self.path.as_ref()).is_dir()
+    pub fn is_match(&self, query: &Query, resolve_symlinks: bool) -> bool {
+        let resolver = if resolve_symlinks {
+            fs::symlink_metadata
+        } else {
+            fs::metadata
+        };
+        let path = self.path.as_ref();
+        query.matches(path) && resolver(path).map(|m| m.is_dir()).unwrap_or(false)
     }
 
     pub fn score(&self, now: Epoch) -> Rank {

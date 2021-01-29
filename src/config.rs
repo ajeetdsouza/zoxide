@@ -1,4 +1,4 @@
-use crate::store::Rank;
+use crate::db::Rank;
 
 use anyhow::{bail, Context, Result};
 use dirs_next as dirs;
@@ -15,7 +15,7 @@ pub fn zo_data_dir() -> Result<PathBuf> {
                 data_dir.push("zoxide");
                 data_dir
             }
-            None => bail!("could not find database directory, please set _ZO_DATA_DIR manually"),
+            None => bail!("could not find data directory, please set _ZO_DATA_DIR manually"),
         },
     };
 

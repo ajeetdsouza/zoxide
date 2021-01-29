@@ -1,4 +1,4 @@
-use crate::store::Epoch;
+use crate::db::Epoch;
 
 use anyhow::{bail, Context, Result};
 

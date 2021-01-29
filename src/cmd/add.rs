@@ -1,6 +1,6 @@
 use super::Cmd;
 use crate::config;
-use crate::store::StoreBuilder;
+use crate::db::DatabaseFile;
 use crate::util;
 
 use anyhow::Result;
@@ -40,10 +40,10 @@ impl Cmd for Add {
         let data_dir = config::zo_data_dir()?;
         let max_age = config::zo_maxage()?;
 
-        let mut store = StoreBuilder::new(data_dir);
-        let mut store = store.build()?;
-        store.add(path, now);
-        store.age(max_age);
+        let mut db = DatabaseFile::new(data_dir);
+        let mut db = db.open()?;
+        db.add(path, now);
+        db.age(max_age);
 
         Ok(())
     }

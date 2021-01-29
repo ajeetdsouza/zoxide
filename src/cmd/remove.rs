@@ -1,7 +1,8 @@
 use super::Cmd;
 use crate::config;
+use crate::db::{DatabaseFile, Query};
+use crate::error::WriteErrorHandler;
 use crate::fzf::Fzf;
-use crate::store::{Query, StoreBuilder};
 use crate::util;
 
 use anyhow::{bail, Context, Result};
@@ -24,8 +25,8 @@ pub struct Remove {
 impl Cmd for Remove {
     fn run(&self) -> Result<()> {
         let data_dir = config::zo_data_dir()?;
-        let mut store = StoreBuilder::new(data_dir);
-        let mut store = store.build()?;
+        let mut db = DatabaseFile::new(data_dir);
+        let mut db = db.open()?;
 
         let selection;
         let path = match &self.interactive {
@@ -35,9 +36,9 @@ impl Cmd for Remove {
 
                 let mut fzf = Fzf::new()?;
                 let handle = fzf.stdin();
-                for dir in store.iter_matches(&query, now) {
-                    writeln!(handle, "{}", dir.display_score(now))
-                        .context("could not write to fzf")?;
+                let resolve_symlinks = config::zo_resolve_symlinks();
+                for dir in db.iter_matches(&query, now, resolve_symlinks) {
+                    writeln!(handle, "{}", dir.display_score(now)).handle_err("fzf")?;
                 }
 
                 selection = fzf.wait_select()?;
@@ -48,11 +49,11 @@ impl Cmd for Remove {
             None => self.path.as_ref().unwrap(),
         };
 
-        if !store.remove(path) {
+        if !db.remove(path) {
             let path = util::resolve_path(&path)?;
             let path = util::path_to_str(&path)?;
-            if !store.remove(path) {
-                bail!("path not found in store: {}", &path)
+            if !db.remove(path) {
+                bail!("path not found in database: {}", &path)
             }
         }
 

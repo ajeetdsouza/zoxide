@@ -1,6 +1,6 @@
 use super::Import;
 
-use crate::store::{Dir, Epoch, Store};
+use crate::db::{Database, Dir, Epoch};
 use anyhow::{Context, Result};
 
 use std::borrow::Cow;
@@ -13,7 +13,7 @@ pub struct Autojump {
 }
 
 impl Import for Autojump {
-    fn import<P: AsRef<Path>>(&self, store: &mut Store, path: P) -> Result<()> {
+    fn import<P: AsRef<Path>>(&self, db: &mut Database, path: P) -> Result<()> {
         let path = path.as_ref();
         let buffer = fs::read_to_string(path)
             .with_context(|| format!("could not open autojump database: {}", path.display()))?;
@@ -45,13 +45,13 @@ impl Import for Autojump {
 
         let rank_sum = entries.iter().map(|(_, rank)| rank).sum::<f64>();
         for &(path, rank) in entries.iter() {
-            if store.dirs.iter_mut().find(|dir| dir.path == path).is_none() {
-                store.dirs.push(Dir {
+            if db.dirs.iter_mut().find(|dir| dir.path == path).is_none() {
+                db.dirs.push(Dir {
                     path: Cow::Owned(path.into()),
                     rank: rank / rank_sum,
                     last_accessed: self.now,
                 });
-                store.modified = true;
+                db.modified = true;
             }
         }
 

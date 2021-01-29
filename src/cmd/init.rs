@@ -1,11 +1,14 @@
 use super::Cmd;
 use crate::config;
+use crate::error::WriteErrorHandler;
 use crate::shell::{self, Hook, Opts};
 
 use anyhow::{Context, Result};
 use askama::Template;
 use clap::{ArgEnum, Clap};
 use once_cell::sync::OnceCell;
+
+use std::io::{self, Write};
 
 /// Generates shell configuration
 #[derive(Clap, Debug)]
@@ -54,9 +57,7 @@ impl Cmd for Init {
             Shell::Zsh => shell::Zsh(opts).render(),
         }
         .context("could not render template")?;
-        println!("{}", source);
-
-        Ok(())
+        writeln!(io::stdout(), "{}", source).handle_err("stdout")
     }
 }
 
@@ -75,8 +76,8 @@ fn env_help() -> &'static str {
     ENV_HELP.get_or_init(|| {
         #[cfg(unix)]
         const PATH_SPLIT_SEPARATOR: u8 = b':';
-        #[cfg(any(target_os = "redox", target_os = "windows"))]
-        const PATH_SPLIT_SEPARATOR: u8 = b'\\';
+        #[cfg(windows)]
+        const PATH_SPLIT_SEPARATOR: u8 = b';';
 
         format!(
             "\

@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Fixed
+
+- Removed unnecessary backtraces on Rust nightly.
+- Fixed generated shell code to avoid accidentally using aliased builtins.
+- Handle broken pipe errors gracefully when writing to streams.
+
 ## [0.5.0] - 2020-10-30
 
 ### Added

@@ -3,13 +3,13 @@ use crate::config;
 use crate::import::{Autojump, Import as _, Z};
 use crate::util;
 
-use crate::store::StoreBuilder;
+use crate::db::DatabaseFile;
 use anyhow::{bail, Result};
 use clap::{ArgEnum, Clap};
 
 use std::path::PathBuf;
 
-/// Import entries from another database
+/// Import entries from another application
 #[derive(Clap, Debug)]
 pub struct Import {
     path: PathBuf,
@@ -27,10 +27,10 @@ impl Cmd for Import {
     fn run(&self) -> Result<()> {
         let data_dir = config::zo_data_dir()?;
 
-        let mut store = StoreBuilder::new(data_dir);
-        let mut store = store.build()?;
-        if !self.merge && !store.dirs.is_empty() {
-            bail!("zoxide database is not empty, specify --merge to continue anyway")
+        let mut db = DatabaseFile::new(data_dir);
+        let mut db = db.open()?;
+        if !self.merge && !db.dirs.is_empty() {
+            bail!("current database is not empty, specify --merge to continue anyway")
         }
 
         let resolve_symlinks = config::zo_resolve_symlinks();
@@ -39,8 +39,8 @@ impl Cmd for Import {
                 resolve_symlinks,
                 now: util::current_time()?,
             }
-            .import(&mut store, &self.path),
-            From::Z => Z { resolve_symlinks }.import(&mut store, &self.path),
+            .import(&mut db, &self.path),
+            From::Z => Z { resolve_symlinks }.import(&mut db, &self.path),
         }
     }
 }

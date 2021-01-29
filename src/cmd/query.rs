@@ -1,9 +1,10 @@
 use super::Cmd;
 use crate::config;
+use crate::db::{self, DatabaseFile};
+use crate::error::WriteErrorHandler;
 use crate::fzf::Fzf;
 use crate::util;
 
-use crate::store::{self, StoreBuilder};
 use anyhow::{Context, Result};
 use clap::Clap;
 
@@ -30,19 +31,20 @@ pub struct Query {
 impl Cmd for Query {
     fn run(&self) -> Result<()> {
         let data_dir = config::zo_data_dir()?;
-        let mut store = StoreBuilder::new(data_dir);
-        let mut store = store.build()?;
+        let mut db = DatabaseFile::new(data_dir);
+        let mut db = db.open()?;
 
-        let query = store::Query::new(&self.keywords);
+        let query = db::Query::new(&self.keywords);
         let now = util::current_time()?;
 
-        let mut matches = store.iter_matches(&query, now);
+        let resolve_symlinks = config::zo_resolve_symlinks();
+        let mut matches = db.iter_matches(&query, now, resolve_symlinks);
 
         if self.interactive {
             let mut fzf = Fzf::new()?;
             let handle = fzf.stdin();
             for dir in matches {
-                writeln!(handle, "{}", dir.display_score(now)).context("could not write to fzf")?;
+                writeln!(handle, "{}", dir.display_score(now)).handle_err("fzf")?;
             }
             let selection = fzf.wait_select()?;
             if self.score {
@@ -62,15 +64,16 @@ impl Cmd for Query {
                 } else {
                     writeln!(handle, "{}", dir.display())
                 }
-                .unwrap()
+                .handle_err("stdout")?;
             }
         } else {
             let dir = matches.next().context("no match found")?;
             if self.score {
-                println!("{}", dir.display_score(now))
+                writeln!(io::stdout(), "{}", dir.display_score(now))
             } else {
-                println!("{}", dir.display())
+                writeln!(io::stdout(), "{}", dir.display())
             }
+            .handle_err("stdout")?;
         }
 
         Ok(())

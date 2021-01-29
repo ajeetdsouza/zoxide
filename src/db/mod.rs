@@ -14,13 +14,13 @@ use std::fs;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 
-pub struct Store<'a> {
+pub struct Database<'a> {
     pub dirs: DirList<'a>,
     pub modified: bool,
     data_dir: &'a Path,
 }
 
-impl<'a> Store<'a> {
+impl<'a> Database<'a> {
     pub fn save(&mut self) -> Result<()> {
         if !self.modified {
             return Ok(());
@@ -29,7 +29,7 @@ impl<'a> Store<'a> {
         let buffer = self.dirs.to_bytes()?;
         let mut file = NamedTempFile::new_in(&self.data_dir).with_context(|| {
             format!(
-                "could not create temporary store in: {}",
+                "could not create temporary database in: {}",
                 self.data_dir.display()
             )
         })?;
@@ -40,14 +40,14 @@ impl<'a> Store<'a> {
         let _ = file.as_file().set_len(buffer.len() as _);
         file.write_all(&buffer).with_context(|| {
             format!(
-                "could not write to temporary store: {}",
+                "could not write to temporary database: {}",
                 file.path().display()
             )
         })?;
 
-        let path = store_path(&self.data_dir);
+        let path = db_path(&self.data_dir);
         persist(file, &path)
-            .with_context(|| format!("could not replace store: {}", path.display()))?;
+            .with_context(|| format!("could not replace database: {}", path.display()))?;
 
         self.modified = false;
         Ok(())
@@ -76,10 +76,13 @@ impl<'a> Store<'a> {
         &'b mut self,
         query: &'b Query,
         now: Epoch,
+        resolve_symlinks: bool,
     ) -> impl DoubleEndedIterator<Item = &'b Dir> {
         self.dirs
             .sort_unstable_by_key(|dir| Reverse(OrderedFloat(dir.score(now))));
-        self.dirs.iter().filter(move |dir| dir.is_match(&query))
+        self.dirs
+            .iter()
+            .filter(move |dir| dir.is_match(&query, resolve_symlinks))
     }
 
     pub fn remove<S: AsRef<str>>(&mut self, path: S) -> bool {
@@ -114,12 +117,12 @@ impl<'a> Store<'a> {
     }
 }
 
-impl Drop for Store<'_> {
+impl Drop for Database<'_> {
     fn drop(&mut self) {
         // Since the error can't be properly handled here,
         // pretty-print it instead.
         if let Err(e) = self.save() {
-            println!("Error: {}", e)
+            let _ = writeln!(io::stderr(), "zoxide: {:?}", e);
         }
     }
 }
@@ -159,29 +162,31 @@ fn persist<P: AsRef<Path>>(file: NamedTempFile, path: P) -> Result<(), PersistEr
     Ok(())
 }
 
-pub struct StoreBuilder {
+pub struct DatabaseFile {
     data_dir: PathBuf,
     buffer: Vec<u8>,
 }
 
-impl StoreBuilder {
-    pub fn new<P: Into<PathBuf>>(data_dir: P) -> StoreBuilder {
-        StoreBuilder {
+impl DatabaseFile {
+    pub fn new<P: Into<PathBuf>>(data_dir: P) -> DatabaseFile {
+        DatabaseFile {
             data_dir: data_dir.into(),
             buffer: Vec::new(),
         }
     }
 
-    pub fn build(&mut self) -> Result<Store> {
-        // Read the entire store to memory. For smaller files, this is faster
-        // than mmap / streaming, and allows for zero-copy deserialization.
-        let path = store_path(&self.data_dir);
+    pub fn open(&mut self) -> Result<Database> {
+        // Read the entire database to memory. For smaller files, this is
+        // faster than mmap / streaming, and allows for zero-copy
+        // deserialization.
+        let path = db_path(&self.data_dir);
         match fs::read(&path) {
             Ok(buffer) => {
                 self.buffer = buffer;
-                let dirs = DirList::from_bytes(&self.buffer)
-                    .with_context(|| format!("could not deserialize store: {}", path.display()))?;
-                Ok(Store {
+                let dirs = DirList::from_bytes(&self.buffer).with_context(|| {
+                    format!("could not deserialize database: {}", path.display())
+                })?;
+                Ok(Database {
                     dirs,
                     modified: false,
                     data_dir: &self.data_dir,
@@ -189,7 +194,7 @@ impl StoreBuilder {
             }
             Err(e) if e.kind() == io::ErrorKind::NotFound => {
                 // Create data directory, but don't create any file yet.
-                // The file will be created later by [`Store::save`]
+                // The file will be created later by [`Database::save`]
                 // if any data is modified.
                 fs::create_dir_all(&self.data_dir).with_context(|| {
                     format!(
@@ -197,22 +202,22 @@ impl StoreBuilder {
                         self.data_dir.display()
                     )
                 })?;
-                Ok(Store {
+                Ok(Database {
                     dirs: DirList::new(),
                     modified: false,
                     data_dir: &self.data_dir,
                 })
             }
             Err(e) => {
-                Err(e).with_context(|| format!("could not read from store: {}", path.display()))
+                Err(e).with_context(|| format!("could not read from database: {}", path.display()))
             }
         }
     }
 }
 
-fn store_path<P: AsRef<Path>>(data_dir: P) -> PathBuf {
-    const STORE_FILENAME: &str = "db.zo";
-    data_dir.as_ref().join(STORE_FILENAME)
+fn db_path<P: AsRef<Path>>(data_dir: P) -> PathBuf {
+    const DB_FILENAME: &str = "db.zo";
+    data_dir.as_ref().join(DB_FILENAME)
 }
 
 #[cfg(test)]
@@ -230,17 +235,17 @@ mod tests {
 
         let data_dir = tempfile::tempdir().unwrap();
         {
-            let mut store = StoreBuilder::new(data_dir.path());
-            let mut store = store.build().unwrap();
-            store.add(path, now);
-            store.add(path, now);
+            let mut db = DatabaseFile::new(data_dir.path());
+            let mut db = db.open().unwrap();
+            db.add(path, now);
+            db.add(path, now);
         }
         {
-            let mut store = StoreBuilder::new(data_dir.path());
-            let store = store.build().unwrap();
-            assert_eq!(store.dirs.len(), 1);
+            let mut db = DatabaseFile::new(data_dir.path());
+            let db = db.open().unwrap();
+            assert_eq!(db.dirs.len(), 1);
 
-            let dir = &store.dirs[0];
+            let dir = &db.dirs[0];
             assert_eq!(dir.path, path);
             assert_eq!(dir.last_accessed, now);
         }
@@ -257,20 +262,20 @@ mod tests {
 
         let data_dir = tempfile::tempdir().unwrap();
         {
-            let mut store = StoreBuilder::new(data_dir.path());
-            let mut store = store.build().unwrap();
-            store.add(path, now);
+            let mut db = DatabaseFile::new(data_dir.path());
+            let mut db = db.open().unwrap();
+            db.add(path, now);
         }
         {
-            let mut store = StoreBuilder::new(data_dir.path());
-            let mut store = store.build().unwrap();
-            assert!(store.remove(path));
+            let mut db = DatabaseFile::new(data_dir.path());
+            let mut db = db.open().unwrap();
+            assert!(db.remove(path));
         }
         {
-            let mut store = StoreBuilder::new(data_dir.path());
-            let mut store = store.build().unwrap();
-            assert!(store.dirs.is_empty());
-            assert!(!store.remove(path));
+            let mut db = DatabaseFile::new(data_dir.path());
+            let mut db = db.open().unwrap();
+            assert!(db.dirs.is_empty());
+            assert!(!db.remove(path));
         }
     }
 }

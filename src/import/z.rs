@@ -1,6 +1,6 @@
 use super::Import;
 
-use crate::store::{Dir, Store};
+use crate::db::{Database, Dir};
 use anyhow::{Context, Result};
 
 use std::borrow::Cow;
@@ -13,7 +13,7 @@ pub struct Z {
 }
 
 impl Import for Z {
-    fn import<P: AsRef<Path>>(&self, store: &mut Store, path: P) -> Result<()> {
+    fn import<P: AsRef<Path>>(&self, db: &mut Database, path: P) -> Result<()> {
         let file = File::open(path).context("could not open z database")?;
         let reader = BufReader::new(file);
 
@@ -41,18 +41,18 @@ impl Import for Z {
                     .parse()
                     .with_context(|| format!("invalid epoch: {}", last_accessed))?;
 
-                match store.dirs.iter_mut().find(|dir| dir.path == path) {
+                match db.dirs.iter_mut().find(|dir| dir.path == path) {
                     Some(dir) => {
                         dir.rank += rank;
                         dir.last_accessed = dir.last_accessed.max(last_accessed);
                     }
-                    None => store.dirs.push(Dir {
+                    None => db.dirs.push(Dir {
                         path: Cow::Owned(path.into()),
                         rank,
                         last_accessed,
                     }),
                 }
-                store.modified = true;
+                db.modified = true;
 
                 Ok(())
             })()

@@ -9,7 +9,7 @@ fn main() {
 
     let version_info = match git_describe {
         Some(description) if !description.is_empty() => description,
-        _ => format!("v{}-unknown", env!("CARGO_PKG_VERSION")),
+        _ => format!("v{}", env!("CARGO_PKG_VERSION")),
     };
 
     println!("cargo:rustc-env=ZOXIDE_VERSION={}", version_info);

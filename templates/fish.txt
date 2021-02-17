@@ -10,19 +10,19 @@
 # pwd based on the value of _ZO_RESOLVE_SYMLINKS.
 function __zoxide_pwd
 {%- if resolve_symlinks %}
-    command pwd -P
+    builtin pwd -P
 {%- else %}
-    command pwd -L
+    builtin pwd -L
 {%- endif %}
 end
 
 # cd + custom logic based on the value of _ZO_ECHO.
 function __zoxide_cd
-    command cd $argv
+    builtin cd $argv
     {%- if echo %}
     and __zoxide_pwd
     {%- endif %}
-    and commandline -f repaint
+    and builtin commandline -f repaint
 end
 
 {{ SECTION }}
@@ -41,7 +41,7 @@ function __zoxide_hook --on-event fish_prompt
 function __zoxide_hook --on-variable PWD
 
 {%- endmatch %}
-    zoxide add (__zoxide_pwd)
+    command zoxide add (__zoxide_pwd)
 end
 
 {{ SECTION }}
@@ -59,40 +59,40 @@ function __zoxide_z
     else if begin; test $argc -eq 1; and test -d $argv[1]; end
         __zoxide_cd $argv[1]
     else
-        set -l __zoxide_result (zoxide query -- $argv)
+        set -l __zoxide_result (command zoxide query -- $argv)
         and __zoxide_cd $__zoxide_result
     end
 end
 
 # Jump to a directory using interactive search.
 function __zoxide_zi
-    set -l __zoxide_result (zoxide query -i -- $argv)
+    set -l __zoxide_result (command zoxide query -i -- $argv)
     and __zoxide_cd $__zoxide_result
 end
 
 # Add a new entry to the database.
 function __zoxide_za
-    zoxide add $argv
+    command zoxide add $argv
 end
 
 # Query an entry from the database using only keywords.
 function __zoxide_zq
-    zoxide query $argv
+    command zoxide query $argv
 end
 
 # Query an entry from the database using interactive selection.
 function __zoxide_zqi
-    zoxide query -i $argv
+    command zoxide query -i $argv
 end
 
 # Remove an entry from the database using the exact path.
 function __zoxide_zr
-    zoxide remove $argv
+    command zoxide remove $argv
 end
 
 # Remove an entry from the database using interactive selection.
 function __zoxide_zri
-    zoxide remove -i $argv
+    command zoxide remove -i $argv
 end
 
 {{ SECTION }}
@@ -106,7 +106,7 @@ end
 function __zoxide_unset
     set --erase $argv > {{ Opts::DEVNULL }} 2>&1
     abbr --erase $argv > {{ Opts::DEVNULL }} 2>&1
-    functions --erase $argv > {{ Opts::DEVNULL }} 2>&1
+    builtin functions --erase $argv > {{ Opts::DEVNULL }} 2>&1
 end
 
 __zoxide_unset '{{cmd}}'

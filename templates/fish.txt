@@ -104,9 +104,9 @@ end
 
 # Remove definitions.
 function __zoxide_unset
-    set --erase $argv > {{ Opts::DEVNULL }} 2>&1
-    abbr --erase $argv > {{ Opts::DEVNULL }} 2>&1
-    builtin functions --erase $argv > {{ Opts::DEVNULL }} 2>&1
+    set --erase $argv > /dev/null 2>&1
+    abbr --erase $argv > /dev/null 2>&1
+    builtin functions --erase $argv > /dev/null 2>&1
 end
 
 __zoxide_unset '{{cmd}}'

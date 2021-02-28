@@ -8,13 +8,6 @@ pub struct Opts<'a> {
     pub resolve_symlinks: bool,
 }
 
-impl Opts<'_> {
-    #[cfg(unix)]
-    pub const DEVNULL: &'static str = "/dev/null";
-    #[cfg(windows)]
-    pub const DEVNULL: &'static str = "NUL";
-}
-
 macro_rules! make_template {
     ($name:ident, $path:expr) => {
         #[derive(::std::fmt::Debug, ::askama::Template)]

@@ -126,9 +126,9 @@ __zoxide_zri() {
 # Remove definitions.
 __zoxide_unset() {
     # shellcheck disable=SC1001
-    \unset -f "$@" >{{ Opts::DEVNULL }} 2>&1
+    \unset -f "$@" >/dev/null 2>&1
     # shellcheck disable=SC1001
-    \unset -v "$@" >{{ Opts::DEVNULL }} 2>&1
+    \unset -v "$@" >/dev/null 2>&1
 }
 
 __zoxide_unset '{{cmd}}'

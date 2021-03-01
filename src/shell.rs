@@ -66,10 +66,10 @@ mod tests {
                     for &hook in HOOKS {
                         for &cmd in CMDS {
                             let opt = Opts {
+                                cmd,
+                                hook,
                                 echo,
                                 resolve_symlinks,
-                                hook,
-                                cmd,
                             };
                             opts.push(opt);
                         }

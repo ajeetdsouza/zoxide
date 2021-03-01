@@ -107,9 +107,9 @@ function __zoxide_zri() {
 
 # Remove definitions.
 function __zoxide_unset() {
-    \builtin unalias "$@" &>{{ Opts::DEVNULL }}
-    \builtin unfunction "$@" &>{{ Opts::DEVNULL }}
-    \builtin unset "$@" &>{{ Opts::DEVNULL }}
+    \builtin unalias "$@" &>/dev/null
+    \builtin unfunction "$@" &>/dev/null
+    \builtin unset "$@" &>/dev/null
 }
 
 __zoxide_unset '{{cmd}}'

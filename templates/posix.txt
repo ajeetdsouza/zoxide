@@ -52,10 +52,10 @@ __zoxide_hook() {
 {{ NOT_CONFIGURED }}
 
 {%- when Hook::Prompt %}
-case "${PS1}" in
-    *\$\(__zoxide_hook\)*) ;;
-    *) PS1="${PS1}\$(__zoxide_hook)" ;;
-esac
+if [ "${__zoxide_hooked}" != '1' ]; then
+    PS1="${PS1}\$(__zoxide_hook)"
+    __zoxide_hooked='1'
+fi
 
 {%- when Hook::Pwd %}
 {{ NOT_CONFIGURED }}

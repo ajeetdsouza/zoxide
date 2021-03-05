@@ -51,10 +51,10 @@ function __zoxide_hook() {
 {{ NOT_CONFIGURED }}
 
 {%- else %}
-case "${PROMPT_COMMAND}" in
-    *__zoxide_hook*) ;;
-    *) PROMPT_COMMAND="${PROMPT_COMMAND:+${PROMPT_COMMAND};}__zoxide_hook" ;;
-esac
+if [ "${__zoxide_hooked}" != '1' ]; then
+    PROMPT_COMMAND="${PROMPT_COMMAND:+${PROMPT_COMMAND};}__zoxide_hook"
+    __zoxide_hooked='1'
+fi
 
 {%- endif %}
 

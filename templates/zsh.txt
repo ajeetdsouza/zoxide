@@ -29,19 +29,17 @@ function __zoxide_hook() {
 }
 
 # Initialize hook.
-{%- match hook %}
-{%- when Hook::None %}
-{{ NOT_CONFIGURED }}
-
-{%- when Hook::Prompt %}
-[[ -n "${precmd_functions[(r)__zoxide_hook]}" ]] || {
+if [ "${__zoxide_hooked}" != '1' ]; then
+    __zoxide_hooked='1'
+    {%- match hook %}
+    {%- when Hook::None %}
+    {{ NOT_CONFIGURED }}
+    {%- when Hook::Prompt %}
     precmd_functions+=(__zoxide_hook)
-}
-
-{%- when Hook::Pwd %}
-chpwd_functions=(${chpwd_functions[@]} "__zoxide_hook")
-
-{%- endmatch %}
+    {%- when Hook::Pwd %}
+    chpwd_functions=(${chpwd_functions[@]} "__zoxide_hook")
+    {%- endmatch %}
+fi
 
 {{ SECTION }}
 # When using zoxide with --no-aliases, alias these internal functions as
@@ -56,7 +54,7 @@ function __zoxide_z() {
         if [ -n "$OLDPWD" ]; then
             __zoxide_cd "$OLDPWD"
         else
-            \builtin echo 'zoxide: \$OLDPWD is not set'
+            \builtin printf 'zoxide: $OLDPWD is not set'
             return 1
         fi
     elif [ "$#" -eq 1 ] &&  [ -d "$1" ]; then

@@ -28,29 +28,29 @@ function __zoxide_hook {
 }
 
 # Initialize hook.
-{%- match hook %}
-{%- when Hook::None %}
-{{ NOT_CONFIGURED }}
-
-{%- when Hook::Prompt %}
-$PreZoxidePrompt = $function:prompt
-function prompt {
-    $null = __zoxide_hook
-    & $PreZoxidePrompt
-}
-
-{%- when Hook::Pwd %}
-if ($PSVersionTable.PSVersion.Major -ge 6) {
-    $ExecutionContext.InvokeCommand.LocationChangedAction = {
+if ($__zoxide_hooked -ne '1') {
+    $__zoxide_hooked = '1'
+    {%- match hook %}
+    {%- when Hook::None %}
+    {{ NOT_CONFIGURED }}
+    {%- when Hook::Prompt %}
+    $__zoxide_prompt_old = $function:prompt
+    function prompt {
         $null = __zoxide_hook
+        & $__zoxide_prompt_old
     }
-} else {
-    Write-Error "`
-zoxide: PWD hooks are not supported below PowerShell 6.
-        Use '--hook prompt' when initializing zoxide."
+    {%- when Hook::Pwd %}
+    if ($PSVersionTable.PSVersion.Major -ge 6) {
+        $ExecutionContext.InvokeCommand.LocationChangedAction = {
+            $null = __zoxide_hook
+        }
+    } else {
+        Write-Error ("`n" +
+            "zoxide: PWD hooks are not supported below PowerShell 6.`n" +
+            "        Use '--hook prompt' when initializing zoxide.")
+    }
+    {%- endmatch %}
 }
-
-{%- endmatch %}
 
 {{ SECTION }}
 # When using zoxide with --no-aliases, alias these internal functions as

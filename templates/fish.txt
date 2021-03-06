@@ -30,18 +30,18 @@ end
 #
 
 # Initialize hook to add new entries to the database.
-{%- match hook %}
-{%- when Hook::None %}
-function __zoxide_hook
-
-{%- when Hook::Prompt %}
-function __zoxide_hook --on-event fish_prompt
-
-{%- when Hook::Pwd %}
-function __zoxide_hook --on-variable PWD
-
-{%- endmatch %}
-    command zoxide add (__zoxide_pwd)
+if test "$__zoxide_hooked" != '1'
+    set __zoxide_hooked '1'
+    {%- match hook %}
+    {%- when Hook::None %}
+    function __zoxide_hook
+    {%- when Hook::Prompt %}
+    function __zoxide_hook --on-event fish_prompt
+    {%- when Hook::Pwd %}
+    function __zoxide_hook --on-variable PWD
+    {%- endmatch %}
+        command zoxide add (__zoxide_pwd)
+    end
 end
 
 {{ SECTION }}

@@ -47,16 +47,14 @@ function __zoxide_hook() {
 {%- endmatch %}
 
 # Initialize hook.
-{%- if hook == Hook::None %}
-{{ NOT_CONFIGURED }}
-
-{%- else %}
-case "${PROMPT_COMMAND}" in
-    *__zoxide_hook*) ;;
-    *) PROMPT_COMMAND="${PROMPT_COMMAND:+${PROMPT_COMMAND};}__zoxide_hook" ;;
-esac
-
-{%- endif %}
+if [ "${__zoxide_hooked}" != '1' ]; then
+    __zoxide_hooked='1'
+    {%- if hook == Hook::None %}
+    {{ NOT_CONFIGURED }}
+    {%- else %}
+    PROMPT_COMMAND="${PROMPT_COMMAND:+${PROMPT_COMMAND};}__zoxide_hook"
+    {%- endif %}
+fi
 
 {{ SECTION }}
 # When using zoxide with --no-aliases, alias these internal functions as
@@ -72,7 +70,7 @@ function __zoxide_z() {
             __zoxide_cd "${OLDPWD}"
         else
             # shellcheck disable=SC2016
-            \builtin echo 'zoxide: $OLDPWD is not set'
+            \builtin printf 'zoxide: $OLDPWD is not set\n'
             return 1
         fi
     elif [ "$#" -eq 1 ] && [ -d "$1" ]; then

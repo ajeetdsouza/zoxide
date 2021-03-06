@@ -1,13 +1,6 @@
 {%- let SECTION = "# =============================================================================\n#" -%}
 {%- let NOT_CONFIGURED = "# -- not configured --" -%}
 
-{%- if hook == Hook::Pwd -%}
-\echo "\
-zoxide: PWD hooks are not supported on POSIX shells.
-        Use '--hook prompt' when initializing zoxide."
-
-{% endif -%}
-
 {{ SECTION }}
 # Utility functions for zoxide.
 #
@@ -47,20 +40,19 @@ __zoxide_hook() {
 {%- endmatch %}
 
 # Initialize hook.
-{%- match hook %}
-{%- when Hook::None %}
-{{ NOT_CONFIGURED }}
-
-{%- when Hook::Prompt %}
-case "${PS1}" in
-    *\$\(__zoxide_hook\)*) ;;
-    *) PS1="${PS1}\$(__zoxide_hook)" ;;
-esac
-
-{%- when Hook::Pwd %}
-{{ NOT_CONFIGURED }}
-
-{%- endmatch %}
+if [ "${__zoxide_hooked}" != '1' ]; then
+    __zoxide_hooked='1'
+    {%- match hook %}
+    {%- when Hook::None %}
+    {{ NOT_CONFIGURED }}
+    {%- when Hook::Prompt %}
+    PS1="${PS1}\$(__zoxide_hook)"
+    {%- when Hook::Pwd %}
+    \printf "%s\n%s\n" \
+        "zoxide: PWD hooks are not supported on POSIX shells." \
+        "        Use '--hook prompt' when initializing zoxide."
+    {%- endmatch %}
+fi
 
 {{ SECTION }}
 # When using zoxide with --no-aliases, alias these internal functions as
@@ -76,7 +68,7 @@ __zoxide_z() {
             __zoxide_cd "${OLDPWD}"
         else
             # shellcheck disable=SC2016
-            \echo 'zoxide: $OLDPWD is not set'
+            \printf 'zoxide: $OLDPWD is not set'
             return 1
         fi
     elif [ "$#" -eq 1 ] && [ -d "$1" ]; then

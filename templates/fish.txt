@@ -70,31 +70,6 @@ function __zoxide_zi
     and __zoxide_cd $__zoxide_result
 end
 
-# Add a new entry to the database.
-function __zoxide_za
-    command zoxide add $argv
-end
-
-# Query an entry from the database using only keywords.
-function __zoxide_zq
-    command zoxide query $argv
-end
-
-# Query an entry from the database using interactive selection.
-function __zoxide_zqi
-    command zoxide query -i $argv
-end
-
-# Remove an entry from the database using the exact path.
-function __zoxide_zr
-    command zoxide remove $argv
-end
-
-# Remove an entry from the database using interactive selection.
-function __zoxide_zri
-    command zoxide remove -i $argv
-end
-
 {{ SECTION }}
 # Convenient aliases for zoxide. Disable these using --no-aliases.
 #
@@ -117,31 +92,6 @@ end
 __zoxide_unset '{{cmd}}i'
 function {{cmd}}i
     __zoxide_zi $argv
-end
-
-__zoxide_unset '{{cmd}}a'
-function {{cmd}}a
-    __zoxide_za $argv
-end
-
-__zoxide_unset '{{cmd}}q'
-function {{cmd}}q
-    __zoxide_zq $argv
-end
-
-__zoxide_unset '{{cmd}}qi'
-function {{cmd}}qi
-    __zoxide_zqi $argv
-end
-
-__zoxide_unset '{{cmd}}r'
-function {{cmd}}r
-    __zoxide_zr $argv
-end
-
-__zoxide_unset '{{cmd}}ri'
-function {{cmd}}ri
-    __zoxide_zri $argv
 end
 
 {%- when None %}

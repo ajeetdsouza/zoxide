@@ -47,7 +47,7 @@ if ($__zoxide_hooked -ne '1') {
     } else {
         Write-Error ("`n" +
             "zoxide: PWD hooks are not supported below PowerShell 6.`n" +
-            "        Use '--hook prompt' when initializing zoxide.")
+            "        Use 'zoxide init powershell --hook prompt' instead.")
     }
     {%- endmatch %}
 }
@@ -84,31 +84,6 @@ function __zoxide_zi {
     }
 }
 
-# Add a new entry to the database.
-function __zoxide_za {
-    zoxide add @args
-}
-
-# Query an entry from the database using only keywords.
-function __zoxide_zq {
-    zoxide query @args
-}
-
-# Query an entry from the database using interactive selection.
-function __zoxide_zqi {
-    zoxide query -i @args
-}
-
-# Remove an entry from the database using the exact path.
-function __zoxide_zr {
-    zoxide remove @args
-}
-
-# Remove an entry from the database using interactive selection.
-function __zoxide_zri {
-    zoxide remove -i @args
-}
-
 {{ SECTION }}
 # Convenient aliases for zoxide. Disable these using --no-aliases.
 #
@@ -118,14 +93,6 @@ function __zoxide_zri {
 
 Set-Alias {{cmd}} __zoxide_z
 Set-Alias {{cmd}}i __zoxide_zi
-
-Set-Alias {{cmd}}a __zoxide_za
-
-Set-Alias {{cmd}}q __zoxide_zq
-Set-Alias {{cmd}}qi __zoxide_zqi
-
-Set-Alias {{cmd}}r __zoxide_zr
-Set-Alias {{cmd}}ri __zoxide_zri
 
 {%- when None %}
 {{ NOT_CONFIGURED }}

@@ -87,31 +87,6 @@ function __zoxide_zi() {
     __zoxide_result="$(zoxide query -i -- "$@")" && __zoxide_cd "${__zoxide_result}"
 }
 
-# Add a new entry to the database.
-function __zoxide_za() {
-    zoxide add "$@"
-}
-
-# Query an entry from the database using only keywords.
-function __zoxide_zq() {
-    zoxide query "$@"
-}
-
-# Query an entry from the database using interactive selection.
-function __zoxide_zqi() {
-    zoxide query -i "$@"
-}
-
-# Remove an entry from the database using the exact path.
-function __zoxide_zr() {
-    zoxide remove "$@"
-}
-
-# Remove an entry from the database using interactive selection.
-function __zoxide_zri() {
-    zoxide remove -i "$@"
-}
-
 {{ SECTION }}
 # Convenient aliases for zoxide. Disable these using --no-aliases.
 #
@@ -135,31 +110,6 @@ function {{cmd}}() {
 __zoxide_unset '{{cmd}}i'
 function {{cmd}}i() {
     __zoxide_zi "$@"
-}
-
-__zoxide_unset '{{cmd}}a'
-function {{cmd}}a() {
-    __zoxide_za "$@"
-}
-
-__zoxide_unset '{{cmd}}q'
-function {{cmd}}q() {
-    __zoxide_zq "$@"
-}
-
-__zoxide_unset '{{cmd}}qi'
-function {{cmd}}qi() {
-    __zoxide_zqi "$@"
-}
-
-__zoxide_unset '{{cmd}}r'
-function {{cmd}}r() {
-    __zoxide_zr "$@"
-}
-
-__zoxide_unset '{{cmd}}ri'
-function {{cmd}}ri() {
-    __zoxide_zri "$@"
 }
 
 {%- when None %}

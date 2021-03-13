@@ -133,46 +133,6 @@ def __zoxide_zi(args: List[str]):
     __zoxide_cd(__zoxide_result)
 
 
-def __zoxide_za(args: List[str]):
-    """Add a new entry to the database."""
-    try:
-        subprocess.run(["zoxide", "add"] + args, check=True)
-    except CalledProcessError as exc:
-        raise ZoxideSilentException from exc
-
-
-def __zoxide_zq(args: List[str]):
-    """Query an entry from the database using only keywords."""
-    try:
-        subprocess.run(["zoxide", "query"] + args, check=True)
-    except CalledProcessError as exc:
-        raise ZoxideSilentException from exc
-
-
-def __zoxide_zqi(args: List[str]):
-    """Query an entry from the database using interactive selection."""
-    try:
-        subprocess.run(["zoxide", "query", "-i"] + args, check=True)
-    except CalledProcessError as exc:
-        raise ZoxideSilentException from exc
-
-
-def __zoxide_zr(args: List[str]):
-    """Remove an entry from the database using the exact path."""
-    try:
-        subprocess.run(["zoxide", "remove"] + args, check=True)
-    except CalledProcessError as exc:
-        raise ZoxideSilentException from exc
-
-
-def __zoxide_zri(args: List[str]):
-    """Remove an entry from the database using interactive selection."""
-    try:
-        subprocess.run(["zoxide", "remove", "-i"] + args, check=True)
-    except CalledProcessError as exc:
-        raise ZoxideSilentException from exc
-
-
 {{ SECTION }}
 # Convenient aliases for zoxide. Disable these using --no-aliases.
 #
@@ -182,11 +142,6 @@ def __zoxide_zri(args: List[str]):
 
 aliases["{{cmd}}"] = __zoxide_z
 aliases["{{cmd}}i"] = __zoxide_zi
-aliases["{{cmd}}a"] = __zoxide_za
-aliases["{{cmd}}q"] = __zoxide_zq
-aliases["{{cmd}}qi"] = __zoxide_zqi
-aliases["{{cmd}}r"] = __zoxide_zr
-aliases["{{cmd}}ri"] = __zoxide_zri
 
 {%- when None %}
 {{ NOT_CONFIGURED }}

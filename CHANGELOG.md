@@ -9,10 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Removed unnecessary backtraces on Rust nightly.
+- Removed backtraces on Rust nightly.
 - Fixed generated shell code to avoid accidentally using aliased builtins.
 - Handle broken pipe errors gracefully when writing to streams.
 - NUL file appearing in working directory on Windows.
+- Accidental redefinition of hooks when initialized twice on some shells.
+
+### Removed
+
+- Aliases: `za`, `zq`, `zqi`, `zr`, `zri`.
 
 ## [0.5.0] - 2020-10-30
 

@@ -3,6 +3,7 @@
 
 [![crates.io](https://img.shields.io/crates/v/zoxide)](https://crates.io/crates/zoxide)
 ![.github/workflows/release.yml](https://github.com/ajeetdsouza/zoxide/workflows/.github/workflows/release.yml/badge.svg)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fajeetdsouza%2Fzoxide.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fajeetdsouza%2Fzoxide?ref=badge_shield)
 
 A faster way to navigate your filesystem
 
@@ -226,3 +227,7 @@ eval "$(zoxide init posix --hook prompt)"
 [Void Linux Packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide
 
 [`dirs` documentation]: https://docs.rs/dirs/latest/dirs/fn.data_local_dir.html
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fajeetdsouza%2Fzoxide.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fajeetdsouza%2Fzoxide?ref=badge_large)

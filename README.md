@@ -1,4 +1,5 @@
 <!-- omit in toc -->
+
 # zoxide
 
 [![crates.io](https://img.shields.io/crates/v/zoxide)](https://crates.io/crates/zoxide)
@@ -7,6 +8,7 @@
 A faster way to navigate your filesystem
 
 <!-- omit in toc -->
+
 ## Table of contents
 
 - [Introduction](#introduction)
@@ -16,8 +18,6 @@ A faster way to navigate your filesystem
   - [Step 2: Install fzf (optional)](#step-2-install-fzf-optional)
   - [Step 3: Add zoxide to your shell](#step-3-add-zoxide-to-your-shell)
 - [Configuration](#configuration)
-  - [`init` flags](#init-flags)
-  - [Environment variables](#environment-variables)
 
 ## Introduction
 
@@ -37,11 +37,6 @@ z foo bar   # cd to highest ranked directory matching foo and bar
 z foo/      # can also cd into actual directories
 
 zi foo      # cd with interactive selection using fzf
-
-zq foo      # echo the best match, don't cd
-
-za /foo     # add /foo to the database
-zr /foo     # remove /foo from the database
 ```
 
 ## Getting started
@@ -57,22 +52,24 @@ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/ajeetdsou
 If you would rather not run a script, you can download the binary from the [Releases](https://github.com/ajeetdsouza/zoxide/releases) page and add it anywhere in your `$PATH`.
 
 <!-- omit in toc -->
+
 #### On Linux
 
-| Distribution      | Repository              | Instructions                                              |
-| ----------------- | ----------------------- | --------------------------------------------------------- |
-| **Any**           | [crates.io]             | `cargo install zoxide`                                    |
-| **Any**           | [Linuxbrew]             | `brew install zoxide`                                     |
-| Alpine Linux      | [Alpine Linux Packages] | `apk add zoxide`                                          |
-| Arch Linux        | [AUR]                   | `yay -Sy zoxide-bin`                                      |
-| CentOS            | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide` |
-| Debian Testing    | [Debian Packages]       | `apt install zoxide`                                      |
-| Fedora            | [Fedora Packages]       | `dnf install zoxide`                                      |
-| NixOS             | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                              |
-| Parrot OS         |                         | `apt install zoxide`                                      |
-| Void Linux        | [Void Linux Packages]   | `xbps-install -S zoxide`                                  |
+| Distribution   | Repository              | Instructions                                              |
+| -------------- | ----------------------- | --------------------------------------------------------- |
+| **Any**        | [crates.io]             | `cargo install zoxide`                                    |
+| **Any**        | [Linuxbrew]             | `brew install zoxide`                                     |
+| Alpine Linux   | [Alpine Linux Packages] | `apk add zoxide`                                          |
+| Arch Linux     | [AUR]                   | `yay -Sy zoxide-bin`                                      |
+| CentOS         | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide` |
+| Debian Testing | [Debian Packages]       | `apt install zoxide`                                      |
+| Fedora         | [Fedora Packages]       | `dnf install zoxide`                                      |
+| NixOS          | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                              |
+| Parrot OS      |                         | `apt install zoxide`                                      |
+| Void Linux     | [Void Linux Packages]   | `xbps-install -S zoxide`                                  |
 
 <!-- omit in toc -->
+
 #### On macOS
 
 | Repository  | Instructions           |
@@ -82,6 +79,7 @@ If you would rather not run a script, you can download the binary from the [Rele
 | [MacPorts]  | `port install zoxide`  |
 
 <!-- omit in toc -->
+
 #### On Windows
 
 | Repository  | Instructions           |
@@ -90,6 +88,7 @@ If you would rather not run a script, you can download the binary from the [Rele
 | [Scoop]     | `scoop install zoxide` |
 
 <!-- omit in toc -->
+
 #### On BSD
 
 | Distribution  | Repository   | Instructions           |
@@ -100,11 +99,12 @@ If you would rather not run a script, you can download the binary from the [Rele
 | NetBSD        | [pkgsrc]     | `pkgin install zoxide` |
 
 <!-- omit in toc -->
+
 #### On Android
 
-| Repository | Instructions           |
-| ---------- | ---------------------- |
-| [Termux]   | `pkg install zoxide`   |
+| Repository | Instructions         |
+| ---------- | -------------------- |
+| [Termux]   | `pkg install zoxide` |
 
 ### Step 2: Install fzf (optional)
 
@@ -128,6 +128,7 @@ zoxide import --from autojump /path/to/db
 ```
 
 <!-- omit in toc -->
+
 #### bash
 
 Add the following line to your `~/.bashrc`:
@@ -137,6 +138,7 @@ eval "$(zoxide init bash)"
 ```
 
 <!-- omit in toc -->
+
 #### fish
 
 Add the following line to your `~/.config/fish/config.fish`:
@@ -146,6 +148,7 @@ zoxide init fish | source
 ```
 
 <!-- omit in toc -->
+
 #### PowerShell
 
 Add the following line to your profile:
@@ -158,6 +161,7 @@ Invoke-Expression (& {
 ```
 
 <!-- omit in toc -->
+
 #### xonsh
 
 Add the following line to your profile (usually `~/.xonshrc`):
@@ -167,6 +171,7 @@ execx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')
 ```
 
 <!-- omit in toc -->
+
 #### zsh
 
 Add the following line to your `~/.zshrc`:
@@ -176,6 +181,7 @@ eval "$(zoxide init zsh)"
 ```
 
 <!-- omit in toc -->
+
 #### Any POSIX shell
 
 Add the following line to your shell's configuration file:
@@ -188,41 +194,56 @@ eval "$(zoxide init posix --hook prompt)"
 
 ### `init` flags
 
-- `--cmd`: change the `z` command (and corresponding aliases) to something else
-- `--hook <HOOK>`: change the event that adds a new entry to the database
-  (default: `pwd`)
-  - `none`: never add entries
-    (this will make `zoxide` useless unless you manually configure a hook)
-  - `prompt`: add an entry at every prompt
-  - `pwd`: add an entry whenever the current directory is changed
-- `--no-aliases`: don't define extra aliases like `zi`, `zq`, `za`, and `zr`
+- `--cmd`: changes the prefix of predefined aliases (`z`, `zi`).
+  - e.g. `--cmd j` would change the aliases to `j` and `ji` respectively.
+- `--hook <HOOK>`: change how often zoxide increments a directory's score:
+  - `none`: never automatically add directories to zoxide.
+  - `prompt`: add the current directory to zoxide at every shell prompt.
+  - `pwd`: whenever the user changes directories, add the new directory to zoxide.
+- `--no-aliases`: don't define extra aliases (`z`, `zi`).
+  - These functions will still be available in your shell as `__zoxide_z` and `__zoxide_zi`, should you choose to use them elsewhere.
 
 ### Environment variables
 
-- `$_ZO_DATA_DIR`: directory where `zoxide` will store its data files
-  (default: platform-specific; see the [`dirs` documentation] for more information)
-- `$_ZO_ECHO`: when set to `1`, `z` will print the matched directory before navigating to it
-- `$_ZO_EXCLUDE_DIRS`: list of directories separated by platform-specific characters
-  ("`:`" on Linux/macOS, "`;`" on Windows) to be excluded from the database
-- `$_ZO_FZF_OPTS`: custom flags to pass to `fzf`
-- `$_ZO_MAXAGE`: sets the maximum total age after which entries start getting deleted
-- `$_ZO_RESOLVE_SYMLINKS`: when set to `1`, `z add` will resolve symlinks.
+- `_ZO_DATA_DIR`
+  - Specifies the directory in which zoxide should store its database.
+  - The default value varies across OSes:
+    | OS          | Path                                     | Example                                    |
+    | ----------- | ---------------------------------------- | ------------------------------------------ |
+    | Linux / BSD | `$XDG_DATA_HOME` or `$HOME/.local/share` | `/home/alice/.local/share`                 |
+    | macOS       | `$HOME/Library/Application Support`      | `/Users/Alice/Library/Application Support` |
+    | Windows     | `{FOLDERID_RoamingAppData}`              | `C:\Users\Alice\AppData\Roaming`           |
+- `_ZO_ECHO`
+  - When set to `1`, `z` will print the matched directory before navigating to it.
+- `_ZO_EXCLUDE_DIRS`
+  - Excludes the specified directories from the database.
+  - This is provided as a list of [Unix globs](https://man7.org/linux/man-pages/man7/glob.7.html), separated by OS-specific characters:
+    | OS                  | Separator | Example                 |
+    | ------------------- | --------- | ----------------------- |
+    | Linux / macOS / BSD | `:`       | `$HOME:$HOME/private/*` |
+    | Windows             | `;`       | `$HOME;$HOME/private/*` |
+- `_ZO_FZF_OPTS`
+  - Custom options to pass to [fzf](https://github.com/junegunn/fzf). See `man fzf` for the list of options.
+- `_ZO_MAXAGE`
+  - Configures the [aging algorithm](https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#aging), which limits the maximum number of entries in the database.
+  - By default, this is set to `10000`.
+- `_ZO_RESOLVE_SYMLINKS`
+  - When set to `1`, `z` will resolve symlinks before adding directories to the database.
 
-[Alpine Linux Packages]: https://pkgs.alpinelinux.org/packages?name=zoxide
-[AUR]: https://aur.archlinux.org/packages/zoxide-bin
-[Copr]: https://copr.fedorainfracloud.org/coprs/atim/zoxide/
+[alpine linux packages]: https://pkgs.alpinelinux.org/packages?name=zoxide
+[aur]: https://aur.archlinux.org/packages/zoxide-bin
+[copr]: https://copr.fedorainfracloud.org/coprs/atim/zoxide/
 [crates.io]: https://crates.io/crates/zoxide
-[Debian Packages]: https://packages.debian.org/testing/admin/zoxide
-[DPorts]: https://github.com/DragonFlyBSD/DPorts/tree/master/sysutils/zoxide
-[FreshPorts]: https://www.freshports.org/sysutils/zoxide/
-[Fedora Packages]: https://src.fedoraproject.org/rpms/rust-zoxide
-[Homebrew]: https://formulae.brew.sh/formula/zoxide
-[Linuxbrew]: https://formulae.brew.sh/formula-linux/zoxide
-[MacPorts]: https://ports.macports.org/port/zoxide/summary
+[debian packages]: https://packages.debian.org/testing/admin/zoxide
+[dports]: https://github.com/DragonFlyBSD/DPorts/tree/master/sysutils/zoxide
+[freshports]: https://www.freshports.org/sysutils/zoxide/
+[fedora packages]: https://src.fedoraproject.org/rpms/rust-zoxide
+[homebrew]: https://formulae.brew.sh/formula/zoxide
+[linuxbrew]: https://formulae.brew.sh/formula-linux/zoxide
+[macports]: https://ports.macports.org/port/zoxide/summary
 [nixpkgs]: https://nixos.org/nixos/packages.html?attr=zoxide&channel=nixpkgs-unstable
 [pkgsrc]: https://pkgsrc.se/sysutils/zoxide
-[Scoop]: https://github.com/ScoopInstaller/Main/tree/master/bucket/zoxide.json
-[Termux]: https://github.com/termux/termux-packages/tree/master/packages/zoxide
-[Void Linux Packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide
-
+[scoop]: https://github.com/ScoopInstaller/Main/tree/master/bucket/zoxide.json
+[termux]: https://github.com/termux/termux-packages/tree/master/packages/zoxide
+[void linux packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide
 [`dirs` documentation]: https://docs.rs/dirs/latest/dirs/fn.data_local_dir.html

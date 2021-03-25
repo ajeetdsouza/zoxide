@@ -1,5 +1,3 @@
-<!-- omit in toc -->
-
 # zoxide
 
 [![crates.io](https://img.shields.io/crates/v/zoxide)](https://crates.io/crates/zoxide)
@@ -7,16 +5,11 @@
 
 A faster way to navigate your filesystem
 
-<!-- omit in toc -->
-
 ## Table of contents
 
 - [Introduction](#introduction)
 - [Examples](#examples)
 - [Getting started](#getting-started)
-  - [Step 1: Install zoxide](#step-1-install-zoxide)
-  - [Step 2: Install fzf (optional)](#step-2-install-fzf-optional)
-  - [Step 3: Add zoxide to your shell](#step-3-add-zoxide-to-your-shell)
 - [Configuration](#configuration)
 
 ## Introduction
@@ -51,8 +44,6 @@ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/ajeetdsou
 
 If you would rather not run a script, you can download the binary from the [Releases](https://github.com/ajeetdsouza/zoxide/releases) page and add it anywhere in your `$PATH`.
 
-<!-- omit in toc -->
-
 #### On Linux
 
 | Distribution   | Repository              | Instructions                                              |
@@ -68,8 +59,6 @@ If you would rather not run a script, you can download the binary from the [Rele
 | Parrot OS      |                         | `apt install zoxide`                                      |
 | Void Linux     | [Void Linux Packages]   | `xbps-install -S zoxide`                                  |
 
-<!-- omit in toc -->
-
 #### On macOS
 
 | Repository  | Instructions           |
@@ -78,16 +67,12 @@ If you would rather not run a script, you can download the binary from the [Rele
 | [Homebrew]  | `brew install zoxide`  |
 | [MacPorts]  | `port install zoxide`  |
 
-<!-- omit in toc -->
-
 #### On Windows
 
 | Repository  | Instructions           |
 | ----------- | ---------------------- |
 | [crates.io] | `cargo install zoxide` |
 | [Scoop]     | `scoop install zoxide` |
-
-<!-- omit in toc -->
 
 #### On BSD
 
@@ -97,8 +82,6 @@ If you would rather not run a script, you can download the binary from the [Rele
 | DragonFly BSD | [DPorts]     | `pkg install zoxide`   |
 | FreeBSD       | [FreshPorts] | `pkg install zoxide`   |
 | NetBSD        | [pkgsrc]     | `pkgin install zoxide` |
-
-<!-- omit in toc -->
 
 #### On Android
 
@@ -112,83 +95,74 @@ If you would rather not run a script, you can download the binary from the [Rele
 zoxide for interactive selection. Installation instructions can be found
 [here](https://github.com/junegunn/fzf#installation).
 
-### Step 3: Add zoxide to your shell
+### Step 3: Import your data (optional)
 
-If you currently use `z`, `z.lua`, or `zsh-z`, you may want to first import
-your existing entries into `zoxide`:
+If you currently use another autojumper, you may want to first import your
+existing entries into zoxide:
 
-```sh
-zoxide import /path/to/db
-```
+| Program               | Instructions                                |
+| --------------------- | ------------------------------------------- |
+| `autojump`            | `zoxide import --from autojump /path/to/db` |
+| `z`, `zsh-z`, `z.lua` | `zoxide import --from z /path/to/db`        |
 
-Alternatively, for `autojump`:
+### Step 4: Add zoxide to your shell
 
-```sh
-zoxide import --from autojump /path/to/db
-```
-
-<!-- omit in toc -->
-
-#### bash
-
-Add the following line to your `~/.bashrc`:
-
-```sh
-eval "$(zoxide init bash)"
-```
-
-<!-- omit in toc -->
-
-#### fish
-
-Add the following line to your `~/.config/fish/config.fish`:
-
-```sh
-zoxide init fish | source
-```
-
-<!-- omit in toc -->
-
-#### PowerShell
-
-Add the following line to your profile:
-
-```powershell
-Invoke-Expression (& {
+<table>
+<tr>
+<th>Shell</th>
+<th>Instructions</th>
+</tr>
+<tr></tr>
+<tr>
+<th>bash</th>
+<td>
+<p>Add the following line to your <code>~/.bashrc</code>:</p>
+<pre lang="bash">eval "$(zoxide init bash)"</pre>
+</td>
+</tr>
+<tr></tr>
+<tr>
+<th>fish</th>
+<td><p>Add the following line to your<code>~/.config/fish/config.fish</code>:</p>
+<pre lang="fish">zoxide init fish | source</pre>
+</td>
+</tr>
+<tr></tr>
+<tr>
+<th>PowerShell</th>
+<td>
+<p>Add the following line to your profile:</p>
+<pre lang="powershell">Invoke-Expression (& {
     $hook = if ($PSVersionTable.PSVersion.Major -lt 6) { 'prompt' } else { 'pwd' }
     (zoxide init --hook $hook powershell) -join "`n"
-})
-```
-
-<!-- omit in toc -->
-
-#### xonsh
-
-Add the following line to your profile (usually `~/.xonshrc`):
-
-```xonsh
-execx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')
-```
-
-<!-- omit in toc -->
-
-#### zsh
-
-Add the following line to your `~/.zshrc`:
-
-```sh
-eval "$(zoxide init zsh)"
-```
-
-<!-- omit in toc -->
-
-#### Any POSIX shell
-
-Add the following line to your shell's configuration file:
-
-```sh
-eval "$(zoxide init posix --hook prompt)"
-```
+})</pre>
+</td>
+</tr>
+<tr></tr>
+<tr>
+<th>xonsh</th>
+<td>
+<p>Add the following line to your profile (usually <code>~/.xonshrc)</code>:</p>
+<pre lang="python">execx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')</pre>
+</td>
+</tr>
+<tr></tr>
+<tr>
+<th>zsh</th>
+<td>
+<p>Add the following line to your <code>~/.zshrc</code>:</p>
+<pre lang="zsh">eval "$(zoxide init zsh)"</pre>
+</td>
+</tr>
+<tr></tr>
+<tr>
+<th>Any POSIX shell</th>
+<td>
+<p>Add the following line to your shell's configuration file:</p>
+<pre lang="sh">eval "$(zoxide init posix --hook prompt)"</pre>
+</td>
+</tr>
+</table>
 
 ## Configuration
 

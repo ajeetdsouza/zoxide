@@ -163,3 +163,26 @@ impl Display for DirDisplayScore<'_> {
 
 pub type Rank = f64;
 pub type Epoch = u64;
+
+#[cfg(test)]
+mod tests {
+    use super::{Dir, DirList};
+
+    use std::borrow::Cow;
+
+    #[test]
+    fn zero_copy() {
+        let dirs = DirList(vec![Dir {
+            path: "/".into(),
+            rank: 0.0,
+            last_accessed: 0,
+        }]);
+
+        let bytes = dirs.to_bytes().unwrap();
+        let dirs = DirList::from_bytes(&bytes).unwrap();
+
+        for dir in dirs.iter() {
+            assert!(matches!(dir.path, Cow::Borrowed(_)))
+        }
+    }
+}

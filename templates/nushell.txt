@@ -91,7 +91,7 @@ alias {{cmd}}i = __zoxide_zi ''
 # Step 2: In your Nushell configuration file, prepend this to the `prompt`
 # variable:
 #
-#   "__zoxide_hook | "
+#   "__zoxide_hook;"
 #
 # Step 3: In your Nushell configuration file, add the following lines to the
 # `startup` variable:

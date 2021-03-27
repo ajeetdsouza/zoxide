@@ -46,7 +46,7 @@ if ($__zoxide_hooked -ne '1') {
         }
     } else {
         Write-Error ("`n" +
-            "zoxide: PWD hooks are not supported below PowerShell 6.`n" +
+            "zoxide: PWD hooks are not supported below powershell 6.`n" +
             "        Use 'zoxide init powershell --hook prompt' instead.")
     }
     {%- endmatch %}
@@ -100,7 +100,7 @@ Set-Alias {{cmd}}i __zoxide_zi
 {%- endmatch %}
 
 {{ SECTION }}
-# To initialize zoxide with PowerShell, add the following line to your
-# PowerShell configuration file (the location is stored in $profile):
+# To initialize zoxide with powershell, add the following line to your
+# powershell configuration file (the location is stored in $profile):
 #
 # Invoke-Expression (& { $hook = if ($PSVersionTable.PSVersion.Major -ge 6) { 'pwd' } else { 'prompt' } (zoxide init powershell --hook $hook) -join "`n" })

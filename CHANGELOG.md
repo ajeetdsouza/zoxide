@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- Support for [Nushell](https://www.nushell.sh/).
+
 ### Fixed
 
 - Removed backtraces on Rust nightly.
@@ -69,7 +73,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Support for PowerShell.
+- Support for powershell.
 
 ### Removed
 

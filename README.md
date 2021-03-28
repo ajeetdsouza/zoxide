@@ -230,6 +230,10 @@ eval "$(zoxide init posix --hook prompt)"
 - `_ZO_RESOLVE_SYMLINKS`
   - When set to `1`, `z` will resolve symlinks before adding directories to the database.
 
+## Projects that use zoxide
+
+* The [xxh project](https://github.com/xxh/xxh) has [xxh-plugin-prerun-zoxide](https://github.com/xxh/xxh-plugin-prerun-zoxide) to using zoxide during SSH sessions.
+
 [alpine linux packages]: https://pkgs.alpinelinux.org/packages?name=zoxide
 [aur]: https://aur.archlinux.org/packages/zoxide-bin
 [copr]: https://copr.fedorainfracloud.org/coprs/atim/zoxide/

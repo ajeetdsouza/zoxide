@@ -53,9 +53,9 @@ impl<'a> Database<'a> {
         Ok(())
     }
 
+    /// Adds a new directory or increments its rank. Also updates its last accessed time.
     pub fn add<S: AsRef<str>>(&mut self, path: S, now: Epoch) {
         let path = path.as_ref();
-        debug_assert!(Path::new(path).is_absolute());
 
         match self.dirs.iter_mut().find(|dir| dir.path == path) {
             None => self.dirs.push(Dir {
@@ -85,6 +85,8 @@ impl<'a> Database<'a> {
             .filter(move |dir| dir.is_match(&query, resolve_symlinks))
     }
 
+    /// Removes the directory with `path` from the store.
+    /// This does not preserve ordering, but is O(1).
     pub fn remove<S: AsRef<str>>(&mut self, path: S) -> bool {
         let path = path.as_ref();
 

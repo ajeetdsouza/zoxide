@@ -43,9 +43,11 @@ impl Import for Autojump {
             .with_context(|| format!("line {}: error reading from autojump database", idx + 1))?;
         }
 
+        // Don't import actual ranks from autojump, since its algorithm is
+        // very different, and might take a while to get normalized.
         let rank_sum = entries.iter().map(|(_, rank)| rank).sum::<f64>();
         for &(path, rank) in entries.iter() {
-            if db.dirs.iter_mut().find(|dir| dir.path == path).is_none() {
+            if !db.dirs.iter().any(|dir| dir.path == path) {
                 db.dirs.push(Dir {
                     path: Cow::Owned(path.into()),
                     rank: rank / rank_sum,

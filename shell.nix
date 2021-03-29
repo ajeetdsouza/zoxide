@@ -1,32 +1,26 @@
 { pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/20.09.tar.gz") {} }:
 
 let
-  my-python3-pkgs = python3-pkgs: with python3-pkgs; [
-    black
-    mypy
-    pylint
-  ];
-  my-python3 = pkgs.python3.withPackages my-python3-pkgs;
+  python-pkgs = pkgs.python3.withPackages (pkgs: [ pkgs.black pkgs.mypy pkgs.pylint ]);
 in
 
 pkgs.mkShell {
   name = "env";
-  nativeBuildInputs = [
-    pkgs.rustc
-    pkgs.cargo
-  ];
   buildInputs = [
     pkgs.bash
+    pkgs.cargo
+    pkgs.cargo-audit
     pkgs.dash
     pkgs.fish
     pkgs.fzf
     pkgs.git
     pkgs.powershell
+    pkgs.rustc
     pkgs.shellcheck
     pkgs.shfmt
     pkgs.xonsh
     pkgs.zsh
-    my-python3
+    python-pkgs
   ];
 
   # Set Environment Variables

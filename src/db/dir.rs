@@ -153,7 +153,7 @@ impl Display for DirDisplayScore<'_> {
         let score = if score > 9999.0 {
             9999
         } else if score > 0.0 {
-            score as _
+            score as u32
         } else {
             0
         };

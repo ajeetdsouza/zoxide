@@ -2,12 +2,12 @@
 name = "zoxide"
 version = "0.5.0"
 authors = ["Ajeet D'Souza <98ajeet@gmail.com>"]
+edition = "2018"
 description = "A faster way to navigate your filesystem"
 repository = "https://github.com/ajeetdsouza/zoxide/"
-edition = "2018"
+license = "MIT"
 keywords = ["cli"]
 categories = ["command-line-utilities", "filesystem"]
-license = "MIT"
 
 [dependencies]
 anyhow = "1.0.32"
@@ -38,6 +38,7 @@ default = []
 # - dash
 # - fish: <https://github.com/fish-shell/fish-shell>
 # - mypy: <https://github.com/python/mypy>
+# - nushell: <https://github.com/nushell/nushell>
 # - powershell: <https://github.com/PowerShell/PowerShell>
 # - pylint: <https://github.com/PyCQA/pylint>
 # - shellcheck: <https://github.com/koalaman/shellcheck>

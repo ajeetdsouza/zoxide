@@ -1,0 +1,26 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/install@v0.1
+        if: ${{ matrix.os == 'windows-latest' }}
+        with:
+          crate: cargo-audit
+          version: latest
+      - uses: cachix/install-nix-action@v12
+        if: ${{ matrix.os != 'windows-latest' }}
+        with:
+          nix_path: nixpkgs=channel:nixos-stable
+      - run: make test

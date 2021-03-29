@@ -38,7 +38,7 @@ pub enum Hook {
     Pwd,
 }
 
-#[cfg(unix)]
+#[cfg(feature = "shell_tests")]
 #[cfg(test)]
 mod tests {
     use super::*;

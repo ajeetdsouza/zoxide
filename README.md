@@ -233,6 +233,7 @@ eval "$(zoxide init posix --hook prompt)"
 ## Third-party integrations
 
 - [xxh](https://github.com/xxh/xxh), via [xxh-plugin-prerun-zoxide](https://github.com/xxh/xxh-plugin-prerun-zoxide)
+- [nnn](https://github.com/jarun/nnn), via [autojump plugin](https://github.com/jarun/nnn/blob/master/plugins/autojump)
 
 [alpine linux packages]: https://pkgs.alpinelinux.org/packages?name=zoxide
 [aur]: https://aur.archlinux.org/packages/zoxide-bin

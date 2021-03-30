@@ -5,6 +5,44 @@
 # Utility functions for zoxide.
 #
 
+# Invoke zoxide, safely escaping the arguments
+# PowerShell escapes command line arguments following the cmd.exe way instead of the C++/Rust way by default
+function zoxide {
+    $startInfo = [System.Diagnostics.ProcessStartInfo]::new("zoxide")
+    $startInfo.StandardOutputEncoding = [System.Text.Encoding]::UTF8
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $startInfo.CreateNoWindow = $true
+    $startInfo.UseShellExecute = $false
+    if ($startInfo.ArgumentList.Add) {
+        # PowerShell 6+ uses .NET 5+ and supports the ArgumentList property
+        # which bypasses the need for manually escaping the argument list into
+        # a command string.
+        foreach ($arg in $args) {
+            $startInfo.ArgumentList.Add($arg)
+        }
+    } else {
+        # Build an arguments string which follows the C++ command-line argument quoting rules
+        # See: https://docs.microsoft.com/en-us/previous-versions//17w5ykft(v=vs.85)?redirectedfrom=MSDN
+        $escaped = $args | ForEach-Object {
+            $s = $_ -Replace '(\\+)"','$1$1"'; # Escape backslash chains immediately preceeding quote marks.
+            $s = $s -Replace '(\\+)$','$1$1';  # Escape backslash chains immediately preceeding the end of the string.
+            $s = $s -Replace '"','\"';         # Escape quote marks.
+            "`"$s`""                           # Quote the argument.
+        }
+        $startInfo.Arguments = $escaped -Join ' ';
+    }
+    $process = [System.Diagnostics.Process]::Start($startInfo)
+    # stderr isn't displayed with this style of invocation
+    # Manually write it to console
+    $stderr = $process.StandardError.ReadToEnd().Trim()
+    if ($stderr -ne '') {
+        # Write-Error doesn't work here
+        $host.ui.WriteErrorLine($stderr)
+    }
+    $process.StandardOutput.ReadToEnd()
+}
+
 # pwd based on the value of _ZO_RESOLVE_SYMLINKS.
 function __zoxide_pwd {
     $(Get-Location).Path

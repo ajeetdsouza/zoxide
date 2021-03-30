@@ -17,10 +17,19 @@ from subprocess import CalledProcessError
 from typing import AnyStr, List, Optional
 
 import xonsh.dirstack  # type: ignore # pylint: disable=import-error
+import xonsh.environ  # type: ignore # pylint: disable=import-error
 
 {{ SECTION }}
 # Utility functions for zoxide.
 #
+
+
+def __zoxide_bin() -> str:
+    """Finds and returns the location of the zoxide binary."""
+    zoxide = xonsh.environ.locate_binary("zoxide")
+    if zoxide is None:
+        zoxide = "zoxide"
+    return zoxide
 
 
 def __zoxide_pwd() -> str:
@@ -90,7 +99,8 @@ if globals().get("__zoxide_hooked") is not True:
     def __zoxide_hook(**_kwargs):
         """Hook to add new entries to the database."""
         pwd = __zoxide_pwd()
-        subprocess.run(["zoxide", "add", pwd], check=False)
+        zoxide = __zoxide_bin()
+        subprocess.run([zoxide, "add", pwd], check=False)
 
 
 {{ SECTION }}
@@ -110,8 +120,9 @@ def __zoxide_z(args: List[str]):
         __zoxide_cd(args[0])
     else:
         try:
+            zoxide = __zoxide_bin()
             __zoxide_cmd = subprocess.run(
-                ["zoxide", "query", "--"] + args, check=True, stdout=subprocess.PIPE
+                [zoxide, "query", "--"] + args, check=True, stdout=subprocess.PIPE
             )
         except CalledProcessError as exc:
             raise ZoxideSilentException() from exc
@@ -123,8 +134,9 @@ def __zoxide_z(args: List[str]):
 def __zoxide_zi(args: List[str]):
     """Jump to a directory using interactive search."""
     try:
+        zoxide = __zoxide_bin()
         __zoxide_cmd = subprocess.run(
-            ["zoxide", "query", "-i", "--"] + args, check=True, stdout=subprocess.PIPE
+            [zoxide, "query", "-i", "--"] + args, check=True, stdout=subprocess.PIPE
         )
     except CalledProcessError as exc:
         raise ZoxideSilentException() from exc

@@ -33,11 +33,11 @@ def __zoxide_hook [] {
 
 # Jump to a directory using only keywords.
 def __zoxide_z [...rest:string] {
-    if $(echo $rest | count) == 1 {
+    if $(echo $rest | length) == 1 {
         cd ~
     } {
         let args = $(echo $rest | skip 1);
-        if $(echo $args | count) == 1 {
+        if $(echo $args | length) == 1 {
             let arg0 = $(echo $args | first 1);
             if $arg0 == '-' {
                 cd -

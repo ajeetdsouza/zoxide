@@ -1,14 +1,17 @@
 on:
   push:
     tags:
-      - "v*" # push events to matching v*, i.e. v1.0, v20.15.10
+      - "v*"
 
 jobs:
   build-linux:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target: ["x86_64-unknown-linux-gnu", "x86_64-unknown-linux-musl", "armv7-unknown-linux-musleabihf"]
+        target:
+          - "x86_64-unknown-linux-gnu"
+          - "x86_64-unknown-linux-musl"
+          - "armv7-unknown-linux-musleabihf"
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/cargo@v1
@@ -46,7 +49,7 @@ jobs:
         with:
           name: "zoxide-x86_64-pc-windows-msvc"
           path: "target/x86_64-pc-windows-msvc/release/zoxide.exe"
-          
+
   release-upload:
     needs:
       - build-linux

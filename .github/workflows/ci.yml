@@ -19,6 +19,11 @@ jobs:
         with:
           crate: cargo-audit
           version: latest
+      - uses: actions-rs/install@v0.1
+        if: ${{ matrix.os != 'windows-latest' }}
+        with:
+          crate: nu
+          version: latest
       - uses: cachix/install-nix-action@v12
         if: ${{ matrix.os != 'windows-latest' }}
         with:

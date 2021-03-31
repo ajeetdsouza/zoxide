@@ -136,8 +136,8 @@ zoxide init nushell --hook prompt | save ~/.zoxide.nu
 
 Then, in your Nushell configuration file:
 
-- Prepend `__zoxide_hook;` to your `prompt` variable.
-- Add the following two lines to your `startup` variable:
+- Prepend `__zoxide_hook;` to the `prompt` variable.
+- Add the following lines to the `startup` variable:
   - `zoxide init nushell --hook prompt | save ~/.zoxide.nu`
   - `source ~/.zoxide.nu`
 

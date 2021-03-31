@@ -84,17 +84,12 @@ alias {{cmd}}i = __zoxide_zi ''
 {{ SECTION }}
 # To initialize zoxide with Nushell:
 #
-# Step 1: Initialize zoxide's config file:
+# Initialize zoxide's Nushell script:
 #
-#   touch ~/.zoxide.nu
+#   zoxide init nushell --hook prompt | save ~/.zoxide.nu
 #
-# Step 2: In your Nushell configuration file, prepend this to the `prompt`
-# variable:
-#
-#   "__zoxide_hook;"
-#
-# Step 3: In your Nushell configuration file, add the following lines to the
-# `startup` variable:
-#
-#   "zoxide init nushell --hook prompt | save ~/.zoxide.nu"
-#   "source ~/.zoxide.nu"
+# Then, in your Nushell configuration file:
+# - Prepend `__zoxide_hook;` to the `prompt` variable.
+# - Add the following lines to the `startup` variable:
+#   - `zoxide init nushell --hook prompt | save ~/.zoxide.nu`
+#   - `source ~/.zoxide.nu`

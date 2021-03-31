@@ -1,0 +1,95 @@
+{%- let SECTION = "# =============================================================================\n#" -%}
+{%- let NOT_CONFIGURED = "# -- not configured --" -%}
+
+{{ SECTION }}
+# Hook configuration for zoxide.
+#
+
+# Hook to add new entries to the database.
+{%- match hook %}
+{%- when Hook::None %}
+def __zoxide_hook [] {}
+
+{%- when Hook::Prompt %}
+def __zoxide_hook [] {
+    zoxide add "$(pwd)"
+}
+
+{%- when Hook::Pwd %}
+def __zoxide_hook [] {}
+
+printf "zoxide: PWD hooks are not supported on Nushell.\n        Use 'zoxide init nushell --hook prompt' instead.\n"
+
+def __zoxide_hook [] {
+    zoxide add "$(pwd)"
+}
+
+{%- endmatch %}
+
+{{ SECTION }}
+# When using zoxide with --no-aliases, alias these internal functions as
+# desired.
+#
+
+# Jump to a directory using only keywords.
+def __zoxide_z [...rest:string] {
+    if $(echo $rest | length) == 1 {
+        cd ~
+    } {
+        let args = $(echo $rest | skip 1);
+        if $(echo $args | length) == 1 {
+            let arg0 = $(echo $args | first 1);
+            if $arg0 == '-' {
+                cd -
+            } {
+                if $(echo $arg0 | path exists) {
+                    cd $arg0
+                } {
+                    cd $(zoxide query -- $args | str trim)
+                }
+            }
+        } {
+            cd $(zoxide query -- $args | str trim)
+        }
+    }
+    {%- if echo %}
+    echo $(pwd)
+    {%- endif %}
+}
+
+# Jump to a directory using interactive search.
+def __zoxide_zi  [...rest:string] {
+    let args = $(echo $rest | skip 1)
+    cd $(zoxide query -i -- $args | str trim)
+    {%- if echo %}
+    echo $(pwd)
+    {%- endif %}
+}
+
+{{ SECTION }}
+# Convenient aliases for zoxide. Disable these using --no-aliases.
+#
+
+{%- match cmd %}
+{%- when Some with (cmd) %}
+
+alias {{cmd}} = __zoxide_z ''
+alias {{cmd}}i = __zoxide_zi ''
+
+{%- when None %}
+{{ NOT_CONFIGURED }}
+
+{%- endmatch %}
+
+{{ SECTION }}
+# To initialize zoxide with Nushell:
+#
+# Initialize zoxide's Nushell script:
+#
+#   zoxide init nushell --hook prompt | save ~/.zoxide.nu
+#
+# Then, in your Nushell configuration file:
+# - Prepend `__zoxide_hook;` to the `prompt` variable.
+# - Add the following lines to the `startup` variable:
+#   - `zoxide init nushell --hook prompt | save ~/.zoxide.nu`
+#   - `source ~/.zoxide.nu`

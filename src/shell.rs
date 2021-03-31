@@ -25,8 +25,9 @@ macro_rules! make_template {
 
 make_template!(Bash, "bash.txt");
 make_template!(Fish, "fish.txt");
+make_template!(Nushell, "nushell.txt");
 make_template!(Posix, "posix.txt");
-make_template!(PowerShell, "powershell.txt");
+make_template!(Powershell, "powershell.txt");
 make_template!(Xonsh, "xonsh.txt");
 make_template!(Zsh, "zsh.txt");
 
@@ -153,6 +154,21 @@ mod tests {
                 // TODO: fishindent
 
                 #[test]
+                fn nushell_nushell_#i() {
+                    let opts = dbg!(&opts()[i]);
+                    let source = Nushell(opts).render().unwrap();
+                    let assert = Command::new("nu")
+                        .args(&["--commands", &source])
+                        .assert()
+                        .success()
+                        .stderr("");
+
+                    if opts.hook != Hook::Pwd {
+                        assert.stdout("");
+                    }
+                }
+
+                #[test]
                 fn posix_bashposix_#i() {
                     let opts = dbg!(&opts()[i]);
                     let source = Posix(opts).render().unwrap();
@@ -214,7 +230,7 @@ mod tests {
                 #[test]
                 fn powershell_pwsh_#i() {
                 let opts = dbg!(&opts()[i]);
-                    let source = PowerShell(opts).render().unwrap();
+                    let source = Powershell(opts).render().unwrap();
                     Command::new("pwsh")
                         .args(&["-Command", &source, "-NoLogo", "-NonInteractive", "-NoProfile"])
                         .assert()

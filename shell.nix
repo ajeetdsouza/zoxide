@@ -14,6 +14,7 @@ pkgs.mkShell {
     pkgs.fish
     pkgs.fzf
     pkgs.git
+    # pkgs.nushell # FIXME: too outdated
     pkgs.powershell
     pkgs.rustc
     pkgs.shellcheck

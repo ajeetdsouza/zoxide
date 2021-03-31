@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- Support for [Nushell](https://www.nushell.sh/).
+
 ### Fixed
 
 - Removed backtraces on Rust nightly.
@@ -14,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Handle broken pipe errors gracefully when writing to streams.
 - NUL file appearing in working directory on Windows.
 - Accidental redefinition of hooks when initialized twice on some shells.
+- zoxide unable to find itself on Xonsh shells.
 
 ### Removed
 
@@ -69,7 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Support for PowerShell.
+- Support for powershell.
 
 ### Removed
 

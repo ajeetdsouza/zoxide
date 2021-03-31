@@ -1,5 +1,3 @@
-<!-- omit in toc -->
-
 # zoxide
 
 [![crates.io](https://img.shields.io/crates/v/zoxide)](https://crates.io/crates/zoxide)
@@ -7,16 +5,11 @@
 
 A faster way to navigate your filesystem
 
-<!-- omit in toc -->
-
 ## Table of contents
 
 - [Introduction](#introduction)
 - [Examples](#examples)
 - [Getting started](#getting-started)
-  - [Step 1: Install zoxide](#step-1-install-zoxide)
-  - [Step 2: Install fzf (optional)](#step-2-install-fzf-optional)
-  - [Step 3: Add zoxide to your shell](#step-3-add-zoxide-to-your-shell)
 - [Configuration](#configuration)
 
 ## Introduction
@@ -51,8 +44,6 @@ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/ajeetdsou
 
 If you would rather not run a script, you can download the binary from the [Releases](https://github.com/ajeetdsouza/zoxide/releases) page and add it anywhere in your `$PATH`.
 
-<!-- omit in toc -->
-
 #### On Linux
 
 | Distribution   | Repository              | Instructions                                              |
@@ -68,8 +59,6 @@ If you would rather not run a script, you can download the binary from the [Rele
 | Parrot OS      |                         | `apt install zoxide`                                      |
 | Void Linux     | [Void Linux Packages]   | `xbps-install -S zoxide`                                  |
 
-<!-- omit in toc -->
-
 #### On macOS
 
 | Repository  | Instructions           |
@@ -78,16 +67,12 @@ If you would rather not run a script, you can download the binary from the [Rele
 | [Homebrew]  | `brew install zoxide`  |
 | [MacPorts]  | `port install zoxide`  |
 
-<!-- omit in toc -->
-
 #### On Windows
 
 | Repository  | Instructions           |
 | ----------- | ---------------------- |
 | [crates.io] | `cargo install zoxide` |
 | [Scoop]     | `scoop install zoxide` |
-
-<!-- omit in toc -->
 
 #### On BSD
 
@@ -97,8 +82,6 @@ If you would rather not run a script, you can download the binary from the [Rele
 | DragonFly BSD | [DPorts]     | `pkg install zoxide`   |
 | FreeBSD       | [FreshPorts] | `pkg install zoxide`   |
 | NetBSD        | [pkgsrc]     | `pkgin install zoxide` |
-
-<!-- omit in toc -->
 
 #### On Android
 
@@ -118,7 +101,7 @@ If you currently use `z`, `z.lua`, or `zsh-z`, you may want to first import
 your existing entries into `zoxide`:
 
 ```sh
-zoxide import /path/to/db
+zoxide import --from z /path/to/db
 ```
 
 Alternatively, for `autojump`:
@@ -126,8 +109,6 @@ Alternatively, for `autojump`:
 ```sh
 zoxide import --from autojump /path/to/db
 ```
-
-<!-- omit in toc -->
 
 #### bash
 
@@ -137,19 +118,30 @@ Add the following line to your `~/.bashrc`:
 eval "$(zoxide init bash)"
 ```
 
-<!-- omit in toc -->
-
 #### fish
 
 Add the following line to your `~/.config/fish/config.fish`:
 
-```sh
+```fish
 zoxide init fish | source
 ```
 
-<!-- omit in toc -->
+#### nushell
 
-#### PowerShell
+Initialize zoxide's Nushell script:
+
+```sh
+zoxide init nushell --hook prompt | save ~/.zoxide.nu
+```
+
+Then, in your Nushell configuration file:
+
+- Prepend `__zoxide_hook;` to the `prompt` variable.
+- Add the following lines to the `startup` variable:
+  - `zoxide init nushell --hook prompt | save ~/.zoxide.nu`
+  - `source ~/.zoxide.nu`
+
+#### powershell
 
 Add the following line to your profile:
 
@@ -160,17 +152,13 @@ Invoke-Expression (& {
 })
 ```
 
-<!-- omit in toc -->
-
 #### xonsh
 
 Add the following line to your profile (usually `~/.xonshrc`):
 
-```xonsh
+```python
 execx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')
 ```
-
-<!-- omit in toc -->
 
 #### zsh
 
@@ -179,8 +167,6 @@ Add the following line to your `~/.zshrc`:
 ```sh
 eval "$(zoxide init zsh)"
 ```
-
-<!-- omit in toc -->
 
 #### Any POSIX shell
 
@@ -204,6 +190,8 @@ eval "$(zoxide init posix --hook prompt)"
   - These functions will still be available in your shell as `__zoxide_z` and `__zoxide_zi`, should you choose to use them elsewhere.
 
 ### Environment variables
+
+Be sure to set these before calling `zoxide init`.
 
 - `_ZO_DATA_DIR`
   - Specifies the directory in which zoxide should store its database.

@@ -51,8 +51,9 @@ impl Cmd for Init {
         let source = match self.shell {
             Shell::Bash => shell::Bash(opts).render(),
             Shell::Fish => shell::Fish(opts).render(),
+            Shell::Nushell => shell::Nushell(opts).render(),
             Shell::Posix => shell::Posix(opts).render(),
-            Shell::Powershell => shell::PowerShell(opts).render(),
+            Shell::Powershell => shell::Powershell(opts).render(),
             Shell::Xonsh => shell::Xonsh(opts).render(),
             Shell::Zsh => shell::Zsh(opts).render(),
         }
@@ -65,6 +66,7 @@ impl Cmd for Init {
 enum Shell {
     Bash,
     Fish,
+    Nushell,
     Posix,
     Powershell,
     Xonsh,

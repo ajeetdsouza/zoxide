@@ -52,7 +52,7 @@ if [ "${__zoxide_hooked}" != '1' ]; then
     {%- if hook == Hook::None %}
     {{ NOT_CONFIGURED }}
     {%- else %}
-    PROMPT_COMMAND="${PROMPT_COMMAND:+${PROMPT_COMMAND};}__zoxide_hook"
+    PROMPT_COMMAND="__zoxide_hook;${PROMPT_COMMAND:+${PROMPT_COMMAND}}"
     {%- endif %}
 fi
 

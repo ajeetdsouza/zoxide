@@ -6,11 +6,11 @@ in
 pkgs.mkShell {
   name = "env";
   buildInputs = [
+    pkgsMaster.cargo-audit
     pkgsMaster.nushell
     pkgsPython
     pkgs.bash
     pkgs.cargo
-    pkgs.cargo-audit
     pkgs.clippy
     pkgs.dash
     pkgs.fish

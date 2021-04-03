@@ -3,7 +3,6 @@ let
   pkgsMaster = import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/470e4a9bbc98b171a7e733dfc9e62531f7b9ceca.tar.gz") {};
   pkgsPython = pkgs.python3.withPackages (pkgs: [ pkgs.black pkgs.mypy pkgs.pylint ]);
 in
-
 pkgs.mkShell
   {
     name = "env";

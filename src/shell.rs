@@ -157,7 +157,12 @@ mod tests {
                 fn nushell_nushell_#i() {
                     let opts = dbg!(&opts()[i]);
                     let source = Nushell(opts).render().unwrap();
+
+                    let tempdir = tempfile::tempdir().unwrap();
+                    let tempdir = tempdir.path().to_str().unwrap();
+
                     let assert = Command::new("nu")
+                        .env("HOME", tempdir)
                         .args(&["--commands", &source])
                         .assert()
                         .success()

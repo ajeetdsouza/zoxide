@@ -11,6 +11,7 @@ pkgs.mkShell {
     pkgs.bash
     pkgs.cargo
     pkgs.cargo-audit
+    pkgs.clippy
     pkgs.dash
     pkgs.fish
     pkgs.fzf

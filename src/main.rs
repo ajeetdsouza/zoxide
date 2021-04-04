@@ -21,8 +21,6 @@ pub fn main() {
     env::remove_var("RUST_LIB_BACKTRACE");
     env::remove_var("RUST_BACKTRACE");
 
-    eprintln!("{:?}", std::env::args());
-
     if let Err(e) = App::parse().run() {
         match e.downcast::<SilentExit>() {
             Ok(SilentExit { code }) => process::exit(code),

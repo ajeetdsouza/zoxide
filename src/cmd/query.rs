@@ -26,6 +26,10 @@ pub struct Query {
     /// Prints score with results
     #[clap(long, short)]
     score: bool,
+
+    /// Excludes a path from results
+    #[clap(long, hidden = true)]
+    exclude: Option<String>,
 }
 
 impl Cmd for Query {
@@ -38,7 +42,9 @@ impl Cmd for Query {
         let now = util::current_time()?;
 
         let resolve_symlinks = config::zo_resolve_symlinks();
-        let mut matches = db.iter_matches(&query, now, resolve_symlinks);
+        let mut matches = db
+            .iter_matches(&query, now, resolve_symlinks)
+            .filter(|dir| Some(dir.path.as_ref()) != self.exclude.as_deref());
 
         if self.interactive {
             let mut fzf = Fzf::new()?;

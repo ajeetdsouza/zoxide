@@ -31,7 +31,7 @@ function __zoxide_cd() {
 
 {%- when Hook::Prompt %}
 function __zoxide_hook() {
-    zoxide add "$(__zoxide_pwd)"
+    zoxide add -- "$(__zoxide_pwd)"
 }
 
 {%- when Hook::Pwd %}
@@ -41,7 +41,7 @@ function __zoxide_hook() {
         __zoxide_pwd_old="${__zoxide_pwd_tmp}"
     elif [ "${__zoxide_pwd_old}" != "${__zoxide_pwd_tmp}" ]; then
         __zoxide_pwd_old="${__zoxide_pwd_tmp}"
-        zoxide add "${__zoxide_pwd_old}"
+        zoxide add -- "${__zoxide_pwd_old}"
     fi
 }
 {%- endmatch %}
@@ -77,7 +77,7 @@ function __zoxide_z() {
         __zoxide_cd "$1"
     else
         \builtin local __zoxide_result
-        __zoxide_result="$(zoxide query -- "$@")" && __zoxide_cd "${__zoxide_result}"
+        __zoxide_result="$(zoxide query --exclude "$(__zoxide_pwd)" -- "$@")" && __zoxide_cd "${__zoxide_result}"
     fi
 }
 

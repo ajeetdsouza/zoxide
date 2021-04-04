@@ -30,8 +30,8 @@ end
 #
 
 # Initialize hook to add new entries to the database.
-if test "$__zoxide_hooked" != '1'
-    set __zoxide_hooked '1'
+if test "$__zoxide_hooked" != 1
+    set __zoxide_hooked 1
     {%- match hook %}
     {%- when Hook::None %}
     function __zoxide_hook
@@ -40,7 +40,7 @@ if test "$__zoxide_hooked" != '1'
     {%- when Hook::Pwd %}
     function __zoxide_hook --on-variable PWD
     {%- endmatch %}
-        command zoxide add (__zoxide_pwd)
+        command zoxide add -- (__zoxide_pwd)
     end
 end
 
@@ -54,12 +54,16 @@ function __zoxide_z
     set argc (count $argv)
     if test $argc -eq 0
         __zoxide_cd $HOME
-    else if begin; test $argc -eq 1; and test $argv[1] = '-'; end
+    else if begin
+            test $argc -eq 1; and test $argv[1] = -
+        end
         __zoxide_cd -
-    else if begin; test $argc -eq 1; and test -d $argv[1]; end
+    else if begin
+            test $argc -eq 1; and test -d $argv[1]
+        end
         __zoxide_cd $argv[1]
     else
-        set -l __zoxide_result (command zoxide query -- $argv)
+        set -l __zoxide_result (command zoxide query --exclude (__zoxide_pwd) -- $argv)
         and __zoxide_cd $__zoxide_result
     end
 end
@@ -79,17 +83,17 @@ end
 
 # Remove definitions.
 function __zoxide_unset
-    set --erase $argv > /dev/null 2>&1
-    abbr --erase $argv > /dev/null 2>&1
-    builtin functions --erase $argv > /dev/null 2>&1
+    set --erase $argv >/dev/null 2>&1
+    abbr --erase $argv >/dev/null 2>&1
+    builtin functions --erase $argv >/dev/null 2>&1
 end
 
-__zoxide_unset '{{cmd}}'
+__zoxide_unset {{cmd}}
 function {{cmd}}
     __zoxide_z $argv
 end
 
-__zoxide_unset '{{cmd}}i'
+__zoxide_unset {{cmd}}i
 function {{cmd}}i
     __zoxide_zi $argv
 end

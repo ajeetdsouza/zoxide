@@ -31,7 +31,7 @@ __zoxide_cd() {
 
 {%- when Hook::Prompt %}
 __zoxide_hook() {
-    zoxide add "$(__zoxide_pwd)"
+    zoxide add -- "$(__zoxide_pwd)"
 }
 
 {%- when Hook::Pwd %}
@@ -74,7 +74,7 @@ __zoxide_z() {
     elif [ "$#" -eq 1 ] && [ -d "$1" ]; then
         __zoxide_cd "$1"
     else
-        __zoxide_result="$(zoxide query -- "$@")" && __zoxide_cd "${__zoxide_result}"
+        __zoxide_result="$(zoxide query --exclude "$(__zoxide_pwd)" -- "$@")" && __zoxide_cd "${__zoxide_result}"
     fi
 }
 

@@ -24,7 +24,7 @@ function __zoxide_cd($dir) {
 
 # Hook to add new entries to the database.
 function __zoxide_hook {
-    zoxide add $(__zoxide_pwd)
+    zoxide add -- $(__zoxide_pwd)
 }
 
 # Initialize hook.
@@ -65,11 +65,11 @@ function __zoxide_z {
     elseif ($args.Length -eq 1 -and $args[0] -eq '-') {
         __zoxide_cd -
     }
-    elseif ($args.Length -eq 1 -and ( Test-Path $args[0] -PathType Container) ) {
+    elseif ($args.Length -eq 1 -and (Test-Path $args[0] -PathType Container)) {
         __zoxide_cd $args[0]
     }
     else {
-        $__zoxide_result = zoxide query -- @args
+        $__zoxide_result = zoxide query --exclude $(__zoxide_pwd) -- @args
         if ($LASTEXITCODE -eq 0) {
             __zoxide_cd $__zoxide_result
         }

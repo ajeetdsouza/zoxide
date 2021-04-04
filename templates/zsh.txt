@@ -16,6 +16,7 @@ function __zoxide_pwd() {
 
 # cd + custom logic based on the value of _ZO_ECHO.
 function __zoxide_cd() {
+    # shellcheck disable=SC2164
     \builtin cd "$@" {%- if echo %} && __zoxide_pwd {%- endif %}
 }
 
@@ -25,7 +26,7 @@ function __zoxide_cd() {
 
 # Hook to add new entries to the database.
 function __zoxide_hook() {
-    zoxide add "$(__zoxide_pwd)"
+    zoxide add -- "$(__zoxide_pwd)"
 }
 
 # Initialize hook.
@@ -37,7 +38,7 @@ if [ "${__zoxide_hooked}" != '1' ]; then
     {%- when Hook::Prompt %}
     precmd_functions+=(__zoxide_hook)
     {%- when Hook::Pwd %}
-    chpwd_functions=(${chpwd_functions[@]} "__zoxide_hook")
+    chpwd_functions=("${chpwd_functions[@]}" "__zoxide_hook")
     {%- endmatch %}
 fi
 
@@ -51,9 +52,10 @@ function __zoxide_z() {
     if [ "$#" -eq 0 ]; then
         __zoxide_cd ~
     elif [ "$#" -eq 1 ] && [ "$1" = '-' ]; then
-        if [ -n "$OLDPWD" ]; then
-            __zoxide_cd "$OLDPWD"
+        if [ -n "${OLDPWD}" ]; then
+            __zoxide_cd "${OLDPWD}"
         else
+            # shellcheck disable=SC2016
             \builtin printf 'zoxide: $OLDPWD is not set'
             return 1
         fi
@@ -61,14 +63,15 @@ function __zoxide_z() {
         __zoxide_cd "$1"
     else
         \builtin local __zoxide_result
-        __zoxide_result="$(zoxide query -- "$@")" && __zoxide_cd "$__zoxide_result"
+        __zoxide_result="$(zoxide query --exclude "$(__zoxide_pwd)" -- "$@")" \
+            && __zoxide_cd "${__zoxide_result}"
     fi
 }
 
 # Jump to a directory using interactive search.
 function __zoxide_zi() {
     \builtin local __zoxide_result
-    __zoxide_result="$(zoxide query -i -- "$@")" && __zoxide_cd "$__zoxide_result"
+    __zoxide_result="$(zoxide query -i -- "$@")" && __zoxide_cd "${__zoxide_result}"
 }
 
 {{ SECTION }}

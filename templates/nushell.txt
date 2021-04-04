@@ -12,17 +12,13 @@ def __zoxide_hook [] {}
 
 {%- when Hook::Prompt %}
 def __zoxide_hook [] {
-    zoxide add "$(pwd)"
+    zoxide add -- $(pwd)
 }
 
 {%- when Hook::Pwd %}
 def __zoxide_hook [] {}
 
 printf "zoxide: PWD hooks are not supported on Nushell.\n        Use 'zoxide init nushell --hook prompt' instead.\n"
-
-def __zoxide_hook [] {
-    zoxide add "$(pwd)"
-}
 
 {%- endmatch %}
 
@@ -45,11 +41,11 @@ def __zoxide_z [...rest:string] {
                 if $(echo $arg0 | path exists) {
                     cd $arg0
                 } {
-                    cd $(zoxide query -- $args | str trim)
+                    cd $(zoxide query --exclude $(pwd) -- $args | str trim)
                 }
             }
         } {
-            cd $(zoxide query -- $args | str trim)
+            cd $(zoxide query --exclude $(pwd) -- $args | str trim)
         }
     }
     {%- if echo %}

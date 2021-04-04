@@ -143,7 +143,7 @@ mod tests {
                     let tempdir = tempdir.path().to_str().unwrap();
 
                     Command::new("fish")
-                        .env("HOME", tempdir) // fish needs a writeable $HOME directory
+                        .env("HOME", tempdir)
                         .args(&["--command", &source, "--private"])
                         .assert()
                         .success()
@@ -151,13 +151,35 @@ mod tests {
                         .stderr("");
                 }
 
-                // TODO: fishindent
+                #[test]
+                fn fish_fishindent_#i() {
+                    let opts = dbg!(&opts()[i]);
+                    let mut source = Fish(opts).render().unwrap();
+                    source.push('\n');
+
+                    let tempdir = tempfile::tempdir().unwrap();
+                    let tempdir = tempdir.path().to_str().unwrap();
+
+                    Command::new("fish")
+                        .env("HOME", tempdir)
+                        .args(&["--command", "fish_indent", "--private"])
+                        .write_stdin(source.to_string())
+                        .assert()
+                        .success()
+                        .stdout(source)
+                        .stderr("");
+                }
 
                 #[test]
                 fn nushell_nushell_#i() {
                     let opts = dbg!(&opts()[i]);
                     let source = Nushell(opts).render().unwrap();
+
+                    let tempdir = tempfile::tempdir().unwrap();
+                    let tempdir = tempdir.path().to_str().unwrap();
+
                     let assert = Command::new("nu")
+                        .env("HOME", tempdir)
                         .args(&["--commands", &source])
                         .assert()
                         .success()
@@ -277,13 +299,29 @@ mod tests {
                 }
 
                 #[test]
-                // FIXME: caused by <https://github.com/xonsh/xonsh/issues/3959>
+                // Xonsh complains about type-hinting here, although it works fine in practice.
+                // <https://github.com/xonsh/xonsh/issues/3959>
                 #[ignore]
                 fn xonsh_xonsh_#i() {
                     let opts = dbg!(&opts()[i]);
                     let source = Xonsh(opts).render().unwrap();
                     Command::new("xonsh")
                         .args(&["-c", &source, "--no-rc"])
+                        .assert()
+                        .success()
+                        .stdout("")
+                        .stderr("");
+                }
+
+                #[test]
+                fn zsh_shellcheck_#i() {
+                    let opts = dbg!(&opts()[i]);
+                    let source = Zsh(opts).render().unwrap();
+                    // ShellCheck doesn't support zsh yet.
+                    // https://github.com/koalaman/shellcheck/issues/809
+                    Command::new("shellcheck")
+                        .args(&["--enable", "all", "--shell", "bash", "-"])
+                        .write_stdin(source)
                         .assert()
                         .success()
                         .stdout("")

@@ -100,7 +100,7 @@ if globals().get("__zoxide_hooked") is not True:
         """Hook to add new entries to the database."""
         pwd = __zoxide_pwd()
         zoxide = __zoxide_bin()
-        subprocess.run([zoxide, "add", pwd], check=False)
+        subprocess.run([zoxide, "add", "--", pwd], check=False)
 
 
 {{ SECTION }}
@@ -122,7 +122,9 @@ def __zoxide_z(args: List[str]):
         try:
             zoxide = __zoxide_bin()
             __zoxide_cmd = subprocess.run(
-                [zoxide, "query", "--"] + args, check=True, stdout=subprocess.PIPE
+                [zoxide, "query", "--exclude", __zoxide_pwd(), "--"] + args,
+                check=True,
+                stdout=subprocess.PIPE,
             )
         except CalledProcessError as exc:
             raise ZoxideSilentException() from exc

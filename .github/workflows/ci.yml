@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/install@v0.1
@@ -19,13 +19,10 @@ jobs:
         with:
           crate: cargo-audit
           version: latest
-      - uses: actions-rs/install@v0.1
-        if: ${{ matrix.os != 'windows-latest' }}
-        with:
-          crate: nu
-          version: latest
       - uses: cachix/install-nix-action@v12
         if: ${{ matrix.os != 'windows-latest' }}
         with:
           nix_path: nixpkgs=channel:nixos-stable
-      - run: make test
+      - run: mkdir -p /tmp/home && make test
+        env:
+          HOME: /tmp/home

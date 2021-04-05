@@ -1,8 +1,9 @@
 import os.path
+import subprocess
+
 import ranger.api
 import ranger.core.fm
 import ranger.ext.signals
-import subprocess
 
 hook_init_old = ranger.api.hook_init
 

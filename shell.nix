@@ -1,14 +1,16 @@
 let
+  nushell = self: super: { nushell = super.nushell.overrideAttrs (old: { checkPhase = ""; }); };
   pkgs = import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/20.09.tar.gz") {};
-  pkgsMaster = import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/470e4a9bbc98b171a7e733dfc9e62531f7b9ceca.tar.gz") {};
-  pkgsPython = pkgs.python3.withPackages (pkgs: [ pkgs.black pkgs.mypy pkgs.pylint ]);
+  pkgs-master = import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/470e4a9bbc98b171a7e733dfc9e62531f7b9ceca.tar.gz") {
+    overlays = [ nushell ];
+  };
+  pkgs-python = pkgs.python3.withPackages (pkgs: [ pkgs.black pkgs.mypy pkgs.pylint ]);
 in
 pkgs.mkShell {
-  name = "env";
   buildInputs = [
-    pkgsMaster.cargo-audit
-    pkgsMaster.nushell
-    pkgsPython
+    pkgs-master.cargo-audit
+    pkgs-master.nushell
+    pkgs-python
     pkgs.bash
     pkgs.cargo
     pkgs.clippy

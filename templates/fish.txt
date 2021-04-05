@@ -1,7 +1,7 @@
-{%- let SECTION = "# =============================================================================\n#" -%}
-{%- let NOT_CONFIGURED = "# -- not configured --" -%}
+{%- let section = "# =============================================================================\n#" -%}
+{%- let not_configured = "# -- not configured --" -%}
 
-{{ SECTION }}
+{{ section }}
 # Utility functions for zoxide.
 #
 
@@ -25,7 +25,7 @@ function __zoxide_cd
     and builtin commandline -f repaint
 end
 
-{{ SECTION }}
+{{ section }}
 # Hook configuration for zoxide.
 #
 
@@ -44,7 +44,7 @@ if test "$__zoxide_hooked" != 1
     end
 end
 
-{{ SECTION }}
+{{ section }}
 # When using zoxide with --no-aliases, alias these internal functions as
 # desired.
 #
@@ -74,7 +74,7 @@ function __zoxide_zi
     and __zoxide_cd $__zoxide_result
 end
 
-{{ SECTION }}
+{{ section }}
 # Convenient aliases for zoxide. Disable these using --no-aliases.
 #
 
@@ -99,11 +99,11 @@ function {{cmd}}i
 end
 
 {%- when None %}
-{{ NOT_CONFIGURED }}
+{{ not_configured }}
 
 {%- endmatch %}
 
-{{ SECTION }}
+{{ section }}
 # To initialize zoxide with fish, add the following line to your fish
 # configuration file (usually ~/.config/fish/config.fish):
 #

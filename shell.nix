@@ -6,6 +6,7 @@ in
 pkgs.mkShell {
   buildInputs = [
     pkgs-master.cargo-audit
+    pkgs-master.elvish
     pkgs-master.nushell
     pkgs-python
     pkgs.bash

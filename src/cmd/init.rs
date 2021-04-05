@@ -50,6 +50,7 @@ impl Cmd for Init {
 
         let source = match self.shell {
             Shell::Bash => shell::Bash(opts).render(),
+            Shell::Elvish => shell::Elvish(opts).render(),
             Shell::Fish => shell::Fish(opts).render(),
             Shell::Nushell => shell::Nushell(opts).render(),
             Shell::Posix => shell::Posix(opts).render(),
@@ -65,6 +66,7 @@ impl Cmd for Init {
 #[derive(ArgEnum, Debug)]
 enum Shell {
     Bash,
+    Elvish,
     Fish,
     Nushell,
     Posix,

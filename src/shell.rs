@@ -24,6 +24,7 @@ macro_rules! make_template {
 }
 
 make_template!(Bash, "bash.txt");
+make_template!(Elvish, "elvish.txt");
 make_template!(Fish, "fish.txt");
 make_template!(Nushell, "nushell.txt");
 make_template!(Posix, "posix.txt");
@@ -123,11 +124,35 @@ mod tests {
                     let opts = dbg!(&opts()[i]);
                     let mut source = Bash(opts).render().unwrap();
                     source.push('\n');
-                    // FIXME: caused by <https://github.com/djc/askama/issues/377>
-                    let source = source.as_str().trim_start();
+
                     Command::new("shfmt")
                         .args(&["-d", "-s", "-ln", "bash", "-i", "4", "-ci", "-"])
                         .write_stdin(source)
+                        .assert()
+                        .success()
+                        .stdout("")
+                        .stderr("");
+                }
+
+                #[test]
+                fn elvish_elvish_#i() {
+                    let opts = dbg!(&opts()[i]);
+                    let mut source = String::new();
+
+                    // Filter out lines using edit:*, since those functions
+                    // are only available in the interactive editor.
+                    for line in Elvish(opts)
+                        .render()
+                        .unwrap()
+                        .split('\n')
+                        .filter(|line| !line.contains("edit:"))
+                    {
+                        source.push_str(line);
+                        source.push('\n');
+                    }
+
+                    Command::new("elvish")
+                        .args(&["-c", &source, "-norc"])
                         .assert()
                         .success()
                         .stdout("")
@@ -238,8 +263,7 @@ mod tests {
                     let opts = dbg!(&opts()[i]);
                     let mut source = Posix(opts).render().unwrap();
                     source.push('\n');
-                    // FIXME: caused by <https://github.com/djc/askama/issues/377>
-                    let source = source.as_str().trim_start();
+
                     Command::new("shfmt")
                         .args(&["-d", "-s", "-ln", "posix", "-i", "4", "-ci", "-"])
                         .write_stdin(source)

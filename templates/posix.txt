@@ -1,7 +1,7 @@
-{%- let SECTION = "# =============================================================================\n#" -%}
-{%- let NOT_CONFIGURED = "# -- not configured --" -%}
+{%- let section = "# =============================================================================\n#" -%}
+{%- let not_configured = "# -- not configured --" -%}
 
-{{ SECTION }}
+{{ section }}
 # Utility functions for zoxide.
 #
 
@@ -20,14 +20,14 @@ __zoxide_cd() {
     \cd "$@" {%- if echo %} && __zoxide_pwd {%- endif %}
 }
 
-{{ SECTION }}
+{{ section }}
 # Hook configuration for zoxide.
 #
 
 # Hook to add new entries to the database.
 {%- match hook %}
 {%- when Hook::None %}
-{{ NOT_CONFIGURED }}
+{{ not_configured }}
 
 {%- when Hook::Prompt %}
 __zoxide_hook() {
@@ -35,26 +35,26 @@ __zoxide_hook() {
 }
 
 {%- when Hook::Pwd %}
-{{ NOT_CONFIGURED }}
+{{ not_configured }}
 
 {%- endmatch %}
 
 # Initialize hook.
 if [ "${__zoxide_hooked}" != '1' ]; then
     __zoxide_hooked='1'
-    {%- match hook %}
-    {%- when Hook::None %}
-    {{ NOT_CONFIGURED }}
-    {%- when Hook::Prompt %}
+{%- match hook %}
+{%- when Hook::None %}
+    {{ not_configured }}
+{%- when Hook::Prompt %}
     PS1="${PS1}\$(__zoxide_hook)"
-    {%- when Hook::Pwd %}
+{%- when Hook::Pwd %}
     \printf "%s\n%s\n" \
         "zoxide: PWD hooks are not supported on POSIX shells." \
         "        Use 'zoxide init posix --hook prompt' instead."
-    {%- endmatch %}
+{%- endmatch %}
 fi
 
-{{ SECTION }}
+{{ section }}
 # When using zoxide with --no-aliases, alias these internal functions as
 # desired.
 #
@@ -83,7 +83,7 @@ __zoxide_zi() {
     __zoxide_result="$(zoxide query -i -- "$@")" && __zoxide_cd "${__zoxide_result}"
 }
 
-{{ SECTION }}
+{{ section }}
 # Convenient aliases for zoxide. Disable these using --no-aliases.
 #
 
@@ -109,11 +109,12 @@ __zoxide_unset '{{cmd}}i'
 }
 
 {%- when None %}
-{{ NOT_CONFIGURED }}
+
+{{ not_configured }}
 
 {%- endmatch %}
 
-{{ SECTION }}
+{{ section }}
 # To initialize zoxide with your POSIX shell, add the following line to your
 # shell configuration file:
 #

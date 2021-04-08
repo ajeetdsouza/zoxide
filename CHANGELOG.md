@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Support for [Nushell](https://www.nushell.sh/).
+- Support for [Elvish](https://elv.sh/).
+
+### Changed
+
+- `z` now excludes the current directory from search results.
 
 ### Fixed
 

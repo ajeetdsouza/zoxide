@@ -1,7 +1,7 @@
-{%- let SECTION = "# =============================================================================\n#" -%}
-{%- let NOT_CONFIGURED = "# -- not configured --" -%}
+{%- let section = "# =============================================================================\n#" -%}
+{%- let not_configured = "# -- not configured --" -%}
 
-{{ SECTION }}
+{{ section }}
 # Utility functions for zoxide.
 #
 
@@ -20,7 +20,7 @@ function __zoxide_cd() {
     \builtin cd "$@" {%- if echo %} && __zoxide_pwd {%- endif %}
 }
 
-{{ SECTION }}
+{{ section }}
 # Hook configuration for zoxide.
 #
 
@@ -32,17 +32,17 @@ function __zoxide_hook() {
 # Initialize hook.
 if [ "${__zoxide_hooked}" != '1' ]; then
     __zoxide_hooked='1'
-    {%- match hook %}
-    {%- when Hook::None %}
-    {{ NOT_CONFIGURED }}
-    {%- when Hook::Prompt %}
+{%- match hook %}
+{%- when Hook::None %}
+    {{ not_configured }}
+{%- when Hook::Prompt %}
     precmd_functions+=(__zoxide_hook)
-    {%- when Hook::Pwd %}
+{%- when Hook::Pwd %}
     chpwd_functions=("${chpwd_functions[@]}" "__zoxide_hook")
-    {%- endmatch %}
+{%- endmatch %}
 fi
 
-{{ SECTION }}
+{{ section }}
 # When using zoxide with --no-aliases, alias these internal functions as
 # desired.
 #
@@ -74,7 +74,7 @@ function __zoxide_zi() {
     __zoxide_result="$(zoxide query -i -- "$@")" && __zoxide_cd "${__zoxide_result}"
 }
 
-{{ SECTION }}
+{{ section }}
 # Convenient aliases for zoxide. Disable these using --no-aliases.
 #
 
@@ -99,11 +99,12 @@ function {{cmd}}i() {
 }
 
 {%- when None %}
-{{ NOT_CONFIGURED }}
+
+{{ not_configured }}
 
 {%- endmatch %}
 
-{{ SECTION }}
+{{ section }}
 # To initialize zoxide with zsh, add the following line to your zsh
 # configuration file (usually ~/.zshrc):
 #

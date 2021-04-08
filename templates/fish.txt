@@ -1,11 +1,9 @@
-{%- let SECTION = "# =============================================================================\n#" -%}
-{%- let NOT_CONFIGURED = "# -- not configured --" -%}
+{%- let section = "# =============================================================================\n#" -%}
+{%- let not_configured = "# -- not configured --" -%}
 
-{{ SECTION }}
+{{ section }}
 # Utility functions for zoxide.
 #
-
-# Remove definitions.
 
 # pwd based on the value of _ZO_RESOLVE_SYMLINKS.
 function __zoxide_pwd
@@ -19,32 +17,32 @@ end
 # cd + custom logic based on the value of _ZO_ECHO.
 function __zoxide_cd
     builtin cd $argv
-    {%- if echo %}
+{%- if echo %}
     and __zoxide_pwd
-    {%- endif %}
+{%- endif %}
     and builtin commandline -f repaint
 end
 
-{{ SECTION }}
+{{ section }}
 # Hook configuration for zoxide.
 #
 
 # Initialize hook to add new entries to the database.
 if test "$__zoxide_hooked" != 1
     set __zoxide_hooked 1
-    {%- match hook %}
-    {%- when Hook::None %}
+{%- match hook %}
+{%- when Hook::None %}
     function __zoxide_hook
-    {%- when Hook::Prompt %}
+{%- when Hook::Prompt %}
     function __zoxide_hook --on-event fish_prompt
-    {%- when Hook::Pwd %}
+{%- when Hook::Pwd %}
     function __zoxide_hook --on-variable PWD
-    {%- endmatch %}
+{%- endmatch %}
         command zoxide add -- (__zoxide_pwd)
     end
 end
 
-{{ SECTION }}
+{{ section }}
 # When using zoxide with --no-aliases, alias these internal functions as
 # desired.
 #
@@ -74,7 +72,7 @@ function __zoxide_zi
     and __zoxide_cd $__zoxide_result
 end
 
-{{ SECTION }}
+{{ section }}
 # Convenient aliases for zoxide. Disable these using --no-aliases.
 #
 
@@ -99,11 +97,12 @@ function {{cmd}}i
 end
 
 {%- when None %}
-{{ NOT_CONFIGURED }}
+
+{{ not_configured }}
 
 {%- endmatch %}
 
-{{ SECTION }}
+{{ section }}
 # To initialize zoxide with fish, add the following line to your fish
 # configuration file (usually ~/.config/fish/config.fish):
 #

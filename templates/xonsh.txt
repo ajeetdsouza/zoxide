@@ -1,5 +1,5 @@
-{%- let SECTION = "# =============================================================================\n#" -%}
-{%- let NOT_CONFIGURED = "# -- not configured --" -%}
+{%- let section = "# =============================================================================\n#" -%}
+{%- let not_configured = "# -- not configured --" -%}
 
 """Initialize zoxide on Xonsh."""
 
@@ -19,7 +19,7 @@ from typing import AnyStr, List, Optional
 import xonsh.dirstack  # type: ignore # pylint: disable=import-error
 import xonsh.environ  # type: ignore # pylint: disable=import-error
 
-{{ SECTION }}
+{{ section }}
 # Utility functions for zoxide.
 #
 
@@ -80,22 +80,21 @@ def __zoxide_errhandler(func):
     return wrapper
 
 
-{{ SECTION }}
+{{ section }}
 # Hook configuration for zoxide.
 #
 
 # Initialize hook to add new entries to the database.
 if globals().get("__zoxide_hooked") is not True:
     globals()["__zoxide_hooked"] = True
-
-    {% match hook -%}
-    {%- when Hook::None -%}
-    {{ NOT_CONFIGURED }}
-    {%- when Hook::Prompt -%}
+{% match hook -%}
+{%- when Hook::None %}
+    {{ not_configured }}
+{%- when Hook::Prompt %}
     @events.on_post_prompt  # type: ignore  # pylint:disable=undefined-variable
-    {%- when Hook::Pwd -%}
+{%- when Hook::Pwd %}
     @events.on_chdir  # type: ignore  # pylint:disable=undefined-variable
-    {%- endmatch %}
+{%- endmatch %}
     def __zoxide_hook(**_kwargs):
         """Hook to add new entries to the database."""
         pwd = __zoxide_pwd()
@@ -103,7 +102,7 @@ if globals().get("__zoxide_hooked") is not True:
         subprocess.run([zoxide, "add", "--", pwd], check=False)
 
 
-{{ SECTION }}
+{{ section }}
 # When using zoxide with --no-aliases, alias these internal functions as
 # desired.
 #
@@ -147,7 +146,7 @@ def __zoxide_zi(args: List[str]):
     __zoxide_cd(__zoxide_result)
 
 
-{{ SECTION }}
+{{ section }}
 # Convenient aliases for zoxide. Disable these using --no-aliases.
 #
 
@@ -158,11 +157,12 @@ aliases["{{cmd}}"] = __zoxide_z
 aliases["{{cmd}}i"] = __zoxide_zi
 
 {%- when None %}
-{{ NOT_CONFIGURED }}
+
+{{ not_configured }}
 
 {%- endmatch %}
 
-{{ SECTION }}
+{{ section }}
 # To initialize zoxide with xonsh, add the following line to your xonsh
 # configuration file (usually ~/.xonshrc):
 #

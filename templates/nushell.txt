@@ -1,7 +1,7 @@
-{%- let SECTION = "# =============================================================================\n#" -%}
-{%- let NOT_CONFIGURED = "# -- not configured --" -%}
+{%- let section = "# =============================================================================\n#" -%}
+{%- let not_configured = "# -- not configured --" -%}
 
-{{ SECTION }}
+{{ section }}
 # Hook configuration for zoxide.
 #
 
@@ -22,7 +22,7 @@ printf "zoxide: PWD hooks are not supported on Nushell.\n        Use 'zoxide ini
 
 {%- endmatch %}
 
-{{ SECTION }}
+{{ section }}
 # When using zoxide with --no-aliases, alias these internal functions as
 # desired.
 #
@@ -48,21 +48,21 @@ def __zoxide_z [...rest:string] {
             cd $(zoxide query --exclude $(pwd) -- $args | str trim)
         }
     }
-    {%- if echo %}
+{%- if echo %}
     echo $(pwd)
-    {%- endif %}
+{%- endif %}
 }
 
 # Jump to a directory using interactive search.
 def __zoxide_zi  [...rest:string] {
     let args = $(echo $rest | skip 1)
     cd $(zoxide query -i -- $args | str trim)
-    {%- if echo %}
+{%- if echo %}
     echo $(pwd)
-    {%- endif %}
+{%- endif %}
 }
 
-{{ SECTION }}
+{{ section }}
 # Convenient aliases for zoxide. Disable these using --no-aliases.
 #
 
@@ -73,11 +73,12 @@ alias {{cmd}} = __zoxide_z ''
 alias {{cmd}}i = __zoxide_zi ''
 
 {%- when None %}
-{{ NOT_CONFIGURED }}
+
+{{ not_configured }}
 
 {%- endmatch %}
 
-{{ SECTION }}
+{{ section }}
 # To initialize zoxide with Nushell:
 #
 # Initialize zoxide's Nushell script:

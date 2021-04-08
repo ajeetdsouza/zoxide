@@ -1,7 +1,7 @@
-{%- let SECTION = "# =============================================================================\n#" -%}
-{%- let NOT_CONFIGURED = "# -- not configured --" -%}
+{%- let section = "# =============================================================================\n#" -%}
+{%- let not_configured = "# -- not configured --" -%}
 
-{{ SECTION }}
+{{ section }}
 # Utility functions for zoxide.
 #
 
@@ -13,12 +13,12 @@ function __zoxide_pwd {
 # cd + custom logic based on the value of _ZO_ECHO.
 function __zoxide_cd($dir) {
     Set-Location $dir -ea Stop
-    {%- if echo %}
+{%- if echo %}
     __zoxide_pwd
-    {%- endif %}
+{%- endif %}
 }
 
-{{ SECTION }}
+{{ section }}
 # Hook configuration for zoxide.
 #
 
@@ -30,16 +30,16 @@ function __zoxide_hook {
 # Initialize hook.
 if ($__zoxide_hooked -ne '1') {
     $__zoxide_hooked = '1'
-    {%- match hook %}
-    {%- when Hook::None %}
-    {{ NOT_CONFIGURED }}
-    {%- when Hook::Prompt %}
+{%- match hook %}
+{%- when Hook::None %}
+    {{ not_configured }}
+{%- when Hook::Prompt %}
     $__zoxide_prompt_old = $function:prompt
     function prompt {
         $null = __zoxide_hook
         & $__zoxide_prompt_old
     }
-    {%- when Hook::Pwd %}
+{%- when Hook::Pwd %}
     if ($PSVersionTable.PSVersion.Major -ge 6) {
         $ExecutionContext.InvokeCommand.LocationChangedAction = {
             $null = __zoxide_hook
@@ -49,10 +49,10 @@ if ($__zoxide_hooked -ne '1') {
             "zoxide: PWD hooks are not supported below powershell 6.`n" +
             "        Use 'zoxide init powershell --hook prompt' instead.")
     }
-    {%- endmatch %}
+{%- endmatch %}
 }
 
-{{ SECTION }}
+{{ section }}
 # When using zoxide with --no-aliases, alias these internal functions as
 # desired.
 #
@@ -84,7 +84,7 @@ function __zoxide_zi {
     }
 }
 
-{{ SECTION }}
+{{ section }}
 # Convenient aliases for zoxide. Disable these using --no-aliases.
 #
 
@@ -95,11 +95,12 @@ Set-Alias {{cmd}} __zoxide_z
 Set-Alias {{cmd}}i __zoxide_zi
 
 {%- when None %}
-{{ NOT_CONFIGURED }}
+
+{{ not_configured }}
 
 {%- endmatch %}
 
-{{ SECTION }}
+{{ section }}
 # To initialize zoxide with powershell, add the following line to your
 # powershell configuration file (the location is stored in $profile):
 #

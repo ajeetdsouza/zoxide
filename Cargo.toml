@@ -36,6 +36,7 @@ default = []
 # - bash
 # - black: <https://github.com/psf/black>
 # - dash
+# - elvish: <https://github.com/elves/elvish>
 # - fish: <https://github.com/fish-shell/fish-shell>
 # - mypy: <https://github.com/python/mypy>
 # - nushell: <https://github.com/nushell/nushell>

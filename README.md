@@ -112,15 +112,23 @@ zoxide import --from autojump /path/to/db
 
 #### bash
 
-Add the following line to your `~/.bashrc`:
+Add the following line to your configuration file (usually `~/.bashrc`):
 
 ```sh
 eval "$(zoxide init bash)"
 ```
 
+#### elvish
+
+Add the following line to your configuration file (usually `~/.elvish/rc.elv`):
+
+```sh
+eval $(zoxide init elvish | slurp)
+```
+
 #### fish
 
-Add the following line to your `~/.config/fish/config.fish`:
+Add the following line to your configuration file (usually `~/.config/fish/config.fish`):
 
 ```fish
 zoxide init fish | source
@@ -154,7 +162,7 @@ Invoke-Expression (& {
 
 #### xonsh
 
-Add the following line to your profile (usually `~/.xonshrc`):
+Add the following line to your configuration file (usually `~/.xonshrc`):
 
 ```python
 execx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')
@@ -162,7 +170,7 @@ execx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')
 
 #### zsh
 
-Add the following line to your `~/.zshrc`:
+Add the following line to your configuration file (usually `~/.zshrc`):
 
 ```sh
 eval "$(zoxide init zsh)"
@@ -170,7 +178,7 @@ eval "$(zoxide init zsh)"
 
 #### Any POSIX shell
 
-Add the following line to your shell's configuration file:
+Add the following line to your configuration file:
 
 ```sh
 eval "$(zoxide init posix --hook prompt)"

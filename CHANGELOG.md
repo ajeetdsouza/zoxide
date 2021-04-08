@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [0.6.0] - 2021-04-09
 
 ### Added
 
@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Removed backtraces on Rust nightly.
-- Fixed generated shell code to avoid accidentally using aliased builtins.
+- Generated shell code avoids using aliased builtins.
 - Handle broken pipe errors gracefully when writing to streams.
 - NUL file appearing in working directory on Windows.
 - Accidental redefinition of hooks when initialized twice on some shells.
@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- Aliases: `za`, `zq`, `zqi`, `zr`, `zri`.
+- Aliases: `za`, `zq`, `zqi`, `zr`, `zri`. These are trivial aliases to zoxide that can easily be defined manually, and aren't very useful to most users.
 
 ## [0.5.0] - 2020-10-30
 
@@ -202,6 +202,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions pipeline to build and upload releases.
 - Support for the `zsh` shell.
 
+[0.6.0]: https://github.com/ajeetdsouza/zoxide/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/ajeetdsouza/zoxide/compare/v0.4.3...v0.5.0
 [0.4.3]: https://github.com/ajeetdsouza/zoxide/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/ajeetdsouza/zoxide/compare/v0.4.1...v0.4.2

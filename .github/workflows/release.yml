@@ -9,9 +9,12 @@ jobs:
     strategy:
       matrix:
         target:
+          - "aarch64-unknown-linux-gnu"
+          - "aarch64-unknown-linux-musl"
+          - "armv7-unknown-linux-gnueabihf"
+          - "armv7-unknown-linux-musleabihf"
           - "x86_64-unknown-linux-gnu"
           - "x86_64-unknown-linux-musl"
-          - "armv7-unknown-linux-musleabihf"
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/cargo@v1
@@ -77,6 +80,42 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: "zoxide-aarch64-unknown-linux-gnu/zoxide"
+          asset_name: "zoxide-aarch64-unknown-linux-gnu"
+          asset_content_type: application/octet-stream
+
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: "zoxide-aarch64-unknown-linux-musl/zoxide"
+          asset_name: "zoxide-aarch64-unknown-linux-musl"
+          asset_content_type: application/octet-stream
+
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: "zoxide-armv7-unknown-linux-gnueabihf/zoxide"
+          asset_name: "zoxide-armv7-unknown-linux-gnueabihf"
+          asset_content_type: application/octet-stream
+
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: "zoxide-armv7-unknown-linux-musleabihf/zoxide"
+          asset_name: "zoxide-armv7-unknown-linux-musleabihf"
+          asset_content_type: application/octet-stream
+
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: "zoxide-x86_64-unknown-linux-gnu/zoxide"
           asset_name: "zoxide-x86_64-unknown-linux-gnu"
           asset_content_type: application/octet-stream
@@ -88,15 +127,6 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: "zoxide-x86_64-unknown-linux-musl/zoxide"
           asset_name: "zoxide-x86_64-unknown-linux-musl"
-          asset_content_type: application/octet-stream
-
-      - uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: "zoxide-armv7-unknown-linux-musleabihf/zoxide"
-          asset_name: "zoxide-armv7-unknown-linux-musleabihf"
           asset_content_type: application/octet-stream
 
       - uses: actions/upload-release-asset@v1

@@ -1,6 +1,6 @@
 [package]
 name = "zoxide"
-version = "0.5.0"
+version = "0.6.0"
 authors = ["Ajeet D'Souza <98ajeet@gmail.com>"]
 edition = "2018"
 description = "A faster way to navigate your filesystem"

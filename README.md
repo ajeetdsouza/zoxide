@@ -5,13 +5,6 @@
 
 A faster way to navigate your filesystem
 
-## Table of contents
-
-- [Introduction](#introduction)
-- [Examples](#examples)
-- [Getting started](#getting-started)
-- [Configuration](#configuration)
-
 ## Introduction
 
 `zoxide` is a blazing fast alternative to `cd`, inspired by

@@ -13,9 +13,9 @@ function __zoxide_pwd {
 # cd + custom logic based on the value of _ZO_ECHO.
 function __zoxide_cd($dir) {
     Set-Location $dir -ea Stop
-    {%- if echo %}
+{%- if echo %}
     __zoxide_pwd
-    {%- endif %}
+{%- endif %}
 }
 
 {{ section }}
@@ -30,16 +30,16 @@ function __zoxide_hook {
 # Initialize hook.
 if ($__zoxide_hooked -ne '1') {
     $__zoxide_hooked = '1'
-    {%- match hook %}
-    {%- when Hook::None %}
+{%- match hook %}
+{%- when Hook::None %}
     {{ not_configured }}
-    {%- when Hook::Prompt %}
+{%- when Hook::Prompt %}
     $__zoxide_prompt_old = $function:prompt
     function prompt {
         $null = __zoxide_hook
         & $__zoxide_prompt_old
     }
-    {%- when Hook::Pwd %}
+{%- when Hook::Pwd %}
     if ($PSVersionTable.PSVersion.Major -ge 6) {
         $ExecutionContext.InvokeCommand.LocationChangedAction = {
             $null = __zoxide_hook
@@ -49,7 +49,7 @@ if ($__zoxide_hooked -ne '1') {
             "zoxide: PWD hooks are not supported below powershell 6.`n" +
             "        Use 'zoxide init powershell --hook prompt' instead.")
     }
-    {%- endmatch %}
+{%- endmatch %}
 }
 
 {{ section }}
@@ -95,6 +95,7 @@ Set-Alias {{cmd}} __zoxide_z
 Set-Alias {{cmd}}i __zoxide_zi
 
 {%- when None %}
+
 {{ not_configured }}
 
 {%- endmatch %}

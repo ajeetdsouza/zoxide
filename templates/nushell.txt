@@ -48,18 +48,18 @@ def __zoxide_z [...rest:string] {
             cd $(zoxide query --exclude $(pwd) -- $args | str trim)
         }
     }
-    {%- if echo %}
+{%- if echo %}
     echo $(pwd)
-    {%- endif %}
+{%- endif %}
 }
 
 # Jump to a directory using interactive search.
 def __zoxide_zi  [...rest:string] {
     let args = $(echo $rest | skip 1)
     cd $(zoxide query -i -- $args | str trim)
-    {%- if echo %}
+{%- if echo %}
     echo $(pwd)
-    {%- endif %}
+{%- endif %}
 }
 
 {{ section }}
@@ -73,6 +73,7 @@ alias {{cmd}} = __zoxide_z ''
 alias {{cmd}}i = __zoxide_zi ''
 
 {%- when None %}
+
 {{ not_configured }}
 
 {%- endmatch %}

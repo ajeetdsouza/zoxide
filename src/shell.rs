@@ -139,13 +139,13 @@ mod tests {
                     let opts = dbg!(&opts()[i]);
                     let mut source = String::new();
 
-                    // Filter out lines using edit:add-var, since that function
-                    // is only available in the interactive editor.
+                    // Filter out lines using edit:*, since those functions
+                    // are only available in the interactive editor.
                     for line in Elvish(opts)
                         .render()
                         .unwrap()
                         .split('\n')
-                        .filter(|line| !line.starts_with("edit:add-var"))
+                        .filter(|line| !line.contains("edit:"))
                     {
                         source.push_str(line);
                         source.push('\n');

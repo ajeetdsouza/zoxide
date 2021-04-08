@@ -87,15 +87,14 @@ def __zoxide_errhandler(func):
 # Initialize hook to add new entries to the database.
 if globals().get("__zoxide_hooked") is not True:
     globals()["__zoxide_hooked"] = True
-
-    {% match hook -%}
-    {%- when Hook::None -%}
+{% match hook -%}
+{%- when Hook::None %}
     {{ not_configured }}
-    {%- when Hook::Prompt -%}
+{%- when Hook::Prompt %}
     @events.on_post_prompt  # type: ignore  # pylint:disable=undefined-variable
-    {%- when Hook::Pwd -%}
+{%- when Hook::Pwd %}
     @events.on_chdir  # type: ignore  # pylint:disable=undefined-variable
-    {%- endmatch %}
+{%- endmatch %}
     def __zoxide_hook(**_kwargs):
         """Hook to add new entries to the database."""
         pwd = __zoxide_pwd()
@@ -158,6 +157,7 @@ aliases["{{cmd}}"] = __zoxide_z
 aliases["{{cmd}}i"] = __zoxide_zi
 
 {%- when None %}
+
 {{ not_configured }}
 
 {%- endmatch %}

@@ -27,8 +27,15 @@ if (not (and (builtin:has-env __zoxide_hooked) (builtin:eq (builtin:get-env __zo
     builtin:set-env __zoxide_oldpwd $pwd
     before-chdir = [$@before-chdir [_]{ builtin:set-env __zoxide_oldpwd $pwd }]
 
-    # edit:before-readline = [{ echo 'going to read' }]
-    # after-chdir = [[dir]{ zoxide add $pwd }]
+    # Initialize hook to add directories to zoxide.
+{%- match hook %}
+{%- when Hook::None %}
+    {{ not_configured }}
+{%- when Hook::Prompt %}
+    edit:before-readline = [$@edit:before-readline []{ zoxide add $pwd }]
+{%- when Hook::Pwd %}
+    after-chdir = [$@after-chdir [_]{ zoxide add $pwd }]
+{%- endmatch %}
 }
 
 {{ section }}
@@ -67,6 +74,7 @@ edit:add-var z~ $__zoxide_z~
 edit:add-var zi~ $__zoxide_zi~
 
 {%- when None %}
+
 {{ not_configured }}
 
 {%- endmatch %}

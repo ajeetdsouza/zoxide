@@ -32,14 +32,14 @@ function __zoxide_hook() {
 # Initialize hook.
 if [ "${__zoxide_hooked}" != '1' ]; then
     __zoxide_hooked='1'
-    {%- match hook %}
-    {%- when Hook::None %}
+{%- match hook %}
+{%- when Hook::None %}
     {{ not_configured }}
-    {%- when Hook::Prompt %}
+{%- when Hook::Prompt %}
     precmd_functions+=(__zoxide_hook)
-    {%- when Hook::Pwd %}
+{%- when Hook::Pwd %}
     chpwd_functions=("${chpwd_functions[@]}" "__zoxide_hook")
-    {%- endmatch %}
+{%- endmatch %}
 fi
 
 {{ section }}
@@ -99,6 +99,7 @@ function {{cmd}}i() {
 }
 
 {%- when None %}
+
 {{ not_configured }}
 
 {%- endmatch %}

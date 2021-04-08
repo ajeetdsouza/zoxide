@@ -42,16 +42,16 @@ __zoxide_hook() {
 # Initialize hook.
 if [ "${__zoxide_hooked}" != '1' ]; then
     __zoxide_hooked='1'
-    {%- match hook %}
-    {%- when Hook::None %}
+{%- match hook %}
+{%- when Hook::None %}
     {{ not_configured }}
-    {%- when Hook::Prompt %}
+{%- when Hook::Prompt %}
     PS1="${PS1}\$(__zoxide_hook)"
-    {%- when Hook::Pwd %}
+{%- when Hook::Pwd %}
     \printf "%s\n%s\n" \
         "zoxide: PWD hooks are not supported on POSIX shells." \
         "        Use 'zoxide init posix --hook prompt' instead."
-    {%- endmatch %}
+{%- endmatch %}
 fi
 
 {{ section }}
@@ -109,6 +109,7 @@ __zoxide_unset '{{cmd}}i'
 }
 
 {%- when None %}
+
 {{ not_configured }}
 
 {%- endmatch %}

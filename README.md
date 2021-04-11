@@ -1,41 +1,44 @@
-# zoxide
+# `zoxide`
 
-[![crates.io](https://img.shields.io/crates/v/zoxide)](https://crates.io/crates/zoxide)
-![.github/workflows/release.yml](https://github.com/ajeetdsouza/zoxide/workflows/.github/workflows/release.yml/badge.svg)
+[![crates.io][crates.io-badge]][crates.io]
 
-A faster way to navigate your filesystem
+> A faster way to navigate your filesystem
 
-## Introduction
+`zoxide` is a blazing fast replacement for your `cd` command, inspired by
+[`z`][z] and [`z.lua`][z.lua]. It keeps track of the directories you use most
+frequently, and uses a ranking algorithm to navigate to the best match.
 
-`zoxide` is a blazing fast alternative to `cd`, inspired by
-[`z`](https://github.com/rupa/z) and [`z.lua`](https://github.com/skywind3000/z.lua).
-It keeps track of the directories you use most frequently, and uses a ranking algorithm
-to navigate to the best match.
-
-![demo](./demo.gif)
+![Demo][demo.gif]
 
 ## Examples
 
 ```sh
-z foo       # cd to highest ranked directory matching foo
-z foo bar   # cd to highest ranked directory matching foo and bar
+z foo       # cd into highest ranked directory matching foo
+z foo bar   # cd into highest ranked directory matching foo and bar
 
-z foo/      # can also cd into actual directories
+z ~/foo     # z also works like a regular cd command
+z foo/      # cd into relative path
+z ..        # cd one level up
+z -         # cd into previous directory
 
-zi foo      # cd with interactive selection using fzf
+zi foo      # cd with interactive selection (using fzf)
 ```
+
+Read more about the matching algorithm [here][algorithm-matching].
 
 ## Getting started
 
-### Step 1: Install zoxide
+### Step 1: Install `zoxide`
 
-zoxide works across all major platforms. If your distribution isn't included in the list below, you can directly install the binary from GitHub:
+`zoxide` works across all major platforms. If your distribution isn't included
+in the list below, you can directly install the binary from GitHub:
 
 ```sh
 curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/ajeetdsouza/zoxide/master/install.sh | sh
 ```
 
-If you would rather not run a script, you can download the binary from the [Releases](https://github.com/ajeetdsouza/zoxide/releases) page and add it anywhere in your `$PATH`.
+If you would rather not run a script, you can download the binary from the
+[Releases] page and add it to your `$PATH`.
 
 #### On Linux
 
@@ -82,28 +85,27 @@ If you would rather not run a script, you can download the binary from the [Rele
 | ---------- | -------------------- |
 | [Termux]   | `pkg install zoxide` |
 
-### Step 2: Install fzf (optional)
+### Step 2: Install `fzf` (optional)
 
-[fzf](https://github.com/junegunn/fzf) is a command-line fuzzy finder, used by
-zoxide for interactive selection. Installation instructions can be found
-[here](https://github.com/junegunn/fzf#installation).
+[`fzf`][fzf] is a command-line fuzzy finder, used by zoxide for interactive
+selection. Installation instructions can be found [here][fzf-installation].
 
-### Step 3: Add zoxide to your shell
+### Step 3: Add `zoxide` to your shell
 
 If you currently use `z`, `z.lua`, or `zsh-z`, you may want to first import
 your existing entries into `zoxide`:
 
 ```sh
-zoxide import --from z /path/to/db
+zoxide import --from z path/to/db
 ```
 
-Alternatively, for `autojump`:
+Alternatively, for `autojump` (note that scores are not imported):
 
 ```sh
-zoxide import --from autojump /path/to/db
+zoxide import --from autojump path/to/db
 ```
 
-#### bash
+#### `bash`
 
 Add the following line to your configuration file (usually `~/.bashrc`):
 
@@ -111,7 +113,7 @@ Add the following line to your configuration file (usually `~/.bashrc`):
 eval "$(zoxide init bash)"
 ```
 
-#### elvish
+#### `elvish`
 
 Add the following line to your configuration file (usually `~/.elvish/rc.elv`):
 
@@ -119,15 +121,16 @@ Add the following line to your configuration file (usually `~/.elvish/rc.elv`):
 eval $(zoxide init elvish | slurp)
 ```
 
-#### fish
+#### `fish`
 
-Add the following line to your configuration file (usually `~/.config/fish/config.fish`):
+Add the following line to your configuration file (usually
+`~/.config/fish/config.fish`):
 
 ```fish
 zoxide init fish | source
 ```
 
-#### nushell
+#### `nushell`
 
 Initialize zoxide's Nushell script:
 
@@ -142,7 +145,7 @@ Then, in your Nushell configuration file:
   - `zoxide init nushell --hook prompt | save ~/.zoxide.nu`
   - `source ~/.zoxide.nu`
 
-#### powershell
+#### `powershell`
 
 Add the following line to your profile:
 
@@ -153,7 +156,7 @@ Invoke-Expression (& {
 })
 ```
 
-#### xonsh
+#### `xonsh`
 
 Add the following line to your configuration file (usually `~/.xonshrc`):
 
@@ -161,7 +164,7 @@ Add the following line to your configuration file (usually `~/.xonshrc`):
 execx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')
 ```
 
-#### zsh
+#### `zsh`
 
 Add the following line to your configuration file (usually `~/.zshrc`):
 
@@ -186,9 +189,11 @@ eval "$(zoxide init posix --hook prompt)"
 - `--hook <HOOK>`: change how often zoxide increments a directory's score:
   - `none`: never automatically add directories to zoxide.
   - `prompt`: add the current directory to zoxide at every shell prompt.
-  - `pwd`: whenever the user changes directories, add the new directory to zoxide.
+  - `pwd`: whenever the user changes directories, add the new directory to
+    zoxide.
 - `--no-aliases`: don't define extra aliases (`z`, `zi`).
-  - These functions will still be available in your shell as `__zoxide_z` and `__zoxide_zi`, should you choose to use them elsewhere.
+  - These functions will still be available in your shell as `__zoxide_z` and
+    `__zoxide_zi`, should you choose to use them elsewhere.
 
 ### Environment variables
 
@@ -203,41 +208,59 @@ Be sure to set these before calling `zoxide init`.
     | macOS       | `$HOME/Library/Application Support`      | `/Users/Alice/Library/Application Support` |
     | Windows     | `{FOLDERID_RoamingAppData}`              | `C:\Users\Alice\AppData\Roaming`           |
 - `_ZO_ECHO`
-  - When set to `1`, `z` will print the matched directory before navigating to it.
+  - When set to `1`, `z` will print the matched directory before navigating to
+    it.
 - `_ZO_EXCLUDE_DIRS`
   - Excludes the specified directories from the database.
-  - This is provided as a list of [Unix globs](https://man7.org/linux/man-pages/man7/glob.7.html), separated by OS-specific characters:
+  - This is provided as a list of [globs][glob], separated by OS-specific
+    characters:
     | OS                  | Separator | Example                 |
     | ------------------- | --------- | ----------------------- |
     | Linux / macOS / BSD | `:`       | `$HOME:$HOME/private/*` |
     | Windows             | `;`       | `$HOME;$HOME/private/*` |
 - `_ZO_FZF_OPTS`
-  - Custom options to pass to [fzf](https://github.com/junegunn/fzf). See `man fzf` for the list of options.
+  - Custom options to pass to [`fzf`][fzf]. See `man fzf` for the list of
+    options.
 - `_ZO_MAXAGE`
-  - Configures the [aging algorithm](https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#aging), which limits the maximum number of entries in the database.
+  - Configures the [aging algorithm][algorithm-aging], which limits the maximum
+    number of entries in the database.
   - By default, this is set to `10000`.
 - `_ZO_RESOLVE_SYMLINKS`
-  - When set to `1`, `z` will resolve symlinks before adding directories to the database.
+  - When set to `1`, `z` will resolve symlinks before adding directories to the
+    database.
 
 ## Third-party integrations
 
-- [xxh](https://github.com/xxh/xxh), via [xxh-plugin-prerun-zoxide](https://github.com/xxh/xxh-plugin-prerun-zoxide)
-- [nnn](https://github.com/jarun/nnn), via [autojump plugin](https://github.com/jarun/nnn/blob/master/plugins/autojump)
+- [nnn], via [autojump plugin][nnn-autojump]
+- [xxh], via [xxh-plugin-prerun-zoxide]
 
+[algorithm-aging]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#aging
+[algorithm-matching]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#matching
 [alpine linux packages]: https://pkgs.alpinelinux.org/packages?name=zoxide
 [aur]: https://aur.archlinux.org/packages/zoxide-bin
 [copr]: https://copr.fedorainfracloud.org/coprs/atim/zoxide/
+[crates.io-badge]: https://img.shields.io/crates/v/zoxide
 [crates.io]: https://crates.io/crates/zoxide
 [debian packages]: https://packages.debian.org/testing/admin/zoxide
+[demo.gif]: demo.gif
 [dports]: https://github.com/DragonFlyBSD/DPorts/tree/master/sysutils/zoxide
-[freshports]: https://www.freshports.org/sysutils/zoxide/
 [fedora packages]: https://src.fedoraproject.org/rpms/rust-zoxide
+[freshports]: https://www.freshports.org/sysutils/zoxide/
+[fzf-installation]: https://github.com/junegunn/fzf#installation
+[fzf]: https://github.com/junegunn/fzf
+[glob]: https://man7.org/linux/man-pages/man7/glob.7.html
 [homebrew]: https://formulae.brew.sh/formula/zoxide
 [linuxbrew]: https://formulae.brew.sh/formula-linux/zoxide
 [macports]: https://ports.macports.org/port/zoxide/summary
-[nixpkgs]: https://nixos.org/nixos/packages.html?attr=zoxide&channel=nixpkgs-unstable
+[nixpkgs]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/tools/misc/zoxide/default.nix
+[nnn-autojump]: https://github.com/jarun/nnn/blob/master/plugins/autojump
+[nnn]: https://github.com/jarun/nnn
 [pkgsrc]: https://pkgsrc.se/sysutils/zoxide
+[releases]: https://github.com/ajeetdsouza/zoxide/releases
 [scoop]: https://github.com/ScoopInstaller/Main/tree/master/bucket/zoxide.json
 [termux]: https://github.com/termux/termux-packages/tree/master/packages/zoxide
 [void linux packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide
-[`dirs` documentation]: https://docs.rs/dirs/latest/dirs/fn.data_local_dir.html
+[xxh-plugin-prerun-zoxide]: https://github.com/xxh/xxh-plugin-prerun-zoxide
+[xxh]: https://github.com/xxh/xxh
+[z.lua]: https://github.com/skywind3000/z.lua
+[z]: https://github.com/rupa/z

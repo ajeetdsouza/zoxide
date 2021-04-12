@@ -10,7 +10,7 @@ use clap::Clap;
 
 use std::io::{self, Write};
 
-/// Searches for a directory
+/// Search for a directory in the database
 #[derive(Clap, Debug)]
 pub struct Query {
     keywords: Vec<String>,

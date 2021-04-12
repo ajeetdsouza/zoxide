@@ -16,7 +16,10 @@ end
 
 # cd + custom logic based on the value of _ZO_ECHO.
 function __zoxide_cd
-    builtin cd $argv
+{#- We can't use `builtin cd` over here, because fish wraps its builtin cd with
+  a function that adds extra features (such as `cd -`). Using the builtin
+  would make those features stop working. #}
+    cd $argv
 {%- if echo %}
     and __zoxide_pwd
 {%- endif %}
@@ -52,9 +55,7 @@ function __zoxide_z
     set argc (count $argv)
     if test $argc -eq 0
         __zoxide_cd $HOME
-    else if begin
-            test $argc -eq 1; and test $argv[1] = -
-        end
+    else if test "$argv" = -
         __zoxide_cd -
     else if begin
             test $argc -eq 1; and test -d $argv[1]

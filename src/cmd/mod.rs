@@ -18,7 +18,13 @@ pub trait Cmd {
 }
 
 #[derive(Debug, Clap)]
-#[clap(about, author, global_setting(AppSettings::GlobalVersion), global_setting(AppSettings::VersionlessSubcommands), version = env!("ZOXIDE_VERSION"))]
+#[clap(
+    about,
+    author,
+    global_setting(AppSettings::DisableHelpSubcommand),
+    global_setting(AppSettings::GlobalVersion),
+    global_setting(AppSettings::VersionlessSubcommands),
+    version = env!("ZOXIDE_VERSION"))]
 pub enum App {
     Add(Add),
     Import(Import),

@@ -10,7 +10,7 @@ use clap::Clap;
 
 use std::io::Write;
 
-/// Removes a directory
+/// Remove a directory from the database
 #[derive(Clap, Debug)]
 pub struct Remove {
     #[clap(conflicts_with = "path", long, short, value_name = "keywords")]

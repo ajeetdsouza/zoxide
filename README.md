@@ -13,15 +13,15 @@ frequently, and uses a ranking algorithm to navigate to the best match.
 ## Examples
 
 ```sh
-z foo       # cd into highest ranked directory matching foo
-z foo bar   # cd into highest ranked directory matching foo and bar
+z foo        # cd into highest ranked directory matching foo
+z foo bar    # cd into highest ranked directory matching foo and bar
 
-z ~/foo     # z also works like a regular cd command
-z foo/      # cd into relative path
-z ..        # cd one level up
-z -         # cd into previous directory
+z ~/foo      # z also works like a regular cd command
+z foo/       # cd into relative path
+z ..         # cd one level up
+z -          # cd into previous directory
 
-zi foo      # cd with interactive selection (using fzf)
+zi foo       # cd with interactive selection (using fzf)
 ```
 
 Read more about the matching algorithm [here][algorithm-matching].
@@ -174,7 +174,8 @@ eval "$(zoxide init zsh)"
 
 #### Any POSIX shell
 
-Add the following line to your configuration file:
+Add the following line to your configuration file (usually
+`~/.config/nu/config.toml`):
 
 ```sh
 eval "$(zoxide init posix --hook prompt)"

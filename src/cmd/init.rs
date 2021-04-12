@@ -10,7 +10,7 @@ use once_cell::sync::OnceCell;
 
 use std::io::{self, Write};
 
-/// Generates shell configuration
+/// Generate shell configuration
 #[derive(Clap, Debug)]
 #[clap(after_help(env_help()))]
 pub struct Init {

@@ -34,7 +34,7 @@ Read more about the matching algorithm [here][algorithm-matching].
 in the list below, you can directly install the binary from GitHub:
 
 ```sh
-curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/ajeetdsouza/zoxide/master/install.sh | sh
+curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
 ```
 
 If you would rather not run a script, you can download the binary from the

@@ -15,7 +15,7 @@ pub struct Import {
     path: PathBuf,
 
     /// Application to import from
-    #[clap(arg_enum, long, default_value = "z")]
+    #[clap(arg_enum, long)]
     from: From,
 
     /// Merge into existing database

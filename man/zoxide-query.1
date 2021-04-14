@@ -1,0 +1,27 @@
+.TH "zoxide-query" "1" "2021-04-12" "zoxide" "zoxide"
+.SH NAME
+zoxide-query - search for a directory in the database
+.SH SYNOPSIS
+.B zoxide query \fI[KEYWORDS] [OPTIONS]\fR
+.SH DESCRIPTION
+Queries the database for paths matching the keywords. The exact \fBMATCHING\fR
+algorithm is described in \fBzoxide\fR(1).
+.SH OPTIONS
+.TP
+.B -h, --help
+Prints help information
+.TP
+.B -i, --interactive
+Use interactive selection. This option requires fzf.
+.TP
+.B -l, --list
+List all results, rather than just the one with the highest frecency.
+.TP
+.B -s, --score
+Print the calculated score as well as the matched path.
+.SH REPORTING BUGS
+For any issues, feature requests, or questions, please visit:
+.sp
+    \fIhttps://github.com/ajeetdsouza/zoxide/issues\fR
+.SH AUTHOR
+Ajeet D'Souza <\fI98ajeet@gmail.com\fR>

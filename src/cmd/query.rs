@@ -15,19 +15,19 @@ use std::io::{self, Write};
 pub struct Query {
     keywords: Vec<String>,
 
-    /// Lists all matching directories
+    /// Use interactive selection
     #[clap(long, short, conflicts_with = "list")]
     interactive: bool,
 
-    /// Lists all matching directories
+    /// List all matching directories
     #[clap(long, short, conflicts_with = "interactive")]
     list: bool,
 
-    /// Prints score with results
+    /// Print score with results
     #[clap(long, short)]
     score: bool,
 
-    /// Excludes a path from results
+    /// Exclude a path from results
     #[clap(long, hidden = true)]
     exclude: Option<String>,
 }

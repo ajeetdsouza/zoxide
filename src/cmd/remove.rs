@@ -13,6 +13,7 @@ use std::io::Write;
 /// Remove a directory from the database
 #[derive(Clap, Debug)]
 pub struct Remove {
+    // Use interactive selection
     #[clap(conflicts_with = "path", long, short, value_name = "keywords")]
     interactive: Option<Vec<String>>,
     #[clap(

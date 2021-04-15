@@ -1,0 +1,150 @@
+.TH "zoxide" "1" "2021-04-12" "zoxide" "zoxide"
+.SH NAME
+zoxide - a faster way to navigate your filesystem
+.SH SYNOPSIS
+.B zoxide \fISUBCOMMAND [OPTIONS]\fR
+.SH DESCRIPTION
+zoxide is a smarter replacement for your cd command. It keeps track of the
+directories you use most frequently, and uses a ranking algorithm to navigate
+to the best match.
+.SH USAGE
+    \fBz\fR \fIfoo\fR        # cd into highest ranked directory matching foo
+    \fBz\fR \fIfoo bar\fR    # cd into highest ranked directory matching foo and bar
+.sp
+    \fBz\fR \fI~/foo\fR      # z also works like a regular cd command
+    \fBz\fR \fIfoo/\fR       # cd into relative path
+    \fBz\fR \fI..\fR         # cd one level up
+    \fBz\fR \fI-\fR          # cd into previous directory
+.sp
+    \fBzi\fR \fIfoo\fR       # cd with interactive selection (using fzf)
+.SH SUBCOMMANDS
+.TP
+\fBzoxide-add\fR(1)
+Add a new directory to the database, or increment its rank.
+.TP
+\fBzoxide-import\fR(1)
+Import entries from another application.
+.TP
+\fBzoxide-init\fR(1)
+Generate shell configuration.
+.TP
+\fBzoxide-query\fR(1)
+Search for a directory in the database.
+.TP
+\fBzoxide-remove\fR(1)
+Remove a directory from the database.
+.SH OPTIONS
+.TP
+.B -h, --help
+Prints help information
+.TP
+.B -V, --version
+Prints version information
+.SH ENVIRONMENT VARIABLES
+Environment variables must be set before calling \fBzoxide init\fR.
+.TP
+.B _ZO_DATA_DIR
+Specifies the directory in which zoxide should store its database. The default
+value varies across OSes:
+.TS
+tab(|);
+l l.
+    \fBOS|Path\fR
+    Linux/BSD|T{
+\fI$XDG_DATA_HOME\fR or \fI$HOME/.local/share\fR
+.br
+eg. /home/alice/.local/share
+T}
+    macOS|T{
+\fI$HOME/Library/Application Support\fR
+.br
+eg. /Users/Alice/Library/Application Support
+T}
+    Windows|T{
+\fI{FOLDERID_RoamingAppData}\fR
+.br
+eg. C:\\Users\\Alice\\AppData\\Roaming
+T}
+.TE
+.TP
+.B _ZO_ECHO
+When set to \fI1\fR, z will print the matched directory before navigating
+to it.
+.TP
+.B _ZO_EXCLUDE_DIRS
+Prevents the specified directories from being added to the database. This is
+provided as a list of globs, separated by OS-specific characters:
+.TS
+tab(|);
+l l.
+    \fBOS|Separator\fR
+    Linux/macOS/BSD|T{
+\fI:\fR eg. $HOME:$HOME/private/*
+T}
+    Windows|\fI;\fR eg. $HOME;$HOME/private/*
+.TE
+.sp
+After setting this up, you might need to use \fBzoxide-remove\fR(1) to remove
+any existing entries from the database.
+.TP
+.B _ZO_FZF_OPTS
+Custom options to pass to fzf. See \fBman fzf\fR for the list of options.
+.TP
+.B _ZO_MAXAGE
+Configures the aging algorithm, which limits the maximum number of entries in
+the database. By default, this is set to \fI10000\fR.
+.TP
+.B _ZO_RESOLVE_SYMLINKS
+When set to \fI1\fR, z will resolve symlinks before adding directories to
+the database.
+.SH ALGORITHM
+.TP
+.B AGING
+zoxide uses a parameter called \fB_ZO_MAXAGE\fR to limit the number of entries
+in the database based on usage patterns. If the total \fBFRECENCY\fR of the
+directories in the database exceeds this value, we divide each directory's
+score by a factor \fIk\fR such that the new total becomes ~90% of
+\fB_ZO_MAXAGE\fR. Thereafter, if the new score of any directory falls below
+\fI1\fR, it is removed from the database.
+.sp
+Theoretically, the maximum number of directories in the database is
+\fI4 * _ZO_MAXAGE\fR, although it is lower in practice.
+.TP
+.B FRECENCY
+Each directory in zoxide is given a score, starting with \fI1\fR the first time
+it is accessed. Every subsequent access increases the score by \fI1\fR. When a
+query is made, we calculate frecency based on the last time the directory was
+accessed:
+.TS
+tab(|);
+l l.
+    \fBLast access time\fR|\fBFrecency\fR
+    Within the last hour|\fIscore * 4\fR
+    Within the last day|\fIscore * 2\fR
+    Within the last week|\fIscore / 2\fR
+    Otherwise|\fIscore / 4\fR
+.TE
+.TP
+.B MATCHING
+zoxide uses a simple, predictable algorithm for resolving queries:
+.sp
+* All matching is case-insensitive.
+    \fBzoxide query\fR \fIfoo\fR matches \fI/foo\fR as well as \fI/FOO\fR.
+.sp
+* All terms must be present (including slashes) within the path, in order.
+    \fBzoxide query\fR \fIfo ba\fR matches \fI/foo/bar\fR, but not \fI/bar/foo\fR.
+    \fBzoxide query\fR \fIfo / ba\fR matches \fI/foo/bar\fR, but not \fI/foobar\fR.
+.sp
+* The last component of the last keyword must match the last component of the path.
+    \fBzoxide query\fR \fIbar\fR matches \fI/foo/bar\fR, but not \fI/bar/foo\fR.
+    \fBzoxide query\fR \fIfoo/bar\fR (last component: \fIbar\fR) matches \fI/foo/bar\fR, but not \fI/foo/bar/baz\fR.
+.sp
+* The path must exist. Deleted directories are filtered out.
+.sp
+* Matches are returned in descending order of \fBFRECENCY\fR.
+.SH REPORTING BUGS
+For any issues, feature requests, or questions, please visit:
+.sp
+    \fIhttps://github.com/ajeetdsouza/zoxide/issues\fR
+.SH AUTHOR
+Ajeet D'Souza <\fI98ajeet@gmail.com\fR>

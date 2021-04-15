@@ -72,8 +72,8 @@ When set to \fI1\fR, z will print the matched directory before navigating
 to it.
 .TP
 .B _ZO_EXCLUDE_DIRS
-Excludes the specified directories from the database. This is provided as a
-list of globs, separated by OS-specific characters:
+Prevents the specified directories from being added to the database. This is
+provided as a list of globs, separated by OS-specific characters:
 .TS
 tab(|);
 l l.
@@ -83,6 +83,9 @@ l l.
 T}
     Windows|\fI;\fR eg. $HOME;$HOME/private/*
 .TE
+.sp
+After setting this up, you might need to use \fBzoxide-remove\fR(1) to remove
+any existing entries from the database.
 .TP
 .B _ZO_FZF_OPTS
 Custom options to pass to fzf. See \fBman fzf\fR for the list of options.

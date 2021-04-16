@@ -2,7 +2,7 @@
 
 [![crates.io][crates.io-badge]][crates.io]
 
-> A faster way to navigate your filesystem
+> A smarter cd command
 
 `zoxide` is a blazing fast replacement for your `cd` command, inspired by
 [`z`][z] and [`z.lua`][z.lua]. It keeps track of the directories you use most

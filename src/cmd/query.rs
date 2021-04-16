@@ -8,7 +8,7 @@ use crate::util;
 use anyhow::{Context, Result};
 use clap::Clap;
 
-use std::io::{self, Write};
+use std::io::{self, BufWriter, Write};
 
 /// Search for a directory in the database
 #[derive(Clap, Debug)]
@@ -52,6 +52,7 @@ impl Cmd for Query {
             for dir in matches {
                 writeln!(handle, "{}", dir.display_score(now)).handle_err("fzf")?;
             }
+
             let selection = fzf.wait_select()?;
             if self.score {
                 print!("{}", selection);
@@ -62,8 +63,13 @@ impl Cmd for Query {
                 print!("{}", path)
             }
         } else if self.list {
+            // Rust does line-buffering by default, i.e. it flushes stdout
+            // after every newline. This is not ideal when printing a large
+            // number of lines, so we put stdout in a BufWriter.
             let stdout = io::stdout();
-            let handle = &mut stdout.lock();
+            let stdout = stdout.lock();
+            let mut handle = BufWriter::new(stdout);
+
             for dir in matches {
                 if self.score {
                     writeln!(handle, "{}", dir.display_score(now))
@@ -72,6 +78,7 @@ impl Cmd for Query {
                 }
                 .handle_err("stdout")?;
             }
+            handle.flush().handle_err("stdout")?;
         } else {
             let dir = matches.next().context("no match found")?;
             if self.score {

@@ -8,36 +8,25 @@ impl Query {
         I: IntoIterator<Item = S>,
         S: AsRef<str>,
     {
-        Query(
-            keywords
-                .into_iter()
-                .map(|s: S| s.as_ref().to_lowercase())
-                .collect(),
-        )
-    }
-
-    pub fn keywords(&self) -> &[String] {
-        &self.0
+        Query(keywords.into_iter().map(|s: S| to_lowercase(s)).collect())
     }
 
     pub fn matches<S: AsRef<str>>(&self, path: S) -> bool {
-        let path = path.as_ref().to_lowercase();
-        let keywords = self.keywords();
-
-        let get_filenames = || {
-            let query_name = Path::new(keywords.last()?).file_name()?.to_str().unwrap();
-            let dir_name = Path::new(&path).file_name()?.to_str().unwrap();
-            Some((query_name, dir_name))
+        let keywords = &self.0;
+        let keywords_last = match keywords.last() {
+            Some(keyword) => keyword,
+            None => return true,
         };
 
-        if let Some((query_name, dir_name)) = get_filenames() {
-            if !dir_name.contains(query_name) {
-                return false;
-            }
+        let path = to_lowercase(path);
+
+        let query_name = get_filename(keywords_last);
+        let dir_name = get_filename(&path);
+        if !dir_name.contains(query_name) {
+            return false;
         }
 
         let mut subpath = path.as_str();
-
         for keyword in keywords.iter() {
             match subpath.find(keyword) {
                 Some(idx) => subpath = &subpath[idx + keyword.len()..],
@@ -46,6 +35,33 @@ impl Query {
         }
 
         true
+    }
+}
+
+fn get_filename(mut path: &str) -> &str {
+    if cfg!(windows) {
+        Path::new(path)
+            .file_name()
+            .unwrap_or_default()
+            .to_str()
+            .unwrap_or_default()
+    } else {
+        if path.ends_with('/') {
+            path = &path[..path.len() - 1];
+        }
+        match path.rfind('/') {
+            Some(idx) => &path[idx + 1..],
+            None => path,
+        }
+    }
+}
+
+fn to_lowercase<S: AsRef<str>>(s: S) -> String {
+    let s = s.as_ref();
+    if s.is_ascii() {
+        s.to_ascii_lowercase()
+    } else {
+        s.to_lowercase()
     }
 }
 

@@ -38,7 +38,7 @@ impl Query {
     }
 }
 
-fn get_filename(path: &str) -> &str {
+fn get_filename(mut path: &str) -> &str {
     if cfg!(windows) {
         Path::new(path)
             .file_name()
@@ -46,6 +46,9 @@ fn get_filename(path: &str) -> &str {
             .to_str()
             .unwrap_or_default()
     } else {
+        if path.ends_with('/') {
+            path = &path[..path.len() - 1];
+        }
         match path.rfind('/') {
             Some(idx) => &path[idx + 1..],
             None => path,

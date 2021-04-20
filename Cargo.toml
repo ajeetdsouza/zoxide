@@ -25,6 +25,9 @@ tempfile = "3.1.0"
 [target.'cfg(windows)'.dependencies]
 rand = "0.7.3"
 
+[build-dependencies]
+git2 = "0.13.18"
+
 [dev-dependencies]
 assert_cmd = "1.0.1"
 seq-macro = "0.2.1"

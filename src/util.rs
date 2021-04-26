@@ -147,9 +147,5 @@ pub fn resolve_path<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
         }
     }
 
-    let result = stack.iter().collect::<PathBuf>();
-    if !result.is_dir() {
-        bail!("could not resolve path: {}", result.display());
-    }
-    Ok(result)
+    Ok(stack.iter().collect())
 }

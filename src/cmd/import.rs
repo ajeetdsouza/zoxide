@@ -30,7 +30,7 @@ impl Cmd for Import {
         let mut db = DatabaseFile::new(data_dir);
         let mut db = db.open()?;
         if !self.merge && !db.dirs.is_empty() {
-            bail!("current database is not empty, specify --merge to continue anyway")
+            bail!("current database is not empty, specify --merge to continue anyway");
         }
 
         let resolve_symlinks = config::zo_resolve_symlinks();

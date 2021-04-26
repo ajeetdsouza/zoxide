@@ -5,7 +5,7 @@ use crate::error::WriteErrorHandler;
 use crate::fzf::Fzf;
 use crate::util;
 
-use anyhow::{bail, Context, Result};
+use anyhow::{bail, Result};
 use clap::Clap;
 
 use std::io::Write;
@@ -30,31 +30,45 @@ impl Cmd for Remove {
         let mut db = db.open()?;
 
         let selection;
-        let path = match &self.interactive {
+        match &self.interactive {
             Some(keywords) => {
                 let query = Query::new(keywords);
                 let now = util::current_time()?;
-
-                let mut fzf = Fzf::new()?;
-                let handle = fzf.stdin();
                 let resolve_symlinks = config::zo_resolve_symlinks();
+
+                let mut fzf = Fzf::new(true)?;
                 for dir in db.iter_matches(&query, now, resolve_symlinks) {
-                    writeln!(handle, "{}", dir.display_score(now)).handle_err("fzf")?;
+                    writeln!(fzf.stdin(), "{}", dir.display_score(now)).wrap_write("fzf")?;
                 }
 
                 selection = fzf.wait_select()?;
-                selection
-                    .get(5..selection.len().saturating_sub(1))
-                    .context("fzf returned invalid output")?
-            }
-            None => self.path.as_ref().unwrap(),
-        };
+                let paths = selection.lines().filter_map(|line| line.get(5..));
+                let mut not_found = Vec::new();
+                for path in paths {
+                    if !db.remove(&path) {
+                        not_found.push(path);
+                    }
+                }
 
-        if !db.remove(path) {
-            let path = util::resolve_path(&path)?;
-            let path = util::path_to_str(&path)?;
-            if !db.remove(path) {
-                bail!("path not found in database: {}", &path)
+                if !not_found.is_empty() {
+                    let mut err = "path not found in database:".to_string();
+                    for path in not_found {
+                        err.push_str("\n  ");
+                        err.push_str(path.as_ref());
+                    }
+                    bail!(err);
+                }
+            }
+            None => {
+                // unwrap is safe here because path is required_unless_present = "interactive"
+                let path = self.path.as_ref().unwrap();
+                if !db.remove(path) {
+                    let path_abs = util::resolve_path(&path)?;
+                    let path_abs = util::path_to_str(&path_abs)?;
+                    if path_abs != path && !db.remove(path) {
+                        bail!("path not found in database:\n  {}", &path)
+                    }
+                }
             }
         }
 

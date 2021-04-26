@@ -3,7 +3,7 @@ use crate::config;
 use crate::db::DatabaseFile;
 use crate::util;
 
-use anyhow::Result;
+use anyhow::{bail, Result};
 use clap::Clap;
 
 use std::path::PathBuf;
@@ -19,9 +19,9 @@ impl Cmd for Add {
         let path = match &self.path {
             Some(path) => {
                 if config::zo_resolve_symlinks() {
-                    util::canonicalize(&path)
+                    util::canonicalize(path)
                 } else {
-                    util::resolve_path(&path)
+                    util::resolve_path(path)
                 }
             }
             None => util::current_dir(),
@@ -34,6 +34,9 @@ impl Cmd for Add {
             return Ok(());
         }
 
+        if !path.is_dir() {
+            bail!("not a directory: {}", path.display());
+        }
         let path = util::path_to_str(&path)?;
         let now = util::current_time()?;
 

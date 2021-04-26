@@ -7,49 +7,44 @@ zoxide-init - generate shell configuration for zoxide
 To initialize zoxide on your shell:
 .TP
 .B bash
-Add the following line to your configuration file (usually \fI~/.bashrc\fR):
+Add this to your configuration (usually \fI~/.bashrc\fR):
 .sp
 .nf
     \fBeval "$(zoxide init bash)"\fR
 .fi
 .TP
 .B elvish
-Add the following line to your configuration file (usually
-\fI~/.elvish/rc.elv\fR):
+Add this to your configuration (usually \fI~/.elvish/rc.elv\fR):
 .sp
 .nf
     \fBeval $(zoxide init elvish | slurp)\fR
 .fi
 .TP
 .B fish
-Add the following line to your configuration file (usually
-\fI~/.config/fish/config.fish\fR):
+Add this to your configuration (usually \fI~/.config/fish/config.fish\fR):
 .sp
 .nf
     \fBzoxide init fish | source\fR
 .fi
 .TP
 .B nushell
-Initialize zoxide's Nushell script:
+Create a Nushell script:
 .sp
 .nf
     \fBzoxide init nushell --hook prompt | save ~/.zoxide.nu\fR
 .fi
 .sp
-Then, in your Nushell configuration file (usually
-\fI~/.config/nu/config.toml\fR):
-.sp
-* Prepend \fB__zoxide_hook;\fR to the \fBprompt\fR variable.
-.sp
-* Add the following lines to the \fBstartup\fR variable:
+Add this to your configuration (usually \fI~/.config/nu/config.toml\fR):
 .sp
 .nf
-    \fBzoxide init nushell --hook prompt | save ~/.zoxide.nu
-    source ~/.zoxide.nu\fR
+    \fBprompt = "__zoxide_hook;__zoxide_prompt"\fR
+    \fBstartup = ["zoxide init nushell --hook prompt | save ~/.zoxide.nu", "source ~/.zoxide.nu"]\fR
 .fi
+.sp
+You can replace \fB__zoxide_prompt\fR with a custom prompt.
 .TP
 .B powershell
-Add the following line to your profile:
+Add this to your configuration (the location is stored in \fI$profile\fR):
 .sp
 .nf
     \fBInvoke-Expression (& {
@@ -59,14 +54,14 @@ Add the following line to your profile:
 .fi
 .TP
 .B xonsh
-Add the following line to your configuration file (usually \fI~/.xonshrc\fR):
+Add this to your configuration (usually \fI~/.xonshrc\fR):
 .sp
 .nf
     \fBexecx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')\fR
 .fi
 .TP
 .B zsh
-Add the following line to your configuration file (usually \fI~/.zshrc\fR):
+Add this to your configuration (usually \fI~/.zshrc\fR):
 .sp
 .nf
     \fBeval "$(zoxide init zsh)"\fR
@@ -74,7 +69,7 @@ Add the following line to your configuration file (usually \fI~/.zshrc\fR):
 .TP
 .B Any POSIX shell
 .sp
-Add the following line to your configuration file:
+Add this to your configuration:
 .sp
 .nf
     \fBeval "$(zoxide init posix --hook prompt)"\fR

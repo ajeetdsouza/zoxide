@@ -163,7 +163,6 @@ aliases["{{cmd}}i"] = __zoxide_zi
 {%- endmatch %}
 
 {{ section }}
-# To initialize zoxide with xonsh, add the following line to your xonsh
-# configuration file (usually ~/.xonshrc):
+# To initialize zoxide, add this to your configuration (usually ~/.xonshrc):
 #
 # execx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')

@@ -120,7 +120,6 @@ function {{cmd}}i() {
 {%- endmatch %}
 
 {{ section }}
-# To initialize zoxide with bash, add the following line to your bash
-# configuration file (usually ~/.bashrc):
+# To initialize zoxide, add this to your configuration (usually ~/.bashrc):
 #
 # eval "$(zoxide init bash)"

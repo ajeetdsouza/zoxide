@@ -11,20 +11,15 @@ use std::path::PathBuf;
 /// Add a new directory or increment its rank
 #[derive(Clap, Debug)]
 pub struct Add {
-    path: Option<PathBuf>,
+    path: PathBuf,
 }
 
 impl Cmd for Add {
     fn run(&self) -> Result<()> {
-        let path = match &self.path {
-            Some(path) => {
-                if config::zo_resolve_symlinks() {
-                    util::canonicalize(path)
-                } else {
-                    util::resolve_path(path)
-                }
-            }
-            None => util::current_dir(),
+        let path = if config::zo_resolve_symlinks() {
+            util::canonicalize(&self.path)
+        } else {
+            util::resolve_path(&self.path)
         }?;
 
         if config::zo_exclude_dirs()?

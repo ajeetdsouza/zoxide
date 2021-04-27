@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Manpages for each subcommand.
 - Default prompt for Nushell.
 
+### Changed
+
+- `zoxide remove -i` now accepts multiple selections.
+- `zoxide add` no longer accepts zero parameters.
+
 ### Fixed
 
 - `cd -` on fish shells.

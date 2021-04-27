@@ -30,6 +30,7 @@ pub trait Cmd {
     about,
     author,
     after_help = ENV_HELP,
+    global_setting(AppSettings::ColoredHelp),
     global_setting(AppSettings::DisableHelpSubcommand),
     global_setting(AppSettings::GlobalVersion),
     global_setting(AppSettings::VersionlessSubcommands),

@@ -104,7 +104,7 @@ end
 {%- endmatch %}
 
 {{ section }}
-# To initialize zoxide with fish, add the following line to your fish
-# configuration file (usually ~/.config/fish/config.fish):
+# To initialize zoxide, add this to your configuration (usually
+# ~/.config/fish/config.fish):
 #
 # zoxide init fish | source

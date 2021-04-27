@@ -115,7 +115,6 @@ __zoxide_unset '{{cmd}}i'
 {%- endmatch %}
 
 {{ section }}
-# To initialize zoxide with your POSIX shell, add the following line to your
-# shell configuration file:
+# To initialize zoxide, add this to your configuration:
 #
 # eval "$(zoxide init posix --hook prompt)"

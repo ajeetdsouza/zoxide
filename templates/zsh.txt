@@ -105,7 +105,6 @@ function {{cmd}}i() {
 {%- endmatch %}
 
 {{ section }}
-# To initialize zoxide with zsh, add the following line to your zsh
-# configuration file (usually ~/.zshrc):
+# To initialize zoxide, add this to your configuration (usually ~/.zshrc):
 #
 # eval "$(zoxide init zsh)"

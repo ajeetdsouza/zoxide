@@ -221,6 +221,7 @@ Be sure to set these before calling `zoxide init`.
     | ------------------- | --------- | ----------------------- |
     | Linux / macOS / BSD | `:`       | `$HOME:$HOME/private/*` |
     | Windows             | `;`       | `$HOME;$HOME/private/*` |
+  - By default, this is set to `"$HOME"`.
 - `_ZO_FZF_OPTS`
   - Custom options to pass to [`fzf`][fzf]. See `man fzf` for the list of
     options.

@@ -2,6 +2,7 @@ use crate::db::Rank;
 
 use anyhow::{bail, Context, Result};
 use dirs_next as dirs;
+use glob::Pattern;
 
 use std::env;
 use std::ffi::OsString;
@@ -29,18 +30,27 @@ pub fn zo_echo() -> bool {
     }
 }
 
-pub fn zo_exclude_dirs() -> Result<Vec<glob::Pattern>> {
+pub fn zo_exclude_dirs() -> Result<Vec<Pattern>> {
     match env::var_os("_ZO_EXCLUDE_DIRS") {
         Some(dirs_osstr) => env::split_paths(&dirs_osstr)
             .map(|path| {
                 let pattern = path
                     .to_str()
                     .context("invalid unicode in _ZO_EXCLUDE_DIRS")?;
-                glob::Pattern::new(&pattern)
+                Pattern::new(&pattern)
                     .with_context(|| format!("invalid glob in _ZO_EXCLUDE_DIRS: {}", pattern))
             })
             .collect(),
-        None => Ok(Vec::new()),
+        None => {
+            let pattern = (|| {
+                let home = dirs::home_dir()?;
+                let home_str = home.to_str()?;
+                let home_esc = Pattern::escape(home_str);
+                Pattern::new(&home_esc).ok()
+            })();
+
+            Ok(pattern.into_iter().collect())
+        }
     }
 }
 

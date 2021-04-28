@@ -42,18 +42,20 @@ If you would rather not run a script, you can download the binary from the
 
 #### On Linux
 
-| Distribution   | Repository              | Instructions                                              |
-| -------------- | ----------------------- | --------------------------------------------------------- |
-| **Any**        | [crates.io]             | `cargo install zoxide`                                    |
-| **Any**        | [Linuxbrew]             | `brew install zoxide`                                     |
-| Alpine Linux   | [Alpine Linux Packages] | `apk add zoxide`                                          |
-| Arch Linux     | [AUR]                   | `yay -Sy zoxide-bin`                                      |
-| CentOS         | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide` |
-| Debian Testing | [Debian Packages]       | `apt install zoxide`                                      |
-| Fedora         | [Fedora Packages]       | `dnf install zoxide`                                      |
-| NixOS          | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                              |
-| Parrot OS      |                         | `apt install zoxide`                                      |
-| Void Linux     | [Void Linux Packages]   | `xbps-install -S zoxide`                                  |
+| Distribution       | Repository              | Instructions                                              |
+| ------------------ | ----------------------- | --------------------------------------------------------- |
+| **Any**            | [crates.io]             | `cargo install zoxide`                                    |
+| **Any**            | [Linuxbrew]             | `brew install zoxide`                                     |
+| Alpine Linux 3.13+ | [Alpine Linux Packages] | `apk add zoxide`                                          |
+| Arch Linux         | [AUR]                   | `yay -Sy zoxide-bin`                                      |
+| CentOS 7+          | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide` |
+| Debian Testing     | [Debian Packages]       | `apt install zoxide`                                      |
+| Devuan 4.0+        | [Devuan Packages]       | `apt install zoxide`                                      |
+| Fedora 32+         | [Fedora Packages]       | `dnf install zoxide`                                      |
+| NixOS              | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                              |
+| Parrot OS          |                         | `apt install zoxide`                                      |
+| Ubuntu 21.04+      | [Ubuntu Packages]       | `apt install zoxide`                                      |
+| Void Linux         | [Void Linux Packages]   | `xbps-install -S zoxide`                                  |
 
 #### On macOS
 
@@ -244,6 +246,7 @@ Be sure to set these before calling `zoxide init`.
 [crates.io]: https://crates.io/crates/zoxide
 [debian packages]: https://packages.debian.org/testing/admin/zoxide
 [demo.gif]: demo.gif
+[devuan packages]: https://pkginfo.devuan.org/cgi-bin/package-query.html?c=package&q=zoxide
 [dports]: https://github.com/DragonFlyBSD/DPorts/tree/master/sysutils/zoxide
 [fedora packages]: https://src.fedoraproject.org/rpms/rust-zoxide
 [freshports]: https://www.freshports.org/sysutils/zoxide/
@@ -260,6 +263,7 @@ Be sure to set these before calling `zoxide init`.
 [releases]: https://github.com/ajeetdsouza/zoxide/releases
 [scoop]: https://github.com/ScoopInstaller/Main/tree/master/bucket/zoxide.json
 [termux]: https://github.com/termux/termux-packages/tree/master/packages/zoxide
+[ubuntu packages]: https://packages.ubuntu.com/hirsute/zoxide
 [void linux packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide
 [xxh-plugin-prerun-zoxide]: https://github.com/xxh/xxh-plugin-prerun-zoxide
 [xxh]: https://github.com/xxh/xxh

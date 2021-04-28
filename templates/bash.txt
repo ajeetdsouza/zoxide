@@ -24,6 +24,10 @@ function __zoxide_cd() {
 # Hook configuration for zoxide.
 #
 
+{# Custom prompts often use "$?" to show the exit status of the previous
+ # command. Adding __zoxide_hook to the front of $PROMPT_COMMAND would change
+ # the exit status, so we must capture it and return it manually instead. -#}
+
 # Hook to add new entries to the database.
 {%- match hook %}
 {%- when Hook::None %}
@@ -31,11 +35,14 @@ function __zoxide_cd() {
 
 {%- when Hook::Prompt %}
 function __zoxide_hook() {
+    \builtin local -r __zoxide_retval="$?"
     zoxide add -- "$(__zoxide_pwd)"
+    return "${__zoxide_retval}"
 }
 
 {%- when Hook::Pwd %}
 function __zoxide_hook() {
+    \builtin local -r __zoxide_retval="$?"
     \builtin local -r __zoxide_pwd_tmp="$(__zoxide_pwd)"
     if [ -z "${__zoxide_pwd_old}" ]; then
         __zoxide_pwd_old="${__zoxide_pwd_tmp}"
@@ -43,9 +50,14 @@ function __zoxide_hook() {
         __zoxide_pwd_old="${__zoxide_pwd_tmp}"
         zoxide add -- "${__zoxide_pwd_old}"
     fi
+    return "${__zoxide_retval}"
 }
 
 {%- endmatch %}
+
+{# bash throws an error if $PROMPT_COMMAND contains two semicolons in sequence.
+ # This is hard to avoid perfectly, but adding __zoxide_hook to the front of
+ # $PROMPT_COMMAND rather than the back makes this scenario unlikely. -#}
 
 # Initialize hook.
 if [ "${__zoxide_hooked}" != '1' ]; then

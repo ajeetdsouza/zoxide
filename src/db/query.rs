@@ -8,7 +8,7 @@ impl Query {
         I: IntoIterator<Item = S>,
         S: AsRef<str>,
     {
-        Query(keywords.into_iter().map(|s: S| to_lowercase(s)).collect())
+        Query(keywords.into_iter().map(to_lowercase).collect())
     }
 
     pub fn matches<S: AsRef<str>>(&self, path: S) -> bool {

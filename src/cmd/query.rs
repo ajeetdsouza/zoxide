@@ -47,10 +47,9 @@ impl Cmd for Query {
             .filter(|dir| Some(dir.path.as_ref()) != self.exclude.as_deref());
 
         if self.interactive {
-            let mut fzf = Fzf::new()?;
-            let handle = fzf.stdin();
+            let mut fzf = Fzf::new(false)?;
             for dir in matches {
-                writeln!(handle, "{}", dir.display_score(now)).handle_err("fzf")?;
+                writeln!(fzf.stdin(), "{}", dir.display_score(now)).wrap_write("fzf")?;
             }
 
             let selection = fzf.wait_select()?;
@@ -76,9 +75,9 @@ impl Cmd for Query {
                 } else {
                     writeln!(handle, "{}", dir.display())
                 }
-                .handle_err("stdout")?;
+                .wrap_write("stdout")?;
             }
-            handle.flush().handle_err("stdout")?;
+            handle.flush().wrap_write("stdout")?;
         } else {
             let dir = matches.next().context("no match found")?;
             if self.score {
@@ -86,7 +85,7 @@ impl Cmd for Query {
             } else {
                 writeln!(io::stdout(), "{}", dir.display())
             }
-            .handle_err("stdout")?;
+            .wrap_write("stdout")?;
         }
 
         Ok(())

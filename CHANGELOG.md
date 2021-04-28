@@ -9,16 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Manpages for each subcommand.
+- Manpages for all subcommands.
 - Default prompt for Nushell.
 
 ### Changed
 
+- `zoxide remove -i` now accepts multiple selections.
+- `zoxide add` no longer accepts zero parameters.
 - `$_ZO_EXCLUDE_DIRS` now defaults to `"$HOME"`.
 
 ### Fixed
 
 - `cd -` on fish shells.
+- `__zoxide_hook` no longer changes value of `$?` within `$PROMPT_COMMAND` on bash.
 
 ## [0.6.0] - 2021-04-09
 
@@ -122,7 +125,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- `fish` no longer `cd`s to the user's home when no match is found.
+- fish no longer `cd`s to the user's home when no match is found.
 
 ## [0.3.1] - 2020-04-03
 
@@ -162,7 +165,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Incorrect exit codes in `z` command on `fish`.
+- Incorrect exit codes in `z` command on fish.
 
 ### Removed
 
@@ -175,7 +178,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `$_ZO_ECHO` to echo match before `cd`ing.
 - Minimal `ranger` plugin.
 - PWD hook to only update the database when the current directory is changed.
-- Support for the `bash` shell.
+- Support for bash.
 - `migrate` subcommand to allow users to migrate from `z`.
 
 ### Fixed
@@ -189,11 +192,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `init` subcommand to remove dependency on shell plugin managers.
 - Support for `z -` command to go to previous directory.
 - `Cargo.lock` for more reproducible builds.
-- Support for the `fish` shell.
+- Support for the fish shell.
 
 ### Fixed
 
-- `_zoxide_precmd` overriding other precmd hooks on `zsh`.
+- `_zoxide_precmd` overriding other precmd hooks on zsh.
 
 ## [0.1.1] - 2020-03-08
 
@@ -215,7 +218,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - GitHub Actions pipeline to build and upload releases.
-- Support for the `zsh` shell.
+- Support for zsh.
 
 [0.6.0]: https://github.com/ajeetdsouza/zoxide/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/ajeetdsouza/zoxide/compare/v0.4.3...v0.5.0

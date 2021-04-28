@@ -10,13 +10,15 @@ pub struct Fzf {
 }
 
 impl Fzf {
-    pub fn new() -> Result<Self> {
+    pub fn new(multiple: bool) -> Result<Self> {
         let mut command = Command::new("fzf");
+        if multiple {
+            command.arg("-m");
+        }
         command
             .arg("-n2..")
             .stdin(Stdio::piped())
             .stdout(Stdio::piped());
-
         if let Some(fzf_opts) = config::zo_fzf_opts() {
             command.env("FZF_DEFAULT_OPTS", fzf_opts);
         }
@@ -27,6 +29,7 @@ impl Fzf {
     }
 
     pub fn stdin(&mut self) -> &mut ChildStdin {
+        // unwrap is safe here because command.stdin() has been piped
         self.child.stdin.as_mut().unwrap()
     }
 

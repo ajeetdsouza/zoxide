@@ -3,7 +3,7 @@ use crate::config;
 use crate::db::DatabaseFile;
 use crate::util;
 
-use anyhow::Result;
+use anyhow::{bail, Result};
 use clap::Clap;
 
 use std::path::PathBuf;
@@ -11,20 +11,15 @@ use std::path::PathBuf;
 /// Add a new directory or increment its rank
 #[derive(Clap, Debug)]
 pub struct Add {
-    path: Option<PathBuf>,
+    path: PathBuf,
 }
 
 impl Cmd for Add {
     fn run(&self) -> Result<()> {
-        let path = match &self.path {
-            Some(path) => {
-                if config::zo_resolve_symlinks() {
-                    util::canonicalize(&path)
-                } else {
-                    util::resolve_path(&path)
-                }
-            }
-            None => util::current_dir(),
+        let path = if config::zo_resolve_symlinks() {
+            util::canonicalize(&self.path)
+        } else {
+            util::resolve_path(&self.path)
         }?;
 
         if config::zo_exclude_dirs()?
@@ -34,6 +29,9 @@ impl Cmd for Add {
             return Ok(());
         }
 
+        if !path.is_dir() {
+            bail!("not a directory: {}", path.display());
+        }
         let path = util::path_to_str(&path)?;
         let now = util::current_time()?;
 

@@ -32,9 +32,9 @@ if (not (and (builtin:has-env __zoxide_hooked) (builtin:eq (builtin:get-env __zo
 {%- when Hook::None %}
     {{ not_configured }}
 {%- when Hook::Prompt %}
-    edit:before-readline = [$@edit:before-readline []{ zoxide add $pwd }]
+    edit:before-readline = [$@edit:before-readline []{ zoxide add -- $pwd }]
 {%- when Hook::Pwd %}
-    after-chdir = [$@after-chdir [_]{ zoxide add $pwd }]
+    after-chdir = [$@after-chdir [_]{ zoxide add -- $pwd }]
 {%- endmatch %}
 }
 

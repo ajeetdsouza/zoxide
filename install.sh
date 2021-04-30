@@ -33,6 +33,9 @@ install() {
 		_cputype="x86_64"
 		_clibtype="musl"
 		;;
+	armv7 | aarch64)
+		_clibtype="musl"
+		;;
 	*)
 		warning "No binaries are available for your CPU architecture ($_cputype)"
 		_clibtype="gnu"

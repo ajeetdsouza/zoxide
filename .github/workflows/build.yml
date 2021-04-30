@@ -1,0 +1,56 @@
+name: build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    name: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        target:
+          - x86_64-unknown-linux-musl
+          - x86_64-apple-darwin
+          - x86_64-pc-windows-msvc
+        include:
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-18.04
+          - target: x86_64-apple-darwin
+            os: macos-latest
+          - target: x86_64-pc-windows-msvc
+            os: windows-2019
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+          target: ${{ matrix.target }}
+      - name: Build binary
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --target=${{ matrix.target }} --release --color=always
+      - name: Build archive
+        shell: bash
+        run: |
+          # Create tmpdir for the archive.
+          tmpdir="zoxide-${{ matrix.target }}"
+          mkdir "$tmpdir/"
+
+          # Copy files to tmpdir.
+          cp -r {man,CHANGELOG.md,LICENSE,README.md} "$tmpdir/"
+          if [ "${{ matrix.target }}" = *"windows"* ]; then
+            cp target/${{ matrix.target }}/release/zoxide.exe "$tmpdir/"
+          else
+            cp target/${{ matrix.target }}/release/zoxide "$tmpdir/"
+          fi

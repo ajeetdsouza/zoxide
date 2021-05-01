@@ -14,7 +14,6 @@ jobs:
       fail-fast: false
       matrix:
         target:
-          - aarch64-apple-darwin
           - aarch64-pc-windows-msvc
           - aarch64-unknown-linux-musl
           - armv7-unknown-linux-musleabihf
@@ -22,20 +21,24 @@ jobs:
           - x86_64-pc-windows-msvc
           - x86_64-unknown-linux-musl
         include:
-          - target: aarch64-apple-darwin
-            os: macos-latest
           - target: aarch64-pc-windows-msvc
             os: windows-latest
+            use-cross: false
           - target: aarch64-unknown-linux-musl
             os: ubuntu-latest
+            use-cross: true
           - target: armv7-unknown-linux-musleabihf
             os: ubuntu-latest
+            use-cross: true
           - target: x86_64-apple-darwin
             os: macos-latest
+            use-cross: false
           - target: x86_64-pc-windows-msvc
             os: windows-latest
+            use-cross: false
           - target: x86_64-unknown-linux-musl
             os: ubuntu-latest
+            use-cross: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -52,7 +55,8 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --target=${{ matrix.target }} --release --color=always
+          args: --color=always --release  --target=${{ matrix.target }}
+          use-cross: ${{ matrix.use-cross }}
       - name: Build archive
         shell: bash
         run: |

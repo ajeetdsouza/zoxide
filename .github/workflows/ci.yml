@@ -1,11 +1,9 @@
 name: ci
-
 on:
   push:
     branches:
       - main
   pull_request:
-
 jobs:
   ci:
     runs-on: ${{ matrix.os }}

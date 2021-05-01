@@ -1,11 +1,11 @@
 name: ci
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
 jobs:
   ci:
+    name: ci-${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:

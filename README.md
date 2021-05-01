@@ -1,8 +1,8 @@
 # `zoxide`
 
-[![crates.io][crates.io-badge]][crates.io]
-
 > A smarter cd command
+
+[![crates.io][crates.io-badge]][crates.io]
 
 `zoxide` is a blazing fast replacement for your `cd` command, inspired by
 [`z`][z] and [`z.lua`][z.lua]. It keeps track of the directories you use most
@@ -31,14 +31,8 @@ Read more about the matching algorithm [here][algorithm-matching].
 ### Step 1: Install `zoxide`
 
 `zoxide` works across all major platforms. If your distribution isn't included
-in the list below, you can directly install the binary from GitHub:
-
-```sh
-curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
-```
-
-If you would rather not run a script, you can download the binary from the
-[Releases] page and add it to your `$PATH`.
+in the list below, you can download the binary from the [Releases] page and
+copy it to your `$PATH`.
 
 #### On Linux
 

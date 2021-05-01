@@ -11,18 +11,31 @@ jobs:
     name: build
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         target:
-          - x86_64-unknown-linux-musl
+          - aarch64-apple-darwin
+          - aarch64-pc-windows-msvc
+          - aarch64-unknown-linux-musl
+          - armv7-unknown-linux-musleabihf
           - x86_64-apple-darwin
           - x86_64-pc-windows-msvc
+          - x86_64-unknown-linux-musl
         include:
-          - target: x86_64-unknown-linux-musl
-            os: ubuntu-18.04
+          - target: aarch64-apple-darwin
+            os: macos-latest
+          - target: aarch64-pc-windows-msvc
+            os: windows-latest
+          - target: aarch64-unknown-linux-musl
+            os: ubuntu-latest
+          - target: armv7-unknown-linux-musleabihf
+            os: ubuntu-latest
           - target: x86_64-apple-darwin
             os: macos-latest
           - target: x86_64-pc-windows-msvc
-            os: windows-2019
+            os: windows-latest
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2

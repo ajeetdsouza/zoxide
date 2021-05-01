@@ -43,14 +43,21 @@ jobs:
       - name: Build archive
         shell: bash
         run: |
-          # Create tmpdir for the archive.
+          # Build archive
           tmpdir="zoxide-${{ matrix.target }}"
           mkdir "$tmpdir/"
-
-          # Copy files to tmpdir.
           cp -r {man,CHANGELOG.md,LICENSE,README.md} "$tmpdir/"
           if [ "${{ matrix.target }}" = *"windows"* ]; then
-            cp target/${{ matrix.target }}/release/zoxide.exe "$tmpdir/"
+            asset="$tmpdir.zip"
+            cp "target/${{ matrix.target }}/release/zoxide.exe" "$tmpdir/"
+            7z a -mm=Deflate -mfb=258 -mpass=15 -r "$asset" "$tmpdir/"
           else
-            cp target/${{ matrix.target }}/release/zoxide "$tmpdir/"
+            asset="$tmpdir.tar.gz"
+            cp "target/${{ matrix.target }}/release/zoxide" "$tmpdir/"
+            tar -I 'gzip --best' -cvzf "$asset" "$tmpdir/"
           fi
+          echo "ASSET=$asset" >> $GITHUB_ENV
+      - name: Upload archive
+        uses: actions/upload-artifact@v2
+        with:
+          path: ${{ env.ASSET }}

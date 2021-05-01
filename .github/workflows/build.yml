@@ -54,10 +54,11 @@ jobs:
           else
             asset="$tmpdir.tar.gz"
             cp "target/${{ matrix.target }}/release/zoxide" "$tmpdir/"
-            tar -I 'gzip --best' -cvzf "$asset" "$tmpdir/"
+            tar -cv "$tmpdir/" | gzip --best > "$asset"
           fi
           echo "ASSET=$asset" >> $GITHUB_ENV
       - name: Upload archive
         uses: actions/upload-artifact@v2
         with:
+          name: ${{ env.ASSET }}
           path: ${{ env.ASSET }}

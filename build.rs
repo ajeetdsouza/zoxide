@@ -1,45 +1,19 @@
 use std::env;
 use std::process::Command;
 
-macro_rules! warn {
-    ($fmt:tt) => ({
-        ::std::println!(::std::concat!("cargo:warning=", $fmt));
-    });
-    ($fmt:tt, $($arg:tt)*) => ({
-        ::std::println!(::std::concat!("cargo:warning=", $fmt), $($arg)*);
-    });
-}
-
 fn git_version() -> Option<String> {
+    // Packages releases of zoxide almost always use the source tarball
+    // provided by GitHub, which does not include the `.git` folder. Since this
+    // feature is only useful for development, there's no need of printing a
+    // warning here.
     let mut git = Command::new("git");
     git.args(&["describe", "--tags", "--broken"]);
 
-    let output = match git.output() {
-        Err(e) => {
-            warn!("when retrieving version: git failed to start: {}", e);
-            return None;
-        }
-        Ok(output) if !output.status.success() => {
-            warn!(
-                "when retrieving version: git exited with code: {:?}",
-                output.status.code()
-            );
-            return None;
-        }
-        Ok(output) => output,
-    };
-
-    match String::from_utf8(output.stdout) {
-        Ok(version) => Some(version),
-        Err(e) => {
-            warn!("when retrieving version: git returned invalid utf-8: {}", e);
-            None
-        }
-    }
+    let output = git.output().ok()?;
+    String::from_utf8(output.stdout).ok()
 }
 
 fn crate_version() -> String {
-    warn!("falling back to crate version");
     // unwrap is safe here, since Cargo will always supply this variable.
     format!("v{}", env::var("CARGO_PKG_VERSION").unwrap())
 }

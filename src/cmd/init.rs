@@ -1,34 +1,15 @@
-use super::Cmd;
+use super::Run;
+use crate::app::{Init, Shell};
 use crate::config;
 use crate::error::WriteErrorHandler;
-use crate::shell::{self, Hook, Opts};
+use crate::shell::{self, Opts};
 
 use anyhow::{Context, Result};
 use askama::Template;
-use clap::{ArgEnum, Clap};
 
 use std::io::{self, Write};
 
-/// Generate shell configuration
-#[derive(Clap, Debug)]
-pub struct Init {
-    #[clap(arg_enum)]
-    shell: Shell,
-
-    /// Prevents zoxide from defining any commands
-    #[clap(long)]
-    no_aliases: bool,
-
-    /// Renames the 'z' command and corresponding aliases
-    #[clap(long, default_value = "z")]
-    cmd: String,
-
-    /// Chooses event upon which an entry is added to the database
-    #[clap(arg_enum, long, default_value = "pwd")]
-    hook: Hook,
-}
-
-impl Cmd for Init {
+impl Run for Init {
     fn run(&self) -> Result<()> {
         let cmd = if self.no_aliases {
             None
@@ -59,16 +40,4 @@ impl Cmd for Init {
         .context("could not render template")?;
         writeln!(io::stdout(), "{}", source).wrap_write("stdout")
     }
-}
-
-#[derive(ArgEnum, Debug)]
-enum Shell {
-    Bash,
-    Elvish,
-    Fish,
-    Nushell,
-    Posix,
-    Powershell,
-    Xonsh,
-    Zsh,
 }

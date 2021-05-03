@@ -1,9 +1,9 @@
-use clap::ArgEnum;
+use crate::app::Hook;
 
 #[derive(Debug, Eq, PartialEq)]
 pub struct Opts<'a> {
     pub cmd: Option<&'a str>,
-    pub hook: Hook,
+    pub(crate) hook: Hook,
     pub echo: bool,
     pub resolve_symlinks: bool,
 }
@@ -31,13 +31,6 @@ make_template!(Posix, "posix.txt");
 make_template!(Powershell, "powershell.txt");
 make_template!(Xonsh, "xonsh.txt");
 make_template!(Zsh, "zsh.txt");
-
-#[derive(ArgEnum, Clone, Copy, Debug, Eq, PartialEq)]
-pub enum Hook {
-    None,
-    Prompt,
-    Pwd,
-}
 
 #[cfg(feature = "shell_tests")]
 #[cfg(test)]

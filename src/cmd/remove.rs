@@ -1,4 +1,5 @@
-use super::Cmd;
+use super::Run;
+use crate::app::Remove;
 use crate::config;
 use crate::db::{DatabaseFile, Query};
 use crate::error::WriteErrorHandler;
@@ -6,24 +7,10 @@ use crate::fzf::Fzf;
 use crate::util;
 
 use anyhow::{bail, Result};
-use clap::Clap;
 
 use std::io::Write;
 
-/// Remove a directory from the database
-#[derive(Clap, Debug)]
-pub struct Remove {
-    // Use interactive selection
-    #[clap(conflicts_with = "path", long, short, value_name = "keywords")]
-    interactive: Option<Vec<String>>,
-    #[clap(
-        conflicts_with = "interactive",
-        required_unless_present = "interactive"
-    )]
-    path: Option<String>,
-}
-
-impl Cmd for Remove {
+impl Run for Remove {
     fn run(&self) -> Result<()> {
         let data_dir = config::zo_data_dir()?;
         let mut db = DatabaseFile::new(data_dir);

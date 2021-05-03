@@ -1,4 +1,5 @@
-use super::Cmd;
+use super::Run;
+use crate::app::Query;
 use crate::config;
 use crate::db::{self, DatabaseFile};
 use crate::error::WriteErrorHandler;
@@ -6,33 +7,10 @@ use crate::fzf::Fzf;
 use crate::util;
 
 use anyhow::{Context, Result};
-use clap::Clap;
 
 use std::io::{self, BufWriter, Write};
 
-/// Search for a directory in the database
-#[derive(Clap, Debug)]
-pub struct Query {
-    keywords: Vec<String>,
-
-    /// Use interactive selection
-    #[clap(long, short, conflicts_with = "list")]
-    interactive: bool,
-
-    /// List all matching directories
-    #[clap(long, short, conflicts_with = "interactive")]
-    list: bool,
-
-    /// Print score with results
-    #[clap(long, short)]
-    score: bool,
-
-    /// Exclude a path from results
-    #[clap(long, hidden = true)]
-    exclude: Option<String>,
-}
-
-impl Cmd for Query {
+impl Run for Query {
     fn run(&self) -> Result<()> {
         let data_dir = config::zo_data_dir()?;
         let mut db = DatabaseFile::new(data_dir);

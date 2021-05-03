@@ -1,5 +1,22 @@
+use clap::IntoApp;
+use clap_generate::{generate_to, generators::*};
+
 use std::env;
 use std::process::Command;
+
+include!("src/app.rs");
+
+fn completions() {
+    let mut app = Cli::into_app();
+    let bin_name = env!("CARGO_PKG_NAME");
+    let out_dir = "contrib/completions";
+
+    generate_to::<Bash, _, _>(&mut app, bin_name, out_dir);
+    generate_to::<Elvish, _, _>(&mut app, bin_name, out_dir);
+    generate_to::<Fish, _, _>(&mut app, bin_name, out_dir);
+    generate_to::<PowerShell, _, _>(&mut app, bin_name, out_dir);
+    generate_to::<Zsh, _, _>(&mut app, bin_name, out_dir);
+}
 
 fn git_version() -> Option<String> {
     // Packages releases of zoxide almost always use the source tarball
@@ -21,4 +38,5 @@ fn crate_version() -> String {
 fn main() {
     let version = git_version().unwrap_or_else(crate_version);
     println!("cargo:rustc-env=ZOXIDE_VERSION={}", version);
+    completions();
 }

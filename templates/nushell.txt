@@ -22,7 +22,7 @@ def __zoxide_hook [] {}
 
 {%- when Hook::Prompt %}
 def __zoxide_hook [] {
-    zoxide add -- $(pwd)
+    shells | where active == $true && name == filesystem | get path | each { zoxide add -- $it }
 }
 
 {%- when Hook::Pwd %}

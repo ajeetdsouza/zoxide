@@ -20,9 +20,9 @@ const ENV_HELP: &str = "ENVIRONMENT VARIABLES:
     global_setting(AppSettings::DisableHelpSubcommand),
     global_setting(AppSettings::GlobalVersion),
     global_setting(AppSettings::VersionlessSubcommands),
-    version = option_env!("ZOXIDE_VERSION").unwrap_or("")
+    version = option_env!("ZOXIDE_VERSION").unwrap_or_default()
 )]
-pub enum Cli {
+pub enum App {
     Add(Add),
     Import(Import),
     Init(Init),
@@ -43,7 +43,7 @@ pub struct Import {
 
     /// Application to import from
     #[clap(arg_enum, long)]
-    pub from: From,
+    pub from: ImportFrom,
 
     /// Merge into existing database
     #[clap(long)]
@@ -51,7 +51,7 @@ pub struct Import {
 }
 
 #[derive(ArgEnum, Debug)]
-pub enum From {
+pub enum ImportFrom {
     Autojump,
     Z,
 }
@@ -60,7 +60,7 @@ pub enum From {
 #[derive(Clap, Debug)]
 pub struct Init {
     #[clap(arg_enum)]
-    pub shell: Shell,
+    pub shell: InitShell,
 
     /// Prevents zoxide from defining any commands
     #[clap(long)]
@@ -72,11 +72,18 @@ pub struct Init {
 
     /// Chooses event upon which an entry is added to the database
     #[clap(arg_enum, long, default_value = "pwd")]
-    pub hook: Hook,
+    pub hook: InitHook,
+}
+
+#[derive(ArgEnum, Clone, Copy, Debug, Eq, PartialEq)]
+pub enum InitHook {
+    None,
+    Prompt,
+    Pwd,
 }
 
 #[derive(ArgEnum, Debug)]
-pub enum Shell {
+pub enum InitShell {
     Bash,
     Elvish,
     Fish,
@@ -85,13 +92,6 @@ pub enum Shell {
     Powershell,
     Xonsh,
     Zsh,
-}
-
-#[derive(ArgEnum, Clone, Copy, Debug, Eq, PartialEq)]
-pub enum Hook {
-    None,
-    Prompt,
-    Pwd,
 }
 
 /// Search for a directory in the database

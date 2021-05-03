@@ -29,11 +29,11 @@ if (not (and (builtin:has-env __zoxide_hooked) (builtin:eq (builtin:get-env __zo
 
     # Initialize hook to add directories to zoxide.
 {%- match hook %}
-{%- when Hook::None %}
+{%- when InitHook::None %}
     {{ not_configured }}
-{%- when Hook::Prompt %}
+{%- when InitHook::Prompt %}
     edit:before-readline = [$@edit:before-readline []{ zoxide add -- $pwd }]
-{%- when Hook::Pwd %}
+{%- when InitHook::Pwd %}
     after-chdir = [$@after-chdir [_]{ zoxide add -- $pwd }]
 {%- endmatch %}
 }

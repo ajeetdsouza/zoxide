@@ -8,7 +8,7 @@ mod import;
 mod shell;
 mod util;
 
-use crate::app::Cli;
+use crate::app::App;
 use crate::cmd::Run;
 use crate::error::SilentExit;
 
@@ -23,7 +23,7 @@ pub fn main() {
     env::remove_var("RUST_LIB_BACKTRACE");
     env::remove_var("RUST_BACKTRACE");
 
-    if let Err(e) = Cli::parse().run() {
+    if let Err(e) = App::parse().run() {
         match e.downcast::<SilentExit>() {
             Ok(SilentExit { code }) => process::exit(code),
             Err(e) => {

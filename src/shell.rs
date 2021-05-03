@@ -1,9 +1,9 @@
-use crate::app::Hook;
+use crate::app::InitHook;
 
 #[derive(Debug, Eq, PartialEq)]
 pub struct Opts<'a> {
     pub cmd: Option<&'a str>,
-    pub(crate) hook: Hook,
+    pub hook: InitHook,
     pub echo: bool,
     pub resolve_symlinks: bool,
 }
@@ -51,7 +51,7 @@ mod tests {
     fn opts() -> &'static [Opts<'static>] {
         static OPTS: OnceCell<Vec<Opts>> = OnceCell::new();
         const BOOLS: &[bool] = &[false, true];
-        const HOOKS: &[Hook] = &[Hook::None, Hook::Prompt, Hook::Pwd];
+        const HOOKS: &[InitHook] = &[InitHook::None, InitHook::Prompt, InitHook::Pwd];
         const CMDS: &[Option<&str>] = &[None, Some("z")];
 
         OPTS.get_or_init(|| {
@@ -203,7 +203,7 @@ mod tests {
                         .success()
                         .stderr("");
 
-                    if opts.hook != Hook::Pwd {
+                    if opts.hook != InitHook::Pwd {
                         assert.stdout("");
                     }
                 }
@@ -218,7 +218,7 @@ mod tests {
                         .success()
                         .stderr("");
 
-                    if opts.hook != Hook::Pwd {
+                    if opts.hook != InitHook::Pwd {
                         assert.stdout("");
                     }
                 }
@@ -233,7 +233,7 @@ mod tests {
                         .success()
                         .stderr("");
 
-                    if opts.hook != Hook::Pwd {
+                    if opts.hook != InitHook::Pwd {
                         assert.stdout("");
                     }
                 }

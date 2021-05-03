@@ -34,11 +34,11 @@ end
 if test "$__zoxide_hooked" != 1
     set __zoxide_hooked 1
 {%- match hook %}
-{%- when Hook::None %}
+{%- when InitHook::None %}
     function __zoxide_hook
-{%- when Hook::Prompt %}
+{%- when InitHook::Prompt %}
     function __zoxide_hook --on-event fish_prompt
-{%- when Hook::Pwd %}
+{%- when InitHook::Pwd %}
     function __zoxide_hook --on-variable PWD
 {%- endmatch %}
         command zoxide add -- (__zoxide_pwd)

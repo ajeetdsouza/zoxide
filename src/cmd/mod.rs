@@ -4,7 +4,7 @@ mod init;
 mod query;
 mod remove;
 
-use crate::app::Cli;
+use crate::app::App;
 
 use anyhow::Result;
 
@@ -12,14 +12,14 @@ pub trait Run {
     fn run(&self) -> Result<()>;
 }
 
-impl Run for Cli {
+impl Run for App {
     fn run(&self) -> Result<()> {
         match self {
-            Cli::Add(cmd) => cmd.run(),
-            Cli::Import(cmd) => cmd.run(),
-            Cli::Init(cmd) => cmd.run(),
-            Cli::Query(cmd) => cmd.run(),
-            Cli::Remove(cmd) => cmd.run(),
+            App::Add(cmd) => cmd.run(),
+            App::Import(cmd) => cmd.run(),
+            App::Init(cmd) => cmd.run(),
+            App::Query(cmd) => cmd.run(),
+            App::Remove(cmd) => cmd.run(),
         }
     }
 }

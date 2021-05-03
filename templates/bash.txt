@@ -30,17 +30,17 @@ function __zoxide_cd() {
 
 # Hook to add new entries to the database.
 {%- match hook %}
-{%- when Hook::None %}
+{%- when InitHook::None %}
 {{ not_configured }}
 
-{%- when Hook::Prompt %}
+{%- when InitHook::Prompt %}
 function __zoxide_hook() {
     \builtin local -r __zoxide_retval="$?"
     zoxide add -- "$(__zoxide_pwd)"
     return "${__zoxide_retval}"
 }
 
-{%- when Hook::Pwd %}
+{%- when InitHook::Pwd %}
 function __zoxide_hook() {
     \builtin local -r __zoxide_retval="$?"
     \builtin local -r __zoxide_pwd_tmp="$(__zoxide_pwd)"
@@ -62,7 +62,7 @@ function __zoxide_hook() {
 # Initialize hook.
 if [ "${__zoxide_hooked}" != '1' ]; then
     __zoxide_hooked='1'
-{%- if hook == Hook::None %}
+{%- if hook == InitHook::None %}
     {{ not_configured }}
 {%- else %}
     PROMPT_COMMAND="__zoxide_hook;${PROMPT_COMMAND:+${PROMPT_COMMAND}}"

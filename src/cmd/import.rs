@@ -1,5 +1,5 @@
 use super::Run;
-use crate::app::{From, Import};
+use crate::app::{Import, ImportFrom};
 use crate::config;
 use crate::import::{Autojump, Import as _, Z};
 use crate::util;
@@ -19,12 +19,12 @@ impl Run for Import {
 
         let resolve_symlinks = config::zo_resolve_symlinks();
         match self.from {
-            From::Autojump => Autojump {
+            ImportFrom::Autojump => Autojump {
                 resolve_symlinks,
                 now: util::current_time()?,
             }
             .import(&mut db, &self.path),
-            From::Z => Z { resolve_symlinks }.import(&mut db, &self.path),
+            ImportFrom::Z => Z { resolve_symlinks }.import(&mut db, &self.path),
         }
     }
 }

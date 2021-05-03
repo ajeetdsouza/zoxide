@@ -1,5 +1,5 @@
 use super::Run;
-use crate::app::{Init, Shell};
+use crate::app::{Init, InitShell};
 use crate::config;
 use crate::error::WriteErrorHandler;
 use crate::shell::{self, Opts};
@@ -28,14 +28,14 @@ impl Run for Init {
         };
 
         let source = match self.shell {
-            Shell::Bash => shell::Bash(opts).render(),
-            Shell::Elvish => shell::Elvish(opts).render(),
-            Shell::Fish => shell::Fish(opts).render(),
-            Shell::Nushell => shell::Nushell(opts).render(),
-            Shell::Posix => shell::Posix(opts).render(),
-            Shell::Powershell => shell::Powershell(opts).render(),
-            Shell::Xonsh => shell::Xonsh(opts).render(),
-            Shell::Zsh => shell::Zsh(opts).render(),
+            InitShell::Bash => shell::Bash(opts).render(),
+            InitShell::Elvish => shell::Elvish(opts).render(),
+            InitShell::Fish => shell::Fish(opts).render(),
+            InitShell::Nushell => shell::Nushell(opts).render(),
+            InitShell::Posix => shell::Posix(opts).render(),
+            InitShell::Powershell => shell::Powershell(opts).render(),
+            InitShell::Xonsh => shell::Xonsh(opts).render(),
+            InitShell::Zsh => shell::Zsh(opts).render(),
         }
         .context("could not render template")?;
         writeln!(io::stdout(), "{}", source).wrap_write("stdout")

@@ -26,15 +26,15 @@ __zoxide_cd() {
 
 # Hook to add new entries to the database.
 {%- match hook %}
-{%- when Hook::None %}
+{%- when InitHook::None %}
 {{ not_configured }}
 
-{%- when Hook::Prompt %}
+{%- when InitHook::Prompt %}
 __zoxide_hook() {
     zoxide add -- "$(__zoxide_pwd)"
 }
 
-{%- when Hook::Pwd %}
+{%- when InitHook::Pwd %}
 {{ not_configured }}
 
 {%- endmatch %}
@@ -43,11 +43,11 @@ __zoxide_hook() {
 if [ "${__zoxide_hooked}" != '1' ]; then
     __zoxide_hooked='1'
 {%- match hook %}
-{%- when Hook::None %}
+{%- when InitHook::None %}
     {{ not_configured }}
-{%- when Hook::Prompt %}
+{%- when InitHook::Prompt %}
     PS1="${PS1}\$(__zoxide_hook)"
-{%- when Hook::Pwd %}
+{%- when InitHook::Pwd %}
     \printf "%s\n%s\n" \
         "zoxide: PWD hooks are not supported on POSIX shells." \
         "        Use 'zoxide init posix --hook prompt' instead."

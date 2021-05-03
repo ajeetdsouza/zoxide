@@ -17,15 +17,15 @@ def __zoxide_prompt [] {
 
 # Hook to add new entries to the database.
 {%- match hook %}
-{%- when Hook::None %}
+{%- when InitHook::None %}
 def __zoxide_hook [] {}
 
-{%- when Hook::Prompt %}
+{%- when InitHook::Prompt %}
 def __zoxide_hook [] {
     shells | where active == $true && name == filesystem | get path | each { zoxide add -- $it }
 }
 
-{%- when Hook::Pwd %}
+{%- when InitHook::Pwd %}
 def __zoxide_hook [] {}
 
 printf "zoxide: PWD hooks are not supported on Nushell.\n        Use 'zoxide init nushell --hook prompt' instead.\n"

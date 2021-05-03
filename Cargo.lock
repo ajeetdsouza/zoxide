@@ -167,6 +167,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "clap_generate"
+version = "3.0.0-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "adf420f8b687b628d2915ccfd43a660c437a170432e3fbcb66944e8717a0d68f"
+dependencies = [
+ "clap",
+]
+
+[[package]]
 name = "difference"
 version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -741,6 +750,7 @@ dependencies = [
  "assert_cmd",
  "bincode",
  "clap",
+ "clap_generate",
  "dirs-next",
  "dunce",
  "glob",

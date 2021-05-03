@@ -1,20 +1,12 @@
-use super::Cmd;
+use super::Run;
+use crate::app::Add;
 use crate::config;
 use crate::db::DatabaseFile;
 use crate::util;
 
 use anyhow::{bail, Result};
-use clap::Clap;
 
-use std::path::PathBuf;
-
-/// Add a new directory or increment its rank
-#[derive(Clap, Debug)]
-pub struct Add {
-    path: PathBuf,
-}
-
-impl Cmd for Add {
+impl Run for Add {
     fn run(&self) -> Result<()> {
         let path = if config::zo_resolve_symlinks() {
             util::canonicalize(&self.path)

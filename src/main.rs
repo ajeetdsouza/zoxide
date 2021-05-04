@@ -4,7 +4,6 @@ mod config;
 mod db;
 mod error;
 mod fzf;
-mod import;
 mod shell;
 mod util;
 

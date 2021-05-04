@@ -10,7 +10,7 @@ use std::fs;
 use std::ops::{Deref, DerefMut};
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct DirList<'a>(#[serde(borrow)] Vec<Dir<'a>>);
+pub struct DirList<'a>(#[serde(borrow)] pub Vec<Dir<'a>>);
 
 impl DirList<'_> {
     const VERSION: u32 = 3;
@@ -86,7 +86,7 @@ impl<'a> From<Vec<Dir<'a>>> for DirList<'a> {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Dir<'a> {
     #[serde(borrow)]
     pub path: Cow<'a, str>,

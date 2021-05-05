@@ -1,4 +1,6 @@
-use std::path::Path;
+use crate::util;
+
+use std::path;
 
 pub struct Query(Vec<String>);
 
@@ -8,28 +10,31 @@ impl Query {
         I: IntoIterator<Item = S>,
         S: AsRef<str>,
     {
-        Query(keywords.into_iter().map(to_lowercase).collect())
+        Query(keywords.into_iter().map(util::to_lowercase).collect())
     }
 
     pub fn matches<S: AsRef<str>>(&self, path: S) -> bool {
         let keywords = &self.0;
-        let keywords_last = match keywords.last() {
-            Some(keyword) => keyword,
+        let (keywords_last, keywords) = match keywords.split_last() {
+            Some(split) => split,
             None => return true,
         };
 
-        let path = to_lowercase(path);
-
-        let query_name = get_filename(keywords_last);
-        let dir_name = get_filename(&path);
-        if !dir_name.contains(query_name) {
-            return false;
+        let path = util::to_lowercase(path);
+        let mut subpath = path.as_str();
+        match subpath.rfind(keywords_last) {
+            Some(idx) => {
+                if subpath[idx + keywords_last.len()..].contains(path::is_separator) {
+                    return false;
+                }
+                subpath = &subpath[..idx];
+            }
+            None => return false,
         }
 
-        let mut subpath = path.as_str();
-        for keyword in keywords.iter() {
-            match subpath.find(keyword) {
-                Some(idx) => subpath = &subpath[idx + keyword.len()..],
+        for keyword in keywords.iter().rev() {
+            match subpath.rfind(keyword) {
+                Some(idx) => subpath = &subpath[..idx],
                 None => return false,
             }
         }
@@ -38,79 +43,36 @@ impl Query {
     }
 }
 
-fn get_filename(mut path: &str) -> &str {
-    if cfg!(windows) {
-        Path::new(path)
-            .file_name()
-            .unwrap_or_default()
-            .to_str()
-            .unwrap_or_default()
-    } else {
-        if path.ends_with('/') {
-            path = &path[..path.len() - 1];
-        }
-        match path.rfind('/') {
-            Some(idx) => &path[idx + 1..],
-            None => path,
-        }
-    }
-}
-
-fn to_lowercase<S: AsRef<str>>(s: S) -> String {
-    let s = s.as_ref();
-    if s.is_ascii() {
-        s.to_ascii_lowercase()
-    } else {
-        s.to_lowercase()
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::Query;
 
     #[test]
-    fn query_normalization() {
-        assert!(Query::new(&["fOo", "bAr"]).matches("/foo/bar"));
-    }
+    fn query() {
+        const CASES: &[(&[&str], &str, bool)] = &[
+            // Case normalization
+            (&["fOo", "bAr"], "/foo/bar", true),
+            // Last component
+            (&["ba"], "/foo/bar", true),
+            (&["fo"], "/foo/bar", false),
+            // Slash as suffix
+            (&["foo/"], "/foo", false),
+            (&["foo/"], "/foo/bar", true),
+            (&["foo/"], "/foo/bar/baz", false),
+            (&["foo", "/"], "/foo", false),
+            (&["foo", "/"], "/foo/bar", true),
+            (&["foo", "/"], "/foo/bar/baz", true),
+            // Split components
+            (&["/", "fo", "/", "ar"], "/foo/bar", true),
+            (&["oo/ba"], "/foo/bar", true),
+            // Overlap
+            (&["foo", "o", "bar"], "/foo/bar", false),
+            (&["/foo/", "/bar"], "/foo/bar", false),
+            (&["/foo/", "/bar"], "/foo/baz/bar", true),
+        ];
 
-    #[test]
-    fn query_filename() {
-        assert!(Query::new(&["ba"]).matches("/foo/bar"));
-    }
-
-    #[test]
-    fn query_not_filename() {
-        assert!(!Query::new(&["fo"]).matches("/foo/bar"));
-    }
-
-    #[test]
-    fn query_not_filename_slash() {
-        assert!(!Query::new(&["foo/"]).matches("/foo/bar"));
-    }
-
-    #[test]
-    fn query_path_separator() {
-        assert!(Query::new(&["/", "fo", "/", "ar"]).matches("/foo/bar"));
-    }
-
-    #[test]
-    fn query_path_separator_between() {
-        assert!(Query::new(&["oo/ba"]).matches("/foo/bar"));
-    }
-
-    #[test]
-    fn query_overlap_text() {
-        assert!(!Query::new(&["foo", "o", "bar"]).matches("/foo/bar"));
-    }
-
-    #[test]
-    fn query_overlap_slash() {
-        assert!(!Query::new(&["/foo/", "/bar"]).matches("/foo/bar"));
-    }
-
-    #[test]
-    fn query_consecutive_slash() {
-        assert!(Query::new(&["/foo/", "/baz"]).matches("/foo/bar/baz"));
+        for &(keywords, path, is_match) in CASES {
+            assert_eq!(is_match, Query::new(keywords).matches(path))
+        }
     }
 }

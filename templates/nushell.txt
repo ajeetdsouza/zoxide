@@ -1,5 +1,6 @@
 {%- let section = "# =============================================================================\n#" -%}
 {%- let not_configured = "# -- not configured --" -%}
+{%- let newline = "{{$(char newline)}}" -%}
 
 {{ section }}
 # Utility functions for zoxide.
@@ -27,9 +28,7 @@ def __zoxide_hook [] {
 
 {%- when InitHook::Pwd %}
 def __zoxide_hook [] {}
-
-printf "zoxide: PWD hooks are not supported on Nushell.\n        Use 'zoxide init nushell --hook prompt' instead.\n"
-
+echo `zoxide: PWD hooks are not supported on Nushell.{{ newline }}        Use 'zoxide init nushell --hook prompt' instead.{{ newline }}`
 {%- endmatch %}
 
 {{ section }}
@@ -39,37 +38,52 @@ printf "zoxide: PWD hooks are not supported on Nushell.\n        Use 'zoxide ini
 
 # Jump to a directory using only keywords.
 def __zoxide_z [...rest:string] {
-    if $(echo $rest | length) == 1 {
-        cd ~
-    } {
-        let args = $(echo $rest | skip 1);
-        if $(echo $args | length) == 1 {
-            let arg0 = $(echo $args | first 1);
-            if $arg0 == '-' {
-                cd -
-            } {
-                if $(echo $arg0 | path exists) {
-                    cd $arg0
-                } {
-                    cd $(zoxide query --exclude $(pwd) -- $args | str trim)
-                }
-            }
+    let args = $(echo $rest | skip 1);
+    if $(shells | where active == $true | get name) != filesystem {
+        if $(echo $args | length) > 1 {
+            echo `zoxide: can only jump directories on filesystem{{ newline }}`
         } {
-            cd $(zoxide query --exclude $(pwd) -- $args | str trim)
-        }
-    }
+            cd $(echo $args)
 {%- if echo %}
-    echo $(pwd)
+            pwd
 {%- endif %}
+        }
+    } {
+        if $(echo $args | length) == 0 {
+            cd ~
+        } {
+            if $(echo $args | length) == 1 {
+                let arg0 = $(echo $args | first 1);
+                if $arg0 == '-' {
+                    cd -
+                } {
+                    if $(echo $arg0 | path exists) {
+                        cd $arg0
+                    } {
+                        cd $(zoxide query --exclude $(pwd) -- $args | str trim)
+                    }
+                }
+            } {
+                cd $(zoxide query --exclude $(pwd) -- $args | str trim)
+            }
+        }
+{%- if echo %}
+        pwd
+{%- endif %}
+    }
 }
 
 # Jump to a directory using interactive search.
 def __zoxide_zi  [...rest:string] {
-    let args = $(echo $rest | skip 1)
-    cd $(zoxide query -i -- $args | str trim)
+    if $(shells | where active == $true | get name) != filesystem {
+        echo `zoxide: can only jump directories on filesystem{{ newline }}`
+    } {
+        let args = $(echo $rest | skip 1)
+        cd $(zoxide query -i -- $args | str trim)
 {%- if echo %}
-    echo $(pwd)
+        pwd
 {%- endif %}
+    }
 }
 
 {{ section }}

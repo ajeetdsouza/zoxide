@@ -149,3 +149,13 @@ pub fn resolve_path<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
 
     Ok(stack.iter().collect())
 }
+
+// Convert a string to lowercase, with a fast path for ASCII strings.
+pub fn to_lowercase<S: AsRef<str>>(s: S) -> String {
+    let s = s.as_ref();
+    if s.is_ascii() {
+        s.to_ascii_lowercase()
+    } else {
+        s.to_lowercase()
+    }
+}

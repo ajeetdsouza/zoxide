@@ -14,14 +14,14 @@ impl Run for Import {
         let data_dir = config::zo_data_dir()?;
 
         let mut db = DatabaseFile::new(data_dir);
-        let mut db = db.open()?;
+        let db = &mut db.open()?;
         if !self.merge && !db.dirs.is_empty() {
             bail!("current database is not empty, specify --merge to continue anyway");
         }
 
         match self.from {
-            ImportFrom::Autojump => from_autojump(&mut db, &self.path),
-            ImportFrom::Z => from_z(&mut db, &self.path),
+            ImportFrom::Autojump => from_autojump(db, &self.path),
+            ImportFrom::Z => from_z(db, &self.path),
         }
         .context("import error")
     }

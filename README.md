@@ -1,6 +1,6 @@
 # `zoxide`
 
-> A smarter cd command
+> A smarter cd command for your terminal
 
 [![crates.io][crates.io-badge]][crates.io]
 

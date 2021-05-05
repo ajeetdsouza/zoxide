@@ -107,7 +107,6 @@ impl<'a> Database<'a> {
 
             for idx in (0..self.dirs.len()).rev() {
                 let dir = &mut self.dirs[idx];
-
                 dir.rank *= factor;
                 if dir.rank < 1.0 {
                     self.dirs.swap_remove(idx);

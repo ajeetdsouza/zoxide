@@ -19,9 +19,8 @@ fn crate_version() -> String {
 }
 
 fn generate_completions() {
-    mod app {
-        include!("src/app.rs");
-    }
+    #[path = "src/app/_app.rs"]
+    mod app;
 
     use app::App;
     use clap::IntoApp;

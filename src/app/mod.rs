@@ -1,10 +1,11 @@
+mod _app;
 mod add;
 mod import;
 mod init;
 mod query;
 mod remove;
 
-use crate::app::App;
+pub use crate::app::_app::*;
 
 use anyhow::Result;
 

@@ -38,6 +38,6 @@ impl Run for Init {
             InitShell::Zsh => shell::Zsh(opts).render(),
         }
         .context("could not render template")?;
-        writeln!(io::stdout(), "{}", source).wrap_write("stdout")
+        writeln!(io::stdout(), "{}", source).pipe_exit("stdout")
     }
 }

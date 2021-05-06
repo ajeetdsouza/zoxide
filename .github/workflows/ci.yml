@@ -20,7 +20,5 @@ jobs:
       - uses: cachix/install-nix-action@v12
         if: ${{ matrix.os != 'windows-latest' }}
         with:
-          nix_path: nixpkgs=channel:nixos-stable
-      - run: mkdir -p /tmp/home && make test
-        env:
-          HOME: /tmp/home
+          nix_path: nixpkgs=https://github.com/NixOS/nixpkgs/archive/20.09.tar.gz
+      - run: make test

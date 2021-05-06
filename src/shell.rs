@@ -60,13 +60,12 @@ mod tests {
                 for &resolve_symlinks in BOOLS {
                     for &hook in HOOKS {
                         for &cmd in CMDS {
-                            let opt = Opts {
+                            opts.push(Opts {
                                 cmd,
                                 hook,
                                 echo,
                                 resolve_symlinks,
-                            };
-                            opts.push(opt);
+                            });
                         }
                     }
                 }
@@ -84,7 +83,7 @@ mod tests {
         })
     }
 
-    macro_rules! generate_tests {
+    macro_rules! make_tests {
         ($N:literal) => {
             seq!(i in 0..$N {
                 #[test]
@@ -92,7 +91,7 @@ mod tests {
                     let opts = dbg!(&opts()[i]);
                     let source = Bash(opts).render().unwrap();
                     Command::new("bash")
-                        .args(&["-c", &source, "--noediting", "--noprofile", "--norc"])
+                        .args(&["--noprofile", "--norc", "-c", &source])
                         .assert()
                         .success()
                         .stdout("")
@@ -213,7 +212,7 @@ mod tests {
                     let opts = dbg!(&opts()[i]);
                     let source = Posix(opts).render().unwrap();
                     let assert = Command::new("bash")
-                        .args(&["--posix", "-c", &source, "--noediting", "--noprofile", "--norc"])
+                        .args(&["--posix", "--noprofile", "--norc", "-c", &source])
                         .assert()
                         .success()
                         .stderr("");
@@ -256,7 +255,6 @@ mod tests {
                     let opts = dbg!(&opts()[i]);
                     let mut source = Posix(opts).render().unwrap();
                     source.push('\n');
-
                     Command::new("shfmt")
                         .args(&["-d", "-s", "-ln", "posix", "-i", "4", "-ci", "-"])
                         .write_stdin(source)
@@ -271,7 +269,7 @@ mod tests {
                 let opts = dbg!(&opts()[i]);
                     let source = Powershell(opts).render().unwrap();
                     Command::new("pwsh")
-                        .args(&["-Command", &source, "-NoLogo", "-NonInteractive", "-NoProfile"])
+                        .args(&["-NoLogo", "-NonInteractive", "-NoProfile", "-Command", &source])
                         .assert()
                         .success()
                         .stdout("")
@@ -316,14 +314,19 @@ mod tests {
                 }
 
                 #[test]
-                // Xonsh complains about type-hinting here, although it works fine in practice.
-                // <https://github.com/xonsh/xonsh/issues/3959>
-                #[ignore]
                 fn xonsh_xonsh_#i() {
                     let opts = dbg!(&opts()[i]);
                     let source = Xonsh(opts).render().unwrap();
+
+                    // We can't pass the source directly to `xonsh -c` due to
+                    // a bug: <https://github.com/xonsh/xonsh/issues/3959>
                     Command::new("xonsh")
-                        .args(&["-c", &source, "--no-rc"])
+                        .args(&[
+                            "-c",
+                            "import sys; execx(sys.stdin.read(), 'exec', __xonsh__.ctx, filename='zoxide')",
+                            "--no-rc"
+                        ])
+                        .write_stdin(source.as_bytes())
                         .assert()
                         .success()
                         .stdout("")
@@ -360,5 +363,5 @@ mod tests {
         }
     }
 
-    with_opts_size!(generate_tests);
+    with_opts_size!(make_tests);
 }

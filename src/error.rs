@@ -16,11 +16,11 @@ impl Display for SilentExit {
 }
 
 pub trait WriteErrorHandler {
-    fn wrap_write(self, device: &str) -> Result<()>;
+    fn pipe_exit(self, device: &str) -> Result<()>;
 }
 
 impl WriteErrorHandler for io::Result<()> {
-    fn wrap_write(self, device: &str) -> Result<()> {
+    fn pipe_exit(self, device: &str) -> Result<()> {
         match self {
             Err(e) if e.kind() == io::ErrorKind::BrokenPipe => bail!(SilentExit { code: 0 }),
             result => result.with_context(|| format!("could not write to {}", device)),

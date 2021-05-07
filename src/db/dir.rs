@@ -1,12 +1,9 @@
-use super::Query;
-
 use anyhow::{bail, Context, Result};
 use bincode::Options as _;
 use serde::{Deserialize, Serialize};
 
 use std::borrow::Cow;
 use std::fmt::{self, Display, Formatter};
-use std::fs;
 use std::ops::{Deref, DerefMut};
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -95,16 +92,6 @@ pub struct Dir<'a> {
 }
 
 impl Dir<'_> {
-    pub fn is_match(&self, query: &Query, resolve_symlinks: bool) -> bool {
-        let resolver = if resolve_symlinks {
-            fs::symlink_metadata
-        } else {
-            fs::metadata
-        };
-        let path = self.path.as_ref();
-        query.matches(path) && resolver(path).map(|m| m.is_dir()).unwrap_or(false)
-    }
-
     pub fn score(&self, now: Epoch) -> Rank {
         const HOUR: Epoch = 60 * 60;
         const DAY: Epoch = 24 * HOUR;

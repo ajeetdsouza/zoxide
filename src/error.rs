@@ -15,11 +15,11 @@ impl Display for SilentExit {
     }
 }
 
-pub trait WriteErrorHandler {
+pub trait BrokenPipeHandler {
     fn pipe_exit(self, device: &str) -> Result<()>;
 }
 
-impl WriteErrorHandler for io::Result<()> {
+impl BrokenPipeHandler for io::Result<()> {
     fn pipe_exit(self, device: &str) -> Result<()> {
         match self {
             Err(e) if e.kind() == io::ErrorKind::BrokenPipe => bail!(SilentExit { code: 0 }),

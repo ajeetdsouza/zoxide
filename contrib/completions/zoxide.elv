@@ -44,6 +44,7 @@ edit:completion:arg-completer[zoxide] = [@words]{
         }
         &'zoxide;query'= {
             cand --exclude 'Exclude a path from results'
+            cand --all 'Show deleted directories'
             cand -i 'Use interactive selection'
             cand --interactive 'Use interactive selection'
             cand -l 'List all matching directories'

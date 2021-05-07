@@ -53,6 +53,7 @@ Register-ArgumentCompleter -Native -CommandName 'zoxide' -ScriptBlock {
         }
         'zoxide;query' {
             [CompletionResult]::new('--exclude', 'exclude', [CompletionResultType]::ParameterName, 'Exclude a path from results')
+            [CompletionResult]::new('--all', 'all', [CompletionResultType]::ParameterName, 'Show deleted directories')
             [CompletionResult]::new('-i', 'i', [CompletionResultType]::ParameterName, 'Use interactive selection')
             [CompletionResult]::new('--interactive', 'interactive', [CompletionResultType]::ParameterName, 'Use interactive selection')
             [CompletionResult]::new('-l', 'l', [CompletionResultType]::ParameterName, 'List all matching directories')

@@ -1,5 +1,4 @@
-use super::Run;
-use crate::app::{Import, ImportFrom};
+use crate::app::{Import, ImportFrom, Run};
 use crate::config;
 use crate::db::{Database, DatabaseFile, Dir, DirList};
 

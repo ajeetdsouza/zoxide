@@ -2,7 +2,7 @@ mod dir;
 mod query;
 
 pub use dir::{Dir, DirList, Epoch, Rank};
-pub use query::Query;
+pub use query::Matcher;
 
 use anyhow::{Context, Result};
 use ordered_float::OrderedFloat;
@@ -72,17 +72,12 @@ impl<'a> Database<'a> {
         self.modified = true;
     }
 
-    pub fn iter_matches<'b>(
-        &'b mut self,
-        query: &'b Query,
-        now: Epoch,
-        resolve_symlinks: bool,
-    ) -> impl DoubleEndedIterator<Item = &'b Dir> {
+    pub fn iter<'i>(&'i mut self, m: &'i Matcher, now: Epoch) -> impl Iterator<Item = &'i Dir> {
         self.dirs
             .sort_unstable_by_key(|dir| Reverse(OrderedFloat(dir.score(now))));
         self.dirs
             .iter()
-            .filter(move |dir| dir.is_match(&query, resolve_symlinks))
+            .filter(move |dir| m.matches(dir.path.as_ref()))
     }
 
     /// Removes the directory with `path` from the store.

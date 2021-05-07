@@ -57,6 +57,7 @@ _arguments "${_arguments_options[@]}" \
 (query)
 _arguments "${_arguments_options[@]}" \
 '--exclude=[Exclude a path from results]' \
+'--all[Show deleted directories]' \
 '(-l --list)-i[Use interactive selection]' \
 '(-l --list)--interactive[Use interactive selection]' \
 '(-i --interactive)-l[List all matching directories]' \

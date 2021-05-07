@@ -1,8 +1,7 @@
-use super::Run;
-use crate::app::Query;
+use crate::app::{Query, Run};
 use crate::config;
-use crate::db::{self, DatabaseFile};
-use crate::error::WriteErrorHandler;
+use crate::db::{DatabaseFile, Matcher};
+use crate::error::BrokenPipeHandler;
 use crate::fzf::Fzf;
 use crate::util;
 
@@ -15,13 +14,16 @@ impl Run for Query {
         let data_dir = config::zo_data_dir()?;
         let mut db = DatabaseFile::new(data_dir);
         let mut db = db.open()?;
-
-        let query = db::Query::new(&self.keywords);
         let now = util::current_time()?;
 
-        let resolve_symlinks = config::zo_resolve_symlinks();
+        let mut matcher = Matcher::new().with_keywords(&self.keywords);
+        if !self.all {
+            let resolve_symlinks = config::zo_resolve_symlinks();
+            matcher = matcher.with_exists(resolve_symlinks);
+        }
+
         let mut matches = db
-            .iter_matches(&query, now, resolve_symlinks)
+            .iter(&matcher, now)
             .filter(|dir| Some(dir.path.as_ref()) != self.exclude.as_deref());
 
         if self.interactive {

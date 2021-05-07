@@ -3,6 +3,7 @@ use crate::error::SilentExit;
 
 use anyhow::{bail, Context, Result};
 
+use std::io;
 use std::process::{Child, ChildStdin, Command, Stdio};
 
 pub struct Fzf {
@@ -23,9 +24,15 @@ impl Fzf {
             command.env("FZF_DEFAULT_OPTS", fzf_opts);
         }
 
-        Ok(Fzf {
-            child: command.spawn().context("could not launch fzf")?,
-        })
+        let child = match command.spawn() {
+            Ok(child) => child,
+            Err(e) if e.kind() == io::ErrorKind::NotFound => {
+                bail!("could not find fzf, is it installed?")
+            }
+            Err(e) => Err(e).context("could not launch fzf")?,
+        };
+
+        Ok(Fzf { child })
     }
 
     pub fn stdin(&mut self) -> &mut ChildStdin {

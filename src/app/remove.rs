@@ -25,7 +25,7 @@ impl Run for Remove {
 
                 let mut fzf = Fzf::new(true)?;
                 for dir in db.iter_matches(&query, now, resolve_symlinks) {
-                    writeln!(fzf.stdin(), "{}", dir.display_score(now)).wrap_write("fzf")?;
+                    writeln!(fzf.stdin(), "{}", dir.display_score(now)).pipe_exit("fzf")?;
                 }
 
                 selection = fzf.wait_select()?;

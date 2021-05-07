@@ -27,7 +27,7 @@ impl Run for Query {
         if self.interactive {
             let mut fzf = Fzf::new(false)?;
             for dir in matches {
-                writeln!(fzf.stdin(), "{}", dir.display_score(now)).wrap_write("fzf")?;
+                writeln!(fzf.stdin(), "{}", dir.display_score(now)).pipe_exit("fzf")?;
             }
 
             let selection = fzf.wait_select()?;
@@ -53,9 +53,9 @@ impl Run for Query {
                 } else {
                     writeln!(handle, "{}", dir.display())
                 }
-                .wrap_write("stdout")?;
+                .pipe_exit("stdout")?;
             }
-            handle.flush().wrap_write("stdout")?;
+            handle.flush().pipe_exit("stdout")?;
         } else {
             let dir = matches.next().context("no match found")?;
             if self.score {
@@ -63,7 +63,7 @@ impl Run for Query {
             } else {
                 writeln!(io::stdout(), "{}", dir.display())
             }
-            .wrap_write("stdout")?;
+            .pipe_exit("stdout")?;
         }
 
         Ok(())

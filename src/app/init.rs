@@ -1,7 +1,6 @@
-use super::Run;
-use crate::app::{Init, InitShell};
+use crate::app::{Init, InitShell, Run};
 use crate::config;
-use crate::error::WriteErrorHandler;
+use crate::error::BrokenPipeHandler;
 use crate::shell::{self, Opts};
 
 use anyhow::{Context, Result};

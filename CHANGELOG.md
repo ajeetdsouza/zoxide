@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Auto-generated shell completions.
+- `zoxide query --all` for listing deleted directories.
 
 ### Fixed
 

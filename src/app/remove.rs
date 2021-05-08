@@ -1,8 +1,7 @@
-use super::Run;
-use crate::app::Remove;
+use crate::app::{Remove, Run};
 use crate::config;
-use crate::db::{DatabaseFile, Query};
-use crate::error::WriteErrorHandler;
+use crate::db::{DatabaseFile, Matcher};
+use crate::error::BrokenPipeHandler;
 use crate::fzf::Fzf;
 use crate::util;
 
@@ -19,12 +18,11 @@ impl Run for Remove {
         let selection;
         match &self.interactive {
             Some(keywords) => {
-                let query = Query::new(keywords);
+                let matcher = Matcher::new().with_keywords(keywords);
                 let now = util::current_time()?;
-                let resolve_symlinks = config::zo_resolve_symlinks();
 
                 let mut fzf = Fzf::new(true)?;
-                for dir in db.iter_matches(&query, now, resolve_symlinks) {
+                for dir in db.iter(&matcher, now) {
                     writeln!(fzf.stdin(), "{}", dir.display_score(now)).pipe_exit("fzf")?;
                 }
 

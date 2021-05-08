@@ -18,6 +18,7 @@ complete -c zoxide -n "__fish_seen_subcommand_from init" -l no-aliases -d 'Preve
 complete -c zoxide -n "__fish_seen_subcommand_from init" -s h -l help -d 'Prints help information'
 complete -c zoxide -n "__fish_seen_subcommand_from query" -r
 complete -c zoxide -n "__fish_seen_subcommand_from query" -l exclude -d 'Exclude a path from results' -r
+complete -c zoxide -n "__fish_seen_subcommand_from query" -l all -d 'Show deleted directories'
 complete -c zoxide -n "__fish_seen_subcommand_from query" -s i -l interactive -d 'Use interactive selection'
 complete -c zoxide -n "__fish_seen_subcommand_from query" -s l -l list -d 'List all matching directories'
 complete -c zoxide -n "__fish_seen_subcommand_from query" -s s -l score -d 'Print score with results'

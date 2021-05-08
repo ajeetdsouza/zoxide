@@ -1,5 +1,4 @@
-use super::Run;
-use crate::app::Add;
+use crate::app::{Add, Run};
 use crate::config;
 use crate::db::DatabaseFile;
 use crate::util;

@@ -5,6 +5,21 @@
 # Utility functions for zoxide.
 #
 
+# provide a custom __fish_cd function that is either a copy of the default fish 
+# cd wrapper function, or an alias for the `builtin cd` to prevent recursively 
+# calling cd when using `alias cd=z`.
+#
+# only create the function `__fish_cd` if it doesn't yet exist
+if ! functions -q __fish_cd
+    if functions -q cd
+        # use the fish wrapper function for __fish_cd if it exists
+        functions -c cd __fish_cd
+    else
+        # use `builtin cd` as fallback if the cd wrapper function does not exist
+        alias __fish_cd="builtin cd"
+    end
+end
+
 # pwd based on the value of _ZO_RESOLVE_SYMLINKS.
 function __zoxide_pwd
 {%- if resolve_symlinks %}
@@ -18,8 +33,9 @@ end
 function __zoxide_cd
 {#- We can't use `builtin cd` over here, because fish wraps its builtin cd with
   a function that adds extra features (such as `cd -`). Using the builtin
-  would make those features stop working. #}
-    cd $argv
+  would make those features stop working. Instead use a custom function that is 
+  either a copy of the cd function or an alias for `builtin cd` as fallback #}
+    __fish_cd $argv
 {%- if echo %}
     and __zoxide_pwd
 {%- endif %}

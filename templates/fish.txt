@@ -5,13 +5,6 @@
 # Utility functions for zoxide.
 #
 
-# Remove definitions.
-function __zoxide_unset
-    set --erase $argv >/dev/null 2>&1
-    abbr --erase $argv >/dev/null 2>&1
-    builtin functions --erase $argv >/dev/null 2>&1
-end
-
 # pwd based on the value of _ZO_RESOLVE_SYMLINKS.
 function __zoxide_pwd
 {%- if resolve_symlinks %}
@@ -23,11 +16,12 @@ end
 
 # A copy of fish's internal cd function. This makes it possible to use
 # `alias cd=z` without causing an infinite loop.
-__zoxide_unset __zoxide_cd_internal
-if builtin functions -q cd
-    builtin functions -c cd __zoxide_cd_internal
-else
-    alias __zoxide_cd_internal="builtin cd"
+if ! builtin functions -q __zoxide_cd_internal
+    if builtin functions -q cd
+        builtin functions -c cd __zoxide_cd_internal
+    else
+        alias __zoxide_cd_internal="builtin cd"
+    end
 end
 
 # cd + custom logic based on the value of _ZO_ECHO.
@@ -92,6 +86,13 @@ end
 
 {%- match cmd %}
 {%- when Some with (cmd) %}
+
+# Remove definitions.
+function __zoxide_unset
+    set --erase $argv >/dev/null 2>&1
+    abbr --erase $argv >/dev/null 2>&1
+    builtin functions --erase $argv >/dev/null 2>&1
+end
 
 __zoxide_unset {{cmd}}
 alias {{cmd}}="__zoxide_z"

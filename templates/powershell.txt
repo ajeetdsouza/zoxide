@@ -5,16 +5,19 @@
 # Utility functions for zoxide.
 #
 
-# pwd based on the value of _ZO_RESOLVE_SYMLINKS.
+# pwd based on zoxide's format.
 function __zoxide_pwd {
-    $(Get-Location).Path
+    $__zoxide_pwd = Get-Location
+    if ($__zoxide_pwd.Provider.Name -eq "FileSystem") {
+        $__zoxide_pwd.ProviderPath
+    }
 }
 
 # cd + custom logic based on the value of _ZO_ECHO.
 function __zoxide_cd($dir) {
     Set-Location $dir -ea Stop
 {%- if echo %}
-    __zoxide_pwd
+    $(Get-Location).Path
 {%- endif %}
 }
 
@@ -24,7 +27,10 @@ function __zoxide_cd($dir) {
 
 # Hook to add new entries to the database.
 function __zoxide_hook {
-    zoxide add -- $(__zoxide_pwd)
+    $__zoxide_result = __zoxide_pwd
+    if ($__zoxide_result -ne $null) {
+        zoxide add -- $__zoxide_result
+    }
 }
 
 # Initialize hook.
@@ -69,7 +75,12 @@ function __zoxide_z {
         __zoxide_cd $args[0]
     }
     else {
-        $__zoxide_result = zoxide query --exclude $(__zoxide_pwd) -- @args
+        $__zoxide_result = __zoxide_pwd
+        if ($__zoxide_result -ne $null) {
+            $__zoxide_result = zoxide query --exclude $__zoxide_result -- @args
+        } else {
+            $__zoxide_result = zoxide query -- @args
+        }
         if ($LASTEXITCODE -eq 0) {
             __zoxide_cd $__zoxide_result
         }

@@ -232,6 +232,7 @@ Be sure to set these before calling `zoxide init`.
 
 - [nnn], via [autojump plugin][nnn-autojump]
 - [xxh], via [xxh-plugin-prerun-zoxide]
+- [vim], via [zoxide.vim]
 
 [algorithm-aging]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#aging
 [algorithm-matching]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#matching
@@ -262,7 +263,9 @@ Be sure to set these before calling `zoxide init`.
 [tutorial]: contrib/tutorial.webp
 [ubuntu packages]: https://packages.ubuntu.com/hirsute/zoxide
 [void linux packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide
+[vim]: https://github.com/vim/vim
 [xxh-plugin-prerun-zoxide]: https://github.com/xxh/xxh-plugin-prerun-zoxide
 [xxh]: https://github.com/xxh/xxh
 [z.lua]: https://github.com/skywind3000/z.lua
 [z]: https://github.com/rupa/z
+[zoxide.vim]: https://github.com/nanotee/zoxide.vim

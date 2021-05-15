@@ -8,7 +8,7 @@
 [`z`][z] and [`z.lua`][z.lua]. It keeps track of the directories you use most
 frequently, and uses a ranking algorithm to navigate to the best match.
 
-![Demo][demo.gif]
+![Tutorial][tutorial]
 
 ## Examples
 
@@ -241,7 +241,6 @@ Be sure to set these before calling `zoxide init`.
 [crates.io-badge]: https://img.shields.io/crates/v/zoxide
 [crates.io]: https://crates.io/crates/zoxide
 [debian packages]: https://packages.debian.org/testing/admin/zoxide
-[demo.gif]: demo.gif
 [devuan packages]: https://pkginfo.devuan.org/cgi-bin/package-query.html?c=package&q=zoxide
 [dm9pzcaq overlay]: https://github.com/gentoo-mirror/dm9pZCAq
 [dports]: https://github.com/DragonFlyBSD/DPorts/tree/master/sysutils/zoxide
@@ -260,6 +259,7 @@ Be sure to set these before calling `zoxide init`.
 [releases]: https://github.com/ajeetdsouza/zoxide/releases
 [scoop]: https://github.com/ScoopInstaller/Main/tree/master/bucket/zoxide.json
 [termux]: https://github.com/termux/termux-packages/tree/master/packages/zoxide
+[tutorial]: contrib/tutorial.webp
 [ubuntu packages]: https://packages.ubuntu.com/hirsute/zoxide
 [void linux packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide
 [xxh-plugin-prerun-zoxide]: https://github.com/xxh/xxh-plugin-prerun-zoxide

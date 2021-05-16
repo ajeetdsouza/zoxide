@@ -98,6 +98,10 @@ end
 __zoxide_unset {{cmd}}
 alias {{cmd}}="__zoxide_z"
 
+# Add completions.
+complete -c {{cmd}} -f -a '(__fish_complete_directories (commandline -t) "")'
+complete -c {{cmd}} -n "test -n (commandline -t)" -a "(zoxide query -l -- (commandline -t))" -k
+
 __zoxide_unset {{cmd}}i
 alias {{cmd}}i="__zoxide_zi"
 

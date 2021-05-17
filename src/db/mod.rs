@@ -1,26 +1,24 @@
 mod dir;
-mod query;
+mod stream;
 
 pub use dir::{Dir, DirList, Epoch, Rank};
-pub use query::Matcher;
+pub use stream::Stream;
 
 use anyhow::{Context, Result};
-use ordered_float::OrderedFloat;
 use tempfile::{NamedTempFile, PersistError};
 
 use std::borrow::Cow;
-use std::cmp::Reverse;
 use std::fs;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 
-pub struct Database<'a> {
-    pub dirs: DirList<'a>,
+pub struct Database<'file> {
+    pub dirs: DirList<'file>,
     pub modified: bool,
-    data_dir: &'a Path,
+    data_dir: &'file PathBuf,
 }
 
-impl<'a> Database<'a> {
+impl<'file> Database<'file> {
     pub fn save(&mut self) -> Result<()> {
         if !self.modified {
             return Ok(());
@@ -28,10 +26,7 @@ impl<'a> Database<'a> {
 
         let buffer = self.dirs.to_bytes()?;
         let mut file = NamedTempFile::new_in(&self.data_dir).with_context(|| {
-            format!(
-                "could not create temporary database in: {}",
-                self.data_dir.display()
-            )
+            format!("could not create temporary database in: {}", self.data_dir.display())
         })?;
 
         // Preallocate enough space on the file, preventing copying later on.
@@ -39,10 +34,7 @@ impl<'a> Database<'a> {
         // ignore it and proceed.
         let _ = file.as_file().set_len(buffer.len() as _);
         file.write_all(&buffer).with_context(|| {
-            format!(
-                "could not write to temporary database: {}",
-                file.path().display()
-            )
+            format!("could not write to temporary database: {}", file.path().display())
         })?;
 
         let path = db_path(&self.data_dir);
@@ -58,11 +50,9 @@ impl<'a> Database<'a> {
         let path = path.as_ref();
 
         match self.dirs.iter_mut().find(|dir| dir.path == path) {
-            None => self.dirs.push(Dir {
-                path: Cow::Owned(path.into()),
-                last_accessed: now,
-                rank: 1.0,
-            }),
+            None => {
+                self.dirs.push(Dir { path: Cow::Owned(path.into()), last_accessed: now, rank: 1.0 })
+            }
             Some(dir) => {
                 dir.last_accessed = now;
                 dir.rank += 1.0;
@@ -72,12 +62,9 @@ impl<'a> Database<'a> {
         self.modified = true;
     }
 
-    pub fn iter<'i>(&'i mut self, m: &'i Matcher, now: Epoch) -> impl Iterator<Item = &'i Dir> {
-        self.dirs
-            .sort_unstable_by_key(|dir| Reverse(OrderedFloat(dir.score(now))));
-        self.dirs
-            .iter()
-            .filter(move |dir| m.matches(dir.path.as_ref()))
+    // Streaming iterator for directories.
+    pub fn stream(&mut self, now: Epoch) -> Stream<'_, 'file> {
+        Stream::new(self, now)
     }
 
     /// Removes the directory with `path` from the store.
@@ -159,16 +146,13 @@ fn persist<P: AsRef<Path>>(file: NamedTempFile, path: P) -> Result<(), PersistEr
 }
 
 pub struct DatabaseFile {
-    data_dir: PathBuf,
     buffer: Vec<u8>,
+    data_dir: PathBuf,
 }
 
 impl DatabaseFile {
-    pub fn new<P: Into<PathBuf>>(data_dir: P) -> DatabaseFile {
-        DatabaseFile {
-            data_dir: data_dir.into(),
-            buffer: Vec::new(),
-        }
+    pub fn new<P: Into<PathBuf>>(data_dir: P) -> Self {
+        DatabaseFile { buffer: Vec::new(), data_dir: data_dir.into() }
     }
 
     pub fn open(&mut self) -> Result<Database> {
@@ -182,27 +166,16 @@ impl DatabaseFile {
                 let dirs = DirList::from_bytes(&self.buffer).with_context(|| {
                     format!("could not deserialize database: {}", path.display())
                 })?;
-                Ok(Database {
-                    dirs,
-                    modified: false,
-                    data_dir: &self.data_dir,
-                })
+                Ok(Database { dirs, modified: false, data_dir: &self.data_dir })
             }
             Err(e) if e.kind() == io::ErrorKind::NotFound => {
                 // Create data directory, but don't create any file yet.
                 // The file will be created later by [`Database::save`]
                 // if any data is modified.
                 fs::create_dir_all(&self.data_dir).with_context(|| {
-                    format!(
-                        "unable to create data directory: {}",
-                        self.data_dir.display()
-                    )
+                    format!("unable to create data directory: {}", self.data_dir.display())
                 })?;
-                Ok(Database {
-                    dirs: DirList::new(),
-                    modified: false,
-                    data_dir: &self.data_dir,
-                })
+                Ok(Database { dirs: DirList::new(), modified: false, data_dir: &self.data_dir })
             }
             Err(e) => {
                 Err(e).with_context(|| format!("could not read from database: {}", path.display()))
@@ -222,11 +195,7 @@ mod tests {
 
     #[test]
     fn add() {
-        let path = if cfg!(windows) {
-            r"C:\foo\bar"
-        } else {
-            "/foo/bar"
-        };
+        let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
         let now = 946684800;
 
         let data_dir = tempfile::tempdir().unwrap();
@@ -249,11 +218,7 @@ mod tests {
 
     #[test]
     fn remove() {
-        let path = if cfg!(windows) {
-            r"C:\foo\bar"
-        } else {
-            "/foo/bar"
-        };
+        let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
         let now = 946684800;
 
         let data_dir = tempfile::tempdir().unwrap();

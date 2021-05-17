@@ -38,13 +38,7 @@ fn completions_fish() {
 fn completions_powershell() {
     let source = include_str!("../contrib/completions/_zoxide.ps1");
     Command::new("pwsh")
-        .args(&[
-            "-NoLogo",
-            "-NonInteractive",
-            "-NoProfile",
-            "-Command",
-            source,
-        ])
+        .args(&["-NoLogo", "-NonInteractive", "-NoProfile", "-Command", source])
         .assert()
         .success()
         .stdout("")
@@ -62,10 +56,5 @@ fn completions_zsh() {
     compinit -u
     "#;
 
-    Command::new("zsh")
-        .args(&["-c", source, "--no-rcs"])
-        .assert()
-        .success()
-        .stdout("")
-        .stderr("");
+    Command::new("zsh").args(&["-c", source, "--no-rcs"]).assert().success().stdout("").stderr("");
 }

@@ -1,6 +1,6 @@
 use crate::app::{Query, Run};
 use crate::config;
-use crate::db::{DatabaseFile, Matcher};
+use crate::db::DatabaseFile;
 use crate::error::BrokenPipeHandler;
 use crate::fzf::Fzf;
 use crate::util;
@@ -16,19 +16,18 @@ impl Run for Query {
         let mut db = db.open()?;
         let now = util::current_time()?;
 
-        let mut matcher = Matcher::new().with_keywords(&self.keywords);
+        let mut stream = db.stream(now).with_keywords(&self.keywords);
         if !self.all {
             let resolve_symlinks = config::zo_resolve_symlinks();
-            matcher = matcher.with_exists(resolve_symlinks);
+            stream = stream.with_exists(resolve_symlinks);
         }
-
-        let mut matches = db
-            .iter(&matcher, now)
-            .filter(|dir| Some(dir.path.as_ref()) != self.exclude.as_deref());
+        if let Some(path) = &self.exclude {
+            stream = stream.with_exclude(path);
+        }
 
         if self.interactive {
             let mut fzf = Fzf::new(false)?;
-            for dir in matches {
+            while let Some(dir) = stream.next() {
                 writeln!(fzf.stdin(), "{}", dir.display_score(now)).pipe_exit("fzf")?;
             }
 
@@ -36,9 +35,7 @@ impl Run for Query {
             if self.score {
                 print!("{}", selection);
             } else {
-                let path = selection
-                    .get(5..)
-                    .context("could not read selection from fzf")?;
+                let path = selection.get(5..).context("could not read selection from fzf")?;
                 print!("{}", path)
             }
         } else if self.list {
@@ -49,7 +46,7 @@ impl Run for Query {
             let stdout = stdout.lock();
             let mut handle = BufWriter::new(stdout);
 
-            for dir in matches {
+            while let Some(dir) = stream.next() {
                 if self.score {
                     writeln!(handle, "{}", dir.display_score(now))
                 } else {
@@ -59,7 +56,7 @@ impl Run for Query {
             }
             handle.flush().pipe_exit("stdout")?;
         } else {
-            let dir = matches.next().context("no match found")?;
+            let dir = stream.next().context("no match found")?;
             if self.score {
                 writeln!(io::stdout(), "{}", dir.display_score(now))
             } else {

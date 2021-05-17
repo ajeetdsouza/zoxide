@@ -8,6 +8,7 @@ zoxide is a smarter replacement for your cd command. It keeps track of the
 directories you use most frequently, and uses a ranking algorithm to navigate
 to the best match.
 .SH USAGE
+.nf
     \fBz\fR \fIfoo\fR        # cd into highest ranked directory matching foo
     \fBz\fR \fIfoo bar\fR    # cd into highest ranked directory matching foo and bar
 .sp
@@ -17,6 +18,7 @@ to the best match.
     \fBz\fR \fI-\fR          # cd into previous directory
 .sp
     \fBzi\fR \fIfoo\fR       # cd with interactive selection (using fzf)
+.fi
 .SH SUBCOMMANDS
 .TP
 \fBzoxide-add\fR(1)

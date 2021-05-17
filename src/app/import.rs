@@ -31,11 +31,8 @@ fn from_autojump<P: AsRef<Path>>(db: &mut Database, path: P) -> Result<()> {
     let buffer = fs::read_to_string(path)
         .with_context(|| format!("could not open autojump database: {}", path.display()))?;
 
-    let mut dirs = db
-        .dirs
-        .iter()
-        .map(|dir| (dir.path.as_ref(), dir.clone()))
-        .collect::<HashMap<_, _>>();
+    let mut dirs =
+        db.dirs.iter().map(|dir| (dir.path.as_ref(), dir.clone())).collect::<HashMap<_, _>>();
 
     for line in buffer.lines() {
         if line.is_empty() {
@@ -43,28 +40,20 @@ fn from_autojump<P: AsRef<Path>>(db: &mut Database, path: P) -> Result<()> {
         }
         let mut split = line.splitn(2, '\t');
 
-        let rank = split
-            .next()
-            .with_context(|| format!("invalid entry: {}", line))?;
-        let mut rank = rank
-            .parse::<f64>()
-            .with_context(|| format!("invalid rank: {}", rank))?;
+        let rank = split.next().with_context(|| format!("invalid entry: {}", line))?;
+        let mut rank = rank.parse::<f64>().with_context(|| format!("invalid rank: {}", rank))?;
         // Normalize the rank using a sigmoid function. Don't import actual
         // ranks from autojump, since its scoring algorithm is very different,
         // and might take a while to get normalized.
         rank = 1.0 / (1.0 + (-rank).exp());
 
-        let path = split
-            .next()
-            .with_context(|| format!("invalid entry: {}", line))?;
+        let path = split.next().with_context(|| format!("invalid entry: {}", line))?;
 
-        dirs.entry(path)
-            .and_modify(|dir| dir.rank += rank)
-            .or_insert_with(|| Dir {
-                path: path.to_string().into(),
-                rank,
-                last_accessed: 0,
-            });
+        dirs.entry(path).and_modify(|dir| dir.rank += rank).or_insert_with(|| Dir {
+            path: path.to_string().into(),
+            rank,
+            last_accessed: 0,
+        });
     }
 
     db.dirs = DirList(dirs.into_iter().map(|(_, dir)| dir).collect());
@@ -78,11 +67,8 @@ fn from_z<P: AsRef<Path>>(db: &mut Database, path: P) -> Result<()> {
     let buffer = fs::read_to_string(path)
         .with_context(|| format!("could not open z database: {}", path.display()))?;
 
-    let mut dirs = db
-        .dirs
-        .iter()
-        .map(|dir| (dir.path.as_ref(), dir.clone()))
-        .collect::<HashMap<_, _>>();
+    let mut dirs =
+        db.dirs.iter().map(|dir| (dir.path.as_ref(), dir.clone())).collect::<HashMap<_, _>>();
 
     for line in buffer.lines() {
         if line.is_empty() {
@@ -90,23 +76,14 @@ fn from_z<P: AsRef<Path>>(db: &mut Database, path: P) -> Result<()> {
         }
         let mut split = line.rsplitn(3, '|');
 
-        let last_accessed = split
-            .next()
-            .with_context(|| format!("invalid entry: {}", line))?;
-        let last_accessed = last_accessed
-            .parse()
-            .with_context(|| format!("invalid epoch: {}", last_accessed))?;
+        let last_accessed = split.next().with_context(|| format!("invalid entry: {}", line))?;
+        let last_accessed =
+            last_accessed.parse().with_context(|| format!("invalid epoch: {}", last_accessed))?;
 
-        let rank = split
-            .next()
-            .with_context(|| format!("invalid entry: {}", line))?;
-        let rank = rank
-            .parse()
-            .with_context(|| format!("invalid rank: {}", rank))?;
+        let rank = split.next().with_context(|| format!("invalid entry: {}", line))?;
+        let rank = rank.parse().with_context(|| format!("invalid rank: {}", rank))?;
 
-        let path = split
-            .next()
-            .with_context(|| format!("invalid entry: {}", line))?;
+        let path = split.next().with_context(|| format!("invalid entry: {}", line))?;
 
         dirs.entry(path)
             .and_modify(|dir| {
@@ -115,11 +92,7 @@ fn from_z<P: AsRef<Path>>(db: &mut Database, path: P) -> Result<()> {
                     dir.last_accessed = last_accessed;
                 }
             })
-            .or_insert(Dir {
-                path: path.to_string().into(),
-                rank,
-                last_accessed,
-            });
+            .or_insert(Dir { path: path.to_string().into(), rank, last_accessed });
     }
 
     db.dirs = DirList(dirs.into_iter().map(|(_, dir)| dir).collect());

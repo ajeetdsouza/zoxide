@@ -26,10 +26,7 @@ impl<'file> Database<'file> {
 
         let buffer = self.dirs.to_bytes()?;
         let mut file = NamedTempFile::new_in(&self.data_dir).with_context(|| {
-            format!(
-                "could not create temporary database in: {}",
-                self.data_dir.display()
-            )
+            format!("could not create temporary database in: {}", self.data_dir.display())
         })?;
 
         // Preallocate enough space on the file, preventing copying later on.
@@ -37,10 +34,7 @@ impl<'file> Database<'file> {
         // ignore it and proceed.
         let _ = file.as_file().set_len(buffer.len() as _);
         file.write_all(&buffer).with_context(|| {
-            format!(
-                "could not write to temporary database: {}",
-                file.path().display()
-            )
+            format!("could not write to temporary database: {}", file.path().display())
         })?;
 
         let path = db_path(&self.data_dir);
@@ -56,11 +50,9 @@ impl<'file> Database<'file> {
         let path = path.as_ref();
 
         match self.dirs.iter_mut().find(|dir| dir.path == path) {
-            None => self.dirs.push(Dir {
-                path: Cow::Owned(path.into()),
-                last_accessed: now,
-                rank: 1.0,
-            }),
+            None => {
+                self.dirs.push(Dir { path: Cow::Owned(path.into()), last_accessed: now, rank: 1.0 })
+            }
             Some(dir) => {
                 dir.last_accessed = now;
                 dir.rank += 1.0;
@@ -160,10 +152,7 @@ pub struct DatabaseFile {
 
 impl DatabaseFile {
     pub fn new<P: Into<PathBuf>>(data_dir: P) -> Self {
-        DatabaseFile {
-            buffer: Vec::new(),
-            data_dir: data_dir.into(),
-        }
+        DatabaseFile { buffer: Vec::new(), data_dir: data_dir.into() }
     }
 
     pub fn open(&mut self) -> Result<Database> {
@@ -177,27 +166,16 @@ impl DatabaseFile {
                 let dirs = DirList::from_bytes(&self.buffer).with_context(|| {
                     format!("could not deserialize database: {}", path.display())
                 })?;
-                Ok(Database {
-                    dirs,
-                    modified: false,
-                    data_dir: &self.data_dir,
-                })
+                Ok(Database { dirs, modified: false, data_dir: &self.data_dir })
             }
             Err(e) if e.kind() == io::ErrorKind::NotFound => {
                 // Create data directory, but don't create any file yet.
                 // The file will be created later by [`Database::save`]
                 // if any data is modified.
                 fs::create_dir_all(&self.data_dir).with_context(|| {
-                    format!(
-                        "unable to create data directory: {}",
-                        self.data_dir.display()
-                    )
+                    format!("unable to create data directory: {}", self.data_dir.display())
                 })?;
-                Ok(Database {
-                    dirs: DirList::new(),
-                    modified: false,
-                    data_dir: &self.data_dir,
-                })
+                Ok(Database { dirs: DirList::new(), modified: false, data_dir: &self.data_dir })
             }
             Err(e) => {
                 Err(e).with_context(|| format!("could not read from database: {}", path.display()))
@@ -217,11 +195,7 @@ mod tests {
 
     #[test]
     fn add() {
-        let path = if cfg!(windows) {
-            r"C:\foo\bar"
-        } else {
-            "/foo/bar"
-        };
+        let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
         let now = 946684800;
 
         let data_dir = tempfile::tempdir().unwrap();
@@ -244,11 +218,7 @@ mod tests {
 
     #[test]
     fn remove() {
-        let path = if cfg!(windows) {
-            r"C:\foo\bar"
-        } else {
-            "/foo/bar"
-        };
+        let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
         let now = 946684800;
 
         let data_dir = tempfile::tempdir().unwrap();

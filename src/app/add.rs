@@ -13,10 +13,7 @@ impl Run for Add {
             util::resolve_path(&self.path)
         }?;
 
-        if config::zo_exclude_dirs()?
-            .iter()
-            .any(|pattern| pattern.matches_path(&path))
-        {
+        if config::zo_exclude_dirs()?.iter().any(|pattern| pattern.matches_path(&path)) {
             return Ok(());
         }
 

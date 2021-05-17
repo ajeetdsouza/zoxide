@@ -26,8 +26,7 @@ rand = "0.7.3"
 
 [dev-dependencies]
 assert_cmd = "1.0.1"
-once_cell = "1.4.1"
-seq-macro = "0.2.1"
+rstest = "0.10.0"
 
 [build-dependencies]
 clap = "3.0.0-beta.2"

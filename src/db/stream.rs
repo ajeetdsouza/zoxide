@@ -24,8 +24,7 @@ pub struct Stream<'db, 'file> {
 impl<'db, 'file> Stream<'db, 'file> {
     pub fn new(db: &'db mut Database<'file>, now: Epoch) -> Self {
         // Iterate in descending order of score.
-        db.dirs
-            .sort_unstable_by_key(|dir| OrderedFloat(dir.score(now)));
+        db.dirs.sort_unstable_by_key(|dir| OrderedFloat(dir.score(now)));
         let idxs = (0..db.dirs.len()).rev();
 
         // If a directory is deleted and hasn't been used for 90 days, delete
@@ -91,15 +90,9 @@ impl<'db, 'file> Stream<'db, 'file> {
             return true;
         }
 
-        let resolver = if self.resolve_symlinks {
-            fs::symlink_metadata
-        } else {
-            fs::metadata
-        };
+        let resolver = if self.resolve_symlinks { fs::symlink_metadata } else { fs::metadata };
 
-        resolver(path.as_ref())
-            .map(|m| m.is_dir())
-            .unwrap_or_default()
+        resolver(path.as_ref()).map(|m| m.is_dir()).unwrap_or_default()
     }
 
     fn matches_keywords<S: AsRef<str>>(&self, path: S) -> bool {
@@ -135,42 +128,34 @@ impl<'db, 'file> Stream<'db, 'file> {
 mod tests {
     use super::Database;
 
+    use rstest::rstest;
+
     use std::path::PathBuf;
 
-    #[test]
-    fn query() {
-        const CASES: &[(&[&str], &str, bool)] = &[
-            // Case normalization
-            (&["fOo", "bAr"], "/foo/bar", true),
-            // Last component
-            (&["ba"], "/foo/bar", true),
-            (&["fo"], "/foo/bar", false),
-            // Slash as suffix
-            (&["foo/"], "/foo", false),
-            (&["foo/"], "/foo/bar", true),
-            (&["foo/"], "/foo/bar/baz", false),
-            (&["foo", "/"], "/foo", false),
-            (&["foo", "/"], "/foo/bar", true),
-            (&["foo", "/"], "/foo/bar/baz", true),
-            // Split components
-            (&["/", "fo", "/", "ar"], "/foo/bar", true),
-            (&["oo/ba"], "/foo/bar", true),
-            // Overlap
-            (&["foo", "o", "bar"], "/foo/bar", false),
-            (&["/foo/", "/bar"], "/foo/bar", false),
-            (&["/foo/", "/bar"], "/foo/baz/bar", true),
-        ];
-
-        let mut db = Database {
-            dirs: Vec::new().into(),
-            modified: false,
-            data_dir: &PathBuf::new(),
-        };
-        let now = 0;
-
-        for &(keywords, path, is_match) in CASES {
-            let stream = db.stream(now).with_keywords(keywords);
-            assert_eq!(is_match, stream.matches_keywords(path));
-        }
+    #[rstest]
+    // Case normalization
+    #[case(&["fOo", "bAr"], "/foo/bar", true)]
+    // Last component
+    #[case(&["ba"], "/foo/bar", true)]
+    #[case(&["fo"], "/foo/bar", false)]
+    // Slash as suffix
+    #[case(&["foo/"], "/foo", false)]
+    #[case(&["foo/"], "/foo/bar", true)]
+    #[case(&["foo/"], "/foo/bar/baz", false)]
+    #[case(&["foo", "/"], "/foo", false)]
+    #[case(&["foo", "/"], "/foo/bar", true)]
+    #[case(&["foo", "/"], "/foo/bar/baz", true)]
+    // Split components
+    #[case(&["/", "fo", "/", "ar"], "/foo/bar", true)]
+    #[case(&["oo/ba"], "/foo/bar", true)]
+    // Overlap
+    #[case(&["foo", "o", "bar"], "/foo/bar", false)]
+    #[case(&["/foo/", "/bar"], "/foo/bar", false)]
+    #[case(&["/foo/", "/bar"], "/foo/baz/bar", true)]
+    fn query(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
+        let mut db =
+            Database { dirs: Vec::new().into(), modified: false, data_dir: &PathBuf::new() };
+        let stream = db.stream(0).with_keywords(keywords);
+        assert_eq!(is_match, stream.matches_keywords(path));
     }
 }

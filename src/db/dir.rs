@@ -20,9 +20,7 @@ impl DirList<'_> {
         // Assume a maximum size for the database. This prevents bincode from
         // throwing strange errors when it encounters invalid data.
         const MAX_SIZE: u64 = 32 << 20; // 32 MiB
-        let deserializer = &mut bincode::options()
-            .with_fixint_encoding()
-            .with_limit(MAX_SIZE);
+        let deserializer = &mut bincode::options().with_fixint_encoding().with_limit(MAX_SIZE);
 
         // Split bytes into sections.
         let version_size = deserializer.serialized_size(&Self::VERSION).unwrap() as _;
@@ -36,11 +34,9 @@ impl DirList<'_> {
             let version = deserializer.deserialize(bytes_version)?;
             match version {
                 Self::VERSION => Ok(deserializer.deserialize(bytes_dirs)?),
-                version => bail!(
-                    "unsupported version (got {}, supports {})",
-                    version,
-                    Self::VERSION,
-                ),
+                version => {
+                    bail!("unsupported version (got {}, supports {})", version, Self::VERSION,)
+                }
             }
         })()
         .context("could not deserialize database")
@@ -159,11 +155,7 @@ mod tests {
 
     #[test]
     fn zero_copy() {
-        let dirs = DirList(vec![Dir {
-            path: "/".into(),
-            rank: 0.0,
-            last_accessed: 0,
-        }]);
+        let dirs = DirList(vec![Dir { path: "/".into(), rank: 0.0, last_accessed: 0 }]);
 
         let bytes = dirs.to_bytes().unwrap();
         let dirs = DirList::from_bytes(&bytes).unwrap();

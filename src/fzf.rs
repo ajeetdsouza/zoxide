@@ -16,10 +16,7 @@ impl Fzf {
         if multiple {
             command.arg("-m");
         }
-        command
-            .arg("-n2..")
-            .stdin(Stdio::piped())
-            .stdout(Stdio::piped());
+        command.arg("-n2..").stdin(Stdio::piped()).stdout(Stdio::piped());
         if let Some(fzf_opts) = config::zo_fzf_opts() {
             command.env("FZF_DEFAULT_OPTS", fzf_opts);
         }
@@ -41,10 +38,7 @@ impl Fzf {
     }
 
     pub fn wait_select(self) -> Result<String> {
-        let output = self
-            .child
-            .wait_with_output()
-            .context("wait failed on fzf")?;
+        let output = self.child.wait_with_output().context("wait failed on fzf")?;
 
         match output.status.code() {
             // normal exit

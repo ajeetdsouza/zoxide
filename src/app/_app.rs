@@ -126,9 +126,6 @@ pub struct Remove {
     // Use interactive selection
     #[clap(conflicts_with = "path", long, short, value_name = "keywords")]
     pub interactive: Option<Vec<String>>,
-    #[clap(
-        conflicts_with = "interactive",
-        required_unless_present = "interactive"
-    )]
+    #[clap(conflicts_with = "interactive", required_unless_present = "interactive")]
     pub path: Option<String>,
 }

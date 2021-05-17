@@ -1,33 +1,89 @@
+use super::{Database, Dir, Epoch};
 use crate::util;
 
+use ordered_float::OrderedFloat;
+
 use std::fs;
+use std::iter::Rev;
+use std::ops::Range;
 use std::path;
 
-#[derive(Debug, Default)]
-pub struct Matcher {
+pub struct Stream<'db, 'file> {
+    db: &'db mut Database<'file>,
+    idxs: Rev<Range<usize>>,
+
     keywords: Vec<String>,
+
     check_exists: bool,
+    expire_below: Epoch,
     resolve_symlinks: bool,
+
+    exclude_path: Option<String>,
 }
 
-impl Matcher {
-    pub fn new() -> Matcher {
-        Matcher::default()
+impl<'db, 'file> Stream<'db, 'file> {
+    pub fn new(db: &'db mut Database<'file>, now: Epoch) -> Self {
+        // Iterate in descending order of score.
+        db.dirs
+            .sort_unstable_by_key(|dir| OrderedFloat(dir.score(now)));
+        let idxs = (0..db.dirs.len()).rev();
+
+        // If a directory is deleted and hasn't been used for 90 days, delete
+        // it from the database.
+        let expire_below = now.saturating_sub(90 * 24 * 60 * 60);
+
+        Stream {
+            db,
+            idxs,
+            keywords: Vec::new(),
+            check_exists: false,
+            expire_below,
+            resolve_symlinks: false,
+            exclude_path: None,
+        }
     }
 
-    pub fn with_exists(mut self, resolve_symlinks: bool) -> Matcher {
+    pub fn with_exclude<S: Into<String>>(mut self, path: S) -> Self {
+        self.exclude_path = Some(path.into());
+        self
+    }
+
+    pub fn with_exists(mut self, resolve_symlinks: bool) -> Self {
         self.check_exists = true;
         self.resolve_symlinks = resolve_symlinks;
         self
     }
 
-    pub fn with_keywords<S: AsRef<str>>(mut self, keywords: &[S]) -> Matcher {
+    pub fn with_keywords<S: AsRef<str>>(mut self, keywords: &[S]) -> Self {
         self.keywords = keywords.iter().map(util::to_lowercase).collect();
         self
     }
 
-    pub fn matches<S: AsRef<str>>(&self, path: S) -> bool {
-        self.matches_keywords(&path) && self.matches_exists(path)
+    pub fn next(&mut self) -> Option<&Dir<'file>> {
+        while let Some(idx) = self.idxs.next() {
+            let dir = &self.db.dirs[idx];
+
+            if !self.matches_keywords(&dir.path) {
+                continue;
+            }
+
+            if !self.matches_exists(&dir.path) {
+                if dir.last_accessed < self.expire_below {
+                    self.db.dirs.swap_remove(idx);
+                    self.db.modified = true;
+                }
+                continue;
+            }
+
+            if Some(dir.path.as_ref()) == self.exclude_path.as_deref() {
+                continue;
+            }
+
+            let dir = &self.db.dirs[idx];
+            return Some(dir);
+        }
+
+        None
     }
 
     fn matches_exists<S: AsRef<str>>(&self, path: S) -> bool {
@@ -77,7 +133,9 @@ impl Matcher {
 
 #[cfg(test)]
 mod tests {
-    use super::Matcher;
+    use super::Database;
+
+    use std::path::PathBuf;
 
     #[test]
     fn query() {
@@ -103,9 +161,16 @@ mod tests {
             (&["/foo/", "/bar"], "/foo/baz/bar", true),
         ];
 
+        let mut db = Database {
+            dirs: Vec::new().into(),
+            modified: false,
+            data_dir: &PathBuf::new(),
+        };
+        let now = 0;
+
         for &(keywords, path, is_match) in CASES {
-            let matcher = Matcher::new().with_keywords(keywords);
-            assert_eq!(is_match, matcher.matches(path))
+            let stream = db.stream(now).with_keywords(keywords);
+            assert_eq!(is_match, stream.matches_keywords(path));
         }
     }
 }

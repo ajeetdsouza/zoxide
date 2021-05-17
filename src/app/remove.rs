@@ -1,6 +1,6 @@
 use crate::app::{Remove, Run};
 use crate::config;
-use crate::db::{DatabaseFile, Matcher};
+use crate::db::DatabaseFile;
 use crate::error::BrokenPipeHandler;
 use crate::fzf::Fzf;
 use crate::util;
@@ -18,11 +18,11 @@ impl Run for Remove {
         let selection;
         match &self.interactive {
             Some(keywords) => {
-                let matcher = Matcher::new().with_keywords(keywords);
                 let now = util::current_time()?;
+                let mut stream = db.stream(now).with_keywords(keywords);
 
                 let mut fzf = Fzf::new(true)?;
-                for dir in db.iter(&matcher, now) {
+                while let Some(dir) = stream.next() {
                     writeln!(fzf.stdin(), "{}", dir.display_score(now)).pipe_exit("fzf")?;
                 }
 

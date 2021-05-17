@@ -1,26 +1,24 @@
 mod dir;
-mod query;
+mod stream;
 
 pub use dir::{Dir, DirList, Epoch, Rank};
-pub use query::Matcher;
+pub use stream::Stream;
 
 use anyhow::{Context, Result};
-use ordered_float::OrderedFloat;
 use tempfile::{NamedTempFile, PersistError};
 
 use std::borrow::Cow;
-use std::cmp::Reverse;
 use std::fs;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 
-pub struct Database<'a> {
-    pub dirs: DirList<'a>,
+pub struct Database<'file> {
+    pub dirs: DirList<'file>,
     pub modified: bool,
-    data_dir: &'a Path,
+    data_dir: &'file PathBuf,
 }
 
-impl<'a> Database<'a> {
+impl<'file> Database<'file> {
     pub fn save(&mut self) -> Result<()> {
         if !self.modified {
             return Ok(());
@@ -72,12 +70,9 @@ impl<'a> Database<'a> {
         self.modified = true;
     }
 
-    pub fn iter<'i>(&'i mut self, m: &'i Matcher, now: Epoch) -> impl Iterator<Item = &'i Dir> {
-        self.dirs
-            .sort_unstable_by_key(|dir| Reverse(OrderedFloat(dir.score(now))));
-        self.dirs
-            .iter()
-            .filter(move |dir| m.matches(dir.path.as_ref()))
+    // Streaming iterator for directories.
+    pub fn stream(&mut self, now: Epoch) -> Stream<'_, 'file> {
+        Stream::new(self, now)
     }
 
     /// Removes the directory with `path` from the store.
@@ -159,15 +154,15 @@ fn persist<P: AsRef<Path>>(file: NamedTempFile, path: P) -> Result<(), PersistEr
 }
 
 pub struct DatabaseFile {
-    data_dir: PathBuf,
     buffer: Vec<u8>,
+    data_dir: PathBuf,
 }
 
 impl DatabaseFile {
-    pub fn new<P: Into<PathBuf>>(data_dir: P) -> DatabaseFile {
+    pub fn new<P: Into<PathBuf>>(data_dir: P) -> Self {
         DatabaseFile {
-            data_dir: data_dir.into(),
             buffer: Vec::new(),
+            data_dir: data_dir.into(),
         }
     }
 

@@ -116,7 +116,7 @@ pub struct Query {
     pub score: bool,
 
     /// Exclude a path from results
-    #[clap(long, hidden = true)]
+    #[clap(long, value_name = "path")]
     pub exclude: Option<String>,
 }
 

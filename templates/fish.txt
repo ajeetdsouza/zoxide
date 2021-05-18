@@ -48,7 +48,8 @@ if test "$__zoxide_hooked" != 1
 {%- when InitHook::Pwd %}
     function __zoxide_hook --on-variable PWD
 {%- endmatch %}
-        command zoxide add -- (__zoxide_pwd)
+        test -z "$fish_private_mode"
+        and command zoxide add -- (__zoxide_pwd)
     end
 end
 

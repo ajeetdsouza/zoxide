@@ -32,7 +32,7 @@ _zoxide() {
 _arguments "${_arguments_options[@]}" \
 '-h[Prints help information]' \
 '--help[Prints help information]' \
-':path:' \
+':path:_files -/' \
 && ret=0
 ;;
 (import)
@@ -41,7 +41,7 @@ _arguments "${_arguments_options[@]}" \
 '--merge[Merge into existing database]' \
 '-h[Prints help information]' \
 '--help[Prints help information]' \
-':path:' \
+':path:_files' \
 && ret=0
 ;;
 (init)
@@ -56,7 +56,7 @@ _arguments "${_arguments_options[@]}" \
 ;;
 (query)
 _arguments "${_arguments_options[@]}" \
-'--exclude=[Exclude a path from results]' \
+'--exclude=[Exclude a path from results]: :_files -/' \
 '--all[Show deleted directories]' \
 '(-l --list)-i[Use interactive selection]' \
 '(-l --list)--interactive[Use interactive selection]' \
@@ -75,7 +75,7 @@ _arguments "${_arguments_options[@]}" \
 '()*--interactive=[]' \
 '-h[Prints help information]' \
 '--help[Prints help information]' \
-'::path:' \
+'::path:_files -/' \
 && ret=0
 ;;
         esac

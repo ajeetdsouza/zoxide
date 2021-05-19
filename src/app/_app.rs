@@ -1,4 +1,4 @@
-use clap::{AppSettings, ArgEnum, Clap};
+use clap::{AppSettings, ArgEnum, Clap, ValueHint};
 
 use std::path::PathBuf;
 
@@ -33,12 +33,14 @@ pub enum App {
 /// Add a new directory or increment its rank
 #[derive(Clap, Debug)]
 pub struct Add {
+    #[clap(value_hint = ValueHint::DirPath)]
     pub path: PathBuf,
 }
 
 /// Import entries from another application
 #[derive(Clap, Debug)]
 pub struct Import {
+    #[clap(value_hint = ValueHint::FilePath)]
     pub path: PathBuf,
 
     /// Application to import from
@@ -116,7 +118,7 @@ pub struct Query {
     pub score: bool,
 
     /// Exclude a path from results
-    #[clap(long, value_name = "path")]
+    #[clap(long, value_hint = ValueHint::DirPath, value_name = "path")]
     pub exclude: Option<String>,
 }
 
@@ -126,6 +128,10 @@ pub struct Remove {
     // Use interactive selection
     #[clap(conflicts_with = "path", long, short, value_name = "keywords")]
     pub interactive: Option<Vec<String>>,
-    #[clap(conflicts_with = "interactive", required_unless_present = "interactive")]
+    #[clap(
+        conflicts_with = "interactive",
+        required_unless_present = "interactive",
+        value_hint = ValueHint::DirPath
+    )]
     pub path: Option<String>,
 }

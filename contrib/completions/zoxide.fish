@@ -5,9 +5,9 @@ complete -c zoxide -n "__fish_use_subcommand" -f -a "import" -d 'Import entries 
 complete -c zoxide -n "__fish_use_subcommand" -f -a "init" -d 'Generate shell configuration'
 complete -c zoxide -n "__fish_use_subcommand" -f -a "query" -d 'Search for a directory in the database'
 complete -c zoxide -n "__fish_use_subcommand" -f -a "remove" -d 'Remove a directory from the database'
-complete -c zoxide -n "__fish_seen_subcommand_from add" -r
+complete -c zoxide -n "__fish_seen_subcommand_from add" -r -f -a "(__fish_complete_directories)"
 complete -c zoxide -n "__fish_seen_subcommand_from add" -s h -l help -d 'Prints help information'
-complete -c zoxide -n "__fish_seen_subcommand_from import" -r
+complete -c zoxide -n "__fish_seen_subcommand_from import" -r -F
 complete -c zoxide -n "__fish_seen_subcommand_from import" -l from -d 'Application to import from' -r -f -a "autojump z"
 complete -c zoxide -n "__fish_seen_subcommand_from import" -l merge -d 'Merge into existing database'
 complete -c zoxide -n "__fish_seen_subcommand_from import" -s h -l help -d 'Prints help information'
@@ -17,12 +17,12 @@ complete -c zoxide -n "__fish_seen_subcommand_from init" -l hook -d 'Chooses eve
 complete -c zoxide -n "__fish_seen_subcommand_from init" -l no-aliases -d 'Prevents zoxide from defining any commands'
 complete -c zoxide -n "__fish_seen_subcommand_from init" -s h -l help -d 'Prints help information'
 complete -c zoxide -n "__fish_seen_subcommand_from query" -r
-complete -c zoxide -n "__fish_seen_subcommand_from query" -l exclude -d 'Exclude a path from results' -r
+complete -c zoxide -n "__fish_seen_subcommand_from query" -l exclude -d 'Exclude a path from results' -r -f -a "(__fish_complete_directories)"
 complete -c zoxide -n "__fish_seen_subcommand_from query" -l all -d 'Show deleted directories'
 complete -c zoxide -n "__fish_seen_subcommand_from query" -s i -l interactive -d 'Use interactive selection'
 complete -c zoxide -n "__fish_seen_subcommand_from query" -s l -l list -d 'List all matching directories'
 complete -c zoxide -n "__fish_seen_subcommand_from query" -s s -l score -d 'Print score with results'
 complete -c zoxide -n "__fish_seen_subcommand_from query" -s h -l help -d 'Prints help information'
 complete -c zoxide -n "__fish_seen_subcommand_from remove" -s i -l interactive -r
-complete -c zoxide -n "__fish_seen_subcommand_from remove" -r
+complete -c zoxide -n "__fish_seen_subcommand_from remove" -r -f -a "(__fish_complete_directories)"
 complete -c zoxide -n "__fish_seen_subcommand_from remove" -s h -l help -d 'Prints help information'

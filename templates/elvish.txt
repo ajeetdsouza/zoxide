@@ -83,4 +83,4 @@ edit:add-var zi~ $__zoxide_zi~
 # To initialize zoxide, add this to your configuration (usually
 # ~/.elvish/rc.elv):
 #
-# eval $(zoxide init elvish | slurp)
+# eval (zoxide init elvish | slurp)

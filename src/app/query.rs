@@ -7,7 +7,7 @@ use crate::util;
 
 use anyhow::{Context, Result};
 
-use std::io::{self, BufWriter, Write};
+use std::io::{self, Write};
 
 impl Run for Query {
     fn run(&self) -> Result<()> {
@@ -39,13 +39,8 @@ impl Run for Query {
                 print!("{}", path)
             }
         } else if self.list {
-            // Rust does line-buffering by default, i.e. it flushes stdout
-            // after every newline. This is not ideal when printing a large
-            // number of lines, so we put stdout in a BufWriter.
             let stdout = io::stdout();
-            let stdout = stdout.lock();
-            let mut handle = BufWriter::new(stdout);
-
+            let handle = &mut stdout.lock();
             while let Some(dir) = stream.next() {
                 if self.score {
                     writeln!(handle, "{}", dir.display_score(now))

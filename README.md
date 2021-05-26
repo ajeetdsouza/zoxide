@@ -3,9 +3,10 @@
 > A smarter cd command for your terminal
 
 [![crates.io][crates.io-badge]][crates.io]
+[![releases][releases-badge]][Releases]
 
 `zoxide` is a blazing fast replacement for your `cd` command, inspired by
-[`z`][z] and [`z.lua`][z.lua]. It keeps track of the directories you use most
+`z` and `z.lua`. It keeps track of the directories you use most
 frequently, and uses a ranking algorithm to navigate to the best match.
 
 ![Tutorial][tutorial]
@@ -115,7 +116,7 @@ eval "$(zoxide init bash)"
 Add this to your configuration (usually `~/.elvish/rc.elv`):
 
 ```sh
-eval $(zoxide init elvish | slurp)
+eval (zoxide init elvish | slurp)
 ```
 
 #### `fish`
@@ -260,6 +261,7 @@ Be sure to set these before calling `zoxide init`.
 [nnn]: https://github.com/jarun/nnn
 [pkgsrc]: https://pkgsrc.se/sysutils/zoxide
 [releases]: https://github.com/ajeetdsouza/zoxide/releases
+[releases-badge]: https://img.shields.io/github/v/release/ajeetdsouza/zoxide
 [scoop]: https://github.com/ScoopInstaller/Main/tree/master/bucket/zoxide.json
 [telescope-zoxide]: https://github.com/jvgrootveld/telescope-zoxide
 [termux]: https://github.com/termux/termux-packages/tree/master/packages/zoxide
@@ -268,7 +270,5 @@ Be sure to set these before calling `zoxide init`.
 [void linux packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide
 [xxh-plugin-prerun-zoxide]: https://github.com/xxh/xxh-plugin-prerun-zoxide
 [xxh]: https://github.com/xxh/xxh
-[z.lua]: https://github.com/skywind3000/z.lua
-[z]: https://github.com/rupa/z
 [zoxide.vim]: https://github.com/nanotee/zoxide.vim
 [zsh-autocomplete]: https://github.com/marlonrichert/zsh-autocomplete

@@ -17,7 +17,7 @@ impl Fzf {
             command.arg("-m");
         }
         command.arg("-n2..").stdin(Stdio::piped()).stdout(Stdio::piped());
-        if let Some(fzf_opts) = config::zo_fzf_opts() {
+        if let Some(fzf_opts) = config::fzf_opts() {
             command.env("FZF_DEFAULT_OPTS", fzf_opts);
         }
 

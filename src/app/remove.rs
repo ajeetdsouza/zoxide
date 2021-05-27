@@ -11,7 +11,7 @@ use std::io::Write;
 
 impl Run for Remove {
     fn run(&self) -> Result<()> {
-        let data_dir = config::zo_data_dir()?;
+        let data_dir = config::data_dir()?;
         let mut db = DatabaseFile::new(data_dir);
         let mut db = db.open()?;
 

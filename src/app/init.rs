@@ -12,8 +12,8 @@ impl Run for Init {
     fn run(&self) -> Result<()> {
         let cmd = if self.no_aliases { None } else { Some(self.cmd.as_str()) };
 
-        let echo = config::zo_echo();
-        let resolve_symlinks = config::zo_resolve_symlinks();
+        let echo = config::echo();
+        let resolve_symlinks = config::resolve_symlinks();
 
         let opts = &Opts { cmd, hook: self.hook, echo, resolve_symlinks };
 

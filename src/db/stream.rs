@@ -89,7 +89,6 @@ impl<'db, 'file> Stream<'db, 'file> {
         if !self.check_exists {
             return true;
         }
-
         let resolver = if self.resolve_symlinks { fs::symlink_metadata } else { fs::metadata };
         resolver(path.as_ref()).map(|m| m.is_dir()).unwrap_or_default()
     }

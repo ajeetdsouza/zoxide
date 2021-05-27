@@ -7,7 +7,6 @@ pub use stream::Stream;
 use anyhow::{Context, Result};
 use tempfile::{NamedTempFile, PersistError};
 
-use std::borrow::Cow;
 use std::fs;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
@@ -51,7 +50,7 @@ impl<'file> Database<'file> {
 
         match self.dirs.iter_mut().find(|dir| dir.path == path) {
             None => {
-                self.dirs.push(Dir { path: Cow::Owned(path.into()), last_accessed: now, rank: 1.0 })
+                self.dirs.push(Dir { path: path.to_string().into(), last_accessed: now, rank: 1.0 })
             }
             Some(dir) => {
                 dir.last_accessed = now;

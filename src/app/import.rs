@@ -10,7 +10,7 @@ use std::path::Path;
 
 impl Run for Import {
     fn run(&self) -> Result<()> {
-        let data_dir = config::zo_data_dir()?;
+        let data_dir = config::data_dir()?;
 
         let mut db = DatabaseFile::new(data_dir);
         let db = &mut db.open()?;

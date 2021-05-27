@@ -11,14 +11,14 @@ use std::io::{self, Write};
 
 impl Run for Query {
     fn run(&self) -> Result<()> {
-        let data_dir = config::zo_data_dir()?;
+        let data_dir = config::data_dir()?;
         let mut db = DatabaseFile::new(data_dir);
         let mut db = db.open()?;
         let now = util::current_time()?;
 
         let mut stream = db.stream(now).with_keywords(&self.keywords);
         if !self.all {
-            let resolve_symlinks = config::zo_resolve_symlinks();
+            let resolve_symlinks = config::resolve_symlinks();
             stream = stream.with_exists(resolve_symlinks);
         }
         if let Some(path) = &self.exclude {

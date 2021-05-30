@@ -41,6 +41,7 @@ copy it to your `$PATH`.
 | ------------------ | ----------------------- | ------------------------------------------------------------------------------------------------------ |
 | **Any**            | [crates.io]             | `cargo install zoxide`                                                                                 |
 | **Any**            | [Linuxbrew]             | `brew install zoxide`                                                                                  |
+| **Any**            | [Huber]                 | `huber install zoxide`                                                                                 |
 | Alpine Linux 3.13+ | [Alpine Linux Packages] | `apk add zoxide`                                                                                       |
 | Arch Linux         | [AUR]                   | `yay -Sy zoxide-bin`                                                                                   |
 | CentOS 7+          | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide`                                              |
@@ -60,6 +61,7 @@ copy it to your `$PATH`.
 | [crates.io] | `cargo install zoxide` |
 | [Homebrew]  | `brew install zoxide`  |
 | [MacPorts]  | `port install zoxide`  |
+| [Huber]     | `huber install zoxide` |
 
 #### On Windows
 
@@ -67,6 +69,7 @@ copy it to your `$PATH`.
 | ----------- | ---------------------- |
 | [crates.io] | `cargo install zoxide` |
 | [Scoop]     | `scoop install zoxide` |
+| [Huber]     | `huber install zoxide` |
 
 #### On BSD
 
@@ -272,3 +275,4 @@ Be sure to set these before calling `zoxide init`.
 [xxh]: https://github.com/xxh/xxh
 [zoxide.vim]: https://github.com/nanotee/zoxide.vim
 [zsh-autocomplete]: https://github.com/marlonrichert/zsh-autocomplete
+[huber]: https://github.com/innobead/huber#installing-huber

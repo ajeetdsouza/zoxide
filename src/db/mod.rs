@@ -11,10 +11,11 @@ use std::fs;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 
+#[derive(Debug)]
 pub struct Database<'file> {
     pub dirs: DirList<'file>,
     pub modified: bool,
-    data_dir: &'file PathBuf,
+    pub data_dir: &'file PathBuf,
 }
 
 impl<'file> Database<'file> {
@@ -59,6 +60,33 @@ impl<'file> Database<'file> {
         };
 
         self.modified = true;
+    }
+
+    pub fn dedup(&mut self) {
+        // Sort by path, so that equal paths are next to each other.
+        self.dirs.sort_by(|dir1, dir2| dir1.path.cmp(&dir2.path));
+
+        for idx in (1..self.dirs.len()).rev() {
+            // Check if curr_dir and next_dir have equal paths.
+            let curr_dir = &self.dirs[idx];
+            let next_dir = &self.dirs[idx - 1];
+            if next_dir.path != curr_dir.path {
+                continue;
+            }
+
+            // Merge curr_dir's rank and last_accessed into next_dir.
+            let rank = curr_dir.rank;
+            let last_accessed = curr_dir.last_accessed;
+            let next_dir = &mut self.dirs[idx - 1];
+            if next_dir.last_accessed < last_accessed {
+                next_dir.last_accessed = last_accessed;
+            }
+            next_dir.rank += rank;
+
+            // Delete curr_dir.
+            self.dirs.swap_remove(idx);
+            self.modified = true;
+        }
     }
 
     // Streaming iterator for directories.

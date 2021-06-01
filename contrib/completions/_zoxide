@@ -62,8 +62,8 @@ _arguments "${_arguments_options[@]}" \
 '(-l --list)--interactive[Use interactive selection]' \
 '(-i --interactive)-l[List all matching directories]' \
 '(-i --interactive)--list[List all matching directories]' \
-'-s[Print score with results]' \
-'--score[Print score with results]' \
+'(-i --interactive)-s[Print score with results]' \
+'(-i --interactive)--score[Print score with results]' \
 '-h[Prints help information]' \
 '--help[Prints help information]' \
 '*::keywords:' \

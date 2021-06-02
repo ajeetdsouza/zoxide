@@ -1,15 +1,19 @@
 {%- let section = "# =============================================================================\n#" -%}
 {%- let not_configured = "# -- not configured --" -%}
-{%- let newline = "{{$(char newline)}}" -%}
 
 {{ section }}
 # Utility functions for zoxide.
 #
 
 # Default prompt for Nushell.
-# Taken from: <https://github.com/nushell/nushell/blob/main/docs/sample_config/config.toml>
 def __zoxide_prompt [] {
-    build-string $(ansi gb) $(pwd) $(ansi reset) '(' $(ansi cb) $(do -i { git rev-parse --abbrev-ref HEAD } | str trim) $(ansi reset) ')' $(ansi yb) $(date format '%m/%d/%Y %I:%M:%S%.3f %p') $(ansi reset) '> '
+    let git = $"(do -i {git rev-parse --abbrev-ref HEAD} | str trim)"
+    let git = (if (echo $git | str length) == 0 {
+        ""
+    } {
+        build-string (char lparen) (ansi cb) $git (ansi reset) (char rparen)
+    })
+    build-string (ansi gb) (pwd) (ansi reset) $git "> "
 }
 
 {{ section }}
@@ -28,7 +32,7 @@ def __zoxide_hook [] {
 
 {%- when InitHook::Pwd %}
 def __zoxide_hook [] {}
-echo `zoxide: PWD hooks are not supported on Nushell.{{ newline }}        Use 'zoxide init nushell --hook prompt' instead.{{ newline }}`
+$"zoxide: PWD hooks are not supported on Nushell.(char nl)Use 'zoxide init nushell --hook prompt' instead.(char nl)"
 {%- endmatch %}
 
 {{ section }}
@@ -38,34 +42,21 @@ echo `zoxide: PWD hooks are not supported on Nushell.{{ newline }}        Use 'z
 
 # Jump to a directory using only keywords.
 def __zoxide_z [...rest:string] {
-    let args = $(echo $rest | skip 1);
-    if $(shells | where active == $true | get name) != filesystem {
-        if $(echo $args | length) > 1 {
-            echo `zoxide: can only jump directories on filesystem{{ newline }}`
+    if (shells | where active == $true | get name) != filesystem {
+        if (echo $rest | length) > 1 {
+            $"zoxide: can only jump directories on filesystem(char nl)"
         } {
-            cd $(echo $args)
+            cd (echo $rest)
 {%- if echo %}
             pwd
 {%- endif %}
         }
     } {
-        if $(echo $args | length) == 0 {
-            cd ~
+        let arg0 = (echo $rest | append '~' | first 1);
+        if (echo $rest | length) <= 1 && ($arg0 == '-' || (echo $arg0 | path expand | path exists)) {
+            cd $arg0
         } {
-            if $(echo $args | length) == 1 {
-                let arg0 = $(echo $args | first 1);
-                if $arg0 == '-' {
-                    cd -
-                } {
-                    if $(echo $arg0 | path exists) {
-                        cd $arg0
-                    } {
-                        cd $(zoxide query --exclude $(pwd) -- $args | str trim)
-                    }
-                }
-            } {
-                cd $(zoxide query --exclude $(pwd) -- $args | str trim)
-            }
+            cd (zoxide query --exclude (pwd) -- $rest | str trim)
         }
 {%- if echo %}
         pwd
@@ -75,11 +66,10 @@ def __zoxide_z [...rest:string] {
 
 # Jump to a directory using interactive search.
 def __zoxide_zi  [...rest:string] {
-    if $(shells | where active == $true | get name) != filesystem {
-        echo `zoxide: can only jump directories on filesystem{{ newline }}`
+    if (shells | where active == $true | get name) != filesystem {
+        $"zoxide: can only jump directories on filesystem(char nl)"
     } {
-        let args = $(echo $rest | skip 1)
-        cd $(zoxide query -i -- $args | str trim)
+        cd (zoxide query -i -- $rest | str trim)
 {%- if echo %}
         pwd
 {%- endif %}
@@ -93,8 +83,8 @@ def __zoxide_zi  [...rest:string] {
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-alias {{cmd}} = __zoxide_z ''
-alias {{cmd}}i = __zoxide_zi ''
+alias {{cmd}} = __zoxide_z
+alias {{cmd}}i = __zoxide_zi
 
 {%- when None %}
 

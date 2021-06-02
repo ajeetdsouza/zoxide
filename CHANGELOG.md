@@ -12,11 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Auto-generated shell completions.
 - `zoxide query --all` for listing deleted directories.
 - Lazy deletion for removed directories that have not been accessed in > 90 days.
+- Nushell: support for 0.32.0+.
 
 ### Fixed
 
 - Nushell: avoid calling `__zoxide_hook` on non-filesystem subshells.
-- `alias cd=z` now works on Fish, but it must be done after calling `zoxide init`.
+- Fish: `alias cd=z` now works, but it must be done after calling `zoxide init`.
 - PowerShell: avoid calling `__zoxide_hook` on non-filesystem providers.
 - Fish: avoid calling `__zoxide_hook` in private mode.
 

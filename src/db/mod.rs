@@ -78,9 +78,7 @@ impl<'file> Database<'file> {
             let rank = curr_dir.rank;
             let last_accessed = curr_dir.last_accessed;
             let next_dir = &mut self.dirs[idx - 1];
-            if next_dir.last_accessed < last_accessed {
-                next_dir.last_accessed = last_accessed;
-            }
+            next_dir.last_accessed = next_dir.last_accessed.max(last_accessed);
             next_dir.rank += rank;
 
             // Delete curr_dir.

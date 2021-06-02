@@ -127,7 +127,7 @@ Add this to your configuration (usually `~/.config/fish/config.fish`):
 zoxide init fish | source
 ```
 
-#### `nushell`
+#### `nushell 0.32.0+`
 
 Initialize zoxide's Nushell script:
 

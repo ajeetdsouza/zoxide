@@ -171,7 +171,6 @@ mod tests {
             .stderr("");
     }
 
-    #[ignore]
     #[rstest]
     fn nushell_nushell(
         #[values(None, Some("z"))] cmd: Option<&str>,

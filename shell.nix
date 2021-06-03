@@ -1,7 +1,7 @@
 let
   pkgs = import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/20.09.tar.gz") {};
-  pkgs-master = import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/470e4a9bbc98b171a7e733dfc9e62531f7b9ceca.tar.gz") {};
-  pkgs-python = pkgs.python3.withPackages (pkgs: [ pkgs.black pkgs.mypy pkgs.pylint ]);
+  pkgs-master = import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/ebe28430ba2d6d0e5562bf69c4afe907645fac61.tar.gz") {};
+  pkgs-python = pkgs-master.python3.withPackages (pkgs: [ pkgs.black pkgs.mypy pkgs.pylint ]);
 in
 pkgs.mkShell {
   buildInputs = [

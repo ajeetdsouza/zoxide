@@ -171,6 +171,22 @@ Add this to your configuration (usually `~/.zshrc`):
 eval "$(zoxide init zsh)"
 ```
 
+If you are using the [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh) framework,
+you can add the plugin with the following command
+
+```sh
+mkdir -p "$ZSH/plugins/zoxide" && zoxide init zsh > "$ZSH/plugins/zoxide/zoxide.plugin.zsh"
+```
+
+Next, add the plugin `zoxide` to `.zshrc`
+
+```
+plugins=(
+  # ...
+  zoxide
+)
+```
+
 #### Any POSIX shell
 
 Add this to your configuration:

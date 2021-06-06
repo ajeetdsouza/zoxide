@@ -2,8 +2,8 @@
 
 > A smarter cd command for your terminal
 
-[![crates.io][crates-io-badge]][crates-io]
-[![releases][releases-badge]][Releases]
+[![crates.io][crates.io-badge]][crates.io]
+[![Releases][releases-badge]][releases]
 
 `zoxide` is a blazing fast replacement for your `cd` command, inspired by
 `z` and `z.lua`. It keeps track of the directories you use most
@@ -39,9 +39,9 @@ copy it to your `$PATH`.
 
 | Distribution       | Repository              | Instructions                                                                                           |
 | ------------------ | ----------------------- | ------------------------------------------------------------------------------------------------------ |
-| **Any**            | [crates.io]             | `cargo install zoxide`                                                                                 |
-| **Any**            | [Linuxbrew]             | `brew install zoxide`                                                                                  |
-| **Any**            | [conda-forge]           | `conda install -c conda-forge zoxide`                                                                  |
+| ***Any***          | **[crates.io]**         | `cargo install zoxide`                                                                                 |
+| *Any*              | [conda-forge]           | `conda install -c conda-forge zoxide`                                                                  |
+| *Any*              | [Linuxbrew]             | `brew install zoxide`                                                                                  |
 | Alpine Linux 3.13+ | [Alpine Linux Packages] | `apk add zoxide`                                                                                       |
 | Arch Linux         | [AUR]                   | `yay -Sy zoxide-bin`                                                                                   |
 | CentOS 7+          | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide`                                              |
@@ -56,28 +56,30 @@ copy it to your `$PATH`.
 
 #### On macOS
 
-| Repository  | Instructions           |
-| ----------- | ---------------------- |
-| [crates.io] | `cargo install zoxide` |
-| [Homebrew]  | `brew install zoxide`  |
-| [MacPorts]  | `port install zoxide`  |
+| Repository      | Instructions                          |
+| --------------- | ------------------------------------- |
+| **[crates.io]** | `cargo install zoxide`                |
+| [conda-forge]   | `conda install -c conda-forge zoxide` |
+| [Homebrew]      | `brew install zoxide`                 |
+| [MacPorts]      | `port install zoxide`                 |
 
 #### On Windows
 
-| Repository   | Instructions           |
-| ------------ | ---------------------- |
-| [crates.io]  | `cargo install zoxide` |
-| [Chocolatey] | `choco install zoxide` |
-| [Scoop]      | `scoop install zoxide` |
+| Repository      | Instructions                          |
+| --------------- | ------------------------------------- |
+| **[crates.io]** | `cargo install zoxide`                |
+| [Chocolatey]    | `choco install zoxide`                |
+| [conda-forge]   | `conda install -c conda-forge zoxide` |
+| [Scoop]         | `scoop install zoxide`                |
 
 #### On BSD
 
-| Distribution  | Repository   | Instructions           |
-| ------------- | ------------ | ---------------------- |
-| **Any**       | [crates.io]  | `cargo install zoxide` |
-| DragonFly BSD | [DPorts]     | `pkg install zoxide`   |
-| FreeBSD       | [FreshPorts] | `pkg install zoxide`   |
-| NetBSD        | [pkgsrc]     | `pkgin install zoxide` |
+| Distribution  | Repository      | Instructions           |
+| ------------- | --------------- | ---------------------- |
+| ***Any***     | **[crates.io]** | `cargo install zoxide` |
+| DragonFly BSD | [DPorts]        | `pkg install zoxide`   |
+| FreeBSD       | [FreshPorts]    | `pkg install zoxide`   |
+| NetBSD        | [pkgsrc]        | `pkgin install zoxide` |
 
 #### On Android
 
@@ -251,10 +253,10 @@ Be sure to set these before calling `zoxide init`.
 [alpine linux packages]: https://pkgs.alpinelinux.org/packages?name=zoxide
 [aur]: https://aur.archlinux.org/packages/zoxide-bin
 [chocolatey]: https://community.chocolatey.org/packages/zoxide
+[conda-forge]: https://anaconda.org/conda-forge/zoxide
 [copr]: https://copr.fedorainfracloud.org/coprs/atim/zoxide/
-[conda-forge]: https://conda-forge.org/
-[crates-io-badge]: https://img.shields.io/crates/v/zoxide
-[crates-io]: https://crates.io/crates/zoxide
+[crates.io-badge]: https://img.shields.io/crates/v/zoxide
+[crates.io]: https://crates.io/crates/zoxide
 [debian packages]: https://packages.debian.org/testing/admin/zoxide
 [devuan packages]: https://pkginfo.devuan.org/cgi-bin/package-query.html?c=package&q=zoxide
 [dm9pzcaq overlay]: https://github.com/gentoo-mirror/dm9pZCAq

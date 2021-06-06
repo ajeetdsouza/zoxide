@@ -66,8 +66,8 @@ copy it to your `$PATH`.
 | Repository   | Instructions           |
 | ------------ | ---------------------- |
 | [crates.io]  | `cargo install zoxide` |
-| [Scoop]      | `scoop install zoxide` |
 | [Chocolatey] | `choco install zoxide` |
+| [Scoop]      | `scoop install zoxide` |
 
 #### On BSD
 

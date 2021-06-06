@@ -2,7 +2,7 @@
 
 > A smarter cd command for your terminal
 
-[![crates.io][crates.io-badge]][crates.io]
+[![crates.io][crates-io-badge]][crates-io]
 [![releases][releases-badge]][Releases]
 
 `zoxide` is a blazing fast replacement for your `cd` command, inspired by
@@ -232,11 +232,18 @@ Be sure to set these before calling `zoxide init`.
 
 ## Third-party integrations
 
-- [nnn], via [autojump plugin][nnn-autojump]
-- [telescope-zoxide]
-- [xxh], via [xxh-plugin-prerun-zoxide]
-- [zoxide.vim]
-- [zsh-autocomplete]
+- [`nnn`][nnn] is a terminal file manager. You can use `zoxide` for navigation
+  with the official [`autojump`][nnn-autojump] plugin.
+- [`ranger`][ranger] is a terminal file manager. You can use `zoxide` for
+  navigation with the [`ranger-zoxide`][ranger-zoxide] plugin.
+- [`telescope.nvim`][telescope-nvim] is a fuzzy finder for `neovim`. You can
+  use it with `zoxide` via the [`telescope-zoxide`][telescope-zoxide] plugin.
+- [`vim`][vim] / [`neovim`][neovim]. You can use `zoxide` for navigation with
+  the [`zoxide.vim`][zoxide-vim] plugin.
+- [`xxh`][xxh] transports your shell configuration over SSH. You can use
+  `zoxide` over SSH via the [`xxh-plugin-prerun-zoxide`][xxh-zoxide] plugin.
+- [`zsh-autocomplete`][zsh-autocomplete] adds realtime completions to `zsh`. It
+  supports `zoxide` out of the box.
 
 [algorithm-aging]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#aging
 [algorithm-matching]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#matching
@@ -244,8 +251,8 @@ Be sure to set these before calling `zoxide init`.
 [aur]: https://aur.archlinux.org/packages/zoxide-bin
 [chocolatey]: https://community.chocolatey.org/packages/zoxide
 [copr]: https://copr.fedorainfracloud.org/coprs/atim/zoxide/
-[crates.io-badge]: https://img.shields.io/crates/v/zoxide
-[crates.io]: https://crates.io/crates/zoxide
+[crates-io-badge]: https://img.shields.io/crates/v/zoxide
+[crates-io]: https://crates.io/crates/zoxide
 [debian packages]: https://packages.debian.org/testing/admin/zoxide
 [devuan packages]: https://pkginfo.devuan.org/cgi-bin/package-query.html?c=package&q=zoxide
 [dm9pzcaq overlay]: https://github.com/gentoo-mirror/dm9pZCAq
@@ -258,19 +265,24 @@ Be sure to set these before calling `zoxide init`.
 [homebrew]: https://formulae.brew.sh/formula/zoxide
 [linuxbrew]: https://formulae.brew.sh/formula-linux/zoxide
 [macports]: https://ports.macports.org/port/zoxide/summary
+[neovim]: https://github.com/neovim/neovim
 [nixpkgs]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/tools/misc/zoxide/default.nix
 [nnn-autojump]: https://github.com/jarun/nnn/blob/master/plugins/autojump
 [nnn]: https://github.com/jarun/nnn
 [pkgsrc]: https://pkgsrc.se/sysutils/zoxide
-[releases]: https://github.com/ajeetdsouza/zoxide/releases
+[ranger-zoxide]: https://github.com/jchook/ranger-zoxide
+[ranger]: https://github.com/ranger/ranger
 [releases-badge]: https://img.shields.io/github/v/release/ajeetdsouza/zoxide
+[releases]: https://github.com/ajeetdsouza/zoxide/releases
 [scoop]: https://github.com/ScoopInstaller/Main/tree/master/bucket/zoxide.json
+[telescope-nvim]: https://github.com/nvim-telescope/telescope.nvim
 [telescope-zoxide]: https://github.com/jvgrootveld/telescope-zoxide
 [termux]: https://github.com/termux/termux-packages/tree/master/packages/zoxide
 [tutorial]: contrib/tutorial.webp
 [ubuntu packages]: https://packages.ubuntu.com/hirsute/zoxide
+[vim]: https://github.com/vim/vim
 [void linux packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide
-[xxh-plugin-prerun-zoxide]: https://github.com/xxh/xxh-plugin-prerun-zoxide
+[xxh-zoxide]: https://github.com/xxh/xxh-plugin-prerun-zoxide
 [xxh]: https://github.com/xxh/xxh
-[zoxide.vim]: https://github.com/nanotee/zoxide.vim
+[zoxide-vim]: https://github.com/nanotee/zoxide.vim
 [zsh-autocomplete]: https://github.com/marlonrichert/zsh-autocomplete

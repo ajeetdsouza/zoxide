@@ -8,6 +8,8 @@ pkgs.mkShell {
     pkgs-master.cargo-audit
     pkgs-master.elvish
     pkgs-master.nushell
+    pkgs-master.shellcheck
+    pkgs-master.shfmt
     pkgs-python
     pkgs.bash
     pkgs.cargo
@@ -19,8 +21,6 @@ pkgs.mkShell {
     pkgs.powershell
     pkgs.rustc
     pkgs.rustfmt
-    pkgs.shellcheck
-    pkgs.shfmt
     pkgs.xonsh
     pkgs.zsh
   ];

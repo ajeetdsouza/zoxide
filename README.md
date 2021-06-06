@@ -41,6 +41,7 @@ copy it to your `$PATH`.
 | ------------------ | ----------------------- | ------------------------------------------------------------------------------------------------------ |
 | **Any**            | [crates.io]             | `cargo install zoxide`                                                                                 |
 | **Any**            | [Linuxbrew]             | `brew install zoxide`                                                                                  |
+| **Any**            | [conda-forge]           | `conda install -c conda-forge zoxide`                                                                  |
 | Alpine Linux 3.13+ | [Alpine Linux Packages] | `apk add zoxide`                                                                                       |
 | Arch Linux         | [AUR]                   | `yay -Sy zoxide-bin`                                                                                   |
 | CentOS 7+          | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide`                                              |
@@ -251,6 +252,7 @@ Be sure to set these before calling `zoxide init`.
 [aur]: https://aur.archlinux.org/packages/zoxide-bin
 [chocolatey]: https://community.chocolatey.org/packages/zoxide
 [copr]: https://copr.fedorainfracloud.org/coprs/atim/zoxide/
+[conda-forge]: https://conda-forge.org/
 [crates-io-badge]: https://img.shields.io/crates/v/zoxide
 [crates-io]: https://crates.io/crates/zoxide
 [debian packages]: https://packages.debian.org/testing/admin/zoxide

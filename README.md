@@ -63,10 +63,11 @@ copy it to your `$PATH`.
 
 #### On Windows
 
-| Repository  | Instructions           |
-| ----------- | ---------------------- |
-| [crates.io] | `cargo install zoxide` |
-| [Scoop]     | `scoop install zoxide` |
+| Repository   | Instructions           |
+| ------------ | ---------------------- |
+| [crates.io]  | `cargo install zoxide` |
+| [Chocolatey] | `choco install zoxide` |
+| [Scoop]      | `scoop install zoxide` |
 
 #### On BSD
 
@@ -241,6 +242,7 @@ Be sure to set these before calling `zoxide init`.
 [algorithm-matching]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#matching
 [alpine linux packages]: https://pkgs.alpinelinux.org/packages?name=zoxide
 [aur]: https://aur.archlinux.org/packages/zoxide-bin
+[chocolatey]: https://community.chocolatey.org/packages/zoxide
 [copr]: https://copr.fedorainfracloud.org/coprs/atim/zoxide/
 [crates.io-badge]: https://img.shields.io/crates/v/zoxide
 [crates.io]: https://crates.io/crates/zoxide

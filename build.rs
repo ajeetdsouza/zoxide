@@ -2,14 +2,13 @@ use std::env;
 use std::process::Command;
 
 fn git_version() -> Option<String> {
-    // Packages releases of zoxide almost always use the source tarball
-    // provided by GitHub, which does not include the `.git` folder. Since this
-    // feature is only useful for development, there's no need of printing a
-    // warning here.
     let mut git = Command::new("git");
     git.args(&["describe", "--tags", "--broken"]);
 
     let output = git.output().ok()?;
+    if !output.status.success() || output.stdout.is_empty() || !output.stderr.is_empty() {
+        return None;
+    }
     String::from_utf8(output.stdout).ok()
 }
 
@@ -39,6 +38,10 @@ fn generate_completions() {
 }
 
 fn main() {
+    // Packaged releases of zoxide almost always use the source tarball
+    // provided by GitHub, which does not include the `.git` folder. Since this
+    // feature is only useful for development, we can silently fall back to
+    // using the crate version.
     let version = git_version().unwrap_or_else(crate_version);
     println!("cargo:rustc-env=ZOXIDE_VERSION={}", version);
 

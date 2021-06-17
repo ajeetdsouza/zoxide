@@ -31,11 +31,21 @@ Read more about the matching algorithm [here][algorithm-matching].
 
 ### Step 1: Install `zoxide`
 
-`zoxide` works across all major platforms. If your distribution isn't included
-in the list below, you can download the binary from the [Releases] page and
-copy it to your `$PATH`.
+On **Linux** / **macOS**:
 
-#### On Linux
+```sh
+curl -sS https://webinstall.dev/zoxide | bash
+```
+
+On **Windows**:
+
+```sh
+curl.exe -A "MS" https://webinstall.dev/zoxide | powershell
+```
+
+Alternatively, you can install it using a package manager:
+
+On **Linux**:
 
 | Distribution       | Repository              | Instructions                                                                                           |
 | ------------------ | ----------------------- | ------------------------------------------------------------------------------------------------------ |
@@ -54,7 +64,7 @@ copy it to your `$PATH`.
 | Ubuntu 21.04+      | [Ubuntu Packages]       | `apt install zoxide`                                                                                   |
 | Void Linux         | [Void Linux Packages]   | `xbps-install -S zoxide`                                                                               |
 
-#### On macOS
+On **macOS**:
 
 | Repository      | Instructions                          |
 | --------------- | ------------------------------------- |
@@ -63,7 +73,7 @@ copy it to your `$PATH`.
 | [Homebrew]      | `brew install zoxide`                 |
 | [MacPorts]      | `port install zoxide`                 |
 
-#### On Windows
+On **Windows**:
 
 | Repository      | Instructions                          |
 | --------------- | ------------------------------------- |
@@ -72,7 +82,7 @@ copy it to your `$PATH`.
 | [conda-forge]   | `conda install -c conda-forge zoxide` |
 | [Scoop]         | `scoop install zoxide`                |
 
-#### On BSD
+On **BSD**:
 
 | Distribution  | Repository      | Instructions           |
 | ------------- | --------------- | ---------------------- |
@@ -81,7 +91,7 @@ copy it to your `$PATH`.
 | FreeBSD       | [FreshPorts]    | `pkg install zoxide`   |
 | NetBSD        | [pkgsrc]        | `pkgin install zoxide` |
 
-#### On Android
+On **Android**:
 
 | Repository | Instructions         |
 | ---------- | -------------------- |

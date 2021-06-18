@@ -138,6 +138,8 @@ impl Drop for Database<'_> {
 #[cfg(windows)]
 fn persist<P: AsRef<Path>>(mut file: NamedTempFile, path: P) -> Result<(), PersistError> {
     use rand::distributions::{Distribution, Uniform};
+    use rand::rngs::SmallRng;
+    use rand::SeedableRng;
     use std::thread;
     use std::time::Duration;
 
@@ -151,7 +153,7 @@ fn persist<P: AsRef<Path>>(mut file: NamedTempFile, path: P) -> Result<(), Persi
         match file.persist(&path) {
             Ok(_) => break,
             Err(e) if e.error.kind() == io::ErrorKind::PermissionDenied => {
-                let mut rng = rng.get_or_insert_with(rand::thread_rng);
+                let mut rng = rng.get_or_insert_with(SmallRng::from_entropy);
                 let between = Uniform::from(50..150);
                 let duration = Duration::from_millis(between.sample(&mut rng));
                 thread::sleep(duration);

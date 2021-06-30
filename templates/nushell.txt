@@ -56,7 +56,7 @@ def __zoxide_z [...rest:string] {
         if (echo $rest | length) <= 1 && ($arg0 == '-' || (echo $arg0 | path expand | path exists)) {
             cd $arg0
         } {
-            cd (zoxide query --exclude (pwd) -- $rest | str trim)
+            cd $"(zoxide query --exclude (pwd) -- $rest | str trim)"
         }
 {%- if echo %}
         pwd
@@ -69,7 +69,7 @@ def __zoxide_zi  [...rest:string] {
     if (shells | where active == $true | get name) != filesystem {
         $"zoxide: can only jump directories on filesystem(char nl)"
     } {
-        cd (zoxide query -i -- $rest | str trim)
+        cd $"(zoxide query -i -- $rest | str trim)"
 {%- if echo %}
         pwd
 {%- endif %}

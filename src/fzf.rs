@@ -16,7 +16,7 @@ impl Fzf {
         if multiple {
             command.arg("--multi");
         }
-        command.arg("--exit-0").arg("-n2..").stdin(Stdio::piped()).stdout(Stdio::piped());
+        command.arg("--exit-0").arg("--preview='ls -al --color --human-readable --group-directories-first --file-type {2..}'").arg("-n2..").stdin(Stdio::piped()).stdout(Stdio::piped());
         if let Some(fzf_opts) = config::fzf_opts() {
             command.env("FZF_DEFAULT_OPTS", fzf_opts);
         }

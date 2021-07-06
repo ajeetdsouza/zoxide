@@ -14,9 +14,9 @@ impl Fzf {
     pub fn new(multiple: bool) -> Result<Self> {
         let mut command = Command::new("fzf");
         if multiple {
-            command.arg("-m");
+            command.arg("--multi");
         }
-        command.arg("-n2..").stdin(Stdio::piped()).stdout(Stdio::piped());
+        command.arg("--exit-0").arg("-n2..").stdin(Stdio::piped()).stdout(Stdio::piped());
         if let Some(fzf_opts) = config::fzf_opts() {
             command.env("FZF_DEFAULT_OPTS", fzf_opts);
         }

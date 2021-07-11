@@ -7,13 +7,13 @@
 
 # Default prompt for Nushell.
 def __zoxide_prompt [] {
-    let git = $"(do -i {git rev-parse --abbrev-ref HEAD} | str trim)"
+    let git = $'(do -i {git rev-parse --abbrev-ref HEAD} | str trim)'
     let git = (if (echo $git | str length) == 0 {
-        ""
+        ''
     } {
         build-string (char lparen) (ansi cb) $git (ansi reset) (char rparen)
     })
-    build-string (ansi gb) (pwd) (ansi reset) $git "> "
+    build-string (ansi gb) (pwd) (ansi reset) $git '> '
 }
 
 {{ section }}
@@ -32,7 +32,7 @@ def __zoxide_hook [] {
 
 {%- when InitHook::Pwd %}
 def __zoxide_hook [] {}
-$"zoxide: PWD hooks are not supported on Nushell.(char nl)Use 'zoxide init nushell --hook prompt' instead.(char nl)"
+$'zoxide: PWD hooks are not supported on Nushell.(char nl)Use (char sq)zoxide init nushell --hook prompt(char sq) instead.(char nl)'
 {%- endmatch %}
 
 {{ section }}
@@ -44,7 +44,7 @@ $"zoxide: PWD hooks are not supported on Nushell.(char nl)Use 'zoxide init nushe
 def __zoxide_z [...rest:string] {
     if (shells | where active == $true | get name) != filesystem {
         if (echo $rest | length) > 1 {
-            $"zoxide: can only jump directories on filesystem(char nl)"
+            $'zoxide: can only jump directories on filesystem(char nl)'
         } {
             cd (echo $rest)
 {%- if echo %}
@@ -56,7 +56,7 @@ def __zoxide_z [...rest:string] {
         if (echo $rest | length) <= 1 && ($arg0 == '-' || (echo $arg0 | path expand | path exists)) {
             cd $arg0
         } {
-            cd $"(zoxide query --exclude (pwd) -- $rest | str trim)"
+            cd $'(zoxide query --exclude (pwd) -- $rest | str trim)'
         }
 {%- if echo %}
         pwd
@@ -67,9 +67,9 @@ def __zoxide_z [...rest:string] {
 # Jump to a directory using interactive search.
 def __zoxide_zi  [...rest:string] {
     if (shells | where active == $true | get name) != filesystem {
-        $"zoxide: can only jump directories on filesystem(char nl)"
+        $'zoxide: can only jump directories on filesystem(char nl)'
     } {
-        cd $"(zoxide query -i -- $rest | str trim)"
+        cd $'(zoxide query -i -- $rest | str trim)'
 {%- if echo %}
         pwd
 {%- endif %}
@@ -99,7 +99,7 @@ alias {{cmd}}i = __zoxide_zi
 #
 # Add this to your configuration (usually ~/.config/nu/config.toml):
 #
-#   prompt = "__zoxide_hook;__zoxide_prompt"
-#   startup = ["zoxide init nushell --hook prompt | save ~/.zoxide.nu", "source ~/.zoxide.nu"]
+#   prompt = '__zoxide_hook;__zoxide_prompt'
+#   startup = ['zoxide init nushell --hook prompt | save ~/.zoxide.nu', 'source ~/.zoxide.nu']
 #
 # You can replace __zoxide_prompt with a custom prompt.

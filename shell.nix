@@ -1,6 +1,6 @@
 let
   pkgs = import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/20.09.tar.gz") {};
-  pkgs-master = import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/ebe28430ba2d6d0e5562bf69c4afe907645fac61.tar.gz") {};
+  pkgs-master = import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/8e4c6b845965440850eaec79db7086e5d9e350fd.tar.gz") {};
   pkgs-python = pkgs-master.python3.withPackages (pkgs: [ pkgs.black pkgs.mypy pkgs.pylint ]);
 in
 pkgs.mkShell {

@@ -280,7 +280,8 @@ mod tests {
         #[values(false, true)] resolve_symlinks: bool,
     ) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
-        let source = Powershell(&opts).render().unwrap();
+        let mut source = "Set-StrictMode -Version latest\n".to_string();
+        Powershell(&opts).render_into(&mut source).unwrap();
 
         Command::new("pwsh")
             .args(&["-NoLogo", "-NonInteractive", "-NoProfile", "-Command", &source])

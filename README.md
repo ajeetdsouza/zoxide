@@ -243,6 +243,21 @@ Be sure to set these before calling `zoxide init`.
   - When set to `1`, `z` will resolve symlinks before adding directories to the
     database.
 
+## Matching
+
+zoxide uses a simple, predictable algorithm for resolving queries:
+
+* All matching is case-insensitive.  
+    `zoxide query foo` matches `/foo` as well as `/FOO`.
+* All terms must be present (including slashes) within the path, in order.  
+    `zoxide query fo ba` matches `/foo/bar`, but not `/bar/foo`.  
+    `zoxide query fo / ba` matches `/foo/bar`, but not `/foobar`.
+* The last component of the last keyword must match the last component of the path.  
+    `zoxide query bar` matches `/foo/bar`, but not `/bar/foo`.  
+    `zoxide query foo/bar` (last component: `bar`) matches `/foo/bar`, but not `/foo/bar/baz`.
+* The path must exist. Deleted directories are filtered out.  
+* Matches are returned in descending order of **FRECENCY**.
+
 ## Third-party integrations
 
 - [`nnn`][nnn] is a terminal file manager. You can use `zoxide` for navigation

@@ -274,7 +274,7 @@ zoxide uses a simple, predictable algorithm for resolving queries:
   supports `zoxide` out of the box.
 
 [algorithm-aging]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#aging
-[algorithm-matching]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#matching
+[algorithm-matching]: #matching
 [alpine linux packages]: https://pkgs.alpinelinux.org/packages?name=zoxide
 [aur]: https://aur.archlinux.org/packages/zoxide-bin
 [chocolatey]: https://community.chocolatey.org/packages/zoxide

@@ -109,10 +109,9 @@ function __zoxide_zi() {
 
 # Remove definitions.
 function __zoxide_unset() {
-    # shellcheck disable=SC1001
     \builtin unset -f "$@" &>/dev/null
-    # shellcheck disable=SC1001
     \builtin unset -v "$@" &>/dev/null
+    \builtin unalias "$@" &>/dev/null || \builtin :
 }
 
 __zoxide_unset '{{cmd}}'

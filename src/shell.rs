@@ -399,7 +399,7 @@ mod tests {
         let source = Zsh(&opts).render().unwrap();
 
         Command::new("zsh")
-            .args(&["-c", &source, "--no-rcs"])
+            .args(&["-c", &source, "--no-globalrcs", "--no-rcs"])
             .assert()
             .success()
             .stdout("")

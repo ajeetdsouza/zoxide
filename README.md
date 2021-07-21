@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD033 -->
+
 # `zoxide`
 
 > A smarter cd command for your terminal
@@ -31,40 +33,49 @@ Read more about the matching algorithm [here][algorithm-matching].
 
 ### Step 1: Install `zoxide`
 
-On **Linux** / **macOS**:
+`zoxide` supports most major platforms. If your platform isn't listed below,
+please [open an issue][issues].
+
+<details>
+<summary>Linux</summary>
+
+To install `zoxide`, run this command in your terminal:
 
 ```sh
 curl -sS https://webinstall.dev/zoxide | bash
 ```
 
-On **Windows**:
+Alternatively, you can use a package manager:
+
+| Distribution       | Repository              | Instructions                                                                                   |
+| ------------------ | ----------------------- | ---------------------------------------------------------------------------------------------- |
+| ***Any***          | **[crates.io]**         | `cargo install zoxide`                                                                         |
+| *Any*              | [conda-forge]           | `conda install -c conda-forge zoxide`                                                          |
+| *Any*              | [Linuxbrew]             | `brew install zoxide`                                                                          |
+| Alpine Linux 3.13+ | [Alpine Linux Packages] | `apk add zoxide`                                                                               |
+| Arch Linux         | [AUR]                   | `yay -Sy zoxide-bin`                                                                           |
+| CentOS 7+          | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide`                                      |
+| Debian Testing     | [Debian Packages]       | `apt install zoxide`                                                                           |
+| Devuan 4.0+        | [Devuan Packages]       | `apt install zoxide`                                                                           |
+| Fedora 32+         | [Fedora Packages]       | `dnf install zoxide`                                                                           |
+| Gentoo             | [GURU Overlay]          | `eselect repository enable guru` <br /> `emerge --sync guru` <br /> `emerge app-shells/zoxide` |
+| NixOS              | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                                                                   |
+| Parrot OS          |                         | `apt install zoxide`                                                                           |
+| Ubuntu 21.04+      | [Ubuntu Packages]       | `apt install zoxide`                                                                           |
+| Void Linux         | [Void Linux Packages]   | `xbps-install -S zoxide`                                                                       |
+
+</details>
+
+<details>
+<summary>macOS</summary>
+
+To install `zoxide`, run this command in your terminal:
 
 ```sh
-curl.exe -A "MS" https://webinstall.dev/zoxide | powershell
+curl -sS https://webinstall.dev/zoxide | bash
 ```
 
-Alternatively, you can install it using a package manager:
-
-On **Linux**:
-
-| Distribution       | Repository              | Instructions                                                                                           |
-| ------------------ | ----------------------- | ------------------------------------------------------------------------------------------------------ |
-| ***Any***          | **[crates.io]**         | `cargo install zoxide`                                                                                 |
-| *Any*              | [conda-forge]           | `conda install -c conda-forge zoxide`                                                                  |
-| *Any*              | [Linuxbrew]             | `brew install zoxide`                                                                                  |
-| Alpine Linux 3.13+ | [Alpine Linux Packages] | `apk add zoxide`                                                                                       |
-| Arch Linux         | [AUR]                   | `yay -Sy zoxide-bin`                                                                                   |
-| CentOS 7+          | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide`                                              |
-| Debian Testing     | [Debian Packages]       | `apt install zoxide`                                                                                   |
-| Devuan 4.0+        | [Devuan Packages]       | `apt install zoxide`                                                                                   |
-| Fedora 32+         | [Fedora Packages]       | `dnf install zoxide`                                                                                   |
-| Gentoo             | [dm9pZCAq Overlay]      | `eselect repository enable dm9pZCAq` <br /> `emerge --sync dm9pZCAq` <br /> `emerge app-shells/zoxide` |
-| NixOS              | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                                                                           |
-| Parrot OS          |                         | `apt install zoxide`                                                                                   |
-| Ubuntu 21.04+      | [Ubuntu Packages]       | `apt install zoxide`                                                                                   |
-| Void Linux         | [Void Linux Packages]   | `xbps-install -S zoxide`                                                                               |
-
-On **macOS**:
+Alternatively, you can use a package manager:
 
 | Repository      | Instructions                          |
 | --------------- | ------------------------------------- |
@@ -73,7 +84,18 @@ On **macOS**:
 | [Homebrew]      | `brew install zoxide`                 |
 | [MacPorts]      | `port install zoxide`                 |
 
-On **Windows**:
+</details>
+
+<details>
+<summary>Windows</summary>
+
+To install `zoxide`, run this command in your command prompt:
+
+```sh
+curl.exe -A "MS" https://webinstall.dev/zoxide | powershell
+```
+
+Alternatively, you can use a package manager:
 
 | Repository      | Instructions                          |
 | --------------- | ------------------------------------- |
@@ -82,7 +104,12 @@ On **Windows**:
 | [conda-forge]   | `conda install -c conda-forge zoxide` |
 | [Scoop]         | `scoop install zoxide`                |
 
-On **BSD**:
+</details>
+
+<details>
+<summary>BSD</summary>
+
+To install `zoxide`, use a package manager:
 
 | Distribution  | Repository      | Instructions           |
 | ------------- | --------------- | ---------------------- |
@@ -91,33 +118,51 @@ On **BSD**:
 | FreeBSD       | [FreshPorts]    | `pkg install zoxide`   |
 | NetBSD        | [pkgsrc]        | `pkgin install zoxide` |
 
-On **Android**:
+</details>
+
+<details>
+<summary>Android</summary>
+
+To install `zoxide`, use a package manager:
 
 | Repository | Instructions         |
 | ---------- | -------------------- |
 | [Termux]   | `pkg install zoxide` |
 
+</details>
+
 ### Step 2: Install `fzf` (optional)
 
-[`fzf`][fzf] is a command-line fuzzy finder, used by zoxide for interactive
-selection. Installation instructions can be found [here][fzf-installation].
+[`fzf`][fzf] is a command-line fuzzy finder, used by `zoxide` for interactive
+selection ([installation instructions][fzf-installation]).
 
 ### Step 3: Add `zoxide` to your shell
 
-If you currently use `z`, `z.lua`, or `zsh-z`, you may want to first import
-your existing entries into `zoxide`:
+If you currently use any of the following utilities, you may want to import
+your data into `zoxide`:
 
-```sh
-zoxide import --from z path/to/db
-```
-
-Alternatively, for `autojump` (note that scores are not imported):
+<details>
+<summary><code>autojump</code></summary>
 
 ```sh
 zoxide import --from autojump path/to/db
 ```
 
-#### `bash`
+</details>
+
+<details>
+<summary><code>z</code>, <code>z.lua</code>, or <code>zsh-z</code></summary>
+
+```sh
+zoxide import --from z path/to/db
+```
+
+</details>
+
+Now, initialize `zoxide` on your shell:
+
+<details>
+<summary><code>bash</code></summary>
 
 Add this to your configuration (usually `~/.bashrc`):
 
@@ -125,7 +170,10 @@ Add this to your configuration (usually `~/.bashrc`):
 eval "$(zoxide init bash)"
 ```
 
-#### `elvish`
+</details>
+
+<details>
+<summary><code>elvish</code></summary>
 
 Add this to your configuration (usually `~/.elvish/rc.elv`):
 
@@ -133,7 +181,10 @@ Add this to your configuration (usually `~/.elvish/rc.elv`):
 eval (zoxide init elvish | slurp)
 ```
 
-#### `fish`
+</details>
+
+<details>
+<summary><code>fish</code></summary>
 
 Add this to your configuration (usually `~/.config/fish/config.fish`):
 
@@ -141,9 +192,12 @@ Add this to your configuration (usually `~/.config/fish/config.fish`):
 zoxide init fish | source
 ```
 
-#### `nushell 0.32.0+`
+</details>
 
-Initialize zoxide's Nushell script:
+<details>
+<summary><code>nushell 0.32+</code></summary>
+
+Initialize the `zoxide` script:
 
 ```sh
 zoxide init nushell --hook prompt | save ~/.zoxide.nu
@@ -158,7 +212,10 @@ startup = ["zoxide init nushell --hook prompt | save ~/.zoxide.nu", "source ~/.z
 
 You can replace `__zoxide_prompt` with a custom prompt.
 
-#### `powershell`
+</details>
+
+<details>
+<summary><code>powershell</code></summary>
 
 Add this to your configuration (the location is stored in `$profile`):
 
@@ -169,7 +226,10 @@ Invoke-Expression (& {
 })
 ```
 
-#### `xonsh`
+</details>
+
+<details>
+<summary><code>xonsh</code></summary>
 
 Add this to your configuration (usually `~/.xonshrc`):
 
@@ -177,7 +237,10 @@ Add this to your configuration (usually `~/.xonshrc`):
 execx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')
 ```
 
-#### `zsh`
+</details>
+
+<details>
+<summary><code>zsh</code></summary>
 
 Add this to your configuration (usually `~/.zshrc`):
 
@@ -185,7 +248,10 @@ Add this to your configuration (usually `~/.zshrc`):
 eval "$(zoxide init zsh)"
 ```
 
-#### Any POSIX shell
+</details>
+
+<details>
+<summary>Any POSIX shell</summary>
 
 Add this to your configuration:
 
@@ -193,27 +259,35 @@ Add this to your configuration:
 eval "$(zoxide init posix --hook prompt)"
 ```
 
+</details>
+
 ## Configuration
 
-### `init` flags
+### Flags
 
-- `--cmd`: changes the prefix of predefined aliases (`z`, `zi`).
+When calling `zoxide init`, the following flags are available:
+
+- `--cmd`
+  - Changes the prefix of predefined aliases (`z`, `zi`).
   - e.g. `--cmd j` would change the aliases to `j` and `ji` respectively.
-- `--hook <HOOK>`: change how often zoxide increments a directory's score:
-  - `none`: never automatically add directories to zoxide.
-  - `prompt`: add the current directory to zoxide at every shell prompt.
-  - `pwd`: whenever the user changes directories, add the new directory to
-    zoxide.
-- `--no-aliases`: don't define extra aliases (`z`, `zi`).
+- `--hook <HOOK>`
+  - Changes how often `zoxide` increments a directory's score:
+    | Hook     | Description                       |
+    | -------- | --------------------------------- |
+    | `none`   | Never                             |
+    | `prompt` | At every shell prompt             |
+    | `pwd`    | Whenever the directory is changed |
+- `--no-aliases`
+  - Don't define extra aliases (`z`, `zi`).
   - These functions will still be available in your shell as `__zoxide_z` and
-    `__zoxide_zi`, should you choose to use them elsewhere.
+    `__zoxide_zi`, should you choose to redefine them.
 
 ### Environment variables
 
 Be sure to set these before calling `zoxide init`.
 
 - `_ZO_DATA_DIR`
-  - Specifies the directory in which zoxide should store its database.
+  - Specifies the directory in which `zoxide` should store its database.
   - The default value varies across OSes:
     | OS          | Path                                     | Example                                    |
     | ----------- | ---------------------------------------- | ------------------------------------------ |
@@ -269,14 +343,15 @@ Be sure to set these before calling `zoxide init`.
 [crates.io]: https://crates.io/crates/zoxide
 [debian packages]: https://packages.debian.org/testing/admin/zoxide
 [devuan packages]: https://pkginfo.devuan.org/cgi-bin/package-query.html?c=package&q=zoxide
-[dm9pzcaq overlay]: https://github.com/gentoo-mirror/dm9pZCAq
 [dports]: https://github.com/DragonFlyBSD/DPorts/tree/master/sysutils/zoxide
 [fedora packages]: https://src.fedoraproject.org/rpms/rust-zoxide
 [freshports]: https://www.freshports.org/sysutils/zoxide/
 [fzf-installation]: https://github.com/junegunn/fzf#installation
 [fzf]: https://github.com/junegunn/fzf
 [glob]: https://man7.org/linux/man-pages/man7/glob.7.html
+[guru overlay]: https://github.com/gentoo-mirror/guru
 [homebrew]: https://formulae.brew.sh/formula/zoxide
+[issues]: https://github.com/ajeetdsouza/zoxide/issues/new
 [linuxbrew]: https://formulae.brew.sh/formula-linux/zoxide
 [macports]: https://ports.macports.org/port/zoxide/summary
 [neovim]: https://github.com/neovim/neovim

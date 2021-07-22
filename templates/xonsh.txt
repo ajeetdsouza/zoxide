@@ -37,9 +37,9 @@ def __zoxide_pwd() -> str:
 {%- if resolve_symlinks %}
     pwd = os.getcwd()
 {%- else %}
-    pwd = os.getenv("PWD")
+    pwd = __xonsh__.env.get("PWD")
     if pwd is None:
-        raise Exception("$PWD not found in env")
+        raise Exception("$PWD not found in Xonsh env")
 {%- endif %}
     return pwd
 

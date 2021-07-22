@@ -3,17 +3,11 @@
 
 """Initialize zoxide on Xonsh."""
 
+import builtins  # pylint: disable=unused-import
 import os
 import os.path
 import subprocess
 import sys
-{%- if cmd.is_some() %}
-from builtins import aliases  # type: ignore # pylint: disable=no-name-in-module
-{%- endif %}
-{%- if hook != InitHook::None %}
-from builtins import events  # type: ignore # pylint: disable=no-name-in-module
-{%- endif %}
-from subprocess import CalledProcessError
 from typing import AnyStr, List, Optional
 
 import xonsh.dirstack  # type: ignore # pylint: disable=import-error
@@ -37,9 +31,9 @@ def __zoxide_pwd() -> str:
 {%- if resolve_symlinks %}
     pwd = os.getcwd()
 {%- else %}
-    pwd = os.getenv("PWD")
+    pwd = builtins.__xonsh__.env.get("PWD")  # type: ignore  # pylint:disable=no-member
     if pwd is None:
-        raise Exception("$PWD not found in env")
+        raise Exception("$PWD not found")
 {%- endif %}
     return pwd
 
@@ -91,9 +85,9 @@ if globals().get("__zoxide_hooked") is not True:
 {%- when InitHook::None %}
     {{ not_configured }}
 {%- when InitHook::Prompt %}
-    @events.on_post_prompt  # type: ignore  # pylint:disable=undefined-variable
+    @builtins.events.on_post_prompt  # type: ignore  # pylint:disable=no-member
 {%- when InitHook::Pwd %}
-    @events.on_chdir  # type: ignore  # pylint:disable=undefined-variable
+    @builtins.events.on_chdir  # type: ignore  # pylint:disable=no-member
 {%- endmatch %}
     def __zoxide_hook(**_kwargs):
         """Hook to add new entries to the database."""
@@ -125,7 +119,7 @@ def __zoxide_z(args: List[str]):
                 check=True,
                 stdout=subprocess.PIPE,
             )
-        except CalledProcessError as exc:
+        except subprocess.CalledProcessError as exc:
             raise ZoxideSilentException() from exc
 
         __zoxide_result = __zoxide_cmd.stdout[:-1]
@@ -139,7 +133,7 @@ def __zoxide_zi(args: List[str]):
         __zoxide_cmd = subprocess.run(
             [zoxide, "query", "-i", "--"] + args, check=True, stdout=subprocess.PIPE
         )
-    except CalledProcessError as exc:
+    except subprocess.CalledProcessError as exc:
         raise ZoxideSilentException() from exc
 
     __zoxide_result = __zoxide_cmd.stdout[:-1]
@@ -153,8 +147,8 @@ def __zoxide_zi(args: List[str]):
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-aliases["{{cmd}}"] = __zoxide_z
-aliases["{{cmd}}i"] = __zoxide_zi
+builtins.aliases["{{cmd}}"] = __zoxide_z  # type: ignore  # pylint:disable=no-member
+builtins.aliases["{{cmd}}i"] = __zoxide_zi  # type: ignore  # pylint:disable=no-member
 
 {%- when None %}
 

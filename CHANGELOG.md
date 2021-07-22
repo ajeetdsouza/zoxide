@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nushell: errors on 0.33.0.
 - PowerShell: errors when initializing in `StrictMode`.
 - Bash/POSIX: remove conflicting alias definitions when initializing.
+- Bash: remove extra semicolon when setting `$PROMPT_COMMAND`.
+- Xonsh: use shell environment instead of `os.environ`.
 
 ## [0.7.2] - 2021-06-10
 

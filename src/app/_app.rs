@@ -33,8 +33,8 @@ pub enum App {
 /// Add a new directory or increment its rank
 #[derive(Clap, Debug)]
 pub struct Add {
-    #[clap(value_hint = ValueHint::DirPath)]
-    pub path: PathBuf,
+    #[clap(min_values = 1, required = true, value_hint = ValueHint::DirPath)]
+    pub paths: Vec<PathBuf>,
 }
 
 /// Import entries from another application

@@ -31,9 +31,9 @@ Read more about the matching algorithm [here][algorithm-matching].
 
 ## Getting started
 
-### Step 1: Install `zoxide`
+### *Step 1: Install `zoxide`*
 
-`zoxide` supports most major platforms. If your platform isn't listed below,
+`zoxide` runs on most major platforms. If your platform isn't listed below,
 please [open an issue][issues].
 
 <details>
@@ -131,12 +131,12 @@ To install `zoxide`, use a package manager:
 
 </details>
 
-### Step 2: Install `fzf` (optional)
+### *Step 2: Install `fzf` (optional)*
 
 [`fzf`][fzf] is a command-line fuzzy finder, used by `zoxide` for interactive
-selection ([installation instructions][fzf-installation]).
+selection. It can be installed from [here][fzf-installation].
 
-### Step 3: Add `zoxide` to your shell
+### *Step 3: Import your data (optional)*
 
 If you currently use any of the following utilities, you may want to import
 your data into `zoxide`:
@@ -159,7 +159,9 @@ zoxide import --from z path/to/db
 
 </details>
 
-Now, initialize `zoxide` on your shell:
+### *Step 4: Add `zoxide` to your shell*
+
+To start using `zoxide`, add it to your shell.
 
 <details>
 <summary><code>bash</code></summary>
@@ -195,7 +197,7 @@ zoxide init fish | source
 </details>
 
 <details>
-<summary><code>nushell 0.32+</code></summary>
+<summary><code>nushell v0.32+</code></summary>
 
 Initialize the `zoxide` script:
 
@@ -217,7 +219,7 @@ You can replace `__zoxide_prompt` with a custom prompt.
 <details>
 <summary><code>powershell</code></summary>
 
-Add this to your configuration (the location is stored in `$profile`):
+Add this to your configuration (find it with `echo $profile`):
 
 ```powershell
 Invoke-Expression (& {
@@ -251,7 +253,7 @@ eval "$(zoxide init zsh)"
 </details>
 
 <details>
-<summary>Any POSIX shell</summary>
+<summary>any POSIX shell</summary>
 
 Add this to your configuration:
 

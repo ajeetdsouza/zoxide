@@ -51,7 +51,7 @@ _zoxide() {
             ;;
         
         zoxide__add)
-            opts=" -h  --help  <path> "
+            opts=" -h  --help  <paths>... "
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0

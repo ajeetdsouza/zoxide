@@ -4,7 +4,7 @@
 
 > A smarter cd command for your terminal
 
-[![crates.io][crates.io-badge]][crates.io]
+[![crates.io][crates-io-badge]][crates-io]
 [![Releases][releases-badge]][releases]
 
 `zoxide` is a blazing fast replacement for your `cd` command, inspired by
@@ -49,7 +49,7 @@ Alternatively, you can use a package manager:
 
 | Distribution       | Repository              | Instructions                                                                                   |
 | ------------------ | ----------------------- | ---------------------------------------------------------------------------------------------- |
-| ***Any***          | **[crates.io]**         | `cargo install zoxide`                                                                         |
+| ***Any***          | **[crates-io]**         | `cargo install zoxide`                                                                         |
 | *Any*              | [conda-forge]           | `conda install -c conda-forge zoxide`                                                          |
 | *Any*              | [Linuxbrew]             | `brew install zoxide`                                                                          |
 | Alpine Linux 3.13+ | [Alpine Linux Packages] | `apk add zoxide`                                                                               |
@@ -69,17 +69,11 @@ Alternatively, you can use a package manager:
 <details>
 <summary>macOS</summary>
 
-To install `zoxide`, run this command in your terminal:
-
-```sh
-curl -sS https://webinstall.dev/zoxide | bash
-```
-
-Alternatively, you can use a package manager:
+To install `zoxide`, use a package manager:
 
 | Repository      | Instructions                          |
 | --------------- | ------------------------------------- |
-| **[crates.io]** | `cargo install zoxide`                |
+| **[crates-io]** | `cargo install zoxide`                |
 | [conda-forge]   | `conda install -c conda-forge zoxide` |
 | [Homebrew]      | `brew install zoxide`                 |
 | [MacPorts]      | `port install zoxide`                 |
@@ -99,7 +93,7 @@ Alternatively, you can use a package manager:
 
 | Repository      | Instructions                          |
 | --------------- | ------------------------------------- |
-| **[crates.io]** | `cargo install zoxide`                |
+| **[crates-io]** | `cargo install zoxide`                |
 | [Chocolatey]    | `choco install zoxide`                |
 | [conda-forge]   | `conda install -c conda-forge zoxide` |
 | [Scoop]         | `scoop install zoxide`                |
@@ -113,7 +107,7 @@ To install `zoxide`, use a package manager:
 
 | Distribution  | Repository      | Instructions           |
 | ------------- | --------------- | ---------------------- |
-| ***Any***     | **[crates.io]** | `cargo install zoxide` |
+| ***Any***     | **[crates-io]** | `cargo install zoxide` |
 | DragonFly BSD | [DPorts]        | `pkg install zoxide`   |
 | FreeBSD       | [FreshPorts]    | `pkg install zoxide`   |
 | NetBSD        | [pkgsrc]        | `pkgin install zoxide` |
@@ -321,6 +315,8 @@ Be sure to set these before calling `zoxide init`.
 
 ## Third-party integrations
 
+- [`emacs`][emacs]. You can use `zoxide` for navigation with the
+  [`zoxide.el`][zoxide-el] plugin.
 - [`nnn`][nnn] is a terminal file manager. You can use `zoxide` for navigation
   with the official [`autojump`][nnn-autojump] plugin.
 - [`ranger`][ranger] is a terminal file manager. You can use `zoxide` for
@@ -341,11 +337,12 @@ Be sure to set these before calling `zoxide init`.
 [chocolatey]: https://community.chocolatey.org/packages/zoxide
 [conda-forge]: https://anaconda.org/conda-forge/zoxide
 [copr]: https://copr.fedorainfracloud.org/coprs/atim/zoxide/
-[crates.io-badge]: https://img.shields.io/crates/v/zoxide
-[crates.io]: https://crates.io/crates/zoxide
+[crates-io-badge]: https://img.shields.io/crates/v/zoxide
+[crates-io]: https://crates.io/crates/zoxide
 [debian packages]: https://packages.debian.org/testing/admin/zoxide
 [devuan packages]: https://pkginfo.devuan.org/cgi-bin/package-query.html?c=package&q=zoxide
 [dports]: https://github.com/DragonFlyBSD/DPorts/tree/master/sysutils/zoxide
+[emacs]: https://www.gnu.org/software/emacs/
 [fedora packages]: https://src.fedoraproject.org/rpms/rust-zoxide
 [freshports]: https://www.freshports.org/sysutils/zoxide/
 [fzf-installation]: https://github.com/junegunn/fzf#installation
@@ -375,5 +372,6 @@ Be sure to set these before calling `zoxide init`.
 [void linux packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide
 [xxh-zoxide]: https://github.com/xxh/xxh-plugin-prerun-zoxide
 [xxh]: https://github.com/xxh/xxh
+[zoxide-el]: https://gitlab.com/Vonfry/zoxide.el
 [zoxide-vim]: https://github.com/nanotee/zoxide.vim
 [zsh-autocomplete]: https://github.com/marlonrichert/zsh-autocomplete

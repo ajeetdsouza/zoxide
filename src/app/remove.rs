@@ -28,35 +28,25 @@ impl Run for Remove {
 
                 selection = fzf.wait_select()?;
                 let paths = selection.lines().filter_map(|line| line.get(5..));
-                let mut not_found = Vec::new();
                 for path in paths {
-                    if !db.remove(&path) {
-                        not_found.push(path);
+                    if !db.remove(path) {
+                        bail!("path not found in database: {}", path);
                     }
-                }
-
-                if !not_found.is_empty() {
-                    let mut err = "path not found in database:".to_string();
-                    for path in not_found {
-                        err.push_str("\n  ");
-                        err.push_str(path.as_ref());
-                    }
-                    bail!(err);
                 }
             }
             None => {
-                // unwrap is safe here because path is required_unless_present = "interactive"
-                let path = self.path.as_ref().unwrap();
-                if !db.remove(path) {
-                    let path_abs = util::resolve_path(&path)?;
-                    let path_abs = util::path_to_str(&path_abs)?;
-                    if path_abs != path && !db.remove(path) {
-                        bail!("path not found in database:\n  {}", &path)
+                for path in self.paths.iter() {
+                    if !db.remove(path) {
+                        let path_abs = util::resolve_path(path)?;
+                        let path_abs = util::path_to_str(&path_abs)?;
+                        if path_abs != path && !db.remove(path_abs) {
+                            bail!("path not found in database: {} ({})", path, path_abs)
+                        }
                     }
                 }
             }
         }
 
-        Ok(())
+        db.save()
     }
 }

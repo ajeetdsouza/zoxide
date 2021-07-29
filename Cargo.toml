@@ -11,18 +11,21 @@ categories = ["command-line-utilities", "filesystem"]
 
 [dependencies]
 anyhow = "1.0.32"
-askama = { version="0.10.3", default-features=false }
+askama = { version = "0.10.3", default-features = false }
 bincode = "1.3.1"
 clap = "3.0.0-beta.2"
 dirs-next = "2.0.0"
 dunce = "1.0.1"
 glob = "0.3.0"
 ordered-float = "2.0.0"
-serde = { version="1.0.116", features=["derive"] }
+serde = { version = "1.0.116", features = ["derive"] }
 tempfile = "3.1.0"
 
 [target.'cfg(windows)'.dependencies]
-rand = { version="0.8.4", features=["getrandom", "small_rng"], default-features=false }
+rand = { version = "0.8.4", features = [
+    "getrandom",
+    "small_rng",
+], default-features = false }
 
 [dev-dependencies]
 assert_cmd = "1.0.1"

@@ -32,7 +32,7 @@ _zoxide() {
 _arguments "${_arguments_options[@]}" \
 '-h[Prints help information]' \
 '--help[Prints help information]' \
-':path:_files -/' \
+'*::paths:_files -/' \
 && ret=0
 ;;
 (import)
@@ -75,7 +75,7 @@ _arguments "${_arguments_options[@]}" \
 '()*--interactive=[]' \
 '-h[Prints help information]' \
 '--help[Prints help information]' \
-'::path:_files -/' \
+'*::paths:_files -/' \
 && ret=0
 ;;
         esac

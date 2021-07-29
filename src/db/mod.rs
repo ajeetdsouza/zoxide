@@ -15,7 +15,7 @@ use std::path::{Path, PathBuf};
 pub struct Database<'file> {
     pub dirs: DirList<'file>,
     pub modified: bool,
-    pub data_dir: &'file PathBuf,
+    pub data_dir: &'file Path,
 }
 
 impl<'file> Database<'file> {
@@ -25,7 +25,7 @@ impl<'file> Database<'file> {
         }
 
         let buffer = self.dirs.to_bytes()?;
-        let mut file = NamedTempFile::new_in(&self.data_dir).with_context(|| {
+        let mut file = NamedTempFile::new_in(self.data_dir).with_context(|| {
             format!("could not create temporary database in: {}", self.data_dir.display())
         })?;
 
@@ -125,16 +125,6 @@ impl<'file> Database<'file> {
     }
 }
 
-impl Drop for Database<'_> {
-    fn drop(&mut self) {
-        // Since the error can't be properly handled here,
-        // pretty-print it instead.
-        if let Err(e) = self.save() {
-            let _ = writeln!(io::stderr(), "zoxide: {:?}", e);
-        }
-    }
-}
-
 #[cfg(windows)]
 fn persist<P: AsRef<Path>>(mut file: NamedTempFile, path: P) -> Result<(), PersistError> {
     use rand::distributions::{Distribution, Uniform};
@@ -168,7 +158,7 @@ fn persist<P: AsRef<Path>>(mut file: NamedTempFile, path: P) -> Result<(), Persi
 
 #[cfg(unix)]
 fn persist<P: AsRef<Path>>(file: NamedTempFile, path: P) -> Result<(), PersistError> {
-    file.persist(&path)?;
+    file.persist(path)?;
     Ok(())
 }
 
@@ -231,6 +221,7 @@ mod tests {
             let mut db = db.open().unwrap();
             db.add(path, now);
             db.add(path, now);
+            db.save().unwrap();
         }
         {
             let mut db = DatabaseFile::new(data_dir.path());
@@ -253,17 +244,20 @@ mod tests {
             let mut db = DatabaseFile::new(data_dir.path());
             let mut db = db.open().unwrap();
             db.add(path, now);
+            db.save().unwrap();
         }
         {
             let mut db = DatabaseFile::new(data_dir.path());
             let mut db = db.open().unwrap();
             assert!(db.remove(path));
+            db.save().unwrap();
         }
         {
             let mut db = DatabaseFile::new(data_dir.path());
             let mut db = db.open().unwrap();
             assert!(db.dirs.is_empty());
             assert!(!db.remove(path));
+            db.save().unwrap();
         }
     }
 }

@@ -33,8 +33,8 @@ pub enum App {
 /// Add a new directory or increment its rank
 #[derive(Clap, Debug)]
 pub struct Add {
-    #[clap(value_hint = ValueHint::DirPath)]
-    pub path: PathBuf,
+    #[clap(min_values = 1, required = true, value_hint = ValueHint::DirPath)]
+    pub paths: Vec<PathBuf>,
 }
 
 /// Import entries from another application
@@ -126,12 +126,12 @@ pub struct Query {
 #[derive(Clap, Debug)]
 pub struct Remove {
     // Use interactive selection
-    #[clap(conflicts_with = "path", long, short, value_name = "keywords")]
+    #[clap(conflicts_with = "paths", long, short, value_name = "keywords")]
     pub interactive: Option<Vec<String>>,
     #[clap(
         conflicts_with = "interactive",
         required_unless_present = "interactive",
         value_hint = ValueHint::DirPath
     )]
-    pub path: Option<String>,
+    pub paths: Vec<String>,
 }

@@ -8,7 +8,7 @@ use std::fs;
 
 impl Run for Import {
     fn run(&self) -> Result<()> {
-        let buffer = &fs::read_to_string(&self.path).with_context(|| {
+        let buffer = fs::read_to_string(&self.path).with_context(|| {
             format!("could not open database for importing: {}", &self.path.display())
         })?;
 
@@ -20,12 +20,12 @@ impl Run for Import {
         }
 
         match self.from {
-            ImportFrom::Autojump => from_autojump(db, buffer),
-            ImportFrom::Z => from_z(db, buffer),
+            ImportFrom::Autojump => from_autojump(db, &buffer),
+            ImportFrom::Z => from_z(db, &buffer),
         }
         .context("import error")?;
 
-        Ok(())
+        db.save()
     }
 }
 

@@ -1,6 +1,6 @@
 use crate::app::{Query, Run};
 use crate::config;
-use crate::db::DatabaseFile;
+use crate::db::{Database, DatabaseFile};
 use crate::error::BrokenPipeHandler;
 use crate::fzf::Fzf;
 use crate::util;
@@ -14,6 +14,12 @@ impl Run for Query {
         let data_dir = config::data_dir()?;
         let mut db = DatabaseFile::new(data_dir);
         let mut db = db.open()?;
+        self.query(&mut db).and(db.save())
+    }
+}
+
+impl Query {
+    fn query(&self, db: &mut Database) -> Result<()> {
         let now = util::current_time()?;
 
         let mut stream = db.stream(now).with_keywords(&self.keywords);

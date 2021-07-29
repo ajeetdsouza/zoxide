@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `zoxide add` now accepts multiple arguments.
+- `zoxide add` and `zoxide remove` now accept multiple arguments.
 
 ### Fixed
 

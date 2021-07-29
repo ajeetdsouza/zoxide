@@ -42,6 +42,7 @@ impl Run for Add {
 
         if db.modified {
             db.age(max_age);
+            db.save()?;
         }
 
         Ok(())

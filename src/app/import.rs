@@ -25,7 +25,7 @@ impl Run for Import {
         }
         .context("import error")?;
 
-        Ok(())
+        db.save()
     }
 }
 

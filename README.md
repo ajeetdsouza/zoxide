@@ -4,7 +4,7 @@
 
 > A smarter cd command for your terminal
 
-[![crates.io][crates-io-badge]][crates-io]
+[![crates.io][crates-io-badge]][crates.io]
 [![Releases][releases-badge]][releases]
 
 `zoxide` is a blazing fast replacement for your `cd` command, inspired by
@@ -49,7 +49,7 @@ Alternatively, you can use a package manager:
 
 | Distribution       | Repository              | Instructions                                                                                   |
 | ------------------ | ----------------------- | ---------------------------------------------------------------------------------------------- |
-| ***Any***          | **[crates-io]**         | `cargo install zoxide`                                                                         |
+| ***Any***          | **[crates.io]**         | `cargo install zoxide`                                                                         |
 | *Any*              | [conda-forge]           | `conda install -c conda-forge zoxide`                                                          |
 | *Any*              | [Linuxbrew]             | `brew install zoxide`                                                                          |
 | Alpine Linux 3.13+ | [Alpine Linux Packages] | `apk add zoxide`                                                                               |
@@ -73,7 +73,7 @@ To install `zoxide`, use a package manager:
 
 | Repository      | Instructions                          |
 | --------------- | ------------------------------------- |
-| **[crates-io]** | `cargo install zoxide`                |
+| **[crates.io]** | `cargo install zoxide`                |
 | [conda-forge]   | `conda install -c conda-forge zoxide` |
 | [Homebrew]      | `brew install zoxide`                 |
 | [MacPorts]      | `port install zoxide`                 |
@@ -93,7 +93,7 @@ Alternatively, you can use a package manager:
 
 | Repository      | Instructions                          |
 | --------------- | ------------------------------------- |
-| **[crates-io]** | `cargo install zoxide`                |
+| **[crates.io]** | `cargo install zoxide`                |
 | [Chocolatey]    | `choco install zoxide`                |
 | [conda-forge]   | `conda install -c conda-forge zoxide` |
 | [Scoop]         | `scoop install zoxide`                |
@@ -107,7 +107,7 @@ To install `zoxide`, use a package manager:
 
 | Distribution  | Repository      | Instructions           |
 | ------------- | --------------- | ---------------------- |
-| ***Any***     | **[crates-io]** | `cargo install zoxide` |
+| ***Any***     | **[crates.io]** | `cargo install zoxide` |
 | DragonFly BSD | [DPorts]        | `pkg install zoxide`   |
 | FreeBSD       | [FreshPorts]    | `pkg install zoxide`   |
 | NetBSD        | [pkgsrc]        | `pkgin install zoxide` |
@@ -125,35 +125,7 @@ To install `zoxide`, use a package manager:
 
 </details>
 
-### *Step 2: Install `fzf` (optional)*
-
-[`fzf`][fzf] is a command-line fuzzy finder, used by `zoxide` for interactive
-selection. It can be installed from [here][fzf-installation].
-
-### *Step 3: Import your data (optional)*
-
-If you currently use any of the following utilities, you may want to import
-your data into `zoxide`:
-
-<details>
-<summary><code>autojump</code></summary>
-
-```sh
-zoxide import --from autojump path/to/db
-```
-
-</details>
-
-<details>
-<summary><code>z</code>, <code>z.lua</code>, or <code>zsh-z</code></summary>
-
-```sh
-zoxide import --from z path/to/db
-```
-
-</details>
-
-### *Step 4: Add `zoxide` to your shell*
+### *Step 2: Add `zoxide` to your shell*
 
 To start using `zoxide`, add it to your shell.
 
@@ -199,7 +171,7 @@ Initialize the `zoxide` script:
 zoxide init nushell --hook prompt | save ~/.zoxide.nu
 ```
 
-Add this to your configuration (usually `~/.config/nu/config.toml`):
+Add this to your configuration (find it by running `config path` in Nushell):
 
 ```toml
 prompt = "__zoxide_hook;__zoxide_prompt"
@@ -213,7 +185,8 @@ You can replace `__zoxide_prompt` with a custom prompt.
 <details>
 <summary><code>powershell</code></summary>
 
-Add this to your configuration (find it with `echo $profile`):
+Add this to your configuration (find it by running `echo $profile` in
+PowerShell):
 
 ```powershell
 Invoke-Expression (& {
@@ -253,6 +226,34 @@ Add this to your configuration:
 
 ```sh
 eval "$(zoxide init posix --hook prompt)"
+```
+
+</details>
+
+### *Step 3: Install `fzf` (optional)*
+
+[`fzf`][fzf] is a command-line fuzzy finder, used by `zoxide` for interactive
+selection. It can be installed from [here][fzf-installation].
+
+### *Step 4: Import your data (optional)*
+
+If you currently use any of the following utilities, you may want to import
+your data into `zoxide`:
+
+<details>
+<summary><code>autojump</code></summary>
+
+```sh
+zoxide import --from autojump path/to/db
+```
+
+</details>
+
+<details>
+<summary><code>z</code>, <code>z.lua</code>, or <code>zsh-z</code></summary>
+
+```sh
+zoxide import --from z path/to/db
 ```
 
 </details>
@@ -338,7 +339,7 @@ Be sure to set these before calling `zoxide init`.
 [conda-forge]: https://anaconda.org/conda-forge/zoxide
 [copr]: https://copr.fedorainfracloud.org/coprs/atim/zoxide/
 [crates-io-badge]: https://img.shields.io/crates/v/zoxide
-[crates-io]: https://crates.io/crates/zoxide
+[crates.io]: https://crates.io/crates/zoxide
 [debian packages]: https://packages.debian.org/testing/admin/zoxide
 [devuan packages]: https://pkginfo.devuan.org/cgi-bin/package-query.html?c=package&q=zoxide
 [dports]: https://github.com/DragonFlyBSD/DPorts/tree/master/sysutils/zoxide

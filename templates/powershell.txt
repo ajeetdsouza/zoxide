@@ -115,7 +115,7 @@ Set-Alias {{cmd}}i __zoxide_zi
 {%- endmatch %}
 
 {{ section }}
-# To initialize zoxide, add this to your configuration (find it with
-# `echo $profile`):
+# To initialize zoxide, add this to your configuration (find it by running
+# `echo $profile` in PowerShell):
 #
 # Invoke-Expression (& { $hook = if ($PSVersionTable.PSVersion.Major -ge 6) { 'pwd' } else { 'prompt' } (zoxide init powershell --hook $hook) -join "`n" })

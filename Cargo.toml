@@ -1,6 +1,6 @@
 [package]
 name = "zoxide"
-version = "0.7.2"
+version = "0.7.3"
 authors = ["Ajeet D'Souza <98ajeet@gmail.com>"]
 edition = "2018"
 description = "A smarter cd command for your terminal"
@@ -29,7 +29,7 @@ rand = { version = "0.8.4", features = [
 
 [dev-dependencies]
 assert_cmd = "1.0.1"
-rstest = "0.10.0"
+rstest = "0.11.0"
 
 [build-dependencies]
 clap = "3.0.0-beta.2"

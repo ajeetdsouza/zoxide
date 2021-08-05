@@ -163,13 +163,7 @@ zoxide init fish | source
 </details>
 
 <details>
-<summary><code>nushell v0.32+</code></summary>
-
-Initialize the `zoxide` script:
-
-```sh
-zoxide init nushell --hook prompt | save ~/.zoxide.nu
-```
+<summary><code>nushell v0.33+</code></summary>
 
 Add this to your configuration (find it by running `config path` in Nushell):
 

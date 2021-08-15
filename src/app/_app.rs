@@ -18,8 +18,8 @@ const ENV_HELP: &str = "ENVIRONMENT VARIABLES:
     after_help = ENV_HELP,
     global_setting(AppSettings::ColoredHelp),
     global_setting(AppSettings::DisableHelpSubcommand),
-    global_setting(AppSettings::GlobalVersion),
-    global_setting(AppSettings::VersionlessSubcommands),
+    global_setting(AppSettings::DisableVersionForSubcommands),
+    global_setting(AppSettings::PropagateVersion),
     version = option_env!("ZOXIDE_VERSION").unwrap_or_default()
 )]
 pub enum App {

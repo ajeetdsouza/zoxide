@@ -1,4 +1,5 @@
 use std::env;
+use std::io;
 use std::process::Command;
 
 fn git_version() -> Option<String> {
@@ -17,7 +18,7 @@ fn crate_version() -> String {
     format!("v{}", env::var("CARGO_PKG_VERSION").unwrap())
 }
 
-fn generate_completions() {
+fn generate_completions() -> io::Result<()> {
     #[path = "src/app/_app.rs"]
     mod app;
 
@@ -30,11 +31,13 @@ fn generate_completions() {
     let bin_name = &env::var("CARGO_PKG_NAME").unwrap();
     let out_dir = "contrib/completions";
 
-    generate_to::<Bash, _, _>(app, bin_name, out_dir);
-    generate_to::<Elvish, _, _>(app, bin_name, out_dir);
-    generate_to::<Fish, _, _>(app, bin_name, out_dir);
-    generate_to::<PowerShell, _, _>(app, bin_name, out_dir);
-    generate_to::<Zsh, _, _>(app, bin_name, out_dir);
+    generate_to::<Bash, _, _>(app, bin_name, out_dir)?;
+    generate_to::<Elvish, _, _>(app, bin_name, out_dir)?;
+    generate_to::<Fish, _, _>(app, bin_name, out_dir)?;
+    generate_to::<PowerShell, _, _>(app, bin_name, out_dir)?;
+    generate_to::<Zsh, _, _>(app, bin_name, out_dir)?;
+
+    Ok(())
 }
 
 fn main() {
@@ -51,5 +54,5 @@ fn main() {
     println!("cargo:rerun-if-changed=templates");
     println!("cargo:rerun-if-changed=tests");
 
-    generate_completions();
+    generate_completions().unwrap();
 }

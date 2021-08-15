@@ -15,10 +15,10 @@ _zoxide() {
 
     local context curcontext="$curcontext" state line
     _arguments "${_arguments_options[@]}" \
-'-h[Prints help information]' \
-'--help[Prints help information]' \
-'-V[Prints version information]' \
-'--version[Prints version information]' \
+'-h[Print help information]' \
+'--help[Print help information]' \
+'-V[Print version information]' \
+'--version[Print version information]' \
 ":: :_zoxide_commands" \
 "*::: :->zoxide" \
 && ret=0
@@ -30,8 +30,10 @@ _zoxide() {
         case $line[1] in
             (add)
 _arguments "${_arguments_options[@]}" \
-'-h[Prints help information]' \
-'--help[Prints help information]' \
+'-h[Print help information]' \
+'--help[Print help information]' \
+'-V[Print version information]' \
+'--version[Print version information]' \
 '*::paths:_files -/' \
 && ret=0
 ;;
@@ -39,8 +41,10 @@ _arguments "${_arguments_options[@]}" \
 _arguments "${_arguments_options[@]}" \
 '--from=[Application to import from]: :(autojump z)' \
 '--merge[Merge into existing database]' \
-'-h[Prints help information]' \
-'--help[Prints help information]' \
+'-h[Print help information]' \
+'--help[Print help information]' \
+'-V[Print version information]' \
+'--version[Print version information]' \
 ':path:_files' \
 && ret=0
 ;;
@@ -49,8 +53,10 @@ _arguments "${_arguments_options[@]}" \
 '--cmd=[Renames the '\''z'\'' command and corresponding aliases]' \
 '--hook=[Chooses event upon which an entry is added to the database]: :(none prompt pwd)' \
 '--no-aliases[Prevents zoxide from defining any commands]' \
-'-h[Prints help information]' \
-'--help[Prints help information]' \
+'-h[Print help information]' \
+'--help[Print help information]' \
+'-V[Print version information]' \
+'--version[Print version information]' \
 ':shell:(bash elvish fish nushell posix powershell xonsh zsh)' \
 && ret=0
 ;;
@@ -64,8 +70,10 @@ _arguments "${_arguments_options[@]}" \
 '(-i --interactive)--list[List all matching directories]' \
 '(-i --interactive)-s[Print score with results]' \
 '(-i --interactive)--score[Print score with results]' \
-'-h[Prints help information]' \
-'--help[Prints help information]' \
+'-h[Print help information]' \
+'--help[Print help information]' \
+'-V[Print version information]' \
+'--version[Print version information]' \
 '*::keywords:' \
 && ret=0
 ;;
@@ -73,8 +81,10 @@ _arguments "${_arguments_options[@]}" \
 _arguments "${_arguments_options[@]}" \
 '()*-i+[]' \
 '()*--interactive=[]' \
-'-h[Prints help information]' \
-'--help[Prints help information]' \
+'-h[Print help information]' \
+'--help[Print help information]' \
+'-V[Print version information]' \
+'--version[Print version information]' \
 '*::paths:_files -/' \
 && ret=0
 ;;
@@ -86,47 +96,37 @@ esac
 (( $+functions[_zoxide_commands] )) ||
 _zoxide_commands() {
     local commands; commands=(
-        "add:Add a new directory or increment its rank" \
-"import:Import entries from another application" \
-"init:Generate shell configuration" \
-"query:Search for a directory in the database" \
-"remove:Remove a directory from the database" \
+'add:Add a new directory or increment its rank' \
+'import:Import entries from another application' \
+'init:Generate shell configuration' \
+'query:Search for a directory in the database' \
+'remove:Remove a directory from the database' \
     )
     _describe -t commands 'zoxide commands' commands "$@"
 }
 (( $+functions[_zoxide__add_commands] )) ||
 _zoxide__add_commands() {
-    local commands; commands=(
-        
-    )
+    local commands; commands=()
     _describe -t commands 'zoxide add commands' commands "$@"
 }
 (( $+functions[_zoxide__import_commands] )) ||
 _zoxide__import_commands() {
-    local commands; commands=(
-        
-    )
+    local commands; commands=()
     _describe -t commands 'zoxide import commands' commands "$@"
 }
 (( $+functions[_zoxide__init_commands] )) ||
 _zoxide__init_commands() {
-    local commands; commands=(
-        
-    )
+    local commands; commands=()
     _describe -t commands 'zoxide init commands' commands "$@"
 }
 (( $+functions[_zoxide__query_commands] )) ||
 _zoxide__query_commands() {
-    local commands; commands=(
-        
-    )
+    local commands; commands=()
     _describe -t commands 'zoxide query commands' commands "$@"
 }
 (( $+functions[_zoxide__remove_commands] )) ||
 _zoxide__remove_commands() {
-    local commands; commands=(
-        
-    )
+    local commands; commands=()
     _describe -t commands 'zoxide remove commands' commands "$@"
 }
 

@@ -59,7 +59,7 @@ function __zoxide_z() {
             \builtin printf 'zoxide: $OLDPWD is not set'
             return 1
         fi
-    elif [ "$#" -eq 1 ] &&  [ -d "$1" ]; then
+    elif [ "$#" -eq 1 ] && [ -d "$1" ]; then
         __zoxide_cd "$1"
     else
         \builtin local __zoxide_result

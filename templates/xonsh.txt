@@ -1,7 +1,7 @@
 {%- let section = "# =============================================================================\n#" -%}
 {%- let not_configured = "# -- not configured --" -%}
 
-"""Initialize zoxide on Xonsh."""
+# pylint: disable=missing-module-docstring
 
 import builtins  # pylint: disable=unused-import
 import os

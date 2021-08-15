@@ -356,15 +356,12 @@ mod tests {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Xonsh(&opts).render().unwrap();
 
-        // We can't pass the source directly to `xonsh -c` due to
-        // a bug: <https://github.com/xonsh/xonsh/issues/3959>
+        let tempdir = tempfile::tempdir().unwrap();
+        let tempdir = tempdir.path().to_str().unwrap();
+
         Command::new("xonsh")
-            .args(&[
-                "-c",
-                "import sys; execx(sys.stdin.read(), 'exec', __xonsh__.ctx, filename='zoxide')",
-                "--no-rc",
-            ])
-            .write_stdin(source.as_bytes())
+            .args(&["-c", &source, "--no-rc"])
+            .env("HOME", tempdir)
             .assert()
             .success()
             .stdout("")

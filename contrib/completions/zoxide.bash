@@ -51,7 +51,7 @@ _zoxide() {
             ;;
         
         zoxide__add)
-            opts=" -h  --help  <paths>... "
+            opts=" -h -V  --help --version  <PATHS>... "
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -66,7 +66,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__import)
-            opts=" -h  --from --merge --help  <path> "
+            opts=" -h -V  --from --merge --help --version  <PATH> "
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -85,7 +85,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__init)
-            opts=" -h  --no-aliases --cmd --hook --help  <shell> "
+            opts=" -h -V  --no-aliases --cmd --hook --help --version  <SHELL> "
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -108,7 +108,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__query)
-            opts=" -i -l -s -h  --all --interactive --list --score --exclude --help  <keywords>... "
+            opts=" -i -l -s -h -V  --all --interactive --list --score --exclude --help --version  <KEYWORDS>... "
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -127,7 +127,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__remove)
-            opts=" -i -h  --interactive --help  <paths>... "
+            opts=" -i -h -V  --interactive --help --version  <PATHS>... "
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -138,7 +138,7 @@ _zoxide() {
                     COMPREPLY=($(compgen -f "${cur}"))
                     return 0
                     ;;
-                    -i)
+                -i)
                     COMPREPLY=($(compgen -f "${cur}"))
                     return 0
                     ;;

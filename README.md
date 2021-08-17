@@ -53,7 +53,7 @@ Alternatively, you can use a package manager:
 | *Any*              | [conda-forge]           | `conda install -c conda-forge zoxide`                                                          |
 | *Any*              | [Linuxbrew]             | `brew install zoxide`                                                                          |
 | Alpine Linux 3.13+ | [Alpine Linux Packages] | `apk add zoxide`                                                                               |
-| Arch Linux         | [AUR]                   | `yay -Sy zoxide-bin`                                                                           |
+| Arch Linux         | [Arch Linux Community]  | `pacman -S zoxide`                                                                             |
 | CentOS 7+          | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide`                                      |
 | Debian Testing     | [Debian Packages]       | `apt install zoxide`                                                                           |
 | Devuan 4.0+        | [Devuan Packages]       | `apt install zoxide`                                                                           |
@@ -328,7 +328,7 @@ Be sure to set these before calling `zoxide init`.
 [algorithm-aging]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#aging
 [algorithm-matching]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#matching
 [alpine linux packages]: https://pkgs.alpinelinux.org/packages?name=zoxide
-[aur]: https://aur.archlinux.org/packages/zoxide-bin
+[arch linux community]: https://archlinux.org/packages/community/x86_64/zoxide/
 [chocolatey]: https://community.chocolatey.org/packages/zoxide
 [conda-forge]: https://anaconda.org/conda-forge/zoxide
 [copr]: https://copr.fedorainfracloud.org/coprs/atim/zoxide/

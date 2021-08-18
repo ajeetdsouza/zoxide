@@ -2,20 +2,33 @@ use std::env;
 use std::io;
 use std::process::Command;
 
+fn main() {
+    let pkg_version = env::var("CARGO_PKG_VERSION").unwrap();
+    let version = match env::var_os("PROFILE") {
+        Some(profile) if profile == "release" => format!("v{}", pkg_version),
+        _ => git_version().unwrap_or_else(|| format!("v{}-unknown", pkg_version)),
+    };
+    println!("cargo:rustc-env=ZOXIDE_VERSION={}", version);
+
+    // Since we are generating completions in the package directory, we need to
+    // set this so that Cargo doesn't rebuild every time.
+    println!("cargo:rerun-if-changed=src");
+    println!("cargo:rerun-if-changed=templates");
+    println!("cargo:rerun-if-changed=tests");
+
+    generate_completions().unwrap();
+}
+
 fn git_version() -> Option<String> {
+    let dir = env::var("CARGO_MANIFEST_DIR").ok()?;
     let mut git = Command::new("git");
-    git.args(&["describe", "--tags", "--broken"]);
+    git.args(&["-C", &dir, "describe", "--tags", "--broken"]);
 
     let output = git.output().ok()?;
     if !output.status.success() || output.stdout.is_empty() || !output.stderr.is_empty() {
         return None;
     }
     String::from_utf8(output.stdout).ok()
-}
-
-fn crate_version() -> String {
-    // unwrap is safe here, since Cargo will always supply this variable.
-    format!("v{}", env::var("CARGO_PKG_VERSION").unwrap())
 }
 
 fn generate_completions() -> io::Result<()> {
@@ -38,21 +51,4 @@ fn generate_completions() -> io::Result<()> {
     generate_to::<Zsh, _, _>(app, bin_name, out_dir)?;
 
     Ok(())
-}
-
-fn main() {
-    // Packaged releases of zoxide almost always use the source tarball
-    // provided by GitHub, which does not include the `.git` folder. Since this
-    // feature is only useful for development, we can silently fall back to
-    // using the crate version.
-    let version = git_version().unwrap_or_else(crate_version);
-    println!("cargo:rustc-env=ZOXIDE_VERSION={}", version);
-
-    // Since we are generating completions in the package directory, we need to
-    // set this so that Cargo doesn't rebuild every time.
-    println!("cargo:rerun-if-changed=src");
-    println!("cargo:rerun-if-changed=templates");
-    println!("cargo:rerun-if-changed=tests");
-
-    generate_completions().unwrap();
 }

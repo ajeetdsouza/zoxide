@@ -101,4 +101,5 @@ alias {{cmd}}i = __zoxide_zi
 #   prompt = '__zoxide_hook;__zoxide_prompt'
 #   startup = ['zoxide init nushell --hook prompt | save ~/.zoxide.nu', 'source ~/.zoxide.nu']
 #
-# You can replace __zoxide_prompt with a custom prompt.
+# You can replace __zoxide_prompt with a custom prompt. Note that zoxide only
+# supports Nushell v0.33.0+.

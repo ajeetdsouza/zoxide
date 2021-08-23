@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Elvish: errors on 0.16.0.
+- Elvish: unable to `z` into directories by path.
+- Elvish: don't show traceback when `z` or `zi` fails.
 
 ## [0.7.4] - 2020-08-15
 

@@ -52,14 +52,26 @@ fn __zoxide_z [@rest]{
     } elif (and ('builtin:==' (builtin:count $rest) 1) (path:is-dir &follow-symlink=$true $rest[0])) {
         __zoxide_cd $rest[0]
     } else {
-        __zoxide_cd (zoxide query --exclude $pwd -- $@rest)
+        var path
+        try {
+            path = (zoxide query --exclude $pwd -- $@rest)
+        } except {
+        } else {
+            __zoxide_cd $path
+        }
     }
 }
 edit:add-var __zoxide_z~ $__zoxide_z~
 
 # Jump to a directory using interactive search.
 fn __zoxide_zi [@rest]{
-    __zoxide_cd (zoxide query -i -- $@rest)
+    var path
+    try {
+        path = (zoxide query -i -- $@rest)
+    } except {
+    } else {
+        __zoxide_cd $path
+    }
 }
 edit:add-var __zoxide_zi~ $__zoxide_zi~
 

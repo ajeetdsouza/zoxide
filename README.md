@@ -55,12 +55,14 @@ Alternatively, you can use a package manager:
 | Alpine Linux 3.13+ | [Alpine Linux Packages] | `apk add zoxide`                                                                               |
 | Arch Linux         | [Arch Linux Community]  | `pacman -S zoxide`                                                                             |
 | CentOS 7+          | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide`                                      |
-| Debian Testing     | [Debian Packages]       | `apt install zoxide`                                                                           |
+| Debian 11+         | [Debian Packages]       | `apt install zoxide`                                                                           |
 | Devuan 4.0+        | [Devuan Packages]       | `apt install zoxide`                                                                           |
 | Fedora 32+         | [Fedora Packages]       | `dnf install zoxide`                                                                           |
 | Gentoo             | [GURU Overlay]          | `eselect repository enable guru` <br /> `emerge --sync guru` <br /> `emerge app-shells/zoxide` |
+| Manjaro            |                         | `pacman -S zoxide`                                                                             |
 | NixOS              | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                                                                   |
 | Parrot OS          |                         | `apt install zoxide`                                                                           |
+| Raspbian           |                         | `apt install zoxide`                                                                           |
 | Ubuntu 21.04+      | [Ubuntu Packages]       | `apt install zoxide`                                                                           |
 | Void Linux         | [Void Linux Packages]   | `xbps-install -S zoxide`                                                                       |
 
@@ -337,7 +339,7 @@ Be sure to set these before calling `zoxide init`.
 [copr]: https://copr.fedorainfracloud.org/coprs/atim/zoxide/
 [crates-io-badge]: https://img.shields.io/crates/v/zoxide
 [crates.io]: https://crates.io/crates/zoxide
-[debian packages]: https://packages.debian.org/testing/admin/zoxide
+[debian packages]: https://packages.debian.org/stable/admin/zoxide
 [devuan packages]: https://pkginfo.devuan.org/cgi-bin/package-query.html?c=package&q=zoxide
 [dports]: https://github.com/DragonFlyBSD/DPorts/tree/master/sysutils/zoxide
 [emacs]: https://www.gnu.org/software/emacs/

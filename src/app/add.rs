@@ -21,7 +21,7 @@ impl Run for Add {
         let mut db = DatabaseFile::new(data_dir);
         let mut db = db.open()?;
 
-        for path in self.paths.iter() {
+        for path in &self.paths {
             let path = if config::resolve_symlinks() {
                 util::canonicalize(path)
             } else {

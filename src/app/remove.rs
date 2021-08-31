@@ -35,7 +35,7 @@ impl Run for Remove {
                 }
             }
             None => {
-                for path in self.paths.iter() {
+                for path in &self.paths {
                     if !db.remove(path) {
                         let path_abs = util::resolve_path(path)?;
                         let path_abs = util::path_to_str(&path_abs)?;

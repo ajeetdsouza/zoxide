@@ -42,7 +42,7 @@ impl Query {
                 print!("{}", selection);
             } else {
                 let path = selection.get(5..).context("could not read selection from fzf")?;
-                print!("{}", path)
+                print!("{}", path);
             }
         } else if self.list {
             let stdout = io::stdout();

@@ -51,7 +51,11 @@ impl<'file> Database<'file> {
 
         match self.dirs.iter_mut().find(|dir| dir.path == path) {
             None => {
-                self.dirs.push(Dir { path: path.to_string().into(), last_accessed: now, rank: 1.0 })
+                self.dirs.push(Dir {
+                    path: path.to_string().into(),
+                    last_accessed: now,
+                    rank: 1.0,
+                });
             }
             Some(dir) => {
                 dir.last_accessed = now;

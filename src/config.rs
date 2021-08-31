@@ -31,15 +31,8 @@ pub fn echo() -> bool {
 }
 
 pub fn exclude_dirs() -> Result<Vec<Pattern>> {
-    match env::var_os("_ZO_EXCLUDE_DIRS") {
-        Some(paths) => env::split_paths(&paths)
-            .map(|path| {
-                let pattern = path.to_str().context("invalid unicode in _ZO_EXCLUDE_DIRS")?;
-                Pattern::new(pattern)
-                    .with_context(|| format!("invalid glob in _ZO_EXCLUDE_DIRS: {}", pattern))
-            })
-            .collect(),
-        None => {
+    env::var_os("_ZO_EXCLUDE_DIRS").map_or_else(
+        || {
             let pattern = (|| {
                 let home = dirs::home_dir()?;
                 let home = home.to_str()?;
@@ -47,8 +40,17 @@ pub fn exclude_dirs() -> Result<Vec<Pattern>> {
                 Pattern::new(&home).ok()
             })();
             Ok(pattern.into_iter().collect())
-        }
-    }
+        },
+        |paths| {
+            env::split_paths(&paths)
+                .map(|path| {
+                    let pattern = path.to_str().context("invalid unicode in _ZO_EXCLUDE_DIRS")?;
+                    Pattern::new(pattern)
+                        .with_context(|| format!("invalid glob in _ZO_EXCLUDE_DIRS: {}", pattern))
+                })
+                .collect()
+        },
+    )
 }
 
 pub fn fzf_opts() -> Option<OsString> {

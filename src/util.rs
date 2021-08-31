@@ -82,16 +82,13 @@ pub fn resolve_path<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
             Some(Component::Prefix(prefix)) => match prefix.kind() {
                 Prefix::Disk(drive_letter) => {
                     let disk = components.next().unwrap();
-                    match components.peek() {
-                        Some(Component::RootDir) => {
-                            let root = components.next().unwrap();
-                            stack.push(disk);
-                            stack.push(root);
-                        }
-                        _ => {
-                            base_path = get_drive_relative(drive_letter)?;
-                            stack.extend(base_path.components());
-                        }
+                    if components.peek() == Some(&Component::RootDir) {
+                        let root = components.next().unwrap();
+                        stack.push(disk);
+                        stack.push(root);
+                    } else {
+                        base_path = get_drive_relative(drive_letter)?;
+                        stack.extend(base_path.components());
                     }
                 }
                 Prefix::VerbatimDisk(drive_letter) => {
@@ -120,17 +117,12 @@ pub fn resolve_path<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
                 stack.extend(base_path.components());
             }
         }
+    } else if components.peek() == Some(&Component::RootDir) {
+        let root = components.next().unwrap();
+        stack.push(root);
     } else {
-        match components.peek() {
-            Some(Component::RootDir) => {
-                let root = components.next().unwrap();
-                stack.push(root);
-            }
-            _ => {
-                base_path = current_dir()?;
-                stack.extend(base_path.components());
-            }
-        }
+        base_path = current_dir()?;
+        stack.extend(base_path.components());
     }
 
     for component in components {

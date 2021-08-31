@@ -9,10 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+
+- Nushell: upgrade minimum supported version to v0.36.0.
+- Nushell: easier installation instructions.
+
 ### Fixed
 
 - Elvish: unable to `z` into directories by path.
 - Elvish: don't show traceback when `z` or `zi` fails.
+- Elvish: nested shells do not initialize correctly.
 
 ## [0.7.4] - 2020-08-15
 

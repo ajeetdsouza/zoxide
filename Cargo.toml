@@ -28,7 +28,7 @@ rand = { version = "0.8.4", features = [
 ], default-features = false }
 
 [dev-dependencies]
-assert_cmd = "1.0.1"
+assert_cmd = "2.0.0"
 rstest = "0.11.0"
 
 [build-dependencies]

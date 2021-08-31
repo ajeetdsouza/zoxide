@@ -151,7 +151,7 @@ Add this to your configuration (usually `~/.elvish/rc.elv`):
 eval (zoxide init elvish | slurp)
 ```
 
-Note that zoxide only supports elvish v0.16.0+.
+Note: zoxide only supports elvish v0.16.0 and above.
 
 </details>
 
@@ -172,12 +172,10 @@ zoxide init fish | source
 Add this to your configuration (find it by running `config path` in Nushell):
 
 ```toml
-prompt = "__zoxide_hook;__zoxide_prompt"
 startup = ["zoxide init nushell --hook prompt | save ~/.zoxide.nu", "source ~/.zoxide.nu"]
 ```
 
-You can replace `__zoxide_prompt` with a custom prompt. Note that zoxide only
-supports Nushell v0.33.0+.
+Note: zoxide only supports Nushell v0.36.0 and above.
 
 </details>
 

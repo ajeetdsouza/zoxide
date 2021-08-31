@@ -95,4 +95,4 @@ edit:add-var zi~ $__zoxide_zi~
 #
 #   eval (zoxide init elvish | slurp)
 #
-# Note that zoxide only supports elvish v0.16.0 and above.
+# Note: zoxide only supports elvish v0.16.0 and above.

@@ -19,6 +19,7 @@ Add this to your configuration (usually \fI~/.elvish/rc.elv\fR):
 .nf
     \fBeval $(zoxide init elvish | slurp)\fR
 .fi
+Note: zoxide only supports elvish v0.16.0 and above.
 .TP
 .B fish
 Add this to your configuration (usually \fI~/.config/fish/config.fish\fR):
@@ -32,14 +33,14 @@ Add this to your configuration (find it by running \fBconfig path\fR in
 Nushell):
 .sp
 .nf
-    \fBprompt = "__zoxide_hook;__zoxide_prompt"\fR
     \fBstartup = ["zoxide init nushell --hook prompt | save ~/.zoxide.nu", "source ~/.zoxide.nu"]\fR
 .fi
 .sp
-You can replace \fB__zoxide_prompt\fR with a custom prompt.
+Note: zoxide only supports Nushell v0.36.0 and above.
 .TP
 .B powershell
-Add this to your configuration (find it with \fIecho $profile\fR):
+Add this to your configuration (find it by running \fBecho $profile\fR in
+PowerShell):
 .sp
 .nf
     \fBInvoke-Expression (& {

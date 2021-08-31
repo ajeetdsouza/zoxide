@@ -25,15 +25,25 @@ def __zoxide_prompt [] {
 # Hook to add new entries to the database.
 {%- match hook %}
 {%- when InitHook::None %}
-def __zoxide_hook [] {}
+{{ not_configured }}
 
 {%- when InitHook::Prompt %}
 def __zoxide_hook [] {
     shells | where active == $true && name == filesystem | get path | each { zoxide add -- $it }
 }
 
+# Initialize hook.
+if ($nu.env | select PROMPT_STRING | empty?) {
+    if ($nu.config | select prompt | empty?) {
+        let-env PROMPT_STRING = '__zoxide_hook;__zoxide_prompt'
+    } {
+        let-env PROMPT_STRING = $'__zoxide_hook;($nu.config.prompt)'
+    }
+} {
+    let-env PROMPT_STRING = $'__zoxide_hook;($nu.env.PROMPT_STRING)'
+}
+
 {%- when InitHook::Pwd %}
-def __zoxide_hook [] {}
 $'zoxide: PWD hooks are not supported on Nushell.(char nl)Use (char sq)zoxide init nushell --hook prompt(char sq) instead.(char nl)'
 {%- endmatch %}
 
@@ -98,8 +108,6 @@ alias {{cmd}}i = __zoxide_zi
 # To initialize zoxide, add this to your configuration (find it by running
 # `config path` in Nushell):
 #
-#   prompt = '__zoxide_hook;__zoxide_prompt'
 #   startup = ['zoxide init nushell --hook prompt | save ~/.zoxide.nu', 'source ~/.zoxide.nu']
 #
-# You can replace __zoxide_prompt with a custom prompt. Note that zoxide only
-# supports Nushell v0.33.0+.
+# Note: zoxide only supports Nushell v0.36.0 and above.

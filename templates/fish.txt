@@ -70,15 +70,15 @@ function __zoxide_z
         end
         __zoxide_cd $argv[1]
     else
-        set -l __zoxide_result (command zoxide query --exclude (__zoxide_pwd) -- $argv)
-        and __zoxide_cd $__zoxide_result
+        set -l result (command zoxide query --exclude (__zoxide_pwd) -- $argv)
+        and __zoxide_cd $result
     end
 end
 
 # Jump to a directory using interactive search.
 function __zoxide_zi
-    set -l __zoxide_result (command zoxide query -i -- $argv)
-    and __zoxide_cd $__zoxide_result
+    set -l result (command zoxide query -i -- $argv)
+    and __zoxide_cd $result
 end
 
 {{ section }}

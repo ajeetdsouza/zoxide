@@ -10,7 +10,7 @@
 # Default prompt for Nushell.
 def __zoxide_prompt [] {
     let git = $'(do -i {git rev-parse --abbrev-ref HEAD} | str trim)'
-    let git = (if (echo $git | str length) == 0 {
+    let git = (if ($git | str length) == 0 {
         ''
     } {
         build-string (char lparen) (ansi cb) $git (ansi reset) (char rparen)
@@ -55,17 +55,17 @@ $'zoxide: PWD hooks are not supported on Nushell.(char nl)Use (char sq)zoxide in
 # Jump to a directory using only keywords.
 def __zoxide_z [...rest:string] {
     if (shells | where active == $true | get name) != filesystem {
-        if (echo $rest | length) > 1 {
+        if ($rest | length) > 1 {
             $'zoxide: can only jump directories on filesystem(char nl)'
         } {
-            cd (echo $rest)
+            cd $rest
 {%- if echo %}
             pwd
 {%- endif %}
         }
     } {
-        let arg0 = (echo $rest | append '~' | first 1);
-        if (echo $rest | length) <= 1 && ($arg0 == '-' || (echo $arg0 | path expand | path exists)) {
+        let arg0 = ($rest | append '~' | first 1);
+        if ($rest | length) <= 1 && ($arg0 == '-' || ($arg0 | path expand | path exists)) {
             cd $arg0
         } {
             cd $'(zoxide query --exclude (pwd) -- $rest | str trim)'

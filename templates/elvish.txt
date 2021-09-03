@@ -80,8 +80,25 @@ edit:add-var __zoxide_zi~ $__zoxide_zi~
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-edit:add-var z~ $__zoxide_z~
-edit:add-var zi~ $__zoxide_zi~
+edit:add-var {{cmd}}~ $__zoxide_z~
+edit:add-var {{cmd}}i~ $__zoxide_zi~
+
+# Load completions.
+{# zoxide-based completions are currently not possible, because Elvish only
+ # prints a completion if the current token is a prefix of it. -#}
+fn __zoxide_z_complete [@args]{
+    if (!= (count $args) 2) {
+        return
+    }
+    edit:complete-filename $args[1] |
+        each [c]{
+            dir = $c[stem]
+            if (path:is-dir $dir) {
+                put $dir
+            }
+        }
+}
+edit:completion:arg-completer[{{cmd}}] = $__zoxide_z_complete~
 
 {%- when None %}
 

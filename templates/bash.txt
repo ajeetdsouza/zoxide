@@ -55,10 +55,9 @@ function __zoxide_hook() {
 
 {%- endmatch %}
 
-# TODO
-{# bash throws an error if $PROMPT_COMMAND contains two semicolons in sequence.
- # This is hard to avoid perfectly, but adding __zoxide_hook to the front of
- # $PROMPT_COMMAND rather than the back makes this scenario unlikely. -#}
+{# $PROMPT_COMMAND cannot contain two semicolons in sequence. It can end with a
+ # semicolon, but it cannot start with one. Therefore, always put the hook
+ # at the start of $PROMPT_COMMAND. -#}
 
 # Initialize hook.
 if [ "${__zoxide_hooked}" != '1' ]; then

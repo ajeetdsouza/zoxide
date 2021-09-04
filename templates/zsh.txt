@@ -62,16 +62,16 @@ function __zoxide_z() {
     elif [ "$#" -eq 1 ] && [ -d "$1" ]; then
         __zoxide_cd "$1"
     else
-        \builtin local __zoxide_result
-        __zoxide_result="$(zoxide query --exclude "$(__zoxide_pwd)" -- "$@")" \
-            && __zoxide_cd "${__zoxide_result}"
+        \builtin local result
+        result="$(zoxide query --exclude "$(__zoxide_pwd)" -- "$@")" \
+            && __zoxide_cd "${result}"
     fi
 }
 
 # Jump to a directory using interactive search.
 function __zoxide_zi() {
-    \builtin local __zoxide_result
-    __zoxide_result="$(zoxide query -i -- "$@")" && __zoxide_cd "${__zoxide_result}"
+    \builtin local result
+    result="$(zoxide query -i -- "$@")" && __zoxide_cd "${result}"
 }
 
 {{ section }}

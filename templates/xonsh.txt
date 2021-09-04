@@ -114,7 +114,7 @@ def __zoxide_z(args: List[str]):
     else:
         try:
             zoxide = __zoxide_bin()
-            __zoxide_cmd = subprocess.run(
+            cmd = subprocess.run(
                 [zoxide, "query", "--exclude", __zoxide_pwd(), "--"] + args,
                 check=True,
                 stdout=subprocess.PIPE,
@@ -122,22 +122,22 @@ def __zoxide_z(args: List[str]):
         except subprocess.CalledProcessError as exc:
             raise ZoxideSilentException() from exc
 
-        __zoxide_result = __zoxide_cmd.stdout[:-1]
-        __zoxide_cd(__zoxide_result)
+        result = cmd.stdout[:-1]
+        __zoxide_cd(result)
 
 
 def __zoxide_zi(args: List[str]):
     """Jump to a directory using interactive search."""
     try:
         zoxide = __zoxide_bin()
-        __zoxide_cmd = subprocess.run(
+        cmd = subprocess.run(
             [zoxide, "query", "-i", "--"] + args, check=True, stdout=subprocess.PIPE
         )
     except subprocess.CalledProcessError as exc:
         raise ZoxideSilentException() from exc
 
-    __zoxide_result = __zoxide_cmd.stdout[:-1]
-    __zoxide_cd(__zoxide_result)
+    result = cmd.stdout[:-1]
+    __zoxide_cd(result)
 
 
 {{ section }}

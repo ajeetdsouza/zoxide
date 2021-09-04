@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- Bash/Elvish: completions for `z` command.
+
 ### Changed
 
 - Nushell: upgrade minimum supported version to v0.36.0.

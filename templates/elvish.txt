@@ -21,20 +21,25 @@ fn __zoxide_cd [path]{
 #
 
 # Initialize hook to track previous directory.
-__zoxide_oldpwd = $pwd
-before-chdir = [$@before-chdir [_]{ edit:add-var __zoxide_oldpwd $pwd }]
-
-{#- __zoxide_hooked requires https://github.com/elves/elvish/issues/1395 #}
+var oldpwd = $builtin:pwd
+set builtin:before-chdir = [$@builtin:before-chdir [_]{ edit:add-var oldpwd $builtin:pwd }]
 
 # Initialize hook to add directories to zoxide.
+var shlvl = $E:SHLVL
+if (builtin:eq $shlvl "") {
+    set shlvl = 0
+}
+if (builtin:not (builtin:eq $E:__zoxide_hooked_elvish $shlvl)) {
+    set E:__zoxide_hooked_elvish = $shlvl
 {%- match hook %}
 {%- when InitHook::None %}
-{{ not_configured }}
+    {{ not_configured }}
 {%- when InitHook::Prompt %}
-edit:before-readline = [$@edit:before-readline []{ zoxide add -- $pwd }]
+    set edit:before-readline = [$@edit:before-readline []{ zoxide add -- $pwd }]
 {%- when InitHook::Pwd %}
-after-chdir = [$@after-chdir [_]{ zoxide add -- $pwd }]
+    set builtin:after-chdir = [$@builtin:after-chdir [_]{ zoxide add -- $pwd }]
 {%- endmatch %}
+}
 
 {{ section }}
 # When using zoxide with --no-aliases, alias these internal functions as
@@ -46,13 +51,13 @@ fn __zoxide_z [@rest]{
     if (builtin:eq [] $rest) {
         __zoxide_cd ~
     } elif (builtin:eq [-] $rest) {
-        __zoxide_cd $__zoxide_oldpwd
+        __zoxide_cd $oldpwd
     } elif (and ('builtin:==' (builtin:count $rest) 1) (path:is-dir &follow-symlink=$true $rest[0])) {
         __zoxide_cd $rest[0]
     } else {
         var path
         try {
-            path = (zoxide query --exclude $pwd -- $@rest)
+            set path = (zoxide query --exclude $pwd -- $@rest)
         } except {
         } else {
             __zoxide_cd $path
@@ -65,7 +70,7 @@ edit:add-var __zoxide_z~ $__zoxide_z~
 fn __zoxide_zi [@rest]{
     var path
     try {
-        path = (zoxide query -i -- $@rest)
+        set path = (zoxide query -i -- $@rest)
     } except {
     } else {
         __zoxide_cd $path
@@ -80,8 +85,25 @@ edit:add-var __zoxide_zi~ $__zoxide_zi~
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-edit:add-var z~ $__zoxide_z~
-edit:add-var zi~ $__zoxide_zi~
+edit:add-var {{cmd}}~ $__zoxide_z~
+edit:add-var {{cmd}}i~ $__zoxide_zi~
+
+# Load completions.
+{# zoxide-based completions are currently not possible, because Elvish only
+ # prints a completion if the current token is a prefix of it. -#}
+fn __zoxide_z_complete [@rest]{
+    if (!= (builtin:count $rest) 2) {
+        builtin:return
+    }
+    edit:complete-filename $rest[1] |
+        builtin:each [completion]{
+            var dir = $completion[stem]
+            if (path:is-dir $dir) {
+                builtin:put $dir
+            }
+        }
+}
+set edit:completion:arg-completer[{{cmd}}] = $__zoxide_z_complete~
 
 {%- when None %}
 

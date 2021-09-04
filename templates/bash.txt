@@ -35,29 +35,29 @@ function __zoxide_cd() {
 
 {%- when InitHook::Prompt %}
 function __zoxide_hook() {
-    \builtin local -r __zoxide_retval="$?"
+    \builtin local -r retval="$?"
     zoxide add -- "$(__zoxide_pwd)"
-    return "${__zoxide_retval}"
+    return "${retval}"
 }
 
 {%- when InitHook::Pwd %}
 function __zoxide_hook() {
-    \builtin local -r __zoxide_retval="$?"
-    \builtin local -r __zoxide_pwd_tmp="$(__zoxide_pwd)"
+    \builtin local -r retval="$?"
+    \builtin local -r pwd_tmp="$(__zoxide_pwd)"
     if [ -z "${__zoxide_pwd_old}" ]; then
-        __zoxide_pwd_old="${__zoxide_pwd_tmp}"
-    elif [ "${__zoxide_pwd_old}" != "${__zoxide_pwd_tmp}" ]; then
-        __zoxide_pwd_old="${__zoxide_pwd_tmp}"
+        __zoxide_pwd_old="${pwd_tmp}"
+    elif [ "${__zoxide_pwd_old}" != "${pwd_tmp}" ]; then
+        __zoxide_pwd_old="${pwd_tmp}"
         zoxide add -- "${__zoxide_pwd_old}"
     fi
-    return "${__zoxide_retval}"
+    return "${retval}"
 }
 
 {%- endmatch %}
 
-{# bash throws an error if $PROMPT_COMMAND contains two semicolons in sequence.
- # This is hard to avoid perfectly, but adding __zoxide_hook to the front of
- # $PROMPT_COMMAND rather than the back makes this scenario unlikely. -#}
+{# $PROMPT_COMMAND cannot contain two semicolons in sequence. It can end with a
+ # semicolon, but it cannot start with one. Therefore, always put the hook
+ # at the start of $PROMPT_COMMAND. -#}
 
 # Initialize hook.
 if [ "${__zoxide_hooked}" != '1' ]; then
@@ -93,15 +93,15 @@ function __zoxide_z() {
     elif [ "$#" -eq 1 ] && [ -d "$1" ]; then
         __zoxide_cd "$1"
     else
-        \builtin local __zoxide_result
-        __zoxide_result="$(zoxide query --exclude "$(__zoxide_pwd)" -- "$@")" && __zoxide_cd "${__zoxide_result}"
+        \builtin local result
+        result="$(zoxide query --exclude "$(__zoxide_pwd)" -- "$@")" && __zoxide_cd "${result}"
     fi
 }
 
 # Jump to a directory using interactive search.
 function __zoxide_zi() {
-    \builtin local __zoxide_result
-    __zoxide_result="$(zoxide query -i -- "$@")" && __zoxide_cd "${__zoxide_result}"
+    \builtin local result
+    result="$(zoxide query -i -- "$@")" && __zoxide_cd "${result}"
 }
 
 {{ section }}
@@ -127,6 +127,39 @@ __zoxide_unset '{{cmd}}i'
 function {{cmd}}i() {
     __zoxide_zi "$@"
 }
+
+# Load completions.
+{# This requires line editing. Since Bash supports only two modes of line
+ # editing (`vim` and `emacs`), we check if one of them is enabled. -#}
+if [[ :"${SHELLOPTS}": =~ :(vi|emacs): ]] && [ "${TERM}" != 'dumb' ]; then
+    {# Use `printf '\e[5n'` to redraw line after fzf closes. -#}
+    \builtin bind '"\e[0n": redraw-current-line' &>/dev/null
+
+    function __zoxide_z_complete() {
+        [ {{ "${#COMP_WORDS[@]}" }} -eq 2 ] || return
+
+        \builtin local -r trigger='**'
+        \builtin local query="${COMP_WORDS[1]}"
+
+        if [[ ${query} == *"${trigger}" ]]; then
+            query="${query:0:$(({{ "${#query} - ${#trigger}" }}))}"
+            COMPREPLY=("$(_ZO_FZF_OPTS="\
+                --bind=ctrl-z:ignore \
+                --exit-0 \
+                --height=35% \
+                --inline-info \
+                --no-sort \
+                --reverse \
+                --select-1 \
+                " zoxide query -i -- "${query}")")
+            \builtin printf '\e[5n'
+        else
+            \builtin mapfile -t COMPREPLY < <(compgen -A directory -S / -- "${query}")
+        fi
+    }
+
+    \builtin complete -F __zoxide_z_complete -o nospace -- '{{cmd}}'
+fi
 
 {%- when None %}
 

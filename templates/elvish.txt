@@ -25,12 +25,8 @@ var oldpwd = $builtin:pwd
 set builtin:before-chdir = [$@builtin:before-chdir [_]{ edit:add-var oldpwd $builtin:pwd }]
 
 # Initialize hook to add directories to zoxide.
-var shlvl = $E:SHLVL
-if (builtin:eq $shlvl "") {
-    set shlvl = 0
-}
-if (builtin:not (builtin:eq $E:__zoxide_hooked_elvish $shlvl)) {
-    set E:__zoxide_hooked_elvish = $shlvl
+if (builtin:not (builtin:eq $E:__zoxide_hooked_elvish $E:SHLVL)) {
+    set E:__zoxide_hooked_elvish = $E:SHLVL
 {%- match hook %}
 {%- when InitHook::None %}
     {{ not_configured }}

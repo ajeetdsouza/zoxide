@@ -78,23 +78,25 @@ def __zoxide_errhandler(func):
 # Hook configuration for zoxide.
 #
 
+{% if hook == InitHook::None -%}
+{{ not_configured }}
+
+{%- else -%}
 # Initialize hook to add new entries to the database.
-if globals().get("__zoxide_hooked") is not True:
-    globals()["__zoxide_hooked"] = True
-{% match hook -%}
-{%- when InitHook::None %}
-    {{ not_configured }}
-{%- when InitHook::Prompt %}
+if "__zoxide_hook" not in globals():
+{% if hook == InitHook::Prompt %}
     @builtins.events.on_post_prompt  # type: ignore  # pylint:disable=no-member
-{%- when InitHook::Pwd %}
+{%- else if hook == InitHook::Pwd %}
     @builtins.events.on_chdir  # type: ignore  # pylint:disable=no-member
-{%- endmatch %}
+{%- endif %}
     def __zoxide_hook(**_kwargs):
         """Hook to add new entries to the database."""
         pwd = __zoxide_pwd()
         zoxide = __zoxide_bin()
         subprocess.run([zoxide, "add", "--", pwd], check=False)
 
+
+{% endif -%}
 
 {{ section }}
 # When using zoxide with --no-aliases, alias these internal functions as

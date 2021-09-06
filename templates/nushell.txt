@@ -29,19 +29,19 @@ def __zoxide_prompt [] {
 
 {%- when InitHook::Prompt %}
 def __zoxide_hook [] {
-    shells | where active == $true && name == filesystem | get path | each { zoxide add -- $it }
+    shells | where active == $true && name == filesystem | get path | each {
+        zoxide add -- $it
+    }
 }
 
 # Initialize hook.
-if ($nu.env | select PROMPT_STRING | empty?) {
-    if ($nu.config | select prompt | empty?) {
-        let-env PROMPT_STRING = '__zoxide_hook;__zoxide_prompt'
-    } {
-        let-env PROMPT_STRING = $'__zoxide_hook;($nu.config.prompt)'
-    }
-} {
-    let-env PROMPT_STRING = $'__zoxide_hook;($nu.env.PROMPT_STRING)'
-}
+let-env PROMPT_STRING = (
+    let prompt = (if ($nu.env | select PROMPT_STRING | empty?) {
+        if ($nu.config | select prompt | empty?) { '__zoxide_prompt' } { $nu.config.prompt }
+    } { $nu.env.PROMPT_STRING });
+
+    if ($prompt | str contains '__zoxide_hook') { $prompt } { $'__zoxide_hook;($prompt)' }
+)
 
 {%- when InitHook::Pwd %}
 $'zoxide: PWD hooks are not supported on Nushell.(char nl)Use (char sq)zoxide init nushell --hook prompt(char sq) instead.(char nl)'

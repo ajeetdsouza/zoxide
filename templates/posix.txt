@@ -24,35 +24,27 @@ __zoxide_cd() {
 # Hook configuration for zoxide.
 #
 
-# Hook to add new entries to the database.
-{%- match hook %}
-{%- when InitHook::None %}
+{% match hook %}
+{%- when InitHook::None -%}
 {{ not_configured }}
 
-{%- when InitHook::Prompt %}
+{%- when InitHook::Prompt -%}
+# Hook to add new entries to the database.
 __zoxide_hook() {
     zoxide add -- "$(__zoxide_pwd)"
 }
 
-{%- when InitHook::Pwd %}
-{{ not_configured }}
-
-{%- endmatch %}
-
 # Initialize hook.
-if [ "${__zoxide_hooked}" != '1' ]; then
-    __zoxide_hooked='1'
-{%- match hook %}
-{%- when InitHook::None %}
-    {{ not_configured }}
-{%- when InitHook::Prompt %}
+if [ "${PS1#*\$(__zoxide_hook)}" = "${PS1}" ]; then
     PS1="${PS1}\$(__zoxide_hook)"
-{%- when InitHook::Pwd %}
-    \printf "%s\n%s\n" \
-        "zoxide: PWD hooks are not supported on POSIX shells." \
-        "        Use 'zoxide init posix --hook prompt' instead."
-{%- endmatch %}
 fi
+
+{%- when InitHook::Pwd -%}
+\printf "%s\n%s\n" \
+    "zoxide: PWD hooks are not supported on POSIX shells." \
+    "        Use 'zoxide init posix --hook prompt' instead."
+
+{%- endmatch %}
 
 {{ section }}
 # When using zoxide with --no-aliases, alias these internal functions as

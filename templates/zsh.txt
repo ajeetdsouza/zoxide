@@ -24,23 +24,26 @@ function __zoxide_cd() {
 # Hook configuration for zoxide.
 #
 
+{% if hook == InitHook::None -%}
+{{ not_configured -}}
+
+{% else -%}
 # Hook to add new entries to the database.
 function __zoxide_hook() {
     zoxide add -- "$(__zoxide_pwd)"
 }
 
 # Initialize hook.
-if [ "${__zoxide_hooked}" != '1' ]; then
-    __zoxide_hooked='1'
-{%- match hook %}
-{%- when InitHook::None %}
-    {{ not_configured }}
-{%- when InitHook::Prompt %}
+# shellcheck disable=SC2154
+if [[ ${precmd_functions[(Ie)__zoxide_hook]} -eq 0 ]] && [[ ${chpwd_functions[(Ie)__zoxide_hook]} -eq 0 ]]; then
+{%- if hook == InitHook::Prompt %}
     precmd_functions+=(__zoxide_hook)
-{%- when InitHook::Pwd %}
+{%- else if hook == InitHook::Pwd %}
     chpwd_functions=("${chpwd_functions[@]}" "__zoxide_hook")
-{%- endmatch %}
+{%- endif %}
 fi
+
+{%- endif %}
 
 {{ section }}
 # When using zoxide with --no-aliases, alias these internal functions as

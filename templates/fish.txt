@@ -37,21 +37,21 @@ end
 # Hook configuration for zoxide.
 #
 
+{% if hook == InitHook::None -%}
+{{ not_configured }}
+
+{%- else -%}
 # Initialize hook to add new entries to the database.
-if test "$__zoxide_hooked" != 1
-    set __zoxide_hooked 1
-{%- match hook %}
-{%- when InitHook::None %}
-    function __zoxide_hook
-{%- when InitHook::Prompt %}
-    function __zoxide_hook --on-event fish_prompt
-{%- when InitHook::Pwd %}
-    function __zoxide_hook --on-variable PWD
-{%- endmatch %}
-        test -z "$fish_private_mode"
-        and command zoxide add -- (__zoxide_pwd)
-    end
+{%- if hook == InitHook::Prompt %}
+function __zoxide_hook --on-event fish_prompt
+{%- else if hook == InitHook::Pwd %}
+function __zoxide_hook --on-variable PWD
+{%- endif %}
+    test -z "$fish_private_mode"
+    and command zoxide add -- (__zoxide_pwd)
 end
+
+{%- endif %}
 
 {{ section }}
 # When using zoxide with --no-aliases, alias these internal functions as

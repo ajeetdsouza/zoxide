@@ -57,9 +57,9 @@ dependencies = [
 
 [[package]]
 name = "assert_cmd"
-version = "2.0.0"
+version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "54f002ce7d0c5e809ebb02be78fd503aeed4a511fd0fcaff6e6914cbdabbfa33"
+checksum = "b800c4403e8105d959595e1f88119e78bc12bc874c4336973658b648a746ba93"
 dependencies = [
  "bstr",
  "doc-comment",
@@ -336,9 +336,9 @@ dependencies = [
 
 [[package]]
 name = "ordered-float"
-version = "2.7.0"
+version = "2.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "039f02eb0f69271f26abe3202189275d7aa2258b903cb0281b5de710a2570ff3"
+checksum = "97c9d06878b3a851e8026ef94bf7fef9ba93062cd412601da4d9cf369b1cc62d"
 dependencies = [
  "num-traits",
 ]
@@ -572,9 +572,9 @@ checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
 
 [[package]]
 name = "syn"
-version = "1.0.75"
+version = "1.0.76"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b7f58f7e8eaa0009c5fec437aabf511bd9933e4b2d7407bd05273c01a8906ea7"
+checksum = "c6f107db402c2c2055242dbf4d2af0e69197202e9faacbef9571bbe47f5a1b84"
 dependencies = [
  "proc-macro2",
  "quote",

@@ -24,54 +24,39 @@ function __zoxide_cd() {
 # Hook configuration for zoxide.
 #
 
-{# Custom prompts often use "$?" to show the exit status of the previous
- # command. Adding __zoxide_hook to the front of $PROMPT_COMMAND would change
- # the exit status, so we must capture it and return it manually instead. -#}
-
-# Hook to add new entries to the database.
-{%- match hook %}
-{%- when InitHook::None %}
+{% if hook == InitHook::None -%}
 {{ not_configured }}
 
-{%- when InitHook::Prompt %}
+{%- else -%}
+# Hook to add new entries to the database.
+{%- if hook == InitHook::Prompt %}
 function __zoxide_hook() {
     \builtin local -r retval="$?"
     zoxide add -- "$(__zoxide_pwd)"
     return "${retval}"
 }
-
-{%- when InitHook::Pwd %}
+{%- else if hook == InitHook::Pwd %}
 function __zoxide_hook() {
     \builtin local -r retval="$?"
     \builtin local -r pwd_tmp="$(__zoxide_pwd)"
-    if [ -z "${__zoxide_pwd_old}" ]; then
-        __zoxide_pwd_old="${pwd_tmp}"
-    elif [ "${__zoxide_pwd_old}" != "${pwd_tmp}" ]; then
-        __zoxide_pwd_old="${pwd_tmp}"
-        zoxide add -- "${__zoxide_pwd_old}"
+    if [ -z "${__zoxide_oldpwd}" ]; then
+        __zoxide_oldpwd="${pwd_tmp}"
+    elif [ "${__zoxide_oldpwd}" != "${pwd_tmp}" ]; then
+        __zoxide_oldpwd="${pwd_tmp}"
+        zoxide add -- "${__zoxide_oldpwd}"
     fi
     return "${retval}"
 }
-
-{%- endmatch %}
-
-{# $PROMPT_COMMAND cannot contain two semicolons in sequence. It can end with a
- # semicolon, but it cannot start with one. Therefore, always put the hook
- # at the start of $PROMPT_COMMAND. -#}
+{%- endif %}
 
 # Initialize hook.
-if [ "${__zoxide_hooked}" != '1' ]; then
-    __zoxide_hooked='1'
-{%- if hook == InitHook::None %}
-    {{ not_configured }}
-{%- else %}
-    if [ -z "${PROMPT_COMMAND}" ]; then
-        PROMPT_COMMAND='__zoxide_hook'
-    else
-        PROMPT_COMMAND="__zoxide_hook;${PROMPT_COMMAND#;}"
-    fi
-{%- endif %}
+if [ -z "${PROMPT_COMMAND}" ]; then
+    PROMPT_COMMAND='__zoxide_hook'
+elif [[ ${PROMPT_COMMAND} != *'__zoxide_hook'* ]]; then
+    PROMPT_COMMAND="__zoxide_hook;${PROMPT_COMMAND#;}"
 fi
+
+{% endif -%}
 
 {{ section }}
 # When using zoxide with --no-aliases, alias these internal functions as
@@ -83,13 +68,7 @@ function __zoxide_z() {
     if [ "$#" -eq 0 ]; then
         __zoxide_cd ~
     elif [ "$#" -eq 1 ] && [ "$1" = '-' ]; then
-        if [ -n "${OLDPWD}" ]; then
-            __zoxide_cd "${OLDPWD}"
-        else
-            # shellcheck disable=SC2016
-            \builtin printf 'zoxide: $OLDPWD is not set\n'
-            return 1
-        fi
+        __zoxide_cd "${OLDPWD}"
     elif [ "$#" -eq 1 ] && [ -d "$1" ]; then
         __zoxide_cd "$1"
     else
@@ -118,12 +97,12 @@ function __zoxide_unset() {
     \builtin unalias "$@" &>/dev/null || \builtin :
 }
 
-__zoxide_unset '{{cmd}}'
+__zoxide_unset {{cmd}}
 function {{cmd}}() {
     __zoxide_z "$@"
 }
 
-__zoxide_unset '{{cmd}}i'
+__zoxide_unset {{cmd}}i
 function {{cmd}}i() {
     __zoxide_zi "$@"
 }
@@ -135,8 +114,8 @@ if [[ :"${SHELLOPTS}": =~ :(vi|emacs): ]] && [ "${TERM}" != 'dumb' ]; then
     {# Use `printf '\e[5n'` to redraw line after fzf closes. -#}
     \builtin bind '"\e[0n": redraw-current-line' &>/dev/null
 
-    function __zoxide_z_complete() {
-        [ {{ "${#COMP_WORDS[@]}" }} -eq 2 ] || return
+    function _{{cmd}}() {
+        [[ {{ "${#COMP_WORDS[@]}" }} -eq 2 && ${COMP_POINT} -eq {{ "${#COMP_LINE}" }} ]] || return
 
         \builtin local -r trigger='**'
         \builtin local query="${COMP_WORDS[1]}"
@@ -152,13 +131,14 @@ if [[ :"${SHELLOPTS}": =~ :(vi|emacs): ]] && [ "${TERM}" != 'dumb' ]; then
                 --reverse \
                 --select-1 \
                 " zoxide query -i -- "${query}")")
+            [[ $? -eq 130 ]] && COMPREPLY=("${query}")
             \builtin printf '\e[5n'
         else
             \builtin mapfile -t COMPREPLY < <(compgen -A directory -S / -- "${query}")
         fi
     }
 
-    \builtin complete -F __zoxide_z_complete -o nospace -- '{{cmd}}'
+    \builtin complete -F _{{cmd}} -o nospace -- {{cmd}}
 fi
 
 {%- when None %}

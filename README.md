@@ -4,11 +4,12 @@
 
 > A smarter cd command for your terminal
 
-[![crates.io][crates-io-badge]][crates.io]
-[![Releases][releases-badge]][releases]
+[![crates.io][crates.io-badge]][crates.io]
+[![Downloads][downloads-badge]][releases]
+[![Built with Nix][builtwithnix-badge]][builtwithnix]
 
 `zoxide` is a blazing fast replacement for your `cd` command, inspired by
-`z` and `z.lua`. It keeps track of the directories you use most
+`z` and `autojump`. It keeps track of the directories you use most
 frequently, and uses a ranking algorithm to navigate to the best match.
 
 ![Tutorial][tutorial]
@@ -332,13 +333,16 @@ Be sure to set these before calling `zoxide init`.
 [algorithm-matching]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#matching
 [alpine linux packages]: https://pkgs.alpinelinux.org/packages?name=zoxide
 [arch linux community]: https://archlinux.org/packages/community/x86_64/zoxide/
+[builtwithnix-badge]: https://img.shields.io/badge/builtwith-nix-7d81f7
+[builtwithnix]: https://builtwithnix.org/
 [chocolatey]: https://community.chocolatey.org/packages/zoxide
 [conda-forge]: https://anaconda.org/conda-forge/zoxide
 [copr]: https://copr.fedorainfracloud.org/coprs/atim/zoxide/
-[crates-io-badge]: https://img.shields.io/crates/v/zoxide
+[crates.io-badge]: https://img.shields.io/crates/v/zoxide
 [crates.io]: https://crates.io/crates/zoxide
 [debian packages]: https://packages.debian.org/stable/admin/zoxide
 [devuan packages]: https://pkginfo.devuan.org/cgi-bin/package-query.html?c=package&q=zoxide
+[downloads-badge]: https://img.shields.io/github/downloads/ajeetdsouza/zoxide/total
 [dports]: https://github.com/DragonFlyBSD/DPorts/tree/master/sysutils/zoxide
 [emacs]: https://www.gnu.org/software/emacs/
 [fedora packages]: https://src.fedoraproject.org/rpms/rust-zoxide
@@ -358,7 +362,6 @@ Be sure to set these before calling `zoxide init`.
 [pkgsrc]: https://pkgsrc.se/sysutils/zoxide
 [ranger-zoxide]: https://github.com/jchook/ranger-zoxide
 [ranger]: https://github.com/ranger/ranger
-[releases-badge]: https://img.shields.io/github/v/release/ajeetdsouza/zoxide
 [releases]: https://github.com/ajeetdsouza/zoxide/releases
 [scoop]: https://github.com/ScoopInstaller/Main/tree/master/bucket/zoxide.json
 [telescope-nvim]: https://github.com/nvim-telescope/telescope.nvim

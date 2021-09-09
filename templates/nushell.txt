@@ -9,10 +9,8 @@
 
 # Default prompt for Nushell.
 def __zoxide_prompt [] {
-    let git = $'(do -i {git rev-parse --abbrev-ref HEAD} | str trim)'
-    let git = (if ($git | str length) == 0 {
-        ''
-    } {
+    let git = $'(do -i {git rev-parse --abbrev-ref HEAD} | str trim -rc (char newline))'
+    let git = (if ($git | str length) == 0 { '' } {
         build-string (char lparen) (ansi cb) $git (ansi reset) (char rparen)
     })
     build-string (ansi gb) (pwd) (ansi reset) $git '> '
@@ -39,7 +37,6 @@ let-env PROMPT_STRING = (
     let prompt = (if ($nu.env | select PROMPT_STRING | empty?) {
         if ($nu.config | select prompt | empty?) { '__zoxide_prompt' } { $nu.config.prompt }
     } { $nu.env.PROMPT_STRING });
-
     if ($prompt | str contains '__zoxide_hook') { $prompt } { $'__zoxide_hook;($prompt)' }
 )
 
@@ -68,7 +65,7 @@ def __zoxide_z [...rest:string] {
         if ($rest | length) <= 1 && ($arg0 == '-' || ($arg0 | path expand | path exists)) {
             cd $arg0
         } {
-            cd $'(zoxide query --exclude (pwd) -- $rest | str trim)'
+            cd $'(zoxide query --exclude (pwd) -- $rest | str trim -rc (char newline))'
         }
 {%- if echo %}
         pwd
@@ -81,7 +78,7 @@ def __zoxide_zi  [...rest:string] {
     if (shells | where active == $true | get name) != filesystem {
         $'zoxide: can only jump directories on filesystem(char nl)'
     } {
-        cd $'(zoxide query -i -- $rest | str trim)'
+        cd $'(zoxide query -i -- $rest | str trim -rc (char newline))'
 {%- if echo %}
         pwd
 {%- endif %}

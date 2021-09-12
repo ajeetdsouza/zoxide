@@ -7,8 +7,7 @@ use std::path::{Component, Path, PathBuf};
 use std::time::SystemTime;
 
 pub fn canonicalize<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
-    dunce::canonicalize(path)
-        .with_context(|| format!("could not resolve path: {}", path.as_ref().display()))
+    dunce::canonicalize(path).with_context(|| format!("could not resolve path: {}", path.as_ref().display()))
 }
 
 pub fn current_dir() -> Result<PathBuf> {
@@ -16,10 +15,8 @@ pub fn current_dir() -> Result<PathBuf> {
 }
 
 pub fn current_time() -> Result<Epoch> {
-    let current_time = SystemTime::now()
-        .duration_since(SystemTime::UNIX_EPOCH)
-        .context("system clock set to invalid time")?
-        .as_secs();
+    let current_time =
+        SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).context("system clock set to invalid time")?.as_secs();
 
     Ok(current_time)
 }
@@ -51,9 +48,7 @@ pub fn resolve_path<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
 
             match components.next() {
                 Some(Component::Prefix(prefix)) => match prefix.kind() {
-                    Prefix::Disk(drive_letter) | Prefix::VerbatimDisk(drive_letter) => {
-                        Some(drive_letter)
-                    }
+                    Prefix::Disk(drive_letter) | Prefix::VerbatimDisk(drive_letter) => Some(drive_letter),
                     _ => None,
                 },
                 _ => None,
@@ -106,9 +101,8 @@ pub fn resolve_path<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
                 components.next();
 
                 let current_dir = env::current_dir()?;
-                let drive_letter = get_drive_letter(&current_dir).with_context(|| {
-                    format!("could not get drive letter: {}", current_dir.display())
-                })?;
+                let drive_letter = get_drive_letter(&current_dir)
+                    .with_context(|| format!("could not get drive letter: {}", current_dir.display()))?;
                 base_path = get_drive_path(drive_letter);
                 stack.extend(base_path.components());
             }

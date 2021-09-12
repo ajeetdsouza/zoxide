@@ -45,8 +45,7 @@ pub fn exclude_dirs() -> Result<Vec<Pattern>> {
             env::split_paths(&paths)
                 .map(|path| {
                     let pattern = path.to_str().context("invalid unicode in _ZO_EXCLUDE_DIRS")?;
-                    Pattern::new(pattern)
-                        .with_context(|| format!("invalid glob in _ZO_EXCLUDE_DIRS: {}", pattern))
+                    Pattern::new(pattern).with_context(|| format!("invalid glob in _ZO_EXCLUDE_DIRS: {}", pattern))
                 })
                 .collect()
         },
@@ -61,9 +60,8 @@ pub fn maxage() -> Result<Rank> {
     match env::var_os("_ZO_MAXAGE") {
         Some(maxage) => {
             let maxage = maxage.to_str().context("invalid unicode in _ZO_MAXAGE")?;
-            let maxage = maxage
-                .parse::<u64>()
-                .with_context(|| format!("unable to parse _ZO_MAXAGE as integer: {}", maxage))?;
+            let maxage =
+                maxage.parse::<u64>().with_context(|| format!("unable to parse _ZO_MAXAGE as integer: {}", maxage))?;
             Ok(maxage as Rank)
         }
         None => Ok(10000.0),

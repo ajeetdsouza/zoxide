@@ -25,21 +25,18 @@ impl<'file> Database<'file> {
         }
 
         let buffer = self.dirs.to_bytes()?;
-        let mut file = NamedTempFile::new_in(self.data_dir).with_context(|| {
-            format!("could not create temporary database in: {}", self.data_dir.display())
-        })?;
+        let mut file = NamedTempFile::new_in(self.data_dir)
+            .with_context(|| format!("could not create temporary database in: {}", self.data_dir.display()))?;
 
         // Preallocate enough space on the file, preventing copying later on.
         // This optimization may fail on some filesystems, but it is safe to
         // ignore it and proceed.
         let _ = file.as_file().set_len(buffer.len() as _);
-        file.write_all(&buffer).with_context(|| {
-            format!("could not write to temporary database: {}", file.path().display())
-        })?;
+        file.write_all(&buffer)
+            .with_context(|| format!("could not write to temporary database: {}", file.path().display()))?;
 
         let path = db_path(&self.data_dir);
-        persist(file, &path)
-            .with_context(|| format!("could not replace database: {}", path.display()))?;
+        persist(file, &path).with_context(|| format!("could not replace database: {}", path.display()))?;
 
         self.modified = false;
         Ok(())
@@ -51,11 +48,7 @@ impl<'file> Database<'file> {
 
         match self.dirs.iter_mut().find(|dir| dir.path == path) {
             None => {
-                self.dirs.push(Dir {
-                    path: path.to_string().into(),
-                    last_accessed: now,
-                    rank: 1.0,
-                });
+                self.dirs.push(Dir { path: path.to_string().into(), last_accessed: now, rank: 1.0 });
             }
             Some(dir) => {
                 dir.last_accessed = now;
@@ -184,23 +177,19 @@ impl DatabaseFile {
         match fs::read(&path) {
             Ok(buffer) => {
                 self.buffer = buffer;
-                let dirs = DirList::from_bytes(&self.buffer).with_context(|| {
-                    format!("could not deserialize database: {}", path.display())
-                })?;
+                let dirs = DirList::from_bytes(&self.buffer)
+                    .with_context(|| format!("could not deserialize database: {}", path.display()))?;
                 Ok(Database { dirs, modified: false, data_dir: &self.data_dir })
             }
             Err(e) if e.kind() == io::ErrorKind::NotFound => {
                 // Create data directory, but don't create any file yet.
                 // The file will be created later by [`Database::save`]
                 // if any data is modified.
-                fs::create_dir_all(&self.data_dir).with_context(|| {
-                    format!("unable to create data directory: {}", self.data_dir.display())
-                })?;
+                fs::create_dir_all(&self.data_dir)
+                    .with_context(|| format!("unable to create data directory: {}", self.data_dir.display()))?;
                 Ok(Database { dirs: DirList::new(), modified: false, data_dir: &self.data_dir })
             }
-            Err(e) => {
-                Err(e).with_context(|| format!("could not read from database: {}", path.display()))
-            }
+            Err(e) => Err(e).with_context(|| format!("could not read from database: {}", path.display())),
         }
     }
 }

@@ -10,7 +10,7 @@ const ENV_HELP: &str = "ENVIRONMENT VARIABLES:
     _ZO_MAXAGE              Maximum total age after which entries start getting deleted
     _ZO_RESOLVE_SYMLINKS    Resolve symlinks when storing paths";
 
-#[derive(Debug, Clap)]
+#[derive(Clap, Debug)]
 #[clap(
     bin_name = env!("CARGO_PKG_NAME"),
     about,

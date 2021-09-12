@@ -21,4 +21,4 @@ jobs:
         if: ${{ matrix.os != 'windows-latest' }}
         with:
           nix_path: nixpkgs=https://github.com/NixOS/nixpkgs/archive/20.09.tar.gz
-      - run: make test
+      - run: cargo xtask ci --nix ${{ matrix.os != 'windows-latest' }}

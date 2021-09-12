@@ -22,11 +22,7 @@ impl Run for Add {
         let mut db = db.open()?;
 
         for path in &self.paths {
-            let path = if config::resolve_symlinks() {
-                util::canonicalize(path)
-            } else {
-                util::resolve_path(path)
-            }?;
+            let path = if config::resolve_symlinks() { util::canonicalize(path) } else { util::resolve_path(path) }?;
             let path = util::path_to_str(&path)?;
 
             // Ignore path if it contains unsupported characters, or if it's in

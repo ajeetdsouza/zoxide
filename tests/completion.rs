@@ -6,12 +6,7 @@ use assert_cmd::Command;
 #[test]
 fn completions_bash() {
     let source = include_str!("../contrib/completions/zoxide.bash");
-    Command::new("bash")
-        .args(&["--noprofile", "--norc", "-c", source])
-        .assert()
-        .success()
-        .stdout("")
-        .stderr("");
+    Command::new("bash").args(&["--noprofile", "--norc", "-c", source]).assert().success().stdout("").stderr("");
 }
 
 // Elvish: the completions file uses editor commands to add completions to the

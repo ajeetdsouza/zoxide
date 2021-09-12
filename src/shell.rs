@@ -50,13 +50,7 @@ mod tests {
     ) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Bash(&opts).render().unwrap();
-
-        Command::new("bash")
-            .args(&["--noprofile", "--norc", "-c", &source])
-            .assert()
-            .success()
-            .stdout("")
-            .stderr("");
+        Command::new("bash").args(&["--noprofile", "--norc", "-c", &source]).assert().success().stdout("").stderr("");
     }
 
     #[rstest]
@@ -110,19 +104,12 @@ mod tests {
 
         // Filter out lines using edit:*, since those functions
         // are only available in the interactive editor.
-        for line in
-            Elvish(&opts).render().unwrap().split('\n').filter(|line| !line.contains("edit:"))
-        {
+        for line in Elvish(&opts).render().unwrap().split('\n').filter(|line| !line.contains("edit:")) {
             source.push_str(line);
             source.push('\n');
         }
 
-        Command::new("elvish")
-            .args(&["-c", &source, "-norc"])
-            .assert()
-            .success()
-            .stdout("")
-            .stderr("");
+        Command::new("elvish").args(&["-c", &source, "-norc"]).assert().success().stdout("").stderr("");
     }
 
     #[rstest]
@@ -184,12 +171,8 @@ mod tests {
         let tempdir = tempfile::tempdir().unwrap();
         let tempdir = tempdir.path().to_str().unwrap();
 
-        let assert = Command::new("nu")
-            .env("HOME", tempdir)
-            .args(&["--commands", &source])
-            .assert()
-            .success()
-            .stderr("");
+        let assert =
+            Command::new("nu").env("HOME", tempdir).args(&["--commands", &source]).assert().success().stderr("");
 
         if opts.hook != InitHook::Pwd {
             assert.stdout("");
@@ -302,12 +285,7 @@ mod tests {
         let mut source = Xonsh(&opts).render().unwrap();
         source.push('\n');
 
-        Command::new("black")
-            .args(&["--check", "--diff", "-"])
-            .write_stdin(source)
-            .assert()
-            .success()
-            .stdout("");
+        Command::new("black").args(&["--check", "--diff", "-"]).write_stdin(source).assert().success().stdout("");
     }
 
     #[rstest]

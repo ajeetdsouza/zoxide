@@ -75,10 +75,10 @@ end
 
 # Completions for `z`.
 function __zoxide_z_complete
-    set -l line (commandline -op)
     set -l trigger '**'
     set -l trigger_length (string length $trigger)
 
+    set -l line (commandline -op)
     set -l interactive 0
     if test (string sub -s "-$trigger_length" $line[-1]) = $trigger
         set line[-1] (string sub -e "-$trigger_length" $line[-1])
@@ -86,11 +86,10 @@ function __zoxide_z_complete
     end
 
     set -l query $line[2..-1]
-    if test $interactive -eq 0 -a (count $query) -le 1
+    if test $interactive -eq 0 -a (count (commandline -cop)) -le 1
         __fish_complete_directories "$query" ''
         return
     end
-
     set -l result (_ZO_FZF_OPTS='{{ crate::shell::FZF_COMPLETE_OPTS }}' zoxide query -i -- $query)
     set -l exit $status
     if test $exit -ne 0

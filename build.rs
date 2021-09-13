@@ -1,6 +1,5 @@
-use std::env;
-use std::io;
 use std::process::Command;
+use std::{env, io};
 
 fn main() {
     let pkg_version = env::var("CARGO_PKG_VERSION").unwrap();
@@ -10,8 +9,8 @@ fn main() {
     };
     println!("cargo:rustc-env=ZOXIDE_VERSION={}", version);
 
-    // Since we are generating completions in the package directory, we need to
-    // set this so that Cargo doesn't rebuild every time.
+    // Since we are generating completions in the package directory, we need to set this so that
+    // Cargo doesn't rebuild every time.
     println!("cargo:rerun-if-changed=src");
     println!("cargo:rerun-if-changed=templates");
     println!("cargo:rerun-if-changed=tests");

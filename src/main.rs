@@ -6,14 +6,13 @@ mod fzf;
 mod shell;
 mod util;
 
-use crate::app::{App, Run};
-use crate::error::SilentExit;
+use std::io::{self, Write};
+use std::{env, process};
 
 use clap::Clap;
 
-use std::env;
-use std::io::{self, Write};
-use std::process;
+use crate::app::{App, Run};
+use crate::error::SilentExit;
 
 pub fn main() {
     // Forcibly disable backtraces.

@@ -1,10 +1,10 @@
-use crate::config;
-use crate::error::SilentExit;
+use std::io;
+use std::process::{Child, ChildStdin, Command, Stdio};
 
 use anyhow::{bail, Context, Result};
 
-use std::io;
-use std::process::{Child, ChildStdin, Command, Stdio};
+use crate::config;
+use crate::error::SilentExit;
 
 pub struct Fzf {
     child: Child,
@@ -33,7 +33,7 @@ impl Fzf {
     }
 
     pub fn stdin(&mut self) -> &mut ChildStdin {
-        // unwrap is safe here because command.stdin() has been piped
+        // unwrap is safe here because command.stdin() has been piped.
         self.child.stdin.as_mut().unwrap()
     }
 

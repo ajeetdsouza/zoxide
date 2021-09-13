@@ -35,11 +35,11 @@ make_template!(Zsh, "zsh.txt");
 #[cfg(feature = "shell_tests")]
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     use askama::Template;
     use assert_cmd::Command;
     use rstest::rstest;
+
+    use super::*;
 
     #[rstest]
     fn bash_bash(
@@ -102,8 +102,8 @@ mod tests {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let mut source = String::new();
 
-        // Filter out lines using edit:*, since those functions
-        // are only available in the interactive editor.
+        // Filter out lines using edit:*, since those functions are only available in the
+        // interactive editor.
         for line in Elvish(&opts).render().unwrap().split('\n').filter(|line| !line.contains("edit:")) {
             source.push_str(line);
             source.push('\n');
@@ -356,8 +356,7 @@ mod tests {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Zsh(&opts).render().unwrap();
 
-        // ShellCheck doesn't support zsh yet.
-        // https://github.com/koalaman/shellcheck/issues/809
+        // ShellCheck doesn't support zsh yet: https://github.com/koalaman/shellcheck/issues/809
         Command::new("shellcheck")
             .args(&["--enable", "all", "--shell", "bash", "-"])
             .write_stdin(source)

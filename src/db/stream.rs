@@ -1,12 +1,11 @@
-use super::{Database, Dir, Epoch};
-use crate::util;
+use std::iter::Rev;
+use std::ops::Range;
+use std::{fs, path};
 
 use ordered_float::OrderedFloat;
 
-use std::fs;
-use std::iter::Rev;
-use std::ops::Range;
-use std::path;
+use super::{Database, Dir, Epoch};
+use crate::util;
 
 pub struct Stream<'db, 'file> {
     db: &'db mut Database<'file>,
@@ -27,8 +26,7 @@ impl<'db, 'file> Stream<'db, 'file> {
         db.dirs.sort_unstable_by_key(|dir| OrderedFloat(dir.score(now)));
         let idxs = (0..db.dirs.len()).rev();
 
-        // If a directory is deleted and hasn't been used for 90 days, delete
-        // it from the database.
+        // If a directory is deleted and hasn't been used for 90 days, delete it from the database.
         let expire_below = now.saturating_sub(90 * 24 * 60 * 60);
 
         Stream {
@@ -124,11 +122,11 @@ impl<'db, 'file> Stream<'db, 'file> {
 
 #[cfg(test)]
 mod tests {
-    use super::Database;
+    use std::path::PathBuf;
 
     use rstest::rstest;
 
-    use std::path::PathBuf;
+    use super::Database;
 
     #[rstest]
     // Case normalization

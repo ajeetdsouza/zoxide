@@ -1,10 +1,10 @@
-use crate::app::{Import, ImportFrom, Run};
-use crate::config;
-use crate::db::{Database, DatabaseFile, Dir};
+use std::fs;
 
 use anyhow::{bail, Context, Result};
 
-use std::fs;
+use crate::app::{Import, ImportFrom, Run};
+use crate::config;
+use crate::db::{Database, DatabaseFile, Dir};
 
 impl Run for Import {
     fn run(&self) -> Result<()> {
@@ -37,9 +37,8 @@ fn from_autojump<'a>(db: &mut Database<'a>, buffer: &'a str) -> Result<()> {
 
         let rank = split.next().with_context(|| format!("invalid entry: {}", line))?;
         let mut rank = rank.parse::<f64>().with_context(|| format!("invalid rank: {}", rank))?;
-        // Normalize the rank using a sigmoid function. Don't import actual
-        // ranks from autojump, since its scoring algorithm is very different,
-        // and might take a while to get normalized.
+        // Normalize the rank using a sigmoid function. Don't import actual ranks from autojump,
+        // since its scoring algorithm is very different and might take a while to get normalized.
         rank = sigmoid(rank);
 
         let path = split.next().with_context(|| format!("invalid entry: {}", line))?;

@@ -1,15 +1,14 @@
 mod dir;
 mod stream;
 
-pub use dir::{Dir, DirList, Epoch, Rank};
-pub use stream::Stream;
-
-use anyhow::{Context, Result};
-use tempfile::{NamedTempFile, PersistError};
-
 use std::fs;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
+
+use anyhow::{Context, Result};
+pub use dir::{Dir, DirList, Epoch, Rank};
+pub use stream::Stream;
+use tempfile::{NamedTempFile, PersistError};
 
 #[derive(Debug)]
 pub struct Database<'file> {
@@ -28,9 +27,8 @@ impl<'file> Database<'file> {
         let mut file = NamedTempFile::new_in(self.data_dir)
             .with_context(|| format!("could not create temporary database in: {}", self.data_dir.display()))?;
 
-        // Preallocate enough space on the file, preventing copying later on.
-        // This optimization may fail on some filesystems, but it is safe to
-        // ignore it and proceed.
+        // Preallocate enough space on the file, preventing copying later on. This optimization may
+        // fail on some filesystems, but it is safe to ignore it and proceed.
         let _ = file.as_file().set_len(buffer.len() as _);
         file.write_all(&buffer)
             .with_context(|| format!("could not write to temporary database: {}", file.path().display()))?;
@@ -89,8 +87,8 @@ impl<'file> Database<'file> {
         Stream::new(self, now)
     }
 
-    /// Removes the directory with `path` from the store.
-    /// This does not preserve ordering, but is O(1).
+    /// Removes the directory with `path` from the store. This does not preserve ordering, but is
+    /// O(1).
     pub fn remove<S: AsRef<str>>(&mut self, path: S) -> bool {
         let path = path.as_ref();
 
@@ -124,15 +122,16 @@ impl<'file> Database<'file> {
 
 #[cfg(windows)]
 fn persist<P: AsRef<Path>>(mut file: NamedTempFile, path: P) -> Result<(), PersistError> {
-    use rand::distributions::{Distribution, Uniform};
-    use rand::rngs::SmallRng;
-    use rand::SeedableRng;
     use std::thread;
     use std::time::Duration;
 
-    // File renames on Windows are not atomic and sometimes fail with `PermissionDenied`.
-    // This is extremely unlikely unless it's running in a loop on multiple threads.
-    // Nevertheless, we guard against it by retrying the rename a fixed number of times.
+    use rand::distributions::{Distribution, Uniform};
+    use rand::rngs::SmallRng;
+    use rand::SeedableRng;
+
+    // File renames on Windows are not atomic and sometimes fail with `PermissionDenied`. This is
+    // extremely unlikely unless it's running in a loop on multiple threads. Nevertheless, we guard
+    // against it by retrying the rename a fixed number of times.
     const MAX_TRIES: usize = 10;
     let mut rng = None;
 
@@ -170,9 +169,8 @@ impl DatabaseFile {
     }
 
     pub fn open(&mut self) -> Result<Database> {
-        // Read the entire database to memory. For smaller files, this is
-        // faster than mmap / streaming, and allows for zero-copy
-        // deserialization.
+        // Read the entire database to memory. For smaller files, this is faster than
+        // mmap / streaming, and allows for zero-copy deserialization.
         let path = db_path(&self.data_dir);
         match fs::read(&path) {
             Ok(buffer) => {
@@ -182,9 +180,8 @@ impl DatabaseFile {
                 Ok(Database { dirs, modified: false, data_dir: &self.data_dir })
             }
             Err(e) if e.kind() == io::ErrorKind::NotFound => {
-                // Create data directory, but don't create any file yet.
-                // The file will be created later by [`Database::save`]
-                // if any data is modified.
+                // Create data directory, but don't create any file yet. The file will be created
+                // later by [`Database::save`] if any data is modified.
                 fs::create_dir_all(&self.data_dir)
                     .with_context(|| format!("unable to create data directory: {}", self.data_dir.display()))?;
                 Ok(Database { dirs: DirList::new(), modified: false, data_dir: &self.data_dir })

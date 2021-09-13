@@ -1,13 +1,12 @@
-use crate::app::{Remove, Run};
-use crate::config;
-use crate::db::DatabaseFile;
-use crate::error::BrokenPipeHandler;
-use crate::fzf::Fzf;
-use crate::util;
+use std::io::Write;
 
 use anyhow::{bail, Result};
 
-use std::io::Write;
+use crate::app::{Remove, Run};
+use crate::db::DatabaseFile;
+use crate::error::BrokenPipeHandler;
+use crate::fzf::Fzf;
+use crate::{config, util};
 
 impl Run for Remove {
     fn run(&self) -> Result<()> {

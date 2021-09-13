@@ -1,12 +1,12 @@
-use crate::db::Rank;
+use std::env;
+use std::ffi::OsString;
+use std::path::PathBuf;
 
 use anyhow::{bail, Context, Result};
 use dirs_next as dirs;
 use glob::Pattern;
 
-use std::env;
-use std::ffi::OsString;
-use std::path::PathBuf;
+use crate::db::Rank;
 
 pub fn data_dir() -> Result<PathBuf> {
     let path = match env::var_os("_ZO_DATA_DIR") {

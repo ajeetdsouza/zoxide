@@ -1,6 +1,6 @@
-use clap::{ArgEnum, Clap};
-
 use std::process::Command;
+
+use clap::{ArgEnum, Clap};
 
 #[derive(Clap, Debug)]
 struct App {

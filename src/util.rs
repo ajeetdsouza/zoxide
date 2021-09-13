@@ -1,10 +1,10 @@
-use crate::db::Epoch;
-
-use anyhow::{bail, Context, Result};
-
 use std::env;
 use std::path::{Component, Path, PathBuf};
 use std::time::SystemTime;
+
+use anyhow::{bail, Context, Result};
+
+use crate::db::Epoch;
 
 pub fn canonicalize<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
     dunce::canonicalize(path).with_context(|| format!("could not resolve path: {}", path.as_ref().display()))
@@ -26,11 +26,8 @@ pub fn path_to_str<P: AsRef<Path>>(path: &P) -> Result<&str> {
     path.to_str().with_context(|| format!("invalid unicode in path: {}", path.display()))
 }
 
-/// Resolves the absolute version of a path.
-///
-/// If path is already absolute, the path is still processed to be cleaned, as it can contained ".." or "." (or other)
-/// character.
-/// If path is relative, use the current directory to build the absolute path.
+/// Returns the absolute version of a path. Like [`std::path::Path::canonicalize`], but doesn't
+/// resolve symlinks.
 pub fn resolve_path<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
     let path = path.as_ref();
     let base_path;
@@ -135,7 +132,7 @@ pub fn resolve_path<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
     Ok(stack.iter().collect())
 }
 
-// Convert a string to lowercase, with a fast path for ASCII strings.
+/// Convert a string to lowercase, with a fast path for ASCII strings.
 pub fn to_lowercase<S: AsRef<str>>(s: S) -> String {
     let s = s.as_ref();
     if s.is_ascii() {

@@ -9,10 +9,9 @@ fn completions_bash() {
     Command::new("bash").args(&["--noprofile", "--norc", "-c", source]).assert().success().stdout("").stderr("");
 }
 
-// Elvish: the completions file uses editor commands to add completions to the
-// shell. However, Elvish does not support running editor commands from a
-// script, so we can't create a test for this.
-// <https://github.com/elves/elvish/issues/1299>
+// Elvish: the completions file uses editor commands to add completions to the shell. However,
+// Elvish does not support running editor commands from a script, so we can't create a test for
+// this. See: https://github.com/elves/elvish/issues/1299
 
 #[test]
 fn completions_fish() {

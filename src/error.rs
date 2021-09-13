@@ -1,9 +1,9 @@
-use anyhow::{bail, Context, Result};
-
 use std::fmt::{self, Display, Formatter};
 use std::io;
 
-// Custom error type for early exit.
+use anyhow::{bail, Context, Result};
+
+/// Custom error type for early exit.
 #[derive(Debug)]
 pub struct SilentExit {
     pub code: i32,

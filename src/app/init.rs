@@ -1,12 +1,12 @@
-use crate::app::{Init, InitShell, Run};
-use crate::config;
-use crate::error::BrokenPipeHandler;
-use crate::shell::{self, Opts};
+use std::io::{self, Write};
 
 use anyhow::{Context, Result};
 use askama::Template;
 
-use std::io::{self, Write};
+use crate::app::{Init, InitShell, Run};
+use crate::config;
+use crate::error::BrokenPipeHandler;
+use crate::shell::{self, Opts};
 
 impl Run for Init {
     fn run(&self) -> Result<()> {

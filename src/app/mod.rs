@@ -5,9 +5,9 @@ mod init;
 mod query;
 mod remove;
 
-pub use crate::app::_app::*;
-
 use anyhow::Result;
+
+pub use crate::app::_app::*;
 
 pub trait Run {
     fn run(&self) -> Result<()>;

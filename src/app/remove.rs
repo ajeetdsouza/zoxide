@@ -22,7 +22,7 @@ impl Run for Remove {
 
                 let mut fzf = Fzf::new(true)?;
                 while let Some(dir) = stream.next() {
-                    writeln!(fzf.stdin(), "{}", dir.display_score(now)).pipe_exit("fzf")?;
+                    writeln!(fzf.stdin(), "{}", dir.display_score(now, Some(keywords))).pipe_exit("fzf")?;
                 }
 
                 selection = fzf.wait_select()?;

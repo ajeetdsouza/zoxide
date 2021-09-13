@@ -5,6 +5,7 @@ use std::ops::{Deref, DerefMut};
 use anyhow::{bail, Context, Result};
 use bincode::Options as _;
 use serde::{Deserialize, Serialize};
+use unicode_segmentation::UnicodeSegmentation;
 
 #[derive(Debug, Deserialize, Serialize, Default)]
 pub struct DirList<'a>(#[serde(borrow)] pub Vec<Dir<'a>>);
@@ -88,7 +89,7 @@ pub struct Dir<'a> {
 }
 
 impl Dir<'_> {
-    pub fn score(&self, now: Epoch, _keywords: &Vec<String>) -> Score {
+    pub fn score(&self, now: Epoch, keywords: &Vec<String>) -> Score {
         const HOUR: Epoch = 60 * 60;
         const DAY: Epoch = 24 * HOUR;
         const WEEK: Epoch = 7 * DAY;
@@ -105,20 +106,109 @@ impl Dir<'_> {
             self.rank * 0.25
         };
 
-        // TODO: incorporate keywords into the scoring logic, so match quality is more significant
-        // than the access date. See issue #260.
-        let kw_score = 1;
+        let left_word_boundaries = left_word_boundaries(&self.path);
 
-        (kw_score, adjusted_rank)
+        let mut kw_score_sum = 0;
+        for keyword in keywords {
+            kw_score_sum += self.compute_kw_score(keyword, &left_word_boundaries);
+        }
+
+        (kw_score_sum, adjusted_rank)
+    }
+
+    pub fn compute_kw_score(&self, keyword: &str, left_word_boundaries: &Vec<usize>) -> u64 {
+        let keyword_lower = &keyword.to_lowercase();
+        let path_lower = self.path.to_lowercase();
+
+        // more than one boundary can match
+        let mut best_boundary_score = 0;
+        for idx in left_word_boundaries {
+            // TODO: think carefully about these rules. Should the case of the match
+            // be allowed to influence the score? What if it's all lowercase, so
+            // a smart case match is impossible?
+            let path = &self.path[*idx..];
+            let path_lower = &path_lower[*idx..];
+            if path.starts_with(keyword) {
+                // exact match
+
+                // TODO: think about checking the right word boundary, and give extra points if it matches.
+                //       Imagine two directories, src_3 and src. If src_3 is more frequently used, "sr" will
+                //       match src_3. But "src" will match src.
+                best_boundary_score = best_boundary_score.max(100);
+            } else if path_lower.starts_with(keyword) {
+                // smart case match
+                best_boundary_score = best_boundary_score.max(90);
+            } else if path_lower.starts_with(keyword_lower) {
+                // wrong case but it's a match otherwise
+                best_boundary_score = best_boundary_score.max(20);
+            }
+
+            // We don't need to give any score for a keyword that matches but not on a word boundary--
+            // All paths being checked should at least match in that way.
+        }
+        debug_assert!(path_lower.contains(keyword_lower));
+
+        best_boundary_score
     }
 
     pub fn display(&self) -> DirDisplay {
         DirDisplay { dir: self }
     }
 
-    pub fn display_score(&self, now: Epoch) -> DirDisplayScore {
-        DirDisplayScore { dir: self, now }
+    pub fn display_score(&self, now: Epoch, keywords: Option<&Vec<String>>) -> DirDisplayScore {
+        DirDisplayScore { dir: self, now, keywords: keywords.map(|vec| vec.iter().cloned().collect()) }
     }
+}
+
+/// Returns byte indices that correspond to the leftmost position of each word.
+/// For input "hi there", the result will contain 0 and 3.
+///
+/// The result may also contain extraneous indices.
+fn left_word_boundaries(text: &str) -> Vec<usize> {
+    let mut boundaries = Vec::new();
+
+    #[derive(PartialEq, Clone, Copy, PartialOrd)]
+    enum Case {
+        None,
+        LowerCase,
+        UpperCase,
+    }
+
+    // We won't need the words themselves because we want to do multi-word match.
+    // We need the whole string for that.
+    for (word_idx, word) in text.unicode_word_indices() {
+        boundaries.push(word_idx);
+
+        // Also search for case changes, and non-text characters:
+        // MyDocuments
+        // my_documents
+        // TODO: should "clap3b4" count as 4 words or 1?
+        let mut prev_case = None;
+        for (grapheme_idx, grapheme) in word.grapheme_indices(true) {
+            let lower = grapheme.to_lowercase();
+            let upper = grapheme.to_uppercase();
+            let case = if lower == grapheme && upper == grapheme {
+                Case::None
+            } else if lower == grapheme {
+                Case::LowerCase
+            } else {
+                // Assume the other cases are upper case, because there might be more than
+                // one way to represent upper case
+                Case::UpperCase
+            };
+
+            if let Some(prev_case) = &prev_case {
+                if case > *prev_case {
+                    // Consider this a word start if going from no case to any case,
+                    // or lower case to upper case.
+                    boundaries.push(word_idx + grapheme_idx);
+                }
+            }
+            let _ = prev_case.replace(case);
+        }
+    }
+
+    boundaries
 }
 
 pub struct DirDisplay<'a> {
@@ -134,11 +224,15 @@ impl Display for DirDisplay<'_> {
 pub struct DirDisplayScore<'a> {
     dir: &'a Dir<'a>,
     now: Epoch,
+    keywords: Option<Vec<String>>,
 }
 
 impl Display for DirDisplayScore<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let (kw_score, score) = self.dir.score(self.now, &vec![]);
+        let no_keywords = Vec::default();
+        let keywords = self.keywords.as_ref().unwrap_or(&no_keywords);
+
+        let (kw_score, score) = self.dir.score(self.now, keywords);
         let score = if score > 9999.0 {
             9999
         } else if score > 0.0 {
@@ -156,9 +250,9 @@ pub type Epoch = u64;
 
 #[cfg(test)]
 mod tests {
-    use std::borrow::Cow;
+    use std::{borrow::Cow, collections::HashSet};
 
-    use super::{Dir, DirList};
+    use super::{left_word_boundaries, Dir, DirList};
 
     #[test]
     fn zero_copy() {
@@ -170,5 +264,33 @@ mod tests {
         for dir in dirs.iter() {
             assert!(matches!(dir.path, Cow::Borrowed(_)))
         }
+    }
+
+    #[test]
+    fn test_left_word_boundaries() {
+        assert!(left_word_boundaries("") == vec![]);
+        assert!(left_word_boundaries("Hi") == vec![0]);
+
+        assert!(vec![0, 3]
+            .into_iter()
+            .collect::<HashSet<_>>()
+            .is_subset(&left_word_boundaries("hi there").into_iter().collect()));
+        assert!(vec![0, 3]
+            .into_iter()
+            .collect::<HashSet<_>>()
+            .is_subset(&left_word_boundaries("hi_there").into_iter().collect()));
+
+        assert!(vec![0, 4] == left_word_boundaries("FürElise"));
+        assert!(vec![0, 1] == left_word_boundaries("uTorrent"));
+        assert!(vec![0, 2] == left_word_boundaries("µTorrent"));
+
+        assert!(vec![1, 6, 11]
+            .into_iter()
+            .collect::<HashSet<_>>()
+            .is_subset(&left_word_boundaries("/path/file.ext").into_iter().collect()));
+        assert!(vec![0, 3, 8, 13]
+            .into_iter()
+            .collect::<HashSet<_>>()
+            .is_subset(&left_word_boundaries(r"C:\path\file.ext").into_iter().collect()));
     }
 }

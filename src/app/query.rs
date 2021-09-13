@@ -34,7 +34,7 @@ impl Query {
         if self.interactive {
             let mut fzf = Fzf::new(false)?;
             while let Some(dir) = stream.next() {
-                writeln!(fzf.stdin(), "{}", dir.display_score(now)).pipe_exit("fzf")?;
+                writeln!(fzf.stdin(), "{}", dir.display_score(now, Some(&self.keywords))).pipe_exit("fzf")?;
             }
 
             let selection = fzf.wait_select()?;
@@ -49,7 +49,7 @@ impl Query {
             let handle = &mut stdout.lock();
             while let Some(dir) = stream.next() {
                 if self.score {
-                    writeln!(handle, "{}", dir.display_score(now))
+                    writeln!(handle, "{}", dir.display_score(now, Some(&self.keywords)))
                 } else {
                     writeln!(handle, "{}", dir.display())
                 }
@@ -59,7 +59,7 @@ impl Query {
         } else {
             let dir = stream.next().context("no match found")?;
             if self.score {
-                writeln!(io::stdout(), "{}", dir.display_score(now))
+                writeln!(io::stdout(), "{}", dir.display_score(now, Some(&self.keywords)))
             } else {
                 writeln!(io::stdout(), "{}", dir.display())
             }

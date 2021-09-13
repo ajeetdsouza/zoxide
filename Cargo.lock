@@ -875,4 +875,5 @@ dependencies = [
  "rstest",
  "serde",
  "tempfile",
+ "unicode-segmentation",
 ]

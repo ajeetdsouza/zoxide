@@ -41,7 +41,7 @@ impl Query {
             if self.score {
                 print!("{}", selection);
             } else {
-                let path = selection.get(5..).context("could not read selection from fzf")?;
+                let path = selection.get(10..).context("could not read selection from fzf")?;
                 print!("{}", path);
             }
         } else if self.list {

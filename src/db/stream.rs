@@ -1,5 +1,3 @@
-use std::iter::Rev;
-use std::ops::Range;
 use std::{fs, path};
 
 use ordered_float::OrderedFloat;
@@ -53,13 +51,21 @@ impl<'db, 'file> Stream<'db, 'file> {
     }
 
     pub fn into_iter(self) -> StreamIterator<'db, 'file> {
-        let mut dirs = std::mem::take(&mut self.db.dirs);
-        // Iterate in descending order of score.
-        dirs.sort_unstable_by_key(|dir| OrderedFloat(dir.score(self.now)));
-        let _ = std::mem::replace(&mut self.db.dirs, dirs);
-        let idxs = (0..self.db.dirs.len()).rev();
+        let mut idxs: Vec<_> = self.db.dirs.iter()
+            .enumerate() // store the original indices before filtering
+            .filter(|(_idx, dir)|
+                self.matches_keywords(&dir.path) &&
+                    Some(dir.path.as_ref()) != self.exclude_path.as_deref())
+            .collect();
 
-        StreamIterator { stream: self, idxs }
+        // Iterate in descending order of score.
+        idxs.sort_by_cached_key(|(_idx, dir)| {
+            let (kw_score, frequency_score) = dir.score(self.now, &self.keywords);
+            (kw_score, OrderedFloat(frequency_score))
+        });
+        let idxs = idxs.into_iter().map(|(idx, _)| idx).rev().collect::<Vec<_>>().into_iter(); // copy the indices to avoid lifetime issues
+
+        StreamIterator { stream: self, idxs: Box::new(idxs) }
     }
 
     fn matches_exists<S: AsRef<str>>(&self, path: S) -> bool {
@@ -101,7 +107,7 @@ impl<'db, 'file> Stream<'db, 'file> {
 
 pub struct StreamIterator<'db, 'file> {
     stream: Stream<'db, 'file>,
-    idxs: Rev<Range<usize>>,
+    idxs: Box<dyn Iterator<Item = usize>>,
 }
 
 impl<'db, 'file> StreamIterator<'db, 'file> {
@@ -109,19 +115,11 @@ impl<'db, 'file> StreamIterator<'db, 'file> {
         while let Some(idx) = self.idxs.next() {
             let dir = &self.stream.db.dirs[idx];
 
-            if !self.stream.matches_keywords(&dir.path) {
-                continue;
-            }
-
             if !self.stream.matches_exists(&dir.path) {
                 if dir.last_accessed < self.stream.expire_below {
                     self.stream.db.dirs.swap_remove(idx);
                     self.stream.db.modified = true;
                 }
-                continue;
-            }
-
-            if Some(dir.path.as_ref()) == self.stream.exclude_path.as_deref() {
                 continue;
             }
 

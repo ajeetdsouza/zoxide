@@ -88,14 +88,14 @@ pub struct Dir<'a> {
 }
 
 impl Dir<'_> {
-    pub fn score(&self, now: Epoch) -> Rank {
+    pub fn score(&self, now: Epoch, _keywords: &Vec<String>) -> Score {
         const HOUR: Epoch = 60 * 60;
         const DAY: Epoch = 24 * HOUR;
         const WEEK: Epoch = 7 * DAY;
 
         // The older the entry, the lesser its importance.
         let duration = now.saturating_sub(self.last_accessed);
-        if duration < HOUR {
+        let adjusted_rank = if duration < HOUR {
             self.rank * 4.0
         } else if duration < DAY {
             self.rank * 2.0
@@ -103,7 +103,13 @@ impl Dir<'_> {
             self.rank * 0.5
         } else {
             self.rank * 0.25
-        }
+        };
+
+        // TODO: incorporate keywords into the scoring logic, so match quality is more significant
+        // than the access date. See issue #260.
+        let kw_score = 1;
+
+        (kw_score, adjusted_rank)
     }
 
     pub fn display(&self) -> DirDisplay {
@@ -132,7 +138,7 @@ pub struct DirDisplayScore<'a> {
 
 impl Display for DirDisplayScore<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let score = self.dir.score(self.now);
+        let (kw_score, score) = self.dir.score(self.now, &vec![]);
         let score = if score > 9999.0 {
             9999
         } else if score > 0.0 {
@@ -140,11 +146,12 @@ impl Display for DirDisplayScore<'_> {
         } else {
             0
         };
-        write!(f, "{:>4} {}", score, self.dir.path)
+        write!(f, "{:>4},{:>4} {}", kw_score, score, self.dir.path)
     }
 }
 
 pub type Rank = f64;
+pub type Score = (u64, Rank);
 pub type Epoch = u64;
 
 #[cfg(test)]

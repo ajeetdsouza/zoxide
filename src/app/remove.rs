@@ -26,7 +26,7 @@ impl Run for Remove {
                 }
 
                 selection = fzf.wait_select()?;
-                let paths = selection.lines().filter_map(|line| line.get(5..));
+                let paths = selection.lines().filter_map(|line| line.get(10..));
                 for path in paths {
                     if !db.remove(path) {
                         bail!("path not found in database: {}", path);

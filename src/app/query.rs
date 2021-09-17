@@ -30,6 +30,7 @@ impl Query {
             stream = stream.with_exclude(path);
         }
 
+        let mut stream = stream.into_iter();
         if self.interactive {
             let mut fzf = Fzf::new(false)?;
             while let Some(dir) = stream.next() {

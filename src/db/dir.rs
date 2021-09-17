@@ -6,7 +6,7 @@ use anyhow::{bail, Context, Result};
 use bincode::Options as _;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Default)]
 pub struct DirList<'a>(#[serde(borrow)] pub Vec<Dir<'a>>);
 
 impl DirList<'_> {

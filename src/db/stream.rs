@@ -9,7 +9,6 @@ use crate::util;
 
 pub struct Stream<'db, 'file> {
     db: &'db mut Database<'file>,
-    idxs: Rev<Range<usize>>,
 
     keywords: Vec<String>,
 
@@ -18,25 +17,22 @@ pub struct Stream<'db, 'file> {
     resolve_symlinks: bool,
 
     exclude_path: Option<String>,
+    now: Epoch,
 }
 
 impl<'db, 'file> Stream<'db, 'file> {
     pub fn new(db: &'db mut Database<'file>, now: Epoch) -> Self {
-        // Iterate in descending order of score.
-        db.dirs.sort_unstable_by_key(|dir| OrderedFloat(dir.score(now)));
-        let idxs = (0..db.dirs.len()).rev();
-
         // If a directory is deleted and hasn't been used for 90 days, delete it from the database.
         let expire_below = now.saturating_sub(90 * 24 * 60 * 60);
 
         Stream {
             db,
-            idxs,
             keywords: Vec::new(),
             check_exists: false,
             expire_below,
             resolve_symlinks: false,
             exclude_path: None,
+            now,
         }
     }
 
@@ -56,31 +52,14 @@ impl<'db, 'file> Stream<'db, 'file> {
         self
     }
 
-    pub fn next(&mut self) -> Option<&Dir<'file>> {
-        while let Some(idx) = self.idxs.next() {
-            let dir = &self.db.dirs[idx];
+    pub fn into_iter(self) -> StreamIterator<'db, 'file> {
+        let mut dirs = std::mem::take(&mut self.db.dirs);
+        // Iterate in descending order of score.
+        dirs.sort_unstable_by_key(|dir| OrderedFloat(dir.score(self.now)));
+        let _ = std::mem::replace(&mut self.db.dirs, dirs);
+        let idxs = (0..self.db.dirs.len()).rev();
 
-            if !self.matches_keywords(&dir.path) {
-                continue;
-            }
-
-            if !self.matches_exists(&dir.path) {
-                if dir.last_accessed < self.expire_below {
-                    self.db.dirs.swap_remove(idx);
-                    self.db.modified = true;
-                }
-                continue;
-            }
-
-            if Some(dir.path.as_ref()) == self.exclude_path.as_deref() {
-                continue;
-            }
-
-            let dir = &self.db.dirs[idx];
-            return Some(dir);
-        }
-
-        None
+        StreamIterator { stream: self, idxs }
     }
 
     fn matches_exists<S: AsRef<str>>(&self, path: S) -> bool {
@@ -117,6 +96,40 @@ impl<'db, 'file> Stream<'db, 'file> {
         }
 
         true
+    }
+}
+
+pub struct StreamIterator<'db, 'file> {
+    stream: Stream<'db, 'file>,
+    idxs: Rev<Range<usize>>,
+}
+
+impl<'db, 'file> StreamIterator<'db, 'file> {
+    pub fn next(&mut self) -> Option<&Dir<'file>> {
+        while let Some(idx) = self.idxs.next() {
+            let dir = &self.stream.db.dirs[idx];
+
+            if !self.stream.matches_keywords(&dir.path) {
+                continue;
+            }
+
+            if !self.stream.matches_exists(&dir.path) {
+                if dir.last_accessed < self.stream.expire_below {
+                    self.stream.db.dirs.swap_remove(idx);
+                    self.stream.db.modified = true;
+                }
+                continue;
+            }
+
+            if Some(dir.path.as_ref()) == self.stream.exclude_path.as_deref() {
+                continue;
+            }
+
+            let dir = &self.stream.db.dirs[idx];
+            return Some(dir);
+        }
+
+        None
     }
 }
 

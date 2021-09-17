@@ -18,7 +18,7 @@ impl Run for Remove {
         match &self.interactive {
             Some(keywords) => {
                 let now = util::current_time()?;
-                let mut stream = db.stream(now).with_keywords(keywords);
+                let mut stream = db.stream(now).with_keywords(keywords).into_iter();
 
                 let mut fzf = Fzf::new(true)?;
                 while let Some(dir) = stream.next() {

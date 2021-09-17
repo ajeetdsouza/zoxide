@@ -182,7 +182,7 @@ Add this to your configuration (find it by running `config path` in Nushell):
 startup = ["zoxide init nushell --hook prompt | save ~/.zoxide.nu", "source ~/.zoxide.nu"]
 ```
 
-Note: zoxide only supports Nushell v0.36.0 and above.
+Note: zoxide only supports Nushell v0.37.0 and above.
 
 </details>
 

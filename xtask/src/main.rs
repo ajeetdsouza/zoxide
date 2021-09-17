@@ -1,18 +1,19 @@
 use std::process::Command;
 
-use clap::{ArgEnum, Clap};
+use clap::Clap;
 
 #[derive(Clap, Debug)]
 struct App {
-    #[clap(arg_enum)]
+    #[clap(subcommand)]
     task: Task,
     #[clap(long)]
     nix: Option<bool>,
 }
 
-#[derive(ArgEnum, Debug)]
+#[derive(Clap, Debug)]
 enum Task {
     CI,
+    Test { keywords: Vec<String> },
 }
 
 fn run(args: &[&str], nix: bool) {
@@ -32,17 +33,24 @@ fn run(args: &[&str], nix: bool) {
 
 fn main() {
     let app = App::parse();
-    let color = if std::env::var_os("CI").is_some() { "--color=always" } else { "--color=auto" };
     let nix = app.nix.unwrap_or_else(|| Command::new("nix-shell").arg("--version").output().is_ok());
     let run = |args: &[&str]| run(args, nix);
     match app.task {
         Task::CI => {
+            let color = if std::env::var_os("CI").is_some() { "--color=always" } else { "" };
             run(&["cargo", "fmt", "--", "--check", color, "--files-with-diff"]);
             run(&["cargo", "check", "--all-features", color]);
-            run(&["cargo", "clippy", "--all-features", color, "--", "--deny=warnings", "--deny=clippy::all"]);
+            run(&["cargo", "clippy", "--all-features", color, "--", "--deny=clippy::all", "--deny=warnings"]);
             run(&["cargo", "test", if nix { "--all-features" } else { "" }, color, "--no-fail-fast"]);
-            // color: https://github.com/rustsec/rustsec/pull/436
-            run(&["cargo", "audit", "--deny=warnings"]);
+            run(&["cargo", "audit", color, "--deny=warnings"]);
+            if nix {
+                run(&["markdownlint", "--ignore-path=.gitignore", "."]);
+            }
+        }
+        Task::Test { keywords } => {
+            let mut args = vec!["cargo", "test", if nix { "--all-features" } else { "" }, "--no-fail-fast", "--"];
+            args.extend(keywords.iter().map(String::as_str));
+            run(&args);
         }
     }
 }

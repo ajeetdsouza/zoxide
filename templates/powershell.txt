@@ -28,17 +28,13 @@ function __zoxide_cd($dir) {
 # Hook to add new entries to the database.
 function __zoxide_hook {
     $result = __zoxide_pwd
-    if ($result -ne $null) {
+    if ($null -ne $result) {
         zoxide add -- $result
     }
 }
 
 # Initialize hook.
-{# Initialize $__zoxide_hooked if it does not exist. Removing this will cause
- # an unset variable error in StrictMode. #}
-$__zoxide_hooked = (Get-Variable __zoxide_hooked -ValueOnly -ErrorAction SilentlyContinue)
-if ($__zoxide_hooked -ne 1) {
-    $__zoxide_hooked = 1
+if (-Not (Get-Command '__zoxide_hook' -ErrorAction SilentlyContinue)) {
 {%- match hook %}
 {%- when InitHook::None %}
     {{ not_configured }}
@@ -53,7 +49,8 @@ if ($__zoxide_hooked -ne 1) {
         $ExecutionContext.InvokeCommand.LocationChangedAction = {
             $null = __zoxide_hook
         }
-    } else {
+    }
+    else {
         Write-Error ("`n" +
             "zoxide: PWD hooks are not supported below powershell 6.`n" +
             "        Use 'zoxide init powershell --hook prompt' instead.")
@@ -79,9 +76,10 @@ function __zoxide_z {
     }
     else {
         $result = __zoxide_pwd
-        if ($result -ne $null) {
+        if ($null -ne $result) {
             $result = zoxide query --exclude $result -- @args
-        } else {
+        }
+        else {
             $result = zoxide query -- @args
         }
         if ($LASTEXITCODE -eq 0) {

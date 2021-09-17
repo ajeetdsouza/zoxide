@@ -1,4 +1,4 @@
-<!-- markdownlint-disable MD024 -->
+<!-- markdownlint-disable-file MD024 -->
 
 # Changelog
 
@@ -112,13 +112,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- Aliases: `za`, `zq`, `zqi`, `zr`, `zri`. These are trivial aliases to zoxide that can easily be defined manually, and aren't very useful to most users.
+- Aliases: `za`, `zq`, `zqi`, `zr`, `zri`. These are trivial aliases that can
+  easily be defined manually, and aren't very useful to most users.
 
 ## [0.5.0] - 2020-10-30
 
 ### Added
 
-- Inaccessible directories are no longer removed; zoxide can now remember paths on removable devices.
 - `$_ZO_EXCLUDE_DIRS` now supports globs.
 - `zoxide init` now defines `__zoxide_z*` functions that can be aliased as needed.
 - Support for the [xonsh](https://xon.sh/) shell.
@@ -135,6 +135,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - Deprecated PWD hooks for POSIX shells.
+- Lazy deletion for inaccessible directories.
 
 ## [0.4.3] - 2020-07-04
 
@@ -153,7 +154,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Increased default value of `$_ZO_MAXAGE` to `10000`.
-- Symlinks are treated as separate directories by default, this can be changed by setting `_ZO_RESOLVE_SYMLINKS=1`.
+- Symlinks are treated as separate directories by default, this can be changed
+  by setting `_ZO_RESOLVE_SYMLINKS=1`.
 
 ### Removed
 
@@ -182,7 +184,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - `zoxide remove` now throws an error if there was no match in the database.
-- Interactive mode in `zoxide` no longer throws an error if `fzf` exits gracefully.
+- Interactive mode in `zoxide` no longer errors out if `fzf` exits gracefully.
 - Canonicalize to regular paths instead of UNC paths on Windows.
 - `zoxide init` now uses PWD hooks by default for better performance.
 - `$_ZO_ECHO` now only works when set to `1`.
@@ -203,7 +205,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Query output no longer has the `query:` prefix, so `$(zq)` can now be used as an argument to commands.
+- `zoxide query` output no longer has the `query:` prefix.
 
 ### Fixed
 
@@ -214,7 +216,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Automatic migration from `v0.2.x` databases.
-- `$_ZO_EXCLUDE_DIRS` to prevent certain directories from being added to the database.
+- `$_ZO_EXCLUDE_DIRS` to prevent directories from being added to the database.
 - Support for POSIX-compliant shells.
 
 ### Changed
@@ -225,7 +227,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Achieve thread safety using unique temporary database file names for each `zoxide` instance.
+- Thread safety using unique tempfile names for each `zoxide` instance.
 - Incomprehensive "could not allocate" message on database corruption.
 
 ## [0.2.2] - 2020-03-20

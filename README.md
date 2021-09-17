@@ -1,4 +1,10 @@
-<!-- markdownlint-disable MD033 -->
+<!-- markdownlint-configure-file {
+  "MD013": {
+    "code_blocks": false,
+    "tables": false
+  },
+  "MD033": false
+} -->
 
 # `zoxide`
 

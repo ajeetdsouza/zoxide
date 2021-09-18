@@ -122,15 +122,7 @@ if [[ :"${SHELLOPTS}": =~ :(vi|emacs): ]] && [ "${TERM}" != 'dumb' ]; then
 
         if [[ ${query} == *"${trigger}" ]]; then
             query="${query:0:$(({{ "${#query} - ${#trigger}" }}))}"
-            COMPREPLY=("$(_ZO_FZF_OPTS="\
-                --bind=ctrl-z:ignore \
-                --exit-0 \
-                --height=35% \
-                --inline-info \
-                --no-sort \
-                --reverse \
-                --select-1 \
-                " zoxide query -i -- "${query}")")
+            COMPREPLY=("$(_ZO_FZF_OPTS='{{ crate::shell::FZF_COMPLETE_OPTS }}' zoxide query -i -- "${query}")")
             [[ $? -eq 130 ]] && COMPREPLY=("${query}")
             \builtin printf '\e[5n'
         else

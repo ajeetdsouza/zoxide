@@ -1,28 +1,29 @@
-.TH "zoxide-init" "1" "2021-04-12" "zoxide" "zoxide"
+.TH "ZOXIDE" "1" "2021-04-12" "" "zoxide"
 .SH NAME
-zoxide-init - generate shell configuration for zoxide
+\fBzoxide-init\fR - generate shell configuration for zoxide
 .SH SYNOPSIS
-.B zoxide init \fISHELL [OPTIONS]\fR
+.B zoxide init SHELL [OPTIONS]
 .SH DESCRIPTION
 To initialize zoxide on your shell:
 .TP
 .B bash
-Add this to your configuration (usually \fI~/.bashrc\fR):
+Add this to your configuration (usually \fB~/.bashrc\fR):
 .sp
 .nf
     \fBeval "$(zoxide init bash)"\fR
 .fi
 .TP
 .B elvish
-Add this to your configuration (usually \fI~/.elvish/rc.elv\fR):
+Add this to your configuration (usually \fB~/.elvish/rc.elv\fR):
 .sp
 .nf
     \fBeval $(zoxide init elvish | slurp)\fR
 .fi
+.sp
 Note: zoxide only supports elvish v0.16.0 and above.
 .TP
 .B fish
-Add this to your configuration (usually \fI~/.config/fish/config.fish\fR):
+Add this to your configuration (usually \fB~/.config/fish/config.fish\fR):
 .sp
 .nf
     \fBzoxide init fish | source\fR
@@ -50,14 +51,14 @@ PowerShell):
 .fi
 .TP
 .B xonsh
-Add this to your configuration (usually \fI~/.xonshrc\fR):
+Add this to your configuration (usually \fB~/.xonshrc\fR):
 .sp
 .nf
     \fBexecx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')\fR
 .fi
 .TP
 .B zsh
-Add this to your configuration (usually \fI~/.zshrc\fR):
+Add this to your configuration (usually \fB~/.zshrc\fR):
 .sp
 .nf
     \fBeval "$(zoxide init zsh)"\fR
@@ -80,14 +81,14 @@ e.g. --cmd j would change the aliases to j and ji respectively.
 .B -h, --help
 Print help information.
 .TP
-.B --hook \fIHOOK\fR
+.B --hook HOOK
 Changes how often zoxide increments a directory's score:
 .TS
 tab(|);
 l l.
-    \fInone\fR|Never
-    \fIprompt\fR|At every shell prompt
-    \fIpwd\fR|Whenever the directory is changed
+    \fBnone\fR|Never
+    \fBprompt\fR|At every shell prompt
+    \fBpwd\fR|Whenever the directory is changed
 .TE
 .TP
 .B --no-aliases
@@ -97,6 +98,6 @@ choose to redefine them.
 .SH REPORTING BUGS
 For any issues, feature requests, or questions, please visit:
 .sp
-    \fIhttps://github.com/ajeetdsouza/zoxide/issues\fR
+\fBhttps://github.com/ajeetdsouza/zoxide/issues\fR.
 .SH AUTHOR
-Ajeet D'Souza <\fI98ajeet@gmail.com\fR>
+Ajeet D'Souza <\fB98ajeet@gmail.com\fR>

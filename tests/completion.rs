@@ -1,6 +1,6 @@
 //! Syntax checking for auto-generated shell completions.
+#![cfg(feature = "nix_tests")]
 
-#![cfg(feature = "shell_tests")]
 use assert_cmd::Command;
 
 #[test]

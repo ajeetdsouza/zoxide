@@ -18,8 +18,9 @@ pkgs.mkShell {
     pkgs.powershell
     pkgs.zsh
 
-    # Linters
+    # Tools
     pkgs-latest.cargo-audit
+    pkgs-latest.mandoc
     pkgs-latest.nodePackages.markdownlint-cli
     pkgs-latest.python3Packages.black
     pkgs-latest.python3Packages.mypy

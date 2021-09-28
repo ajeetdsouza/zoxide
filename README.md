@@ -285,10 +285,11 @@ When calling `zoxide init`, the following flags are available:
 
 ### Environment variables
 
-Be sure to set these before calling `zoxide init`.
+Environment variables<sup>[?][wiki-env]</sup> can be used for configuration.
+They must be set before `zoxide init` is called.
 
 - `_ZO_DATA_DIR`
-  - Specifies the directory in which `zoxide` should store its database.
+  - Specifies the directory in which the database is stored.
   - The default value varies across OSes:
     | OS          | Path                                     | Example                                    |
     | ----------- | ---------------------------------------- | ------------------------------------------ |
@@ -308,8 +309,8 @@ Be sure to set these before calling `zoxide init`.
     | Windows             | `;`       | `$HOME;$HOME/private/*` |
   - By default, this is set to `"$HOME"`.
 - `_ZO_FZF_OPTS`
-  - Custom options to pass to [`fzf`][fzf]. See `man fzf` for the list of
-    options.
+  - Custom options to pass to [`fzf`][fzf]. See [`man fzf`][fzf-man] for the list
+    of options.
 - `_ZO_MAXAGE`
   - Configures the [aging algorithm][algorithm-aging], which limits the maximum
     number of entries in the database.
@@ -320,20 +321,15 @@ Be sure to set these before calling `zoxide init`.
 
 ## Third-party integrations
 
-- [`emacs`][emacs]. You can use `zoxide` for navigation with the
-  [`zoxide.el`][zoxide-el] plugin.
-- [`nnn`][nnn] is a terminal file manager. You can use `zoxide` for navigation
-  with the official [`autojump`][nnn-autojump] plugin.
-- [`ranger`][ranger] is a terminal file manager. You can use `zoxide` for
-  navigation with the [`ranger-zoxide`][ranger-zoxide] plugin.
-- [`telescope.nvim`][telescope-nvim] is a fuzzy finder for `neovim`. You can
-  use it with `zoxide` via the [`telescope-zoxide`][telescope-zoxide] plugin.
-- [`vim`][vim] / [`neovim`][neovim]. You can use `zoxide` for navigation with
-  the [`zoxide.vim`][zoxide-vim] plugin.
-- [`xxh`][xxh] transports your shell configuration over SSH. You can use
-  `zoxide` over SSH via the [`xxh-plugin-prerun-zoxide`][xxh-zoxide] plugin.
-- [`zsh-autocomplete`][zsh-autocomplete] adds realtime completions to `zsh`. It
-  supports `zoxide` out of the box.
+| Application        | Description                             | Plugin                     |
+| ------------------ | --------------------------------------- | -------------------------- |
+| [emacs]            | Text editor                             | [zoxide.el]                |
+| [nnn]              | File manager                            | [nnn-autojump]             |
+| [ranger]           | File manager                            | [ranger-zoxide]            |
+| [telescope.nvim]   | Fuzzy finder for Neovim                 | [telescope-zoxide]         |
+| [vim]              | Text editor                             | [zoxide.vim]               |
+| [xxh]              | Transports shell configuration over SSH | [xxh-plugin-prerun-zoxide] |
+| [zsh-autocomplete] | Realtime completions for zsh            | Supported by default       |
 
 [algorithm-aging]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#aging
 [algorithm-matching]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#matching
@@ -354,6 +350,7 @@ Be sure to set these before calling `zoxide init`.
 [fedora packages]: https://src.fedoraproject.org/rpms/rust-zoxide
 [freshports]: https://www.freshports.org/sysutils/zoxide/
 [fzf-installation]: https://github.com/junegunn/fzf#installation
+[fzf-man]: https://manpages.ubuntu.com/manpages/en/man1/fzf.1.html
 [fzf]: https://github.com/junegunn/fzf
 [glob]: https://man7.org/linux/man-pages/man7/glob.7.html
 [guru overlay]: https://github.com/gentoo-mirror/guru
@@ -370,15 +367,16 @@ Be sure to set these before calling `zoxide init`.
 [ranger]: https://github.com/ranger/ranger
 [releases]: https://github.com/ajeetdsouza/zoxide/releases
 [scoop]: https://github.com/ScoopInstaller/Main/tree/master/bucket/zoxide.json
-[telescope-nvim]: https://github.com/nvim-telescope/telescope.nvim
 [telescope-zoxide]: https://github.com/jvgrootveld/telescope-zoxide
+[telescope.nvim]: https://github.com/nvim-telescope/telescope.nvim
 [termux]: https://github.com/termux/termux-packages/tree/master/packages/zoxide
 [tutorial]: contrib/tutorial.webp
 [ubuntu packages]: https://packages.ubuntu.com/hirsute/zoxide
 [vim]: https://github.com/vim/vim
 [void linux packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide
-[xxh-zoxide]: https://github.com/xxh/xxh-plugin-prerun-zoxide
+[wiki-env]: https://github.com/ajeetdsouza/zoxide/wiki/HOWTO:-set-environment-variables "HOWTO: set environment variables"
+[xxh-plugin-prerun-zoxide]: https://github.com/xxh/xxh-plugin-prerun-zoxide
 [xxh]: https://github.com/xxh/xxh
-[zoxide-el]: https://gitlab.com/Vonfry/zoxide.el
-[zoxide-vim]: https://github.com/nanotee/zoxide.vim
+[zoxide.el]: https://gitlab.com/Vonfry/zoxide.el
+[zoxide.vim]: https://github.com/nanotee/zoxide.vim
 [zsh-autocomplete]: https://github.com/marlonrichert/zsh-autocomplete

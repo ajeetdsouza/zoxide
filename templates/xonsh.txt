@@ -93,7 +93,7 @@ if "__zoxide_hook" not in globals():
         """Hook to add new entries to the database."""
         pwd = __zoxide_pwd()
         zoxide = __zoxide_bin()
-        subprocess.run([zoxide, "add", "--", pwd], check=False)
+        subprocess.run([zoxide, "add", "--", pwd], check=False, env=builtins.__xonsh__.env.detype())
 
 
 {% endif -%}
@@ -119,6 +119,7 @@ def __zoxide_z(args: List[str]):
             cmd = subprocess.run(
                 [zoxide, "query", "--exclude", __zoxide_pwd(), "--"] + args,
                 check=True,
+                env=builtins.__xonsh__.env.detype(),
                 stdout=subprocess.PIPE,
             )
         except subprocess.CalledProcessError as exc:
@@ -128,12 +129,16 @@ def __zoxide_z(args: List[str]):
         __zoxide_cd(result)
 
 
+@__zoxide_errhandler
 def __zoxide_zi(args: List[str]):
     """Jump to a directory using interactive search."""
     try:
         zoxide = __zoxide_bin()
         cmd = subprocess.run(
-            [zoxide, "query", "-i", "--"] + args, check=True, stdout=subprocess.PIPE
+            [zoxide, "query", "-i", "--"] + args,
+            check=True,
+            env=builtins.__xonsh__.env.detype(),
+            stdout=subprocess.PIPE
         )
     except subprocess.CalledProcessError as exc:
         raise ZoxideSilentException() from exc

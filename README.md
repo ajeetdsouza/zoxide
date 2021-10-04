@@ -328,6 +328,7 @@ They must be set before `zoxide init` is called.
 | [ranger]           | File manager                            | [ranger-zoxide]            |
 | [telescope.nvim]   | Fuzzy finder for Neovim                 | [telescope-zoxide]         |
 | [vim]              | Text editor                             | [zoxide.vim]               |
+| [xplr]             | File manager                            | [zoxide.xplr]              |
 | [xxh]              | Transports shell configuration over SSH | [xxh-plugin-prerun-zoxide] |
 | [zsh-autocomplete] | Realtime completions for zsh            | Supported by default       |
 
@@ -375,8 +376,10 @@ They must be set before `zoxide init` is called.
 [vim]: https://github.com/vim/vim
 [void linux packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide
 [wiki-env]: https://github.com/ajeetdsouza/zoxide/wiki/HOWTO:-set-environment-variables "HOWTO: set environment variables"
+[xplr]: https://github.com/sayanarijit/xplr
 [xxh-plugin-prerun-zoxide]: https://github.com/xxh/xxh-plugin-prerun-zoxide
 [xxh]: https://github.com/xxh/xxh
 [zoxide.el]: https://gitlab.com/Vonfry/zoxide.el
 [zoxide.vim]: https://github.com/nanotee/zoxide.vim
+[zoxide.xplr]: https://github.com/sayanarijit/zoxide.xplr
 [zsh-autocomplete]: https://github.com/marlonrichert/zsh-autocomplete

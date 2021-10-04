@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Nushell: upgrade minimum supported version to v0.37.0.
 
+### Fixed
+
+- Xonsh: error messages in `zi`.
+- Xonsh: configuration environment variables not being handled correctly.
+
 ## [0.7.5] - 2020-09-09
 
 ### Added

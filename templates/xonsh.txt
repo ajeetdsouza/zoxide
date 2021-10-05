@@ -8,7 +8,7 @@ import os
 import os.path
 import subprocess
 import sys
-from typing import AnyStr, List, Optional
+from typing import AnyStr, Dict, List, Optional
 
 import xonsh.dirstack  # type: ignore # pylint: disable=import-error
 import xonsh.environ  # type: ignore # pylint: disable=import-error
@@ -26,12 +26,17 @@ def __zoxide_bin() -> str:
     return zoxide
 
 
+def __zoxide_env() -> Dict[str, str]:
+    """Returns the current environment."""
+    return builtins.__xonsh__.env.detype()  # type: ignore  # pylint:disable=no-member
+
+
 def __zoxide_pwd() -> str:
     """pwd based on the value of _ZO_RESOLVE_SYMLINKS."""
 {%- if resolve_symlinks %}
     pwd = os.getcwd()
 {%- else %}
-    pwd = builtins.__xonsh__.env.get("PWD")  # type: ignore  # pylint:disable=no-member
+    pwd = __zoxide_env().get("PWD")
     if pwd is None:
         raise Exception("$PWD not found")
 {%- endif %}
@@ -93,7 +98,11 @@ if "__zoxide_hook" not in globals():
         """Hook to add new entries to the database."""
         pwd = __zoxide_pwd()
         zoxide = __zoxide_bin()
-        subprocess.run([zoxide, "add", "--", pwd], check=False)
+        subprocess.run(
+            [zoxide, "add", "--", pwd],
+            check=False,
+            env=__zoxide_env(),
+        )
 
 
 {% endif -%}
@@ -119,6 +128,7 @@ def __zoxide_z(args: List[str]):
             cmd = subprocess.run(
                 [zoxide, "query", "--exclude", __zoxide_pwd(), "--"] + args,
                 check=True,
+                env=__zoxide_env(),
                 stdout=subprocess.PIPE,
             )
         except subprocess.CalledProcessError as exc:
@@ -128,12 +138,16 @@ def __zoxide_z(args: List[str]):
         __zoxide_cd(result)
 
 
+@__zoxide_errhandler
 def __zoxide_zi(args: List[str]):
     """Jump to a directory using interactive search."""
     try:
         zoxide = __zoxide_bin()
         cmd = subprocess.run(
-            [zoxide, "query", "-i", "--"] + args, check=True, stdout=subprocess.PIPE
+            [zoxide, "query", "-i", "--"] + args,
+            check=True,
+            env=__zoxide_env(),
+            stdout=subprocess.PIPE,
         )
     except subprocess.CalledProcessError as exc:
         raise ZoxideSilentException() from exc

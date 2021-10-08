@@ -12,6 +12,8 @@ fn main() -> Result<()> {
     let app = App::parse();
     match app {
         App::Audit => run_audit(&[] as &[&str])?,
+        App::Check => run_check(&[] as &[&str])?,
+        App::Clippy => run_clippy(&[] as &[&str])?,
         App::CI => run_ci(nix_enabled)?,
         App::Fmt => run_fmt(&[] as &[&str])?,
         App::Markdownlint => run_markdownlint()?,
@@ -24,7 +26,9 @@ fn main() -> Result<()> {
 #[derive(Clap)]
 enum App {
     Audit,
+    Check,
     CI,
+    Clippy,
     Fmt,
     Markdownlint,
     Test { args: Vec<String> },
@@ -49,6 +53,10 @@ fn run_audit<S: AsRef<OsStr>>(args: &[S]) -> Result<()> {
     Command::new("cargo").args(&["audit", "--deny=warnings"]).args(args)._run()
 }
 
+fn run_check<S: AsRef<OsStr>>(args: &[S]) -> Result<()> {
+    Command::new("cargo").args(&["check", "--all-features", "--all-targets", "--workspace"]).args(args)._run()
+}
+
 fn run_clippy<S: AsRef<OsStr>>(args: &[S]) -> Result<()> {
     Command::new("cargo").args(&["clippy", "--all-features", "--all-targets"]).args(args)._run()
 }
@@ -56,6 +64,7 @@ fn run_clippy<S: AsRef<OsStr>>(args: &[S]) -> Result<()> {
 fn run_ci(nix_enabled: bool) -> Result<()> {
     let color = if env::var_os("CI").is_some() { "--color=always" } else { "--color=auto" };
     run_fmt(&["--check", color, "--files-with-diff"])?;
+    run_check(&[color])?;
     run_clippy(&[color])?;
     run_test(nix_enabled, &[color, "--no-fail-fast"])?;
     if nix_enabled {

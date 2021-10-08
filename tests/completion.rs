@@ -1,5 +1,5 @@
 //! Syntax checking for auto-generated shell completions.
-#![cfg(feature = "nix_tests")]
+#![cfg(feature = "nix")]
 
 use assert_cmd::Command;
 

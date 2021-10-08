@@ -1,56 +1,104 @@
-use std::process::Command;
-
+use anyhow::{bail, Context, Result};
 use clap::Clap;
 
-#[derive(Clap, Debug)]
-struct App {
-    #[clap(subcommand)]
-    task: Task,
-    #[clap(long)]
-    nix: Option<bool>,
-}
+use std::env;
+use std::ffi::OsStr;
+use std::path::PathBuf;
+use std::process::{self, Command};
 
-#[derive(Clap, Debug)]
-enum Task {
-    CI,
-    Test { keywords: Vec<String> },
-}
+fn main() -> Result<()> {
+    let nix_enabled = enable_nix();
 
-fn run(args: &[&str], nix: bool) {
-    let args_str = args.join(" ");
-    println!(">>> {}", args_str);
-
-    let status = if nix {
-        Command::new("nix-shell").args(&["--pure", "--run", &args_str]).status()
-    } else {
-        let (cmd, args) = args.split_first().unwrap();
-        Command::new(cmd).args(args).status()
-    };
-    if !status.unwrap().success() {
-        panic!("command exited with an error");
-    }
-}
-
-fn main() {
     let app = App::parse();
-    let nix = app.nix.unwrap_or_else(|| Command::new("nix-shell").arg("--version").output().is_ok());
-    let run = |args: &[&str]| run(args, nix);
-    match app.task {
-        Task::CI => {
-            let color = if std::env::var_os("CI").is_some() { "--color=always" } else { "" };
-            run(&["cargo", "fmt", "--", "--check", color, "--files-with-diff"]);
-            run(&["cargo", "check", "--all-features", color]);
-            run(&["cargo", "clippy", "--all-features", color, "--", "--deny=clippy::all", "--deny=warnings"]);
-            run(&["cargo", "test", if nix { "--all-features" } else { "" }, color, "--no-fail-fast"]);
-            run(&["cargo", "audit", color, "--deny=warnings"]);
-            if nix {
-                run(&["markdownlint", "--ignore-path=.gitignore", "."]);
-            }
-        }
-        Task::Test { keywords } => {
-            let mut args = vec!["cargo", "test", if nix { "--all-features" } else { "" }, "--no-fail-fast", "--"];
-            args.extend(keywords.iter().map(String::as_str));
-            run(&args);
-        }
+    match app {
+        App::Audit => run_audit(&[] as &[&str])?,
+        App::CI => run_ci(nix_enabled)?,
+        App::Fmt => run_fmt(&[] as &[&str])?,
+        App::Markdownlint => run_markdownlint()?,
+        App::Test { args } => run_test(nix_enabled, &args)?,
     }
+
+    Ok(())
+}
+
+#[derive(Clap)]
+enum App {
+    Audit,
+    CI,
+    Fmt,
+    Markdownlint,
+    Test { args: Vec<String> },
+}
+
+trait CommandExt {
+    fn _run(self) -> Result<()>;
+}
+
+impl CommandExt for &mut Command {
+    fn _run(self) -> Result<()> {
+        println!(">>> {:?}", self);
+        let status = self.status().with_context(|| format!("command failed to start: {:?}", self))?;
+        if !status.success() {
+            bail!("command failed: {:?} with status: {:?}", self, status);
+        }
+        Ok(())
+    }
+}
+
+fn run_audit<S: AsRef<OsStr>>(args: &[S]) -> Result<()> {
+    Command::new("cargo").args(&["audit", "--deny=warnings"]).args(args)._run()
+}
+
+fn run_clippy<S: AsRef<OsStr>>(args: &[S]) -> Result<()> {
+    Command::new("cargo").args(&["clippy", "--all-features", "--all-targets"]).args(args)._run()
+}
+
+fn run_ci(nix_enabled: bool) -> Result<()> {
+    let color = if env::var_os("CI").is_some() { "--color=always" } else { "--color=auto" };
+    run_fmt(&["--check", color, "--files-with-diff"])?;
+    run_clippy(&[color])?;
+    run_test(nix_enabled, &[color, "--no-fail-fast"])?;
+    if nix_enabled {
+        run_audit(&[] as &[&str])?; // FIXME: add "color" when cargo-audit 0.15.3 is released
+        run_markdownlint()?;
+    }
+    Ok(())
+}
+
+fn run_fmt<S: AsRef<OsStr>>(rustfmt_args: &[S]) -> Result<()> {
+    Command::new("cargo").args(&["fmt", "--all", "--"]).args(rustfmt_args)._run()
+}
+
+fn run_markdownlint() -> Result<()> {
+    Command::new("markdownlint").args(&["--ignore-path=.gitignore", "."])._run()
+}
+
+fn run_test<S: AsRef<OsStr>>(nix_enabled: bool, args: &[S]) -> Result<()> {
+    Command::new("cargo")
+        .args(&["test", "--workspace", if nix_enabled { "--features=nix" } else { "" }])
+        .args(args)
+        ._run()
+}
+
+fn enable_nix() -> bool {
+    let nix_supported = cfg!(any(target_os = "linux", target_os = "macos"));
+    if !nix_supported {
+        return false;
+    }
+    let nix_enabled = env::var_os("IN_NIX_SHELL").unwrap_or_default() == "pure";
+    if nix_enabled {
+        return true;
+    }
+    let nix_detected = Command::new("nix-shell").arg("--version").status().map(|s| s.success()).unwrap_or(false);
+    if !nix_detected {
+        return false;
+    }
+
+    println!("Detected Nix in environment, re-running in Nix.");
+    let args = env::args();
+    let cmd = shell_words::join(args);
+    let mut nix_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    nix_path.push("../shell.nix");
+    let status = Command::new("nix-shell").args(&["--pure", "--run", &cmd, "--"]).arg(nix_path).status().unwrap();
+    process::exit(status.code().unwrap_or(1));
 }

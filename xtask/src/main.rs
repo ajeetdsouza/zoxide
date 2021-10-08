@@ -17,7 +17,7 @@ fn main() -> Result<()> {
         App::CI => run_ci(nix_enabled)?,
         App::Fmt => run_fmt(&[] as &[&str])?,
         App::Markdownlint => run_markdownlint()?,
-        App::Test { args } => run_test(nix_enabled, &args)?,
+        App::Test { name } => run_test(nix_enabled, &[name])?,
     }
 
     Ok(())
@@ -31,7 +31,10 @@ enum App {
     Clippy,
     Fmt,
     Markdownlint,
-    Test { args: Vec<String> },
+    Test {
+        #[clap(default_value = "")]
+        name: String,
+    },
 }
 
 trait CommandExt {

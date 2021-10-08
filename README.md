@@ -64,7 +64,7 @@ Alternatively, you can use a package manager:
 | CentOS 7+          | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide`                                      |
 | Debian 11+         | [Debian Packages]       | `apt install zoxide`                                                                           |
 | Devuan 4.0+        | [Devuan Packages]       | `apt install zoxide`                                                                           |
-| Fedora 32+         | [Fedora Packages]       | `dnf install zoxide`                                                                           |
+| Fedora 32+         | [Fedora Packages]       | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide`                                      |
 | Gentoo             | [GURU Overlay]          | `eselect repository enable guru` <br /> `emerge --sync guru` <br /> `emerge app-shells/zoxide` |
 | Manjaro            |                         | `pacman -S zoxide`                                                                             |
 | NixOS              | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                                                                   |

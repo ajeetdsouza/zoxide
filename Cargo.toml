@@ -9,6 +9,9 @@ license = "MIT"
 keywords = ["cli"]
 categories = ["command-line-utilities", "filesystem"]
 
+[badges]
+maintenance = { status = "actively-developed" }
+
 [workspace]
 members = ["xtask/"]
 

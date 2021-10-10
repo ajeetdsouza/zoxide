@@ -321,16 +321,7 @@ mod tests {
         let mut source = Xonsh(&opts).render().unwrap();
         source.push('\n');
 
-        let tempdir = tempfile::tempdir().unwrap();
-        let tempdir = tempdir.path().to_str().unwrap();
-
-        Command::new("pylint")
-            .args(&["--from-stdin", "zoxide"])
-            .env("HOME", tempdir)
-            .write_stdin(source)
-            .assert()
-            .success()
-            .stderr("");
+        Command::new("pylint").args(&["--from-stdin", "zoxide"]).write_stdin(source).assert().success().stderr("");
     }
 
     #[rstest]

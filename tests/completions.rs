@@ -1,4 +1,4 @@
-//! Syntax checking for auto-generated shell completions.
+//! Test clap generated completions.
 #![cfg(feature = "nix")]
 
 use assert_cmd::Command;

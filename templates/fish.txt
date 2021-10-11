@@ -30,7 +30,6 @@ function __zoxide_cd
 {%- if echo %}
     and __zoxide_pwd
 {%- endif %}
-    and builtin commandline -f repaint
 end
 
 {{ section }}
@@ -124,6 +123,7 @@ end
 
 __zoxide_unset {{cmd}}
 alias {{cmd}}=__zoxide_z
+complete -e {{cmd}}
 complete -c {{cmd}} -f -a '(__zoxide_z_complete)'
 
 __zoxide_unset {{cmd}}i

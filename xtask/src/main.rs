@@ -1,56 +1,150 @@
-use std::process::Command;
-
+use anyhow::{bail, Context, Result};
 use clap::Clap;
+use ignore::Walk;
 
-#[derive(Clap, Debug)]
-struct App {
-    #[clap(subcommand)]
-    task: Task,
-    #[clap(long)]
-    nix: Option<bool>,
+use std::env;
+use std::ffi::OsStr;
+use std::path::PathBuf;
+use std::process::{self, Command};
+
+fn main() -> Result<()> {
+    let nix_enabled = enable_nix();
+
+    let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let dir = dir.parent().with_context(|| format!("could not find workspace root: {}", dir.display()))?;
+    env::set_current_dir(dir).with_context(|| format!("could not set current directory: {}", dir.display()))?;
+
+    let app = App::parse();
+    match app {
+        App::CI => run_ci(nix_enabled)?,
+        App::Fmt { check } => run_fmt(nix_enabled, check)?,
+        App::Lint => run_lint(nix_enabled)?,
+        App::Test { name } => run_tests(nix_enabled, &name)?,
+    }
+
+    Ok(())
 }
 
-#[derive(Clap, Debug)]
-enum Task {
+#[derive(Clap)]
+enum App {
     CI,
-    Test { keywords: Vec<String> },
+    Fmt {
+        #[clap(long)]
+        check: bool,
+    },
+    Lint,
+    Test {
+        #[clap(default_value = "")]
+        name: String,
+    },
 }
 
-fn run(args: &[&str], nix: bool) {
-    let args_str = args.join(" ");
-    println!(">>> {}", args_str);
+trait CommandExt {
+    fn _run(self) -> Result<()>;
+}
 
-    let status = if nix {
-        Command::new("nix-shell").args(&["--pure", "--run", &args_str]).status()
-    } else {
-        let (cmd, args) = args.split_first().unwrap();
-        Command::new(cmd).args(args).status()
-    };
-    if !status.unwrap().success() {
-        panic!("command exited with an error");
+impl CommandExt for &mut Command {
+    fn _run(self) -> Result<()> {
+        println!(">>> {:?}", self);
+        let status = self.status().with_context(|| format!("command failed to start: {:?}", self))?;
+        if !status.success() {
+            bail!("command failed: {:?} with status: {:?}", self, status);
+        }
+        Ok(())
     }
 }
 
-fn main() {
-    let app = App::parse();
-    let nix = app.nix.unwrap_or_else(|| Command::new("nix-shell").arg("--version").output().is_ok());
-    let run = |args: &[&str]| run(args, nix);
-    match app.task {
-        Task::CI => {
-            let color = if std::env::var_os("CI").is_some() { "--color=always" } else { "" };
-            run(&["cargo", "fmt", "--", "--check", color, "--files-with-diff"]);
-            run(&["cargo", "check", "--all-features", color]);
-            run(&["cargo", "clippy", "--all-features", color, "--", "--deny=clippy::all", "--deny=warnings"]);
-            run(&["cargo", "test", if nix { "--all-features" } else { "" }, color, "--no-fail-fast"]);
-            run(&["cargo", "audit", color, "--deny=warnings"]);
-            if nix {
-                run(&["markdownlint", "--ignore-path=.gitignore", "."]);
+fn run_ci(nix_enabled: bool) -> Result<()> {
+    let color: &[&str] = if is_ci() { &["--color=always"] } else { &[] };
+    Command::new("cargo").args(&["check", "--all-features"]).args(color)._run()?;
+
+    run_fmt(nix_enabled, true)?;
+    run_lint(nix_enabled)?;
+    run_tests(nix_enabled, "")
+}
+
+fn run_fmt(nix_enabled: bool, check: bool) -> Result<()> {
+    // Run cargo-fmt.
+    let color: &[&str] = if is_ci() { &["--color=always"] } else { &[] };
+    let check_args: &[&str] = if check { &["--check", "--files-with-diff"] } else { &[] };
+    Command::new("cargo").args(&["fmt", "--all", "--"]).args(color).args(check_args)._run()?;
+
+    // Run nixfmt.
+    if nix_enabled {
+        for result in Walk::new("./") {
+            let entry = result.unwrap();
+            let path = entry.path();
+            if path.is_file() && path.extension() == Some(OsStr::new("nix")) {
+                let check_args: &[&str] = if check { &["--check"] } else { &[] };
+                Command::new("nixfmt").args(check_args).arg("--").arg(path)._run()?;
             }
         }
-        Task::Test { keywords } => {
-            let mut args = vec!["cargo", "test", if nix { "--all-features" } else { "" }, "--no-fail-fast", "--"];
-            args.extend(keywords.iter().map(String::as_str));
-            run(&args);
+    }
+
+    Ok(())
+}
+
+fn run_lint(nix_enabled: bool) -> Result<()> {
+    // Run cargo-clippy.
+    let color: &[&str] = if is_ci() { &["--color=always"] } else { &[] };
+    Command::new("cargo").args(&["clippy", "--all-features", "--all-targets"]).args(color)._run()?;
+
+    if nix_enabled {
+        // Run cargo-audit.
+        let color: &[&str] = if is_ci() { &["--color=always"] } else { &[] };
+        Command::new("cargo").args(&["audit", "--deny=warnings"]).args(color)._run()?;
+
+        // Run markdownlint.
+        for result in Walk::new("./") {
+            let entry = result.unwrap();
+            let path = entry.path();
+            if path.is_file() && path.extension() == Some(OsStr::new("md")) {
+                Command::new("markdownlint").arg(path)._run()?;
+            }
+        }
+
+        // Run mandoc with linting enabled.
+        for result in Walk::new("./man/") {
+            let entry = result.unwrap();
+            let path = entry.path();
+            if path.is_file() && path.extension() == Some(OsStr::new("1")) {
+                Command::new("mandoc").args(&["-man", "-Wall", "-Tlint", "--"]).arg(path)._run()?;
+            }
         }
     }
+
+    Ok(())
+}
+
+fn run_tests(nix_enabled: bool, name: &str) -> Result<()> {
+    let color: &[&str] = if is_ci() { &["--color=always"] } else { &[] };
+    let features: &[&str] = if nix_enabled { &["--all-features"] } else { &[] };
+    Command::new("cargo").args(&["test", "--no-fail-fast", "--workspace"]).args(color).args(features).arg(name)._run()
+}
+
+fn is_ci() -> bool {
+    env::var_os("CI").is_some()
+}
+
+fn enable_nix() -> bool {
+    let nix_supported = cfg!(any(target_os = "linux", target_os = "macos"));
+    if !nix_supported {
+        return false;
+    }
+    let nix_enabled = env::var_os("IN_NIX_SHELL").unwrap_or_default() == "pure";
+    if nix_enabled {
+        return true;
+    }
+    let nix_detected = Command::new("nix-shell").arg("--version").status().map(|s| s.success()).unwrap_or(false);
+    if !nix_detected {
+        return false;
+    }
+
+    println!("Detected Nix in environment, re-running in Nix.");
+    let args = env::args();
+    let cmd = shell_words::join(args);
+    let mut nix_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    nix_path.push("../shell.nix");
+    let status = Command::new("nix-shell").args(&["--pure", "--run", &cmd, "--"]).arg(nix_path).status().unwrap();
+    process::exit(status.code().unwrap_or(1));
 }

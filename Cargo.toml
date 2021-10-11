@@ -9,6 +9,12 @@ license = "MIT"
 keywords = ["cli"]
 categories = ["command-line-utilities", "filesystem"]
 
+[badges]
+maintenance = { status = "actively-developed" }
+
+[workspace]
+members = ["xtask/"]
+
 [dependencies]
 anyhow = "1.0.32"
 askama = { version = "0.10.3", default-features = false }
@@ -27,17 +33,17 @@ rand = { version = "0.8.4", features = [
     "small_rng",
 ], default-features = false }
 
-[dev-dependencies]
-assert_cmd = "2.0.0"
-rstest = "0.11.0"
-
 [build-dependencies]
 clap = "=3.0.0-beta.4"
 clap_generate = "=3.0.0-beta.4"
 
+[dev-dependencies]
+assert_cmd = "2.0.0"
+rstest = "0.11.0"
+
 [features]
 default = []
-nix_tests = []
+nix = []
 
 [profile.release]
 codegen-units = 1

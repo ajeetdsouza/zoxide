@@ -1,6 +1,6 @@
 [package]
 name = "zoxide"
-version = "0.7.5"
+version = "0.7.6"
 authors = ["Ajeet D'Souza <98ajeet@gmail.com>"]
 edition = "2018"
 description = "A smarter cd command for your terminal"

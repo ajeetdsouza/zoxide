@@ -7,7 +7,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.7.6] - 2020-10-13
+## [0.7.7] - 2021-10-15
+
+### Fixed
+
+- PowerShell: Hook not initializing correctly.
+
+## [0.7.6] - 2021-10-13
 
 ### Changed
 
@@ -18,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Xonsh: error messages in `zi`.
 - Xonsh: configuration environment variables not being handled correctly.
 
-## [0.7.5] - 2020-09-09
+## [0.7.5] - 2021-09-09
 
 ### Added
 
@@ -35,13 +41,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Elvish: don't show traceback when `z` or `zi` fails.
 - Elvish: nested shells do not initialize correctly.
 
-## [0.7.4] - 2020-08-15
+## [0.7.4] - 2021-08-15
 
 ### Fixed
 
 - Compile error with `clap v3.0.0-beta.4`.
 
-## [0.7.3] - 2020-08-05
+## [0.7.3] - 2021-08-05
 
 ### Added
 
@@ -300,6 +306,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions pipeline to build and upload releases.
 - Support for zsh.
 
+[0.7.7]: https://github.com/ajeetdsouza/zoxide/compare/v0.7.6...v0.7.7
 [0.7.6]: https://github.com/ajeetdsouza/zoxide/compare/v0.7.5...v0.7.6
 [0.7.5]: https://github.com/ajeetdsouza/zoxide/compare/v0.7.4...v0.7.5
 [0.7.4]: https://github.com/ajeetdsouza/zoxide/compare/v0.7.3...v0.7.4

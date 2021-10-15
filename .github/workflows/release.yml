@@ -1,7 +1,7 @@
 name: release
 on:
   push:
-    tags: ["v*"]
+    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
 jobs:
   build:
     name: build-${{ matrix.target }}
@@ -35,6 +35,13 @@ jobs:
             os: ubuntu-latest
             use-cross: true
     steps:
+      - name: Get the release version from the tag
+        shell: bash
+        if: env.RG_VERSION == ''
+        run: |
+          # https://github.community/t/how-to-get-just-the-tag-name/16241/7#M1027
+          echo "RELEASE_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          echo "Release version: ${{ env.RELEASE_VERSION }}"
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
@@ -56,7 +63,7 @@ jobs:
         shell: bash
         run: |
           # Build archive
-          tmpdir="zoxide-${{ matrix.target }}"
+          tmpdir="zoxide-${{ env.RELEASE_VERSION }}-${{ matrix.target }}"
           mkdir "$tmpdir/"
           cp -r {man,CHANGELOG.md,LICENSE,README.md} "$tmpdir/"
           if [[ "${{ matrix.target }}" = *"windows"* ]]; then

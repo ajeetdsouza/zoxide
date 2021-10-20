@@ -1,5 +1,5 @@
 use anyhow::{bail, Context, Result};
-use clap::Clap;
+use clap::Parser;
 use ignore::Walk;
 
 use std::env;
@@ -25,7 +25,7 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-#[derive(Clap)]
+#[derive(Parser)]
 enum App {
     CI,
     Fmt {

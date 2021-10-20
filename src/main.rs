@@ -9,7 +9,7 @@ mod util;
 use std::io::{self, Write};
 use std::{env, process};
 
-use clap::Clap;
+use clap::Parser;
 
 use crate::app::{App, Run};
 use crate::error::SilentExit;

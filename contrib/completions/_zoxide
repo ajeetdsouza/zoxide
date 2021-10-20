@@ -39,7 +39,7 @@ _arguments "${_arguments_options[@]}" \
 ;;
 (import)
 _arguments "${_arguments_options[@]}" \
-'--from=[Application to import from]: :(autojump z)' \
+'--from=[Application to import from]:FROM:(autojump z)' \
 '--merge[Merge into existing database]' \
 '-h[Print help information]' \
 '--help[Print help information]' \
@@ -50,8 +50,8 @@ _arguments "${_arguments_options[@]}" \
 ;;
 (init)
 _arguments "${_arguments_options[@]}" \
-'--cmd=[Renames the '\''z'\'' command and corresponding aliases]' \
-'--hook=[Chooses event upon which an entry is added to the database]: :(none prompt pwd)' \
+'--cmd=[Renames the '\''z'\'' command and corresponding aliases]:CMD: ' \
+'--hook=[Chooses event upon which an entry is added to the database]:HOOK:(none prompt pwd)' \
 '--no-aliases[Prevents zoxide from defining any commands]' \
 '-h[Print help information]' \
 '--help[Print help information]' \
@@ -62,7 +62,7 @@ _arguments "${_arguments_options[@]}" \
 ;;
 (query)
 _arguments "${_arguments_options[@]}" \
-'--exclude=[Exclude a path from results]: :_files -/' \
+'--exclude=[Exclude a path from results]:path:_files -/' \
 '--all[Show deleted directories]' \
 '(-l --list)-i[Use interactive selection]' \
 '(-l --list)--interactive[Use interactive selection]' \
@@ -79,8 +79,8 @@ _arguments "${_arguments_options[@]}" \
 ;;
 (remove)
 _arguments "${_arguments_options[@]}" \
-'()*-i+[]' \
-'()*--interactive=[]' \
+'()-i+[]:keywords: ' \
+'()--interactive=[]:keywords: ' \
 '-h[Print help information]' \
 '--help[Print help information]' \
 '-V[Print version information]' \

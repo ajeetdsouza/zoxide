@@ -3,7 +3,7 @@ let
     "https://github.com/oxalica/rust-overlay/archive/ad311f5bb5c5ef475985f1e0f264e831470a8510.tar.gz");
   pkgs = import <nixpkgs> { overlays = [ rust ]; };
   pkgs-latest = import (fetchTarball
-    "https://github.com/NixOS/nixpkgs/archive/b4692e4197869c42c46d77e31af7e687e1892f55.tar.gz")
+    "https://github.com/NixOS/nixpkgs/archive/3ef1d2a9602c18f8742e1fb63d5ae9867092e3d6.tar.gz")
     { };
 in pkgs.mkShell {
   buildInputs = [

@@ -22,7 +22,7 @@ fn main() {
 fn git_version() -> Option<String> {
     let dir = env!("CARGO_MANIFEST_DIR");
     let mut git = Command::new("git");
-    git.args(&["-C", &dir, "describe", "--tags", "--broken"]);
+    git.args(&["-C", dir, "describe", "--tags", "--broken"]);
 
     let output = git.output().ok()?;
     if !output.status.success() || output.stdout.is_empty() || !output.stderr.is_empty() {
@@ -44,11 +44,11 @@ fn generate_completions() -> io::Result<()> {
     let bin_name = env!("CARGO_PKG_NAME");
     let out_dir = "contrib/completions";
 
-    generate_to::<Bash, _, _>(app, bin_name, out_dir)?;
-    generate_to::<Elvish, _, _>(app, bin_name, out_dir)?;
-    generate_to::<Fish, _, _>(app, bin_name, out_dir)?;
-    generate_to::<PowerShell, _, _>(app, bin_name, out_dir)?;
-    generate_to::<Zsh, _, _>(app, bin_name, out_dir)?;
+    generate_to(Bash, app, bin_name, out_dir)?;
+    generate_to(Elvish, app, bin_name, out_dir)?;
+    generate_to(Fish, app, bin_name, out_dir)?;
+    generate_to(PowerShell, app, bin_name, out_dir)?;
+    generate_to(Zsh, app, bin_name, out_dir)?;
 
     Ok(())
 }

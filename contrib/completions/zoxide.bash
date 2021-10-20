@@ -12,7 +12,6 @@ _zoxide() {
             zoxide)
                 cmd="zoxide"
                 ;;
-            
             add)
                 cmd+="__add"
                 ;;
@@ -35,13 +34,12 @@ _zoxide() {
 
     case "${cmd}" in
         zoxide)
-            opts=" -h -V  --help --version  add import init query remove"
+            opts="-h -V --help --version add import init query remove"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
             fi
             case "${prev}" in
-                
                 *)
                     COMPREPLY=()
                     ;;
@@ -49,15 +47,13 @@ _zoxide() {
             COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
             return 0
             ;;
-        
         zoxide__add)
-            opts=" -h -V  --help --version  <PATHS>... "
+            opts="-h -V --help --version <PATHS>..."
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
             fi
             case "${prev}" in
-                
                 *)
                     COMPREPLY=()
                     ;;
@@ -66,13 +62,12 @@ _zoxide() {
             return 0
             ;;
         zoxide__import)
-            opts=" -h -V  --from --merge --help --version  <PATH> "
+            opts="-h -V --from --merge --help --version <PATH>"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
             fi
             case "${prev}" in
-                
                 --from)
                     COMPREPLY=($(compgen -W "autojump z" -- "${cur}"))
                     return 0
@@ -85,13 +80,12 @@ _zoxide() {
             return 0
             ;;
         zoxide__init)
-            opts=" -h -V  --no-aliases --cmd --hook --help --version  <SHELL> "
+            opts="-h -V --no-aliases --cmd --hook --help --version bash elvish fish nushell posix powershell xonsh zsh"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
             fi
             case "${prev}" in
-                
                 --cmd)
                     COMPREPLY=($(compgen -f "${cur}"))
                     return 0
@@ -108,13 +102,12 @@ _zoxide() {
             return 0
             ;;
         zoxide__query)
-            opts=" -i -l -s -h -V  --all --interactive --list --score --exclude --help --version  <KEYWORDS>... "
+            opts="-i -l -s -h -V --all --interactive --list --score --exclude --help --version <KEYWORDS>..."
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
             fi
             case "${prev}" in
-                
                 --exclude)
                     COMPREPLY=($(compgen -f "${cur}"))
                     return 0
@@ -127,13 +120,12 @@ _zoxide() {
             return 0
             ;;
         zoxide__remove)
-            opts=" -i -h -V  --interactive --help --version  <PATHS>... "
+            opts="-i -h -V --interactive --help --version <PATHS>..."
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
             fi
             case "${prev}" in
-                
                 --interactive)
                     COMPREPLY=($(compgen -f "${cur}"))
                     return 0

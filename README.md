@@ -56,7 +56,7 @@ Alternatively, you can use a package manager:
 
 | Distribution       | Repository              | Instructions                                                                                   |
 | ------------------ | ----------------------- | ---------------------------------------------------------------------------------------------- |
-| ***Any***          | **[crates.io]**         | `cargo install zoxide`                                                                         |
+| ***Any***          | **[crates.io]**         | `cargo install zoxide --locked`                                                                |
 | *Any*              | [conda-forge]           | `conda install -c conda-forge zoxide`                                                          |
 | *Any*              | [Linuxbrew]             | `brew install zoxide`                                                                          |
 | Alpine Linux 3.13+ | [Alpine Linux Packages] | `apk add zoxide`                                                                               |
@@ -82,7 +82,7 @@ To install `zoxide`, use a package manager:
 
 | Repository      | Instructions                          |
 | --------------- | ------------------------------------- |
-| **[crates.io]** | `cargo install zoxide`                |
+| **[crates.io]** | `cargo install zoxide --locked`       |
 | [conda-forge]   | `conda install -c conda-forge zoxide` |
 | [Homebrew]      | `brew install zoxide`                 |
 | [MacPorts]      | `port install zoxide`                 |
@@ -102,7 +102,7 @@ Alternatively, you can use a package manager:
 
 | Repository      | Instructions                          |
 | --------------- | ------------------------------------- |
-| **[crates.io]** | `cargo install zoxide`                |
+| **[crates.io]** | `cargo install zoxide --locked`       |
 | [Chocolatey]    | `choco install zoxide`                |
 | [conda-forge]   | `conda install -c conda-forge zoxide` |
 | [Scoop]         | `scoop install zoxide`                |
@@ -114,12 +114,12 @@ Alternatively, you can use a package manager:
 
 To install `zoxide`, use a package manager:
 
-| Distribution  | Repository      | Instructions           |
-| ------------- | --------------- | ---------------------- |
-| ***Any***     | **[crates.io]** | `cargo install zoxide` |
-| DragonFly BSD | [DPorts]        | `pkg install zoxide`   |
-| FreeBSD       | [FreshPorts]    | `pkg install zoxide`   |
-| NetBSD        | [pkgsrc]        | `pkgin install zoxide` |
+| Distribution  | Repository      | Instructions                    |
+| ------------- | --------------- | ------------------------------- |
+| ***Any***     | **[crates.io]** | `cargo install zoxide --locked` |
+| DragonFly BSD | [DPorts]        | `pkg install zoxide`            |
+| FreeBSD       | [FreshPorts]    | `pkg install zoxide`            |
+| NetBSD        | [pkgsrc]        | `pkgin install zoxide`          |
 
 </details>
 

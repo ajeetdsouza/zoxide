@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use clap::{AppSettings, ArgEnum, Clap, ValueHint};
+use clap::{AppSettings, ArgEnum, Parser, ValueHint};
 
 const ENV_HELP: &str = "ENVIRONMENT VARIABLES:
     _ZO_DATA_DIR            Path for zoxide data files
@@ -10,15 +10,13 @@ const ENV_HELP: &str = "ENVIRONMENT VARIABLES:
     _ZO_MAXAGE              Maximum total age after which entries start getting deleted
     _ZO_RESOLVE_SYMLINKS    Resolve symlinks when storing paths";
 
-#[derive(Clap, Debug)]
+#[derive(Debug, Parser)]
 #[clap(
     bin_name = env!("CARGO_PKG_NAME"),
     about,
     author,
     after_help = ENV_HELP,
-    global_setting(AppSettings::ColoredHelp),
     global_setting(AppSettings::DisableHelpSubcommand),
-    global_setting(AppSettings::DisableVersionForSubcommands),
     global_setting(AppSettings::PropagateVersion),
     version = option_env!("ZOXIDE_VERSION").unwrap_or_default()
 )]
@@ -31,14 +29,14 @@ pub enum App {
 }
 
 /// Add a new directory or increment its rank
-#[derive(Clap, Debug)]
+#[derive(Debug, Parser)]
 pub struct Add {
     #[clap(min_values = 1, required = true, value_hint = ValueHint::DirPath)]
     pub paths: Vec<PathBuf>,
 }
 
 /// Import entries from another application
-#[derive(Clap, Debug)]
+#[derive(Debug, Parser)]
 pub struct Import {
     #[clap(value_hint = ValueHint::FilePath)]
     pub path: PathBuf,
@@ -52,14 +50,14 @@ pub struct Import {
     pub merge: bool,
 }
 
-#[derive(ArgEnum, Debug)]
+#[derive(ArgEnum, Clone, Debug)]
 pub enum ImportFrom {
     Autojump,
     Z,
 }
 
 /// Generate shell configuration
-#[derive(Clap, Debug)]
+#[derive(Debug, Parser)]
 pub struct Init {
     #[clap(arg_enum)]
     pub shell: InitShell,
@@ -84,7 +82,7 @@ pub enum InitHook {
     Pwd,
 }
 
-#[derive(ArgEnum, Debug)]
+#[derive(ArgEnum, Clone, Debug)]
 pub enum InitShell {
     Bash,
     Elvish,
@@ -97,7 +95,7 @@ pub enum InitShell {
 }
 
 /// Search for a directory in the database
-#[derive(Clap, Debug)]
+#[derive(Debug, Parser)]
 pub struct Query {
     pub keywords: Vec<String>,
 
@@ -123,7 +121,7 @@ pub struct Query {
 }
 
 /// Remove a directory from the database
-#[derive(Clap, Debug)]
+#[derive(Debug, Parser)]
 pub struct Remove {
     // Use interactive selection
     #[clap(conflicts_with = "paths", long, short, value_name = "keywords")]

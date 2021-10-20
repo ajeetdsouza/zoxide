@@ -2,21 +2,21 @@
 use builtin;
 use str;
 
-edit:completion:arg-completer[zoxide] = [@words]{
+set edit:completion:arg-completer[zoxide] = [@words]{
     fn spaces [n]{
         builtin:repeat $n ' ' | str:join ''
     }
     fn cand [text desc]{
-        edit:complex-candidate $text &display-suffix=' '(spaces (- 14 (wcswidth $text)))$desc
+        edit:complex-candidate $text &display=$text' '(spaces (- 14 (wcswidth $text)))$desc
     }
-    command = 'zoxide'
+    var command = 'zoxide'
     for word $words[1..-1] {
         if (str:has-prefix $word '-') {
             break
         }
-        command = $command';'$word
+        set command = $command';'$word
     }
-    completions = [
+    var completions = [
         &'zoxide'= {
             cand -h 'Print help information'
             cand --help 'Print help information'

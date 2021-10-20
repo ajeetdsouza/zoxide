@@ -180,6 +180,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "clap_generate_fig"
+version = "3.0.0-beta.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b3482836f06a77604c543ffbf86b0b9b814e5413cec432d75fea9db7eb9bf26d"
+dependencies = [
+ "clap",
+ "clap_generate",
+]
+
+[[package]]
 name = "crossbeam-utils"
 version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -856,6 +866,7 @@ dependencies = [
  "bincode",
  "clap",
  "clap_generate",
+ "clap_generate_fig",
  "dirs-next",
  "dunce",
  "glob",

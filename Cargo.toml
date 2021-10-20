@@ -36,6 +36,7 @@ rand = { version = "0.8.4", features = [
 [build-dependencies]
 clap = "=3.0.0-beta.5"
 clap_generate = "=3.0.0-beta.5"
+clap_generate_fig = "=3.0.0-beta.5"
 
 [dev-dependencies]
 assert_cmd = "2.0.0"

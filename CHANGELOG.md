@@ -7,6 +7,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Fixed
+
+- Fish: error erasing completions on older versions.
+
 ## [0.7.7] - 2021-10-21
 
 ### Added
@@ -15,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fix compile errors due to broken `clap` dependency.
+- Compile error with `clap v3.0.0-beta.5`.
 
 ## [0.7.7] - 2021-10-15
 

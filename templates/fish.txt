@@ -123,7 +123,7 @@ end
 
 __zoxide_unset {{cmd}}
 alias {{cmd}}=__zoxide_z
-complete -e {{cmd}}
+complete -c {{cmd}} -e
 complete -c {{cmd}} -f -a '(__zoxide_z_complete)'
 
 __zoxide_unset {{cmd}}i

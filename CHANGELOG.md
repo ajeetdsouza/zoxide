@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fish: error erasing completions on older versions.
+- PowerShell: enable `--cmd cd` to replace the `cd` command.
 
 ## [0.7.7] - 2021-10-21
 

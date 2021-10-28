@@ -6,17 +6,15 @@
   "MD033": false
 } -->
 
-# `zoxide`
-
-> A smarter cd command for your terminal
+# zoxide
 
 [![crates.io][crates.io-badge]][crates.io]
 [![Downloads][downloads-badge]][releases]
 [![Built with Nix][builtwithnix-badge]][builtwithnix]
 
-`zoxide` is a blazing fast replacement for your `cd` command, inspired by
-`z` and `autojump`. It keeps track of the directories you use most
-frequently, and uses a ranking algorithm to navigate to the best match.
+zoxide is a smarter cd command, inspired by z and autojump. It keeps track of
+the directories you use most frequently, and uses a ranking algorithm to
+navigate to the best match.
 
 ![Tutorial][tutorial]
 
@@ -38,15 +36,15 @@ Read more about the matching algorithm [here][algorithm-matching].
 
 ## Getting started
 
-### *Step 1: Install `zoxide`*
+### *Step 1: Install zoxide*
 
-`zoxide` runs on most major platforms. If your platform isn't listed below,
+zoxide runs on most major platforms. If your platform isn't listed below,
 please [open an issue][issues].
 
 <details>
 <summary>Linux</summary>
 
-To install `zoxide`, run this command in your terminal:
+To install zoxide, run this command in your terminal:
 
 ```sh
 curl -sS https://webinstall.dev/zoxide | bash
@@ -78,7 +76,7 @@ Alternatively, you can use a package manager:
 <details>
 <summary>macOS</summary>
 
-To install `zoxide`, use a package manager:
+To install zoxide, use a package manager:
 
 | Repository      | Instructions                          |
 | --------------- | ------------------------------------- |
@@ -92,7 +90,7 @@ To install `zoxide`, use a package manager:
 <details>
 <summary>Windows</summary>
 
-To install `zoxide`, run this command in your command prompt:
+To install zoxide, run this command in your command prompt:
 
 ```sh
 curl.exe -A "MS" https://webinstall.dev/zoxide | powershell
@@ -112,7 +110,7 @@ Alternatively, you can use a package manager:
 <details>
 <summary>BSD</summary>
 
-To install `zoxide`, use a package manager:
+To install zoxide, use a package manager:
 
 | Distribution  | Repository      | Instructions                    |
 | ------------- | --------------- | ------------------------------- |
@@ -126,7 +124,7 @@ To install `zoxide`, use a package manager:
 <details>
 <summary>Android</summary>
 
-To install `zoxide`, use a package manager:
+To install zoxide, use a package manager:
 
 | Repository | Instructions         |
 | ---------- | -------------------- |
@@ -134,12 +132,12 @@ To install `zoxide`, use a package manager:
 
 </details>
 
-### *Step 2: Add `zoxide` to your shell*
+### *Step 2: Add zoxide to your shell*
 
-To start using `zoxide`, add it to your shell.
+To start using zoxide, add it to your shell.
 
 <details>
-<summary><code>bash</code></summary>
+<summary>bash</summary>
 
 Add this to your configuration (usually `~/.bashrc`):
 
@@ -150,7 +148,7 @@ eval "$(zoxide init bash)"
 </details>
 
 <details>
-<summary><code>elvish</code></summary>
+<summary>elvish</summary>
 
 Add this to your configuration (usually `~/.elvish/rc.elv`):
 
@@ -163,7 +161,7 @@ Note: zoxide only supports elvish v0.16.0 and above.
 </details>
 
 <details>
-<summary><code>fish</code></summary>
+<summary>fish</summary>
 
 Add this to your configuration (usually `~/.config/fish/config.fish`):
 
@@ -174,7 +172,7 @@ zoxide init fish | source
 </details>
 
 <details>
-<summary><code>nushell</code></summary>
+<summary>nushell</summary>
 
 Add this to your configuration (find it by running `config path` in Nushell):
 
@@ -187,7 +185,7 @@ Note: zoxide only supports Nushell v0.37.0 and above.
 </details>
 
 <details>
-<summary><code>powershell</code></summary>
+<summary>powershell</summary>
 
 Add this to your configuration (find it by running `echo $profile` in
 PowerShell):
@@ -202,7 +200,7 @@ Invoke-Expression (& {
 </details>
 
 <details>
-<summary><code>xonsh</code></summary>
+<summary>xonsh</summary>
 
 Add this to your configuration (usually `~/.xonshrc`):
 
@@ -213,7 +211,7 @@ execx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')
 </details>
 
 <details>
-<summary><code>zsh</code></summary>
+<summary>zsh</summary>
 
 Add this to your configuration (usually `~/.zshrc`):
 
@@ -234,18 +232,18 @@ eval "$(zoxide init posix --hook prompt)"
 
 </details>
 
-### *Step 3: Install `fzf` (optional)*
+### *Step 3: Install fzf (optional)*
 
-[`fzf`][fzf] is a command-line fuzzy finder, used by `zoxide` for interactive
+[fzf] is a command-line fuzzy finder, used by zoxide for interactive
 selection. It can be installed from [here][fzf-installation].
 
 ### *Step 4: Import your data (optional)*
 
 If you currently use any of the following utilities, you may want to import
-your data into `zoxide`:
+your data into zoxide:
 
 <details>
-<summary><code>autojump</code></summary>
+<summary>autojump</summary>
 
 ```sh
 zoxide import --from autojump path/to/db
@@ -254,7 +252,7 @@ zoxide import --from autojump path/to/db
 </details>
 
 <details>
-<summary><code>z</code>, <code>z.lua</code>, or <code>zsh-z</code></summary>
+<summary>z, z.lua, or zsh-z</summary>
 
 ```sh
 zoxide import --from z path/to/db
@@ -270,16 +268,17 @@ When calling `zoxide init`, the following flags are available:
 
 - `--cmd`
   - Changes the prefix of predefined aliases (`z`, `zi`).
-  - e.g. `--cmd j` would change the aliases to `j` and `ji` respectively.
+  - `--cmd j` would change the aliases to (`j`, `ji`).
+  - `--cmd cd` would replace the `cd` command (doesn't work on Nushell / POSIX shells).
 - `--hook <HOOK>`
-  - Changes how often `zoxide` increments a directory's score:
+  - Changes how often zoxide increments a directory's score:
     | Hook     | Description                       |
     | -------- | --------------------------------- |
     | `none`   | Never                             |
     | `prompt` | At every shell prompt             |
     | `pwd`    | Whenever the directory is changed |
 - `--no-aliases`
-  - Don't define extra aliases (`z`, `zi`).
+  - Don't define aliases (`z`, `zi`).
   - These functions will still be available in your shell as `__zoxide_z` and
     `__zoxide_zi`, should you choose to redefine them.
 
@@ -297,7 +296,7 @@ They must be set before `zoxide init` is called.
     | macOS       | `$HOME/Library/Application Support`      | `/Users/Alice/Library/Application Support` |
     | Windows     | `{FOLDERID_RoamingAppData}`              | `C:\Users\Alice\AppData\Roaming`           |
 - `_ZO_ECHO`
-  - When set to `1`, `z` will print the matched directory before navigating to
+  - When set to 1, `z` will print the matched directory before navigating to
     it.
 - `_ZO_EXCLUDE_DIRS`
   - Excludes the specified directories from the database.
@@ -309,14 +308,14 @@ They must be set before `zoxide init` is called.
     | Windows             | `;`       | `$HOME;$HOME/private/*` |
   - By default, this is set to `"$HOME"`.
 - `_ZO_FZF_OPTS`
-  - Custom options to pass to [`fzf`][fzf]. See [`man fzf`][fzf-man] for the list
-    of options.
+  - Custom options to pass to [fzf] during interactive selection. See
+    [`man fzf`][fzf-man] for the list of options.
 - `_ZO_MAXAGE`
   - Configures the [aging algorithm][algorithm-aging], which limits the maximum
     number of entries in the database.
-  - By default, this is set to `10000`.
+  - By default, this is set to 10000.
 - `_ZO_RESOLVE_SYMLINKS`
-  - When set to `1`, `z` will resolve symlinks before adding directories to the
+  - When set to 1, `z` will resolve symlinks before adding directories to the
     database.
 
 ## Third-party integrations

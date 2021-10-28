@@ -189,27 +189,6 @@ mod tests {
     }
 
     #[rstest]
-    fn posix_bashposix(
-        #[values(None, Some("z"))] cmd: Option<&str>,
-        #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
-        #[values(false, true)] echo: bool,
-        #[values(false, true)] resolve_symlinks: bool,
-    ) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
-        let source = Posix(&opts).render().unwrap();
-
-        let assert = Command::new("bash")
-            .args(&["--posix", "--noprofile", "--norc", "-c", &source])
-            .assert()
-            .success()
-            .stderr("");
-
-        if opts.hook != InitHook::Pwd {
-            assert.stdout("");
-        }
-    }
-
-    #[rstest]
     fn posix_dash(
         #[values(None, Some("z"))] cmd: Option<&str>,
         #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,

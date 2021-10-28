@@ -4,7 +4,7 @@ use clap::{AppSettings, ArgEnum, Parser, ValueHint};
 
 const ENV_HELP: &str = "ENVIRONMENT VARIABLES:
     _ZO_DATA_DIR            Path for zoxide data files
-    _ZO_ECHO                Prints the matched directory before navigating to it when set to 1
+    _ZO_ECHO                Print the matched directory before navigating to it when set to 1
     _ZO_EXCLUDE_DIRS        List of directory globs to be excluded
     _ZO_FZF_OPTS            Custom flags to pass to fzf
     _ZO_MAXAGE              Maximum total age after which entries start getting deleted

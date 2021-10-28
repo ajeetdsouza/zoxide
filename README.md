@@ -3,8 +3,11 @@
     "code_blocks": false,
     "tables": false
   },
-  "MD033": false
+  "MD033": false,
+  "MD041": false
 } -->
+
+<div align="center">
 
 # zoxide
 
@@ -12,13 +15,22 @@
 [![Downloads][downloads-badge]][releases]
 [![Built with Nix][builtwithnix-badge]][builtwithnix]
 
-zoxide is a smarter cd command, inspired by z and autojump. It keeps track of
-the directories you use most frequently, and uses a ranking algorithm to
-navigate to the best match.
+zoxide is a **smarter cd command**, inspired by z and autojump.
+
+It remembers which directories you use most frequently, so you can "jump" to
+them in just a few keystrokes.<br />
+zoxide works on all major shells.
+
+[Getting started](#getting-started) •
+[Installation](#installation) •
+[Configuration](#configuration) •
+[Integrations](#third-party-integrations)
+
+</div>
+
+## Getting started
 
 ![Tutorial][tutorial]
-
-## Examples
 
 ```sh
 z foo        # cd into highest ranked directory matching foo
@@ -34,7 +46,7 @@ zi foo       # cd with interactive selection (using fzf)
 
 Read more about the matching algorithm [here][algorithm-matching].
 
-## Getting started
+## Installation
 
 ### *Step 1: Install zoxide*
 
@@ -137,7 +149,7 @@ To install zoxide, use a package manager:
 To start using zoxide, add it to your shell.
 
 <details>
-<summary>bash</summary>
+<summary>Bash</summary>
 
 Add this to your configuration (usually `~/.bashrc`):
 
@@ -148,7 +160,7 @@ eval "$(zoxide init bash)"
 </details>
 
 <details>
-<summary>elvish</summary>
+<summary>Elvish</summary>
 
 Add this to your configuration (usually `~/.elvish/rc.elv`):
 
@@ -161,7 +173,7 @@ Note: zoxide only supports elvish v0.16.0 and above.
 </details>
 
 <details>
-<summary>fish</summary>
+<summary>Fish</summary>
 
 Add this to your configuration (usually `~/.config/fish/config.fish`):
 
@@ -172,7 +184,7 @@ zoxide init fish | source
 </details>
 
 <details>
-<summary>nushell</summary>
+<summary>Nushell</summary>
 
 Add this to your configuration (find it by running `config path` in Nushell):
 
@@ -185,7 +197,7 @@ Note: zoxide only supports Nushell v0.37.0 and above.
 </details>
 
 <details>
-<summary>powershell</summary>
+<summary>PowerShell</summary>
 
 Add this to your configuration (find it by running `echo $profile` in
 PowerShell):
@@ -200,7 +212,7 @@ Invoke-Expression (& {
 </details>
 
 <details>
-<summary>xonsh</summary>
+<summary>Xonsh</summary>
 
 Add this to your configuration (usually `~/.xonshrc`):
 
@@ -211,7 +223,7 @@ execx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')
 </details>
 
 <details>
-<summary>zsh</summary>
+<summary>Zsh</summary>
 
 Add this to your configuration (usually `~/.zshrc`):
 
@@ -222,7 +234,7 @@ eval "$(zoxide init zsh)"
 </details>
 
 <details>
-<summary>any POSIX shell</summary>
+<summary>Any POSIX shell</summary>
 
 Add this to your configuration:
 

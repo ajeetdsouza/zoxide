@@ -3,8 +3,11 @@
     "code_blocks": false,
     "tables": false
   },
-  "MD033": false
+  "MD033": false,
+  "MD041": false
 } -->
+
+<div align="center">
 
 # zoxide
 
@@ -12,13 +15,22 @@
 [![Downloads][downloads-badge]][releases]
 [![Built with Nix][builtwithnix-badge]][builtwithnix]
 
-zoxide is a smarter cd command, inspired by z and autojump. It keeps track of
-the directories you use most frequently, and uses a ranking algorithm to
-navigate to the best match.
+zoxide is a **smarter cd command**, inspired by z and autojump.
+
+It remembers which directories you use most frequently, so you can "jump" to
+them in just a few keystrokes.<br />
+zoxide works on all major shells.
+
+[Getting started](#getting-started) •
+[Installation](#installation) •
+[Configuration](#configuration) •
+[Integrations](#third-party-integrations)
+
+</div>
+
+## Getting started
 
 ![Tutorial][tutorial]
-
-## Examples
 
 ```sh
 z foo        # cd into highest ranked directory matching foo
@@ -34,7 +46,7 @@ zi foo       # cd with interactive selection (using fzf)
 
 Read more about the matching algorithm [here][algorithm-matching].
 
-## Getting started
+## Installation
 
 ### *Step 1: Install zoxide*
 

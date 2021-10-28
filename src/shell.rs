@@ -286,7 +286,7 @@ mod tests {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Xonsh(&opts).render().unwrap();
 
-        Command::new("mypy").args(&["--command", &source]).assert().success().stderr("");
+        Command::new("mypy").args(&["--command", &source, "--strict"]).assert().success().stderr("");
     }
 
     #[rstest]

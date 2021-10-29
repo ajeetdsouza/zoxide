@@ -1,51 +1,53 @@
 name: release
 on:
   push:
+    branches: [main]
     tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+  pull_request:
+  workflow_dispatch:
+
 jobs:
-  build:
-    name: build-${{ matrix.target }}
+  release:
+    name: ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        target:
-          - aarch64-pc-windows-msvc
-          - aarch64-unknown-linux-musl
-          - armv7-unknown-linux-musleabihf
-          - x86_64-apple-darwin
-          - x86_64-pc-windows-msvc
-          - x86_64-unknown-linux-musl
         include:
-          - target: aarch64-pc-windows-msvc
-            os: windows-latest
-            use-cross: false
-          - target: aarch64-unknown-linux-musl
-            os: ubuntu-latest
-            use-cross: true
-          - target: armv7-unknown-linux-musleabihf
-            os: ubuntu-latest
-            use-cross: true
-          - target: x86_64-apple-darwin
-            os: macos-latest
-            use-cross: false
-          - target: x86_64-pc-windows-msvc
-            os: windows-latest
-            use-cross: false
-          - target: x86_64-unknown-linux-musl
-            os: ubuntu-latest
-            use-cross: true
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+          - os: ubuntu-latest
+            target: arm-unknown-linux-musleabihf
+          - os: ubuntu-latest
+            target: armv7-unknown-linux-musleabihf
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-musl
+
+          - os: macos-11
+            target: x86_64-apple-darwin
+          - os: macos-11
+            target: aarch64-apple-darwin
+
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - os: windows-latest
+            target: aarch64-pc-windows-msvc
     steps:
-      - name: Get the release version from the tag
-        shell: bash
-        if: env.RG_VERSION == ''
-        run: |
-          # https://github.community/t/how-to-get-just-the-tag-name/16241/7#M1027
-          echo "RELEASE_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-          echo "Release version: ${{ env.RELEASE_VERSION }}"
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          fetch-depth: 1
+          fetch-depth: 0
+
+      - name: Set artifact name
+        shell: bash
+        run: |
+          version="$(git describe --tags --match='v*.*.*' --always)"
+          name="zoxide-$version-${{ matrix.target }}"
+          echo "ARTIFACT_NAME=$name" >> $GITHUB_ENV
+
+          echo "version: $version"
+          echo "artifact: $name"
+
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -53,52 +55,45 @@ jobs:
           profile: minimal
           override: true
           target: ${{ matrix.target }}
+
       - name: Build binary
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --color=always --release  --target=${{ matrix.target }}
-          use-cross: ${{ matrix.use-cross }}
-      - name: Build archive
-        shell: bash
-        run: |
-          # Build archive
-          tmpdir="zoxide-${{ env.RELEASE_VERSION }}-${{ matrix.target }}"
-          mkdir "$tmpdir/"
-          cp -r {man,CHANGELOG.md,LICENSE,README.md} "$tmpdir/"
-          if [[ "${{ matrix.target }}" = *"windows"* ]]; then
-            asset="$tmpdir.zip"
-            cp "target/${{ matrix.target }}/release/zoxide.exe" "$tmpdir/"
-            7z a -mm=Deflate -mfb=258 -mpass=15 -r "$asset" "./$tmpdir/*"
-          else
-            asset="$tmpdir.tar.gz"
-            cp "target/${{ matrix.target }}/release/zoxide" "$tmpdir/"
-            tar -cv "$tmpdir/" | gzip --best > "$asset"
-          fi
-          echo "ASSET=$asset" >> $GITHUB_ENV
-      - name: Upload archive
+          args: --release --locked --target=${{ matrix.target }} --color=always --verbose
+          use-cross: ${{ runner.os == 'Linux' }}
+
+      - name: Package (*nix)
+        if: runner.os != 'Windows'
+        run: >
+          tar -cv
+          CHANGELOG.md LICENSE README.md
+          man/
+          -C contrib/ completions/ -C ../
+          -C target/${{ matrix.target }}/release/ zoxide
+          | gzip --best > '${{ env.ARTIFACT_NAME }}.tar.gz'
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        run: >
+          7z a ${{ env.ARTIFACT_NAME }}.zip
+          CHANGELOG.md LICENSE README.md
+          ./man/
+          ./contrib/completions/
+          ./target/${{ matrix.target }}/release/zoxide.exe
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ env.ASSET }}
-          path: ${{ env.ASSET }}
-  release:
-    runs-on: ubuntu-latest
-    needs: [build]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 1
-      - name: Download archives
-        uses: actions/download-artifact@v2
-        with:
-          path: artifact
-      - name: Show downloaded files
-        run: ls -lRh artifact/
+          name: ${{ matrix.target }}
+          path: |
+            *.zip
+            *.tar.gz
+
       - name: Create release
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v1
         with:
           draft: true
-          files: artifact/*/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          files: |
+            *.zip
+            *.tar.gz

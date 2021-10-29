@@ -3,22 +3,30 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 jobs:
   ci:
-    name: ci-${{ matrix.os }}
+    name: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@v2
-      - uses: actions-rs/install@v0.1
+
+      - uses: actions-rs/toolchain@v1
         if: ${{ matrix.os == 'windows-latest' }}
         with:
-          crate: cargo-audit
-          version: latest
+          toolchain: stable
+          components: rustfmt, clippy
+          profile: minimal
+          override: true
       - uses: cachix/install-nix-action@v12
         if: ${{ matrix.os != 'windows-latest' }}
         with:
           nix_path: nixpkgs=https://github.com/NixOS/nixpkgs/archive/20.09.tar.gz
+
       - run: cargo xtask ci
+        if: ${{ matrix.os == 'windows-latest' }}
+      - run: nix-shell --cores 0 --pure --run 'cargo xtask ci'
+        if: ${{ matrix.os != 'windows-latest' }}

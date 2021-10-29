@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 jobs:
   ci:
-    name: CI (${{ matrix.os }})
+    name: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:

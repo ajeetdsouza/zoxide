@@ -7,7 +7,7 @@ on:
 
 jobs:
   release:
-    name: Release (${{ matrix.target }})
+    name: ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -22,9 +22,9 @@ jobs:
           - os: ubuntu-latest
             target: aarch64-unknown-linux-musl
 
-          - os: macos-latest
+          - os: macos-11
             target: x86_64-apple-darwin
-          - os: macos-latest
+          - os: macos-11
             target: aarch64-apple-darwin
 
           - os: windows-latest
@@ -60,25 +60,25 @@ jobs:
         with:
           command: build
           args: --release --locked --target=${{ matrix.target }} --color=always --verbose
-          use-cross: ${{ runner.os == 'Linux' && matrix.target != 'x86_64-unknown-linux-gnu' }}
+          use-cross: ${{ runner.os == 'Linux' }}
 
       - name: Package (*nix)
         if: runner.os != 'Windows'
         run: >
           tar -cv
-            CHANGELOG.md LICENSE README.md
-            man/
-            -C contrib/ completions/ -C ../
-            -C target/${{ matrix.target }}/release/ zoxide
-            | gzip --best > '${{ env.ARTIFACT_NAME }}.tar.gz'
+          CHANGELOG.md LICENSE README.md
+          man/
+          -C contrib/ completions/ -C ../
+          -C target/${{ matrix.target }}/release/ zoxide
+          | gzip --best > '${{ env.ARTIFACT_NAME }}.tar.gz'
       - name: Package (Windows)
         if: runner.os == 'Windows'
         run: >
           7z a ${{ env.ARTIFACT_NAME }}.zip
-            CHANGELOG.md LICENSE README.md
-            ./man/
-            ./contrib/completions/
-            ./target/${{ matrix.target }}/release/zoxide.exe
+          CHANGELOG.md LICENSE README.md
+          ./man/
+          ./contrib/completions/
+          ./target/${{ matrix.target }}/release/zoxide.exe
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2

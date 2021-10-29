@@ -76,7 +76,10 @@ Add this to your configuration:
 .B --cmd
 Changes the prefix of predefined aliases (\fBz\fR, \fBzi\fR).
 .br
-e.g. --cmd j would change the aliases to j and ji respectively.
+\fB--cmd j\fR would change the aliases to (\fBj\fR, \fBji\fR).
+.br
+\fB--cmd cd\fR would replace the \fBcd\fR command (doesn't work on Nushell /
+POSIX shells).
 .TP
 .B -h, --help
 Print help information.

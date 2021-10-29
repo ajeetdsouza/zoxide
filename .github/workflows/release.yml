@@ -1,11 +1,13 @@
 name: release
 on:
   push:
+    branches: [main]
   pull_request:
+  workflow_dispatch:
 
 jobs:
-  github-release:
-    name: Release ${{ matrix.target }}
+  release:
+    name: Release (${{ matrix.target }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -35,16 +37,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set Artifact Name
+      - name: Set artifact name
         shell: bash
         run: |
-          version=$(git describe --tags --match "v*.*.*" --always)
-          echo "version is: $version"
-          echo "GIT_TAG_VERSION=$version" >> $GITHUB_ENV
-
+          version="$(git describe --tags --match='v*.*.*' --always --broken)"
           name="zoxide-$version-${{ matrix.target }}"
-          echo "artifact name is: $name"
           echo "ARTIFACT_NAME=$name" >> $GITHUB_ENV
+
+          echo "version: $version"
+          echo "artifact: $name"
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1
@@ -56,37 +57,38 @@ jobs:
 
       - name: Build binary
         uses: actions-rs/cargo@v1
-        env:
-          # TODO: Remove this once macos-11 is macos-latest
-          SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
         with:
           command: build
-          args: --release --verbose --locked --target ${{ matrix.target }}
+          args: --release --locked --target=${{ matrix.target }} --color=always --verbose
           use-cross: ${{ runner.os == 'Linux' && matrix.target != 'x86_64-unknown-linux-gnu' }}
 
-      - name: Package (-nix)
+      - name: Package (*nix)
         if: runner.os != 'Windows'
         run: >
-          tar --gzip -cvf ${{ env.ARTIFACT_NAME }}.tar.gz
-          man CHANGELOG.md LICENSE README.md
-          -C contrib completions -C ..
-          -C target/${{ matrix.target }}/release zoxide
-      - name: Package (windows)
+          tar -cv
+            CHANGELOG.md LICENSE README.md
+            man/
+            -C contrib/ completions/ -C ../
+            -C target/${{ matrix.target }}/release/ zoxide
+            | gzip --best > '${{ env.ARTIFACT_NAME }}.tar.gz'
+      - name: Package (Windows)
         if: runner.os == 'Windows'
-        run: |
-          7z a ${{ env.ARTIFACT_NAME }}.zip completions LICENSE README.md
-          cd target/${{ matrix.target }}/release
-          7z a ../../../${{ env.ARTIFACT_NAME }}.zip zoxide.exe
-          cd -
+        run: >
+          7z a ${{ env.ARTIFACT_NAME }}.zip
+            CHANGELOG.md LICENSE README.md
+            ./man/
+            ./contrib/completions/
+            ./target/${{ matrix.target }}/release/zoxide.exe
 
-      - uses: actions/upload-artifact@v2
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.target }}
           path: |
             *.zip
             *.tar.gz
 
-      - name: GitHub Release
+      - name: Create release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v1
         with:

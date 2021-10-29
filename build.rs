@@ -21,7 +21,7 @@ fn main() {
 fn git_version() -> Option<String> {
     let dir = env::var("CARGO_MANIFEST_DIR").ok()?;
     let mut git = Command::new("git");
-    git.args(&["-C", &dir, "describe", "--tags", "--broken"]);
+    git.args(&["-C", &dir, "describe", "--tags", "--match=v*.*.*", "--always", "--broken"]);
 
     let output = git.output().ok()?;
     if !output.status.success() || output.stdout.is_empty() || !output.stderr.is_empty() {

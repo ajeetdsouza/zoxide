@@ -162,9 +162,8 @@ mod tests {
         let tempdir = tempfile::tempdir().unwrap();
         let tempdir = tempdir.path().to_str().unwrap();
 
-        Command::new("fish")
+        Command::new("fish_indent")
             .env("HOME", tempdir)
-            .args(&["--command", "fish_indent", "--private"])
             .write_stdin(source.to_string())
             .assert()
             .success()
@@ -194,6 +193,26 @@ mod tests {
     }
 
     #[rstest]
+    fn posix_bash(
+        #[values(None, Some("z"))] cmd: Option<&str>,
+        #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
+        #[values(false, true)] echo: bool,
+        #[values(false, true)] resolve_symlinks: bool,
+    ) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+        let source = Posix(&opts).render().unwrap();
+
+        let assert = Command::new("bash")
+            .args(&["--posix", "--noprofile", "--norc", "-e", "-u", "-o", "pipefail", "-c", &source])
+            .assert()
+            .success()
+            .stderr("");
+        if opts.hook != InitHook::Pwd {
+            assert.stdout("");
+        }
+    }
+
+    #[rstest]
     fn posix_dash(
         #[values(None, Some("z"))] cmd: Option<&str>,
         #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
@@ -203,7 +222,7 @@ mod tests {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Posix(&opts).render().unwrap();
 
-        let assert = Command::new("dash").args(&["-c", &source]).assert().success().stderr("");
+        let assert = Command::new("dash").args(&["-c", &source, "-e", "-u"]).assert().success().stderr("");
         if opts.hook != InitHook::Pwd {
             assert.stdout("");
         }
@@ -361,7 +380,7 @@ mod tests {
         let source = Zsh(&opts).render().unwrap();
 
         Command::new("zsh")
-            .args(&["-c", &source, "--no-globalrcs", "--no-rcs"])
+            .args(&["-c", &source, "-e", "-u", "-o", "pipefail", "--no-globalrcs", "--no-rcs"])
             .assert()
             .success()
             .stdout("")

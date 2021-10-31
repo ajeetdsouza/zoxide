@@ -74,31 +74,19 @@ end
 
 # Completions for `z`.
 function __zoxide_z_complete
-    set -l trigger '**'
-    set -l trigger_length (string length $trigger)
+    set -l tokens (commandline -op)
+    set -l curr_tokens (commandline -cop)
 
-    set -l line (commandline -op)
-    set -l interactive 0
-    if test (string sub -s "-$trigger_length" $line[-1]) = $trigger
-        set line[-1] (string sub -e "-$trigger_length" $line[-1])
-        set interactive 1
+    if test (count $tokens) -le 2 -a (count $curr_tokens) -eq 1
+        # If there is only one argument, use `cd` completions.
+        __fish_complete_directories "$tokens[2]" ''
+    else
+        # Otherwise, use interactive selection.
+        set -l query $tokens[2..-1]
+        set -l result (_ZO_FZF_OPTS='{{ crate::shell::FZF_COMPLETE_OPTS }}' zoxide query -i -- $query)
+        and commandline -p "$tokens[1] "(string escape $result)
+        commandline -f repaint
     end
-
-    set -l query $line[2..-1]
-    if test $interactive -eq 0 -a (count (commandline -cop)) -le 1
-        __fish_complete_directories "$query" ''
-        return
-    end
-    set -l result (_ZO_FZF_OPTS='{{ crate::shell::FZF_COMPLETE_OPTS }}' zoxide query -i -- $query)
-    set -l exit $status
-    if test $exit -ne 0
-        test $exit -eq 130
-        and commandline -p "$line"
-        return
-    end
-
-    set -l cmd $line[1]
-    commandline -p "$cmd "(string escape $result)
 end
 
 # Jump to a directory using interactive search.

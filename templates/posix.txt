@@ -35,7 +35,7 @@ __zoxide_hook() {
 }
 
 # Initialize hook.
-if [ "${PS1#*\$(__zoxide_hook)}" = "${PS1}" ]; then
+if [ "${PS1:=}" = "${PS1#*\$(__zoxide_hook)}" ]; then
     PS1="${PS1}\$(__zoxide_hook)"
 fi
 

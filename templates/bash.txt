@@ -124,7 +124,7 @@ if [[ :"${SHELLOPTS}": =~ :(vi|emacs): && ${TERM} != 'dumb' ]]; then
         # If there is only one argument, use `cd` completions.
         if [[ {{ "${#COMP_WORDS[@]}" }} -eq 2 ]]; then
             \builtin mapfile -t COMPREPLY < <(compgen -A directory -S / -- "${COMP_WORDS[-1]}")
-        # Otherwise, use interactive selection.
+        # If there is a space after the last word, use interactive selection.
         elif [[ -z ${COMP_WORDS[-1]} ]]; then
             \local result
             result="$(

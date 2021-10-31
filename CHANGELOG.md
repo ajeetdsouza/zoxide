@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Bash: improved completions for `z` command.
+- Bash/Fish: improved completions for `z` command.
 
 ### Fixed
 

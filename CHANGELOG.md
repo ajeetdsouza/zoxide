@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+
+- Bash: improved completions for `z` command.
+
 ### Fixed
 
 - Fish: error erasing completions on older versions.

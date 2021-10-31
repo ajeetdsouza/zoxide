@@ -32,27 +32,25 @@ function __zoxide_cd() {
 {%- if hook == InitHook::Prompt %}
 function __zoxide_hook() {
     \builtin local -r retval="$?"
-    zoxide add -- "$(__zoxide_pwd)"
+    \builtin command zoxide add -- "$(__zoxide_pwd)"
     return "${retval}"
 }
 {%- else if hook == InitHook::Pwd %}
+__zoxide_oldpwd="$(__zoxide_pwd)"
+
 function __zoxide_hook() {
     \builtin local -r retval="$?"
     \builtin local -r pwd_tmp="$(__zoxide_pwd)"
-    if [ -z "${__zoxide_oldpwd}" ]; then
+    if [[ ${__zoxide_oldpwd} != "${pwd_tmp}" ]]; then
         __zoxide_oldpwd="${pwd_tmp}"
-    elif [ "${__zoxide_oldpwd}" != "${pwd_tmp}" ]; then
-        __zoxide_oldpwd="${pwd_tmp}"
-        zoxide add -- "${__zoxide_oldpwd}"
+        \builtin command zoxide add -- "${__zoxide_oldpwd}"
     fi
     return "${retval}"
 }
 {%- endif %}
 
 # Initialize hook.
-if [ -z "${PROMPT_COMMAND}" ]; then
-    PROMPT_COMMAND='__zoxide_hook'
-elif [[ ${PROMPT_COMMAND} != *'__zoxide_hook'* ]]; then
+if [[ ${PROMPT_COMMAND:=} != *'__zoxide_hook'* ]]; then
     PROMPT_COMMAND="__zoxide_hook;${PROMPT_COMMAND#;}"
 fi
 
@@ -63,24 +61,29 @@ fi
 # desired.
 #
 
+__zoxide_z_prefix='z#'
+
 # Jump to a directory using only keywords.
 function __zoxide_z() {
-    if [ "$#" -eq 0 ]; then
+    if [[ $# -eq 0 ]]; then
         __zoxide_cd ~
-    elif [ "$#" -eq 1 ] && [ "$1" = '-' ]; then
+    elif [[ $# -eq 1 && $1 == '-' ]]; then
         __zoxide_cd "${OLDPWD}"
-    elif [ "$#" -eq 1 ] && [ -d "$1" ]; then
+    elif [[ $# -eq 1 && -d $1 ]]; then
         __zoxide_cd "$1"
+    elif [[ ${*: -1} == "${__zoxide_z_prefix}"* ]]; then
+        \builtin local result="${*: -1}"
+        __zoxide_cd "${result:2}"
     else
         \builtin local result
-        result="$(zoxide query --exclude "$(__zoxide_pwd)" -- "$@")" && __zoxide_cd "${result}"
+        result="$(\builtin command zoxide query --exclude "$(__zoxide_pwd)" -- "$@")" && __zoxide_cd "${result}"
     fi
 }
 
 # Jump to a directory using interactive search.
 function __zoxide_zi() {
     \builtin local result
-    result="$(zoxide query -i -- "$@")" && __zoxide_cd "${result}"
+    result="$(\builtin command zoxide query -i -- "$@")" && __zoxide_cd "${result}"
 }
 
 {{ section }}
@@ -108,25 +111,27 @@ function {{cmd}}i() {
 }
 
 # Load completions.
-{# This requires line editing. Since Bash supports only two modes of line
- # editing (`vim` and `emacs`), we check if one of them is enabled. -#}
-if [[ :"${SHELLOPTS}": =~ :(vi|emacs): ]] && [ "${TERM}" != 'dumb' ]; then
-    {# Use `printf '\e[5n'` to redraw line after fzf closes. -#}
+# Completions require line editing. Since Bash supports only two modes of line
+# editing (`vim` and `emacs`), we check if one of them is enabled.
+if [[ :"${SHELLOPTS}": =~ :(vi|emacs): && ${TERM} != 'dumb' ]]; then
+    # Use `printf '\e[5n'` to redraw line after fzf closes.
     \builtin bind '"\e[0n": redraw-current-line' &>/dev/null
 
     function _{{cmd}}() {
-        [[ {{ "${#COMP_WORDS[@]}" }} -eq 2 && ${COMP_POINT} -eq {{ "${#COMP_LINE}" }} ]] || return
+        # Only show completions when the cursor is at the end of the line.
+        [[ {{ "${#COMP_LINE}" }} -eq ${COMP_POINT} ]] || return
 
-        \builtin local -r trigger='**'
-        \builtin local query="${COMP_WORDS[1]}"
-
-        if [[ ${query} == *"${trigger}" ]]; then
-            query="${query:0:$(({{ "${#query} - ${#trigger}" }}))}"
-            COMPREPLY=("$(_ZO_FZF_OPTS='{{ crate::shell::FZF_COMPLETE_OPTS }}' zoxide query -i -- "${query}")")
-            [[ $? -eq 130 ]] && COMPREPLY=("${query}")
+        # If there is only one argument, use `cd` completions.
+        if [[ {{ "${#COMP_WORDS[@]}" }} -eq 2 ]]; then
+            \builtin mapfile -t COMPREPLY < <(compgen -A directory -S / -- "${COMP_WORDS[-1]}")
+        # Otherwise, use interactive selection.
+        elif [[ -z ${COMP_WORDS[-1]} ]]; then
+            \local result
+            result="$(
+                _ZO_FZF_OPTS='{{ crate::shell::FZF_COMPLETE_OPTS }}' \
+                    \builtin command zoxide query -i -- "${COMP_WORDS[@]:1}"
+            )" && COMPREPLY=("${__zoxide_z_prefix}${result}")
             \builtin printf '\e[5n'
-        else
-            \builtin mapfile -t COMPREPLY < <(compgen -A directory -S / -- "${query}")
         fi
     }
 

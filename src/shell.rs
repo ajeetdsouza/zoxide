@@ -59,7 +59,12 @@ mod tests {
     ) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Bash(&opts).render().unwrap();
-        Command::new("bash").args(&["--noprofile", "--norc", "-c", &source]).assert().success().stdout("").stderr("");
+        Command::new("bash")
+            .args(&["--noprofile", "--norc", "-e", "-u", "-o", "pipefail", "-c", &source])
+            .assert()
+            .success()
+            .stdout("")
+            .stderr("");
     }
 
     #[rstest]

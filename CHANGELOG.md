@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [0.7.9] - 2021-11-02
 
 ### Changed
 
@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fish: error erasing completions on older versions.
 - PowerShell: enable `--cmd cd` to replace the `cd` command.
 
-## [0.7.7] - 2021-10-21
+## [0.7.8] - 2021-10-21
 
 ### Added
 
@@ -327,6 +327,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions pipeline to build and upload releases.
 - Support for zsh.
 
+[0.7.9]: https://github.com/ajeetdsouza/zoxide/compare/v0.7.8...v0.7.9
+[0.7.8]: https://github.com/ajeetdsouza/zoxide/compare/v0.7.7...v0.7.8
 [0.7.7]: https://github.com/ajeetdsouza/zoxide/compare/v0.7.6...v0.7.7
 [0.7.6]: https://github.com/ajeetdsouza/zoxide/compare/v0.7.5...v0.7.6
 [0.7.5]: https://github.com/ajeetdsouza/zoxide/compare/v0.7.4...v0.7.5

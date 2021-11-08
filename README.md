@@ -56,13 +56,7 @@ please [open an issue][issues].
 <details>
 <summary>Linux</summary>
 
-To install zoxide, run this command in your terminal:
-
-```sh
-curl -sS https://webinstall.dev/zoxide | bash
-```
-
-Alternatively, you can use a package manager:
+To install zoxide, use a package manager:
 
 | Distribution       | Repository              | Instructions                                                                                   |
 | ------------------ | ----------------------- | ---------------------------------------------------------------------------------------------- |

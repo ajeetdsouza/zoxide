@@ -1,13 +1,14 @@
 [package]
-name = "zoxide"
-version = "0.7.9"
 authors = ["Ajeet D'Souza <98ajeet@gmail.com>"]
-edition = "2018"
-description = "A smarter cd command for your terminal"
-repository = "https://github.com/ajeetdsouza/zoxide"
-license = "MIT"
-keywords = ["cli"]
 categories = ["command-line-utilities", "filesystem"]
+description = "A smarter cd command for your terminal"
+edition = "2018"
+keywords = ["cli"]
+license = "MIT"
+name = "zoxide"
+repository = "https://github.com/ajeetdsouza/zoxide"
+rust-version = "1.56"
+version = "0.7.9"
 
 [badges]
 maintenance = { status = "actively-developed" }
@@ -29,8 +30,8 @@ tempfile = "3.1.0"
 
 [target.'cfg(windows)'.dependencies]
 rand = { version = "0.8.4", features = [
-    "getrandom",
-    "small_rng",
+  "getrandom",
+  "small_rng",
 ], default-features = false }
 
 [build-dependencies]

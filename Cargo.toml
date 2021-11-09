@@ -1,6 +1,7 @@
 [package]
 name = "zoxide"
 version = "0.7.9"
+rust-version = "1.56"
 authors = ["Ajeet D'Souza <98ajeet@gmail.com>"]
 edition = "2018"
 description = "A smarter cd command for your terminal"
@@ -29,7 +30,7 @@ tempfile = "3.1.0"
 
 [target.'cfg(windows)'.dependencies]
 rand = { version = "0.8.4", features = [
-    "getrandom",
+  "getrandom",
     "small_rng",
 ], default-features = false }
 

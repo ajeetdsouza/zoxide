@@ -56,7 +56,13 @@ please [open an issue][issues].
 <details>
 <summary>Linux</summary>
 
-To install zoxide, use a package manager:
+To install zoxide, run this command in your terminal:
+
+```sh
+curl -sS https://webinstall.dev/zoxide | bash
+```
+
+Alternatively, you can use a package manager:
 
 | Distribution       | Repository              | Instructions                                                                                   |
 | ------------------ | ----------------------- | ---------------------------------------------------------------------------------------------- |
@@ -73,7 +79,6 @@ To install zoxide, use a package manager:
 | Manjaro            |                         | `pacman -S zoxide`                                                                             |
 | NixOS              | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                                                                   |
 | Parrot OS          |                         | `apt install zoxide`                                                                           |
-| Raspbian           |                         | `apt install zoxide`                                                                           |
 | Ubuntu 21.04+      | [Ubuntu Packages]       | `apt install zoxide`                                                                           |
 | Void Linux         | [Void Linux Packages]   | `xbps-install -S zoxide`                                                                       |
 

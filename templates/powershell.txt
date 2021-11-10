@@ -107,8 +107,8 @@ function __zoxide_zi {
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-Set-Alias -Name {{cmd}} -Value __zoxide_z -Option AllScope
-Set-Alias -Name {{cmd}}i -Value __zoxide_zi -Option AllScope
+Set-Alias -Name {{cmd}} -Value __zoxide_z -Option AllScope -Scope Global -Force
+Set-Alias -Name {{cmd}}i -Value __zoxide_zi -Option AllScope -Scope Global -Force
 
 {%- when None %}
 

@@ -86,8 +86,8 @@ function __zoxide_zi() {
 
 # Remove definitions.
 function __zoxide_unset() {
-    \builtin unalias "$@" &>/dev/null
-    \builtin unfunction "$@" &>/dev/null
+    \builtin unalias "$@" &>/dev/null || true
+    \builtin unfunction "$@" &>/dev/null || true
     \builtin unset "$@" &>/dev/null
 }
 

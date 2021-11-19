@@ -35,11 +35,11 @@ function __zoxide_hook() {
 
 # Initialize hook.
 # shellcheck disable=SC2154
-if [[ ${precmd_functions[(Ie)__zoxide_hook]} -eq 0 ]] && [[ ${chpwd_functions[(Ie)__zoxide_hook]} -eq 0 ]]; then
+if [[ ${precmd_functions[(Ie)__zoxide_hook]:-} -eq 0 ]] && [[ ${chpwd_functions[(Ie)__zoxide_hook]:-} -eq 0 ]]; then
 {%- if hook == InitHook::Prompt %}
     precmd_functions+=(__zoxide_hook)
 {%- else if hook == InitHook::Pwd %}
-    chpwd_functions=("${chpwd_functions[@]}" "__zoxide_hook")
+    chpwd_functions+=(__zoxide_hook)
 {%- endif %}
 fi
 
@@ -86,8 +86,8 @@ function __zoxide_zi() {
 
 # Remove definitions.
 function __zoxide_unset() {
-    \builtin unalias "$@" &>/dev/null
-    \builtin unfunction "$@" &>/dev/null
+    \builtin unalias "$@" &>/dev/null || true
+    \builtin unfunction "$@" &>/dev/null || true
     \builtin unset "$@" &>/dev/null
 }
 

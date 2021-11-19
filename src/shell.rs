@@ -222,7 +222,7 @@ mod tests {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Posix(&opts).render().unwrap();
 
-        let assert = Command::new("dash").args(&["-c", &source, "-e", "-u"]).assert().success().stderr("");
+        let assert = Command::new("dash").args(&["-e", "-u", "-c", &source]).assert().success().stderr("");
         if opts.hook != InitHook::Pwd {
             assert.stdout("");
         }
@@ -380,7 +380,7 @@ mod tests {
         let source = Zsh(&opts).render().unwrap();
 
         Command::new("zsh")
-            .args(&["-c", &source, "-e", "-u", "-o", "pipefail", "--no-globalrcs", "--no-rcs"])
+            .args(&["-e", "-u", "-o", "pipefail", "--no-globalrcs", "--no-rcs", "-c", &source])
             .assert()
             .success()
             .stdout("")

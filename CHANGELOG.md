@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - PowerShell: use global scope for aliases.
+- Zsh: fix errors with `set -eu`.
 
 ## [0.7.9] - 2021-11-02
 

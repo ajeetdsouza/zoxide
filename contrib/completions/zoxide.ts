@@ -159,7 +159,7 @@ const completion: Fig.Spec = {
         },
         {
           name: ["-s", "--score"],
-          description: "Print score with results",
+          description: "Print score with results (keyword match score, frequency score)",
         },
         {
           name: ["-h", "--help"],

@@ -111,7 +111,7 @@ pub struct Query {
     #[clap(long, short, conflicts_with = "interactive")]
     pub list: bool,
 
-    /// Print score with results
+    /// Print score with results (keyword match score, frequency score)
     #[clap(long, short, conflicts_with = "interactive")]
     pub score: bool,
 

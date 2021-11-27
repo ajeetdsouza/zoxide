@@ -114,7 +114,9 @@ impl Dir<'_> {
 
         let mut kw_score_sum = 0;
 
-        // Split the path into components, then words, so the "M" can be a better match
+        let smart_case = keywords.iter().all(|kw| &kw.to_lowercase() == kw);
+
+        // Split the path into components, then words, so the "m" can be a better match
         // for "folk music" than for "tom", and the best match for "music".
         // And even more so if it's the last path component.
         let path = PathBuf::from_str(&self.path).unwrap(); // safe because error is Infallible
@@ -122,9 +124,12 @@ impl Dir<'_> {
         let mut is_last_component = true;
         for component in path_components.rev() {
             let component = component.as_os_str().to_str().unwrap(); // safe because the path came from a string
+            let component = if smart_case { component.to_lowercase() } else { component.to_owned() };
+
             let left_word_boundaries = left_word_boundaries(&component);
             for keyword in keywords {
-                kw_score_sum += Self::compute_kw_score(&component, keyword, &left_word_boundaries, is_last_component);
+                kw_score_sum +=
+                    Self::compute_kw_score(&component, keyword, &left_word_boundaries, smart_case, is_last_component);
             }
             is_last_component = false;
         }
@@ -136,6 +141,7 @@ impl Dir<'_> {
         path_component: &str,
         keyword: &str,
         left_word_boundaries: &Vec<usize>,
+        smart_case: bool,
         is_last_component: bool,
     ) -> u64 {
         let keyword_lower = &keyword.to_lowercase();
@@ -158,9 +164,10 @@ impl Dir<'_> {
                 //       Imagine two directories, src_3 and src. If src_3 is more frequently used, "sr" will
                 //       match src_3. But "src" will match src.
                 best_boundary_score = best_boundary_score.max(score);
-            } else if word_lower.starts_with(keyword) {
-                // smart case match
-                best_boundary_score = best_boundary_score.max(90);
+            } else if !smart_case && word_lower.starts_with(keyword) {
+                // smart case is off (a keyword has case), but this keyword alone would be a smart case match
+                // for the component.
+                best_boundary_score = best_boundary_score.max(25);
             } else if word_lower.starts_with(keyword_lower) {
                 // wrong case but it's a match otherwise
                 best_boundary_score = best_boundary_score.max(20);

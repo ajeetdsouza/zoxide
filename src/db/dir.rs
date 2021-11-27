@@ -1,6 +1,8 @@
 use std::borrow::Cow;
 use std::fmt::{self, Display, Formatter};
 use std::ops::{Deref, DerefMut};
+use std::path::PathBuf;
+use std::str::FromStr;
 
 use anyhow::{bail, Context, Result};
 use bincode::Options as _;
@@ -106,19 +108,38 @@ impl Dir<'_> {
             self.rank * 0.25
         };
 
-        let left_word_boundaries = left_word_boundaries(&self.path);
+        for keyword in keywords {
+            debug_assert!(self.path.to_lowercase().contains(&keyword.to_lowercase()));
+        }
 
         let mut kw_score_sum = 0;
-        for keyword in keywords {
-            kw_score_sum += self.compute_kw_score(keyword, &left_word_boundaries);
+
+        // Split the path into components, then words, so the "M" can be a better match
+        // for "folk music" than for "tom", and the best match for "music".
+        // And even more so if it's the last path component.
+        let path = PathBuf::from_str(&self.path).unwrap(); // safe because error is Infallible
+        let path_components = path.components();
+        let mut is_last_component = true;
+        for component in path_components.rev() {
+            let component = component.as_os_str().to_str().unwrap(); // safe because the path came from a string
+            let left_word_boundaries = left_word_boundaries(&component);
+            for keyword in keywords {
+                kw_score_sum += Self::compute_kw_score(&component, keyword, &left_word_boundaries, is_last_component);
+            }
+            is_last_component = false;
         }
 
         (kw_score_sum, adjusted_rank)
     }
 
-    pub fn compute_kw_score(&self, keyword: &str, left_word_boundaries: &Vec<usize>) -> u64 {
+    pub fn compute_kw_score(
+        path_component: &str,
+        keyword: &str,
+        left_word_boundaries: &Vec<usize>,
+        is_last_component: bool,
+    ) -> u64 {
         let keyword_lower = &keyword.to_lowercase();
-        let path_lower = self.path.to_lowercase();
+        let path_lower = path_component.to_lowercase();
 
         // more than one boundary can match
         let mut best_boundary_score = 0;
@@ -126,27 +147,32 @@ impl Dir<'_> {
             // TODO: think carefully about these rules. Should the case of the match
             // be allowed to influence the score? What if it's all lowercase, so
             // a smart case match is impossible?
-            let path = &self.path[*idx..];
-            let path_lower = &path_lower[*idx..];
-            if path.starts_with(keyword) {
+            let word = &path_component[*idx..];
+            let word_lower = &path_lower[*idx..];
+            if word.starts_with(keyword) {
                 // exact match
 
                 // TODO: think about checking the right word boundary, and give extra points if it matches.
                 //       Imagine two directories, src_3 and src. If src_3 is more frequently used, "sr" will
                 //       match src_3. But "src" will match src.
                 best_boundary_score = best_boundary_score.max(100);
-            } else if path_lower.starts_with(keyword) {
+            } else if word_lower.starts_with(keyword) {
                 // smart case match
                 best_boundary_score = best_boundary_score.max(90);
-            } else if path_lower.starts_with(keyword_lower) {
+            } else if word_lower.starts_with(keyword_lower) {
                 // wrong case but it's a match otherwise
                 best_boundary_score = best_boundary_score.max(20);
+            } else {
+                // No score. We don't need to give any score for a keyword that matches but not on a word boundary--
+                // All paths being checked should at least match in that way.
+                // But note that though the path will match the keyword, this path component may not match.
             }
-
-            // We don't need to give any score for a keyword that matches but not on a word boundary--
-            // All paths being checked should at least match in that way.
         }
-        debug_assert!(path_lower.contains(keyword_lower));
+
+        if best_boundary_score > 0 && is_last_component {
+            // matches in the last path component should be considered a little better
+            best_boundary_score += 5;
+        }
 
         best_boundary_score
     }

@@ -150,12 +150,14 @@ impl Dir<'_> {
             let word = &path_component[*idx..];
             let word_lower = &path_lower[*idx..];
             if word.starts_with(keyword) {
-                // exact match
+                // exact match, but even better if it's at the leftmost position in the component,
+                // like "D" matching $HOME/Documents
+                let score = if *idx == 0 { 105 } else { 100 };
 
                 // TODO: think about checking the right word boundary, and give extra points if it matches.
                 //       Imagine two directories, src_3 and src. If src_3 is more frequently used, "sr" will
                 //       match src_3. But "src" will match src.
-                best_boundary_score = best_boundary_score.max(100);
+                best_boundary_score = best_boundary_score.max(score);
             } else if word_lower.starts_with(keyword) {
                 // smart case match
                 best_boundary_score = best_boundary_score.max(90);

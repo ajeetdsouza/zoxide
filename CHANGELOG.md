@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+
+- Better defaults for `fzf`.
+
 ### Fixed
 
 - PowerShell: use global scope for aliases.

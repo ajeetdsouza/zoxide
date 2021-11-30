@@ -3,7 +3,7 @@ use std::ffi::OsString;
 use std::path::PathBuf;
 
 use anyhow::{bail, Context, Result};
-use dirs_next as dirs;
+use dirs;
 use glob::Pattern;
 
 use crate::db::Rank;

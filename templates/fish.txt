@@ -83,7 +83,7 @@ function __zoxide_z_complete
     else
         # Otherwise, use interactive selection.
         set -l query $tokens[2..-1]
-        set -l result (_ZO_FZF_OPTS='{{ crate::shell::FZF_COMPLETE_OPTS }}' zoxide query -i -- $query)
+        set -l result (zoxide query -i -- $query)
         and commandline -p "$tokens[1] "(string escape $result)
         commandline -f repaint
     end

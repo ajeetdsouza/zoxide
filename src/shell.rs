@@ -1,14 +1,5 @@
 use crate::app::InitHook;
 
-const FZF_COMPLETE_OPTS: &str = "\
-    --bind=ctrl-z:ignore \
-    --exit-0 \
-    --height=35% \
-    --inline-info \
-    --no-sort \
-    --reverse \
-    --select-1";
-
 #[derive(Debug, Eq, PartialEq)]
 pub struct Opts<'a> {
     pub cmd: Option<&'a str>,

@@ -19,6 +19,19 @@ impl Fzf {
         command.arg("-n2..").stdin(Stdio::piped()).stdout(Stdio::piped());
         if let Some(fzf_opts) = config::fzf_opts() {
             command.env("FZF_DEFAULT_OPTS", fzf_opts);
+        } else {
+            command.args(&[
+                "--bind=ctrl-z:ignore",
+                "--exit-0",
+                "--height=35%",
+                "--inline-info",
+                "--no-sort",
+                "--reverse",
+                "--select-1",
+            ]);
+            if cfg!(unix) {
+                command.arg("--preview=ls -p {2}");
+            }
         }
 
         let child = match command.spawn() {

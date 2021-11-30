@@ -127,10 +127,8 @@ if [[ :"${SHELLOPTS}": =~ :(vi|emacs): && ${TERM} != 'dumb' ]]; then
         # If there is a space after the last word, use interactive selection.
         elif [[ -z ${COMP_WORDS[-1]} ]]; then
             \local result
-            result="$(
-                _ZO_FZF_OPTS='{{ crate::shell::FZF_COMPLETE_OPTS }}' \
-                    \builtin command zoxide query -i -- "${COMP_WORDS[@]:1}"
-            )" && COMPREPLY=("${__zoxide_z_prefix}${result}")
+            result="$(\builtin command zoxide query -i -- "${COMP_WORDS[@]:1}")" &&
+                COMPREPLY=("${__zoxide_z_prefix}${result}")
             \builtin printf '\e[5n'
         fi
     }

@@ -79,6 +79,7 @@ Alternatively, you can use a package manager:
 | Manjaro            |                         | `pacman -S zoxide`                                                                             |
 | NixOS              | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                                                                   |
 | Parrot OS          |                         | `apt install zoxide`                                                                           |
+| Raspbian 11+       | [Raspbian Packages]     | `apt install zoxide`                                                                           |
 | Ubuntu 21.04+      | [Ubuntu Packages]       | `apt install zoxide`                                                                           |
 | Void Linux         | [Void Linux Packages]   | `xbps-install -S zoxide`                                                                       |
 
@@ -376,6 +377,7 @@ They must be set before `zoxide init` is called.
 [pkgsrc]: https://pkgsrc.se/sysutils/zoxide
 [ranger-zoxide]: https://github.com/jchook/ranger-zoxide
 [ranger]: https://github.com/ranger/ranger
+[raspbian packages]: https://archive.raspbian.org/raspbian/pool/main/r/rust-zoxide/
 [releases]: https://github.com/ajeetdsouza/zoxide/releases
 [scoop]: https://github.com/ScoopInstaller/Main/tree/master/bucket/zoxide.json
 [telescope-zoxide]: https://github.com/jvgrootveld/telescope-zoxide

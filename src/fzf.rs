@@ -1,4 +1,4 @@
-use std::io;
+use std::io::{self, Read};
 use std::process::{Child, ChildStdin, Command, Stdio};
 
 use anyhow::{bail, Context, Result};
@@ -46,28 +46,21 @@ impl Fzf {
     }
 
     pub fn stdin(&mut self) -> &mut ChildStdin {
-        // unwrap is safe here because command.stdin() has been piped.
         self.child.stdin.as_mut().unwrap()
     }
 
-    pub fn wait_select(self) -> Result<String> {
-        let output = self.child.wait_with_output().context("wait failed on fzf")?;
+    pub fn select(mut self) -> Result<String> {
+        let mut output = String::new();
+        let stdout = self.child.stdout.as_mut().unwrap();
+        stdout.read_to_string(&mut output).context("failed to read from fzf")?;
 
-        match output.status.code() {
-            // normal exit
-            Some(0) => String::from_utf8(output.stdout).context("invalid unicode in fzf output"),
-
-            // no match
+        let status = self.child.wait().context("wait failed on fzf")?;
+        match status.code() {
+            Some(0) => Ok(output),
             Some(1) => bail!("no match found"),
-
-            // error
             Some(2) => bail!("fzf returned an error"),
-
-            // terminated by a signal
             Some(code @ 130) => bail!(SilentExit { code }),
             Some(128..=254) | None => bail!("fzf was terminated"),
-
-            // unknown
             _ => bail!("fzf returned an unknown error"),
         }
     }

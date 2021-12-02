@@ -1,10 +1,9 @@
-use std::io::Write;
+use std::io::{self, Write};
 
-use anyhow::{bail, Result};
+use anyhow::{bail, Context, Result};
 
 use crate::app::{Remove, Run};
 use crate::db::DatabaseFile;
-use crate::error::BrokenPipeHandler;
 use crate::fzf::Fzf;
 use crate::{config, util};
 
@@ -14,18 +13,25 @@ impl Run for Remove {
         let mut db = DatabaseFile::new(data_dir);
         let mut db = db.open()?;
 
-        let selection;
         match &self.interactive {
             Some(keywords) => {
                 let now = util::current_time()?;
                 let mut stream = db.stream(now).with_keywords(keywords);
 
                 let mut fzf = Fzf::new(true)?;
-                while let Some(dir) = stream.next() {
-                    writeln!(fzf.stdin(), "{}", dir.display_score(now)).pipe_exit("fzf")?;
-                }
+                let selection = loop {
+                    let dir = match stream.next() {
+                        Some(dir) => dir,
+                        None => break fzf.select()?,
+                    };
 
-                selection = fzf.wait_select()?;
+                    match writeln!(fzf.stdin(), "{}", dir.display_score(now)) {
+                        Ok(()) => (()),
+                        Err(e) if e.kind() == io::ErrorKind::BrokenPipe => break fzf.select()?,
+                        Err(e) => Err(e).context("could not write to fzf")?,
+                    }
+                };
+
                 let paths = selection.lines().filter_map(|line| line.get(5..));
                 for path in paths {
                     if !db.remove(path) {

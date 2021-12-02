@@ -11,12 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Better defaults for `fzf`.
+- fzf: better default options.
 
 ### Fixed
 
 - PowerShell: use global scope for aliases.
 - Zsh: fix errors with `set -eu`.
+- fzf: handle early selection.
 
 ## [0.7.9] - 2021-11-02
 

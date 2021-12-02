@@ -78,10 +78,10 @@ function __zoxide_z_complete
     set -l curr_tokens (commandline -cop)
 
     if test (count $tokens) -le 2 -a (count $curr_tokens) -eq 1
-        # If there is only one argument, use `cd` completions.
+        # If there are < 2 arguments, use `cd` completions.
         __fish_complete_directories "$tokens[2]" ''
-    else
-        # Otherwise, use interactive selection.
+    else if test (count $tokens) -eq (count $curr_tokens)
+        # If the last argument is empty, use interactive selection.
         set -l query $tokens[2..-1]
         set -l result (zoxide query -i -- $query)
         and commandline -p "$tokens[1] "(string escape $result)

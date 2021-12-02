@@ -1,4 +1,5 @@
 use std::io::{self, Read};
+use std::mem;
 use std::process::{Child, ChildStdin, Command, Stdio};
 
 use anyhow::{bail, Context, Result};
@@ -50,8 +51,11 @@ impl Fzf {
     }
 
     pub fn select(mut self) -> Result<String> {
+        // Drop stdin to prevent deadlock.
+        mem::drop(self.child.stdin.take());
+
+        let mut stdout = self.child.stdout.take().unwrap();
         let mut output = String::new();
-        let stdout = self.child.stdout.as_mut().unwrap();
         stdout.read_to_string(&mut output).context("failed to read from fzf")?;
 
         let status = self.child.wait().context("wait failed on fzf")?;

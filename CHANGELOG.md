@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - fzf: better default options.
+- fish: interactive completions are only triggered when the last argument is empty.
 
 ### Fixed
 

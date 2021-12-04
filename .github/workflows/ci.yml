@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest] # FIXME: macos-latest
     steps:
       - uses: actions/checkout@v2
 
@@ -28,5 +28,5 @@ jobs:
 
       - run: cargo xtask ci
         if: ${{ matrix.os == 'windows-latest' }}
-      - run: nix-shell --cores 0 --pure --run 'cargo xtask ci'
+      - run: nix-shell --cores 0 --pure --run 'rm -rf ~/.cargo/bin; cargo xtask ci'
         if: ${{ matrix.os != 'windows-latest' }}

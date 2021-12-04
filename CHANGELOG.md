@@ -9,16 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- Zsh: completions for `z` command.
+
 ### Changed
 
-- fzf: better default options.
-- fish: interactive completions are only triggered when the last argument is empty.
+- Fzf: better default options.
+- Fish: interactive completions are only triggered when the last argument is empty.
 
 ### Fixed
 
 - PowerShell: use global scope for aliases.
 - Zsh: fix errors with `set -eu`.
-- fzf: handle early selection.
+- Fzf: handle early selection.
 
 ## [0.7.9] - 2021-11-02
 

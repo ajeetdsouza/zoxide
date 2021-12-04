@@ -32,16 +32,17 @@ impl Query {
 
         if self.interactive {
             let mut fzf = Fzf::new(false)?;
+            let stdin = fzf.stdin();
+
             let selection = loop {
                 let dir = match stream.next() {
                     Some(dir) => dir,
                     None => break fzf.select()?,
                 };
 
-                match writeln!(fzf.stdin(), "{}", dir.display_score(now)) {
-                    Ok(()) => (()),
+                match writeln!(stdin, "{}", dir.display_score(now)) {
                     Err(e) if e.kind() == io::ErrorKind::BrokenPipe => break fzf.select()?,
-                    Err(e) => Err(e).context("could not write to fzf")?,
+                    result => result.context("could not write to fzf")?,
                 }
             };
 

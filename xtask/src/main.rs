@@ -87,7 +87,11 @@ fn run_fmt(nix_enabled: bool, check: bool) -> Result<()> {
 fn run_lint(nix_enabled: bool) -> Result<()> {
     // Run cargo-clippy.
     let color: &[&str] = if is_ci() { &["--color=always"] } else { &[] };
-    Command::new("cargo").args(&["clippy", "--all-features", "--all-targets"]).args(color)._run()?;
+    Command::new("cargo")
+        .args(&["clippy", "--all-features", "--all-targets"])
+        .args(color)
+        .args(&["--", "-Dwarnings"])
+        ._run()?;
 
     if nix_enabled {
         // Run cargo-audit.

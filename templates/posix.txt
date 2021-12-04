@@ -8,16 +8,16 @@
 # pwd based on the value of _ZO_RESOLVE_SYMLINKS.
 __zoxide_pwd() {
 {%- if resolve_symlinks %}
-    \pwd -P
+    \command pwd -P
 {%- else %}
-    \pwd -L
+    \command pwd -L
 {%- endif %}
 }
 
 # cd + custom logic based on the value of _ZO_ECHO.
 __zoxide_cd() {
     # shellcheck disable=SC2164
-    \cd "$@" {%- if echo %} && __zoxide_pwd {%- endif %}
+    \command cd "$@" {%- if echo %} && __zoxide_pwd {%- endif %}
 }
 
 {{ section }}
@@ -31,7 +31,7 @@ __zoxide_cd() {
 {%- when InitHook::Prompt -%}
 # Hook to add new entries to the database.
 __zoxide_hook() {
-    zoxide add -- "$(__zoxide_pwd)"
+    \command zoxide add -- "$(__zoxide_pwd || \builtin true)"
 }
 
 # Initialize hook.
@@ -40,7 +40,7 @@ if [ "${PS1:=}" = "${PS1#*\$(__zoxide_hook)}" ]; then
 fi
 
 {%- when InitHook::Pwd -%}
-\printf "%s\n%s\n" \
+\command printf "%s\n%s\n" \
     "zoxide: PWD hooks are not supported on POSIX shells." \
     "        Use 'zoxide init posix --hook prompt' instead."
 
@@ -60,19 +60,20 @@ __zoxide_z() {
             __zoxide_cd "${OLDPWD}"
         else
             # shellcheck disable=SC2016
-            \printf 'zoxide: $OLDPWD is not set'
+            \command printf 'zoxide: $OLDPWD is not set'
             return 1
         fi
     elif [ "$#" -eq 1 ] && [ -d "$1" ]; then
         __zoxide_cd "$1"
     else
-        __zoxide_result="$(zoxide query --exclude "$(__zoxide_pwd)" -- "$@")" && __zoxide_cd "${__zoxide_result}"
+        __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd || \builtin true)" -- "$@")" &&
+            __zoxide_cd "${__zoxide_result}"
     fi
 }
 
 # Jump to a directory using interactive search.
 __zoxide_zi() {
-    __zoxide_result="$(zoxide query -i -- "$@")" && __zoxide_cd "${__zoxide_result}"
+    __zoxide_result="$(\command zoxide query -i -- "$@")" && __zoxide_cd "${__zoxide_result}"
 }
 
 {{ section }}
@@ -84,10 +85,10 @@ __zoxide_zi() {
 
 # Remove definitions.
 __zoxide_unset() {
-    \unset -f "$@" >/dev/null 2>&1
-    \unset -v "$@" >/dev/null 2>&1
+    \command unset -f "$@" >/dev/null 2>&1
+    \command unset -v "$@" >/dev/null 2>&1
     # shellcheck disable=SC1001
-    \unalias "$@" >/dev/null 2>&1 || \:
+    \command unalias "$@" >/dev/null 2>&1 || \:
 }
 
 __zoxide_unset '{{cmd}}'

@@ -2,7 +2,7 @@
 authors = ["Ajeet D'Souza <98ajeet@gmail.com>"]
 categories = ["command-line-utilities", "filesystem"]
 description = "A smarter cd command for your terminal"
-edition = "2018"
+edition = "2021"
 keywords = ["cli"]
 license = "MIT"
 name = "zoxide"

@@ -33,15 +33,17 @@ zoxide works on all major shells.
 ![Tutorial][tutorial]
 
 ```sh
-z foo        # cd into highest ranked directory matching foo
-z foo bar    # cd into highest ranked directory matching foo and bar
+z foo              # cd into highest ranked directory matching foo
+z foo bar          # cd into highest ranked directory matching foo and bar
 
-z ~/foo      # z also works like a regular cd command
-z foo/       # cd into relative path
-z ..         # cd one level up
-z -          # cd into previous directory
+z ~/foo            # z also works like a regular cd command
+z foo/             # cd into relative path
+z ..               # cd one level up
+z -                # cd into previous directory
 
-zi foo       # cd with interactive selection (using fzf)
+zi foo             # cd with interactive selection (using fzf)
+
+z foo<SPACE><TAB>  # show interactive completions (zoxide v0.7.10+, bash/fish/zsh only)
 ```
 
 Read more about the matching algorithm [here][algorithm-matching].
@@ -231,6 +233,8 @@ Add this to your configuration (usually `~/.zshrc`):
 eval "$(zoxide init zsh)"
 ```
 
+For completions to work, this line must be added _after_ calling `compinit`.
+
 </details>
 
 <details>
@@ -347,16 +351,16 @@ They must be set before `zoxide init` is called.
 [algorithm-matching]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#matching
 [alpine linux packages]: https://pkgs.alpinelinux.org/packages?name=zoxide
 [arch linux community]: https://archlinux.org/packages/community/x86_64/zoxide/
-[builtwithnix-badge]: https://img.shields.io/badge/builtwith-nix-7d81f7
+[builtwithnix-badge]: https://img.shields.io/badge/builtwith-nix-7d81f7?style=flat-square
 [builtwithnix]: https://builtwithnix.org/
 [chocolatey]: https://community.chocolatey.org/packages/zoxide
 [conda-forge]: https://anaconda.org/conda-forge/zoxide
 [copr]: https://copr.fedorainfracloud.org/coprs/atim/zoxide/
-[crates.io-badge]: https://img.shields.io/crates/v/zoxide
+[crates.io-badge]: https://img.shields.io/crates/v/zoxide?style=flat-square
 [crates.io]: https://crates.io/crates/zoxide
 [debian packages]: https://packages.debian.org/stable/admin/zoxide
 [devuan packages]: https://pkginfo.devuan.org/cgi-bin/package-query.html?c=package&q=zoxide
-[downloads-badge]: https://img.shields.io/github/downloads/ajeetdsouza/zoxide/total
+[downloads-badge]: https://img.shields.io/github/downloads/ajeetdsouza/zoxide/total?style=flat-square
 [dports]: https://github.com/DragonFlyBSD/DPorts/tree/master/sysutils/zoxide
 [emacs]: https://www.gnu.org/software/emacs/
 [fedora packages]: https://src.fedoraproject.org/rpms/rust-zoxide

@@ -32,7 +32,7 @@ function __zoxide_cd() {
 {%- if hook == InitHook::Prompt %}
 function __zoxide_hook() {
     \builtin local -r retval="$?"
-    \builtin command zoxide add -- "$(__zoxide_pwd)"
+    \command zoxide add -- "$(__zoxide_pwd || \builtin true)"
     return "${retval}"
 }
 {%- else if hook == InitHook::Pwd %}
@@ -40,10 +40,11 @@ __zoxide_oldpwd="$(__zoxide_pwd)"
 
 function __zoxide_hook() {
     \builtin local -r retval="$?"
-    \builtin local -r pwd_tmp="$(__zoxide_pwd)"
+    \builtin local pwd_tmp
+    pwd_tmp="$(__zoxide_pwd)"
     if [[ ${__zoxide_oldpwd} != "${pwd_tmp}" ]]; then
         __zoxide_oldpwd="${pwd_tmp}"
-        \builtin command zoxide add -- "${__zoxide_oldpwd}"
+        \command zoxide add -- "${__zoxide_oldpwd}"
     fi
     return "${retval}"
 }
@@ -76,14 +77,15 @@ function __zoxide_z() {
         __zoxide_cd "${result:2}"
     else
         \builtin local result
-        result="$(\builtin command zoxide query --exclude "$(__zoxide_pwd)" -- "$@")" && __zoxide_cd "${result}"
+        result="$(\command zoxide query --exclude "$(__zoxide_pwd || \builtin true)" -- "$@")" &&
+            __zoxide_cd "${result}"
     fi
 }
 
 # Jump to a directory using interactive search.
 function __zoxide_zi() {
     \builtin local result
-    result="$(\builtin command zoxide query -i -- "$@")" && __zoxide_cd "${result}"
+    result="$(\command zoxide query -i -- "$@")" && __zoxide_cd "${result}"
 }
 
 {{ section }}
@@ -123,11 +125,12 @@ if [[ :"${SHELLOPTS}": =~ :(vi|emacs): && ${TERM} != 'dumb' ]]; then
 
         # If there is only one argument, use `cd` completions.
         if [[ {{ "${#COMP_WORDS[@]}" }} -eq 2 ]]; then
-            \builtin mapfile -t COMPREPLY < <(compgen -A directory -S / -- "${COMP_WORDS[-1]}")
+            \builtin mapfile -t COMPREPLY < \
+                <(\builtin compgen -A directory -S / -- "${COMP_WORDS[-1]}" || \builtin true)
         # If there is a space after the last word, use interactive selection.
         elif [[ -z ${COMP_WORDS[-1]} ]]; then
-            \local result
-            result="$(\builtin command zoxide query -i -- "${COMP_WORDS[@]:1}")" &&
+            \builtin local result
+            result="$(\command zoxide query -i -- "{{ "${COMP_WORDS[@]:1:${#COMP_WORDS[@]}-2}" }}")" &&
                 COMPREPLY=("${__zoxide_z_prefix}${result}")
             \builtin printf '\e[5n'
         fi

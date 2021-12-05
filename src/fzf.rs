@@ -24,7 +24,7 @@ impl Fzf {
             command.args(&[
                 "--bind=ctrl-z:ignore",
                 "--exit-0",
-                "--height=35%",
+                "--height=40%",
                 "--inline-info",
                 "--no-sort",
                 "--reverse",

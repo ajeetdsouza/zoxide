@@ -30,7 +30,7 @@ function __zoxide_cd() {
 {% else -%}
 # Hook to add new entries to the database.
 function __zoxide_hook() {
-    zoxide add -- "$(__zoxide_pwd)"
+    \command zoxide add -- "$(__zoxide_pwd || \builtin true)"
 }
 
 # Initialize hook.
@@ -52,29 +52,29 @@ fi
 
 # Jump to a directory using only keywords.
 function __zoxide_z() {
-    if [ "$#" -eq 0 ]; then
+    if [[ "$#" -eq 0 ]]; then
         __zoxide_cd ~
-    elif [ "$#" -eq 1 ] && [ "$1" = '-' ]; then
-        if [ -n "${OLDPWD}" ]; then
+    elif [[ "$#" -eq 1 ]] && [[ "$1" = '-' ]]; then
+        if [[ -n "${OLDPWD}" ]]; then
             __zoxide_cd "${OLDPWD}"
         else
             # shellcheck disable=SC2016
             \builtin printf 'zoxide: $OLDPWD is not set'
             return 1
         fi
-    elif [ "$#" -eq 1 ] && [ -d "$1" ]; then
+    elif [[ "$#" -eq 1 ]] && [[ -d "$1" ]]; then
         __zoxide_cd "$1"
     else
         \builtin local result
-        result="$(zoxide query --exclude "$(__zoxide_pwd)" -- "$@")" \
-            && __zoxide_cd "${result}"
+        result="$(\command zoxide query --exclude "$(__zoxide_pwd || \builtin true)" -- "$@")" &&
+            __zoxide_cd "${result}"
     fi
 }
 
 # Jump to a directory using interactive search.
 function __zoxide_zi() {
     \builtin local result
-    result="$(zoxide query -i -- "$@")" && __zoxide_cd "${result}"
+    result="$(\command zoxide query -i -- "$@")" && __zoxide_cd "${result}"
 }
 
 {{ section }}
@@ -86,8 +86,8 @@ function __zoxide_zi() {
 
 # Remove definitions.
 function __zoxide_unset() {
-    \builtin unalias "$@" &>/dev/null || true
-    \builtin unfunction "$@" &>/dev/null || true
+    \builtin unalias "$@" &>/dev/null || \builtin true
+    \builtin unfunction "$@" &>/dev/null || \builtin true
     \builtin unset "$@" &>/dev/null
 }
 
@@ -100,6 +100,43 @@ __zoxide_unset '{{cmd}}i'
 function {{cmd}}i() {
     __zoxide_zi "$@"
 }
+
+if [[ -o zle ]]; then
+  function _{{cmd}}() {
+    \builtin local buffer tokens
+    # shellcheck disable=SC2034,SC2153,SC2154
+    buffer="${BUFFER}."
+    # shellcheck disable=SC2206,SC2296
+    tokens=(${(Q)${(z)buffer}})
+
+    if [[ "{{ "${#tokens[@]}" }}" -eq 2 ]]; then
+        _files -/
+    elif [[ "${tokens[-1]}" == '.' ]]; then
+        \builtin printf '\e[5n'
+    fi
+  }
+
+  function _{{cmd}}_helper() {
+    \builtin local tokens result
+    # shellcheck disable=SC2154,SC2206,SC2296
+    tokens=(${(Q)${(z)BUFFER}})
+    # shellcheck disable=SC2086
+    if result="$(\command zoxide query -i -- ${tokens[2,-1]})"; then
+      # shellcheck disable=SC2034
+      RBUFFER=''
+      # shellcheck disable=SC2034,SC2296
+      LBUFFER="${tokens[1]} ${(q-)result}"
+    fi
+    \builtin zle reset-prompt
+  }
+
+  \builtin zle -N _{{cmd}}_helper
+  \builtin bindkey "\e[0n" _{{cmd}}_helper
+  if [[ "${+functions[compdef]}" -ne 0 ]]; then
+    \compdef -d {{cmd}}
+    \compdef _{{cmd}} {{cmd}}
+  fi
+fi
 
 {%- when None %}
 

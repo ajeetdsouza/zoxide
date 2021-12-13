@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PowerShell: use global scope for aliases.
 - Zsh: fix errors with `set -eu`.
 - Fzf: handle early selection.
+- PowerShell: correctly handle escape characters in paths.
 
 ## [0.7.9] - 2021-11-02
 

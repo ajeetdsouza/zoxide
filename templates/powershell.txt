@@ -7,17 +7,19 @@
 
 # pwd based on zoxide's format.
 function __zoxide_pwd {
-    $__zoxide_pwd = Get-Location
-    if ($__zoxide_pwd.Provider.Name -eq "FileSystem") {
-        $__zoxide_pwd.ProviderPath
+    $cwd = Get-Location
+    if ($cwd.Provider.Name -eq "FileSystem") {
+        $cwd.ProviderPath
     }
 }
 
 # cd + custom logic based on the value of _ZO_ECHO.
 function __zoxide_cd($dir) {
-    Set-Location $dir -ea Stop
 {%- if echo %}
-    $(Get-Location).Path
+    $dir = Set-Location -LiteralPath $dir -Passthru -ErrorAction Stop
+    Write-Output $dir.Path
+{%- else %}
+    Set-Location -LiteralPath $dir -ErrorAction Stop
 {%- endif %}
 }
 

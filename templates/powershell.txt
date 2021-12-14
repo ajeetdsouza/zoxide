@@ -14,12 +14,14 @@ function __zoxide_pwd {
 }
 
 # cd + custom logic based on the value of _ZO_ECHO.
-function __zoxide_cd($dir) {
+function __zoxide_cd($dir, $literal) {
+    $dir = if ($literal) {
+        Set-Location -LiteralPath $dir -Passthru -ErrorAction Stop
+    } else {
+        Set-Location -Path $dir -Passthru -ErrorAction Stop
+    }
 {%- if echo %}
-    $dir = Set-Location -LiteralPath $dir -Passthru -ErrorAction Stop
     Write-Output $dir.Path
-{%- else %}
-    Set-Location -LiteralPath $dir -ErrorAction Stop
 {%- endif %}
 }
 
@@ -72,13 +74,13 @@ if ($__zoxide_hooked -ne 1) {
 # Jump to a directory using only keywords.
 function __zoxide_z {
     if ($args.Length -eq 0) {
-        __zoxide_cd ~
+        __zoxide_cd ~ $true
     }
-    elseif ($args.Length -eq 1 -and $args[0] -eq '-') {
-        __zoxide_cd -
-    }
-    elseif ($args.Length -eq 1 -and (Test-Path $args[0] -PathType Container)) {
-        __zoxide_cd $args[0]
+    elseif (
+        $args.Length -eq 1 -and
+        (($args[0] -eq '-' -or $args[0] -eq '+') -or (Test-Path $args[0] -PathType Container))
+    ) {
+        __zoxide_cd $args[0] $false
     }
     else {
         $result = __zoxide_pwd
@@ -89,7 +91,7 @@ function __zoxide_z {
             $result = zoxide query -- @args
         }
         if ($LASTEXITCODE -eq 0) {
-            __zoxide_cd $result
+            __zoxide_cd $result $true
         }
     }
 }
@@ -98,7 +100,7 @@ function __zoxide_z {
 function __zoxide_zi {
     $result = zoxide query -i -- @args
     if ($LASTEXITCODE -eq 0) {
-        __zoxide_cd $result
+        __zoxide_cd $result $true
     }
 }
 
@@ -122,4 +124,4 @@ Set-Alias -Name {{cmd}}i -Value __zoxide_zi -Option AllScope -Scope Global -Forc
 # To initialize zoxide, add this to your configuration (find it by running
 # `echo $profile` in PowerShell):
 #
-# Invoke-Expression (& { $hook = if ($PSVersionTable.PSVersion.Major -ge 6) { 'pwd' } else { 'prompt' } (zoxide init powershell --hook $hook) -join "`n" })
+# Invoke-Expression (& { $hook = if ($PSVersionTable.PSVersion.Major -ge 6) { 'pwd' } else { 'prompt' } (zoxide init powershell --hook $hook | Out-String) })

@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fzf: better default options.
 - Fish: interactive completions are only triggered when the last argument is empty.
+- PowerShell: installation instructions.
 
 ### Fixed
 

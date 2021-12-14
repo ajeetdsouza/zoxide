@@ -21,7 +21,7 @@ jobs:
           components: rustfmt, clippy
           profile: minimal
           override: true
-      - uses: cachix/install-nix-action@v12
+      - uses: cachix/install-nix-action@v15
         if: ${{ matrix.os != 'windows-latest' }}
         with:
           nix_path: nixpkgs=https://github.com/NixOS/nixpkgs/archive/20.09.tar.gz

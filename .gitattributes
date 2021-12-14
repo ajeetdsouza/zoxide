@@ -1,2 +1,5 @@
-contrib/completions/* linguist-generated=true
-contrib/completions/README.md linguist-generated=false
+/contrib/completions/* eol=lf linguist-generated=true text
+/contrib/completions/README.md -eol -linguist-generated -text
+/init.fish eol=lf text
+/templates/*.txt eol=lf text
+/zoxide.plugin.zsh eol=lf text

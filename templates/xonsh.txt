@@ -105,9 +105,7 @@ if "__zoxide_hook" not in globals():
             check=False,
             env=__zoxide_env(),
         )
-
-
-{% endif -%}
+{% endif %}
 
 {{ section }}
 # When using zoxide with --no-aliases, alias these internal functions as

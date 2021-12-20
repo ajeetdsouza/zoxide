@@ -172,7 +172,6 @@ const completion: Fig.Spec = {
       ],
       args: {
         name: "keywords",
-        isVariadic: true,
         isOptional: true,
       },
     },
@@ -184,7 +183,6 @@ const completion: Fig.Spec = {
           name: ["-i", "--interactive"],
           args: {
             name: "interactive",
-            isVariadic: true,
             isOptional: true,
           },
         },
@@ -199,7 +197,6 @@ const completion: Fig.Spec = {
       ],
       args: {
         name: "paths",
-        isVariadic: true,
         isOptional: true,
         template: "folders",
       },

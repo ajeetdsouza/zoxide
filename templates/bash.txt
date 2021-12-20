@@ -66,15 +66,17 @@ __zoxide_z_prefix='z#'
 
 # Jump to a directory using only keywords.
 function __zoxide_z() {
+    # shellcheck disable=SC2199
     if [[ $# -eq 0 ]]; then
         __zoxide_cd ~
     elif [[ $# -eq 1 && $1 == '-' ]]; then
         __zoxide_cd "${OLDPWD}"
     elif [[ $# -eq 1 && -d $1 ]]; then
         __zoxide_cd "$1"
-    elif [[ ${*: -1} == "${__zoxide_z_prefix}"* ]]; then
-        \builtin local result="${*: -1}"
-        __zoxide_cd "${result:2}"
+    elif [[ ${@: -1} == "${__zoxide_z_prefix}"* ]]; then
+        # shellcheck disable=SC2124
+        \builtin local result="${@: -1}"
+        __zoxide_cd "{{ "${result:${#__zoxide_z_prefix}}" }}"
     else
         \builtin local result
         result="$(\command zoxide query --exclude "$(__zoxide_pwd || \builtin true)" -- "$@")" &&
@@ -113,15 +115,17 @@ function {{cmd}}i() {
 }
 
 # Load completions.
-# Completions require line editing. Since Bash supports only two modes of line
-# editing (`vim` and `emacs`), we check if one of them is enabled.
-if [[ :"${SHELLOPTS}": =~ :(vi|emacs): && ${TERM} != 'dumb' ]]; then
+# - Bash 4.0+ is needed to use `mapfile`.
+# - Completions require line editing. Since Bash supports only two modes of
+#   line editing (`vim` and `emacs`), we check if either them is enabled.
+# - Completions don't work on `dumb` terminals.
+if [[ ${BASH_VERSINFO:-0} -ge 4 && :"${SHELLOPTS}": =~ :(vi|emacs): && ${TERM} != 'dumb' ]]; then
     # Use `printf '\e[5n'` to redraw line after fzf closes.
     \builtin bind '"\e[0n": redraw-current-line' &>/dev/null
 
     function _{{cmd}}() {
         # Only show completions when the cursor is at the end of the line.
-        [[ {{ "${#COMP_LINE}" }} -eq ${COMP_POINT} ]] || return
+        [[ {{ "${#COMP_WORDS[@]}" }} -eq $((COMP_CWORD + 1)) ]] || return
 
         # If there is only one argument, use `cd` completions.
         if [[ {{ "${#COMP_WORDS[@]}" }} -eq 2 ]]; then
@@ -131,7 +135,7 @@ if [[ :"${SHELLOPTS}": =~ :(vi|emacs): && ${TERM} != 'dumb' ]]; then
         elif [[ -z ${COMP_WORDS[-1]} ]]; then
             \builtin local result
             result="$(\command zoxide query -i -- "{{ "${COMP_WORDS[@]:1:${#COMP_WORDS[@]}-2}" }}")" &&
-                COMPREPLY=("${__zoxide_z_prefix}${result}")
+                COMPREPLY=("${__zoxide_z_prefix}${result@Q}")
             \builtin printf '\e[5n'
         fi
     }

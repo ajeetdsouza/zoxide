@@ -79,8 +79,8 @@ _arguments "${_arguments_options[@]}" \
 ;;
 (remove)
 _arguments "${_arguments_options[@]}" \
-'()-i+[]:keywords: ' \
-'()--interactive=[]:keywords: ' \
+'()*-i+[]:keywords: ' \
+'()*--interactive=[]:keywords: ' \
 '-h[Print help information]' \
 '--help[Print help information]' \
 '-V[Print version information]' \

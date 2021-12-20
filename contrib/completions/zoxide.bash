@@ -9,7 +9,7 @@ _zoxide() {
     for i in ${COMP_WORDS[@]}
     do
         case "${i}" in
-            zoxide)
+            "$1")
                 cmd="zoxide"
                 ;;
             add)

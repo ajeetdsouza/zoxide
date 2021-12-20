@@ -31,7 +31,7 @@ impl Fzf {
                 "--select-1",
             ]);
             if cfg!(unix) {
-                command.arg("--preview=ls -p {2}");
+                command.arg("--preview=ls -p {2..}");
             }
         }
 

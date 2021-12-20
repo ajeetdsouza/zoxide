@@ -50,8 +50,11 @@ fi
 # desired.
 #
 
+__zoxide_z_prefix='z#'
+
 # Jump to a directory using only keywords.
 function __zoxide_z() {
+    # shellcheck disable=SC2199
     if [[ "$#" -eq 0 ]]; then
         __zoxide_cd ~
     elif [[ "$#" -eq 1 ]] && [[ "$1" = '-' ]]; then
@@ -64,6 +67,10 @@ function __zoxide_z() {
         fi
     elif [[ "$#" -eq 1 ]] && [[ -d "$1" ]]; then
         __zoxide_cd "$1"
+    elif [[ "$@[-1]" == "${__zoxide_z_prefix}"* ]]; then
+        # shellcheck disable=SC2124
+        \builtin local result="${@[-1]}"
+        __zoxide_cd "{{ "${result:${#__zoxide_z_prefix}}" }}"
     else
         \builtin local result
         result="$(\command zoxide query --exclude "$(__zoxide_pwd || \builtin true)" -- "$@")" &&
@@ -91,51 +98,51 @@ function __zoxide_unset() {
     \builtin unset "$@" &>/dev/null
 }
 
-__zoxide_unset '{{cmd}}'
+__zoxide_unset {{cmd}}
 function {{cmd}}() {
     __zoxide_z "$@"
 }
 
-__zoxide_unset '{{cmd}}i'
+__zoxide_unset {{cmd}}i
 function {{cmd}}i() {
     __zoxide_zi "$@"
 }
 
 if [[ -o zle ]]; then
-  function _{{cmd}}() {
-    \builtin local buffer tokens
-    # shellcheck disable=SC2034,SC2153,SC2154
-    buffer="${BUFFER}."
-    # shellcheck disable=SC2206,SC2296
-    tokens=(${(Q)${(z)buffer}})
+    __zoxide_unset _{{cmd}}
+    function _{{cmd}}() {
+        # Only show completions when the cursor is at the end of the line.
+        # shellcheck disable=SC2154
+        [[ "{{ "${#words[@]}" }}" -eq "${CURRENT}" ]] || return
 
-    if [[ "{{ "${#tokens[@]}" }}" -eq 2 ]]; then
-        _files -/
-    elif [[ "${tokens[-1]}" == '.' ]]; then
-        \builtin printf '\e[5n'
+        if [[ "{{ "${#words[@]}" }}" -eq 2 ]]; then
+            _files -/
+        elif [[ "${words[-1]}" == '' ]]; then
+            \builtin local result
+            # shellcheck disable=SC2086
+            if result="$(\command zoxide query -i -- ${words[2,-1]})"; then
+                __zoxide_result="${result}"
+            else
+                __zoxide_result=''
+            fi
+            \builtin printf '\e[5n'
+        fi
+    }
+
+    __zoxide_unset _{{cmd}}_helper
+    function _{{cmd}}_helper() {
+        \builtin local result="${__zoxide_z_prefix}${__zoxide_result}"
+        # shellcheck disable=SC2296
+        [[ -n "${__zoxide_result}" ]] && LBUFFER="${LBUFFER}${(q-)result}"
+        \builtin zle reset-prompt
+    }
+
+    \builtin zle -N _{{cmd}}_helper
+    \builtin bindkey "\e[0n" _{{cmd}}_helper
+    if [[ "${+functions[compdef]}" -ne 0 ]]; then
+        \compdef -d {{cmd}}
+        \compdef _{{cmd}} {{cmd}}
     fi
-  }
-
-  function _{{cmd}}_helper() {
-    \builtin local tokens result
-    # shellcheck disable=SC2154,SC2206,SC2296
-    tokens=(${(Q)${(z)BUFFER}})
-    # shellcheck disable=SC2086
-    if result="$(\command zoxide query -i -- ${tokens[2,-1]})"; then
-      # shellcheck disable=SC2034
-      RBUFFER=''
-      # shellcheck disable=SC2034,SC2296
-      LBUFFER="${tokens[1]} ${(q-)result}"
-    fi
-    \builtin zle reset-prompt
-  }
-
-  \builtin zle -N _{{cmd}}_helper
-  \builtin bindkey "\e[0n" _{{cmd}}_helper
-  if [[ "${+functions[compdef]}" -ne 0 ]]; then
-    \compdef -d {{cmd}}
-    \compdef _{{cmd}} {{cmd}}
-  fi
 fi
 
 {%- when None %}

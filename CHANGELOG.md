@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fzf: handle early selection.
 - PowerShell: correctly handle escape characters in paths.
 - Parse error on Cygwin/MSYS due to CRLF line endings.
+- Fzf: handle spaces correctly in preview window.
+- Bash: avoid initializing completions on older versions.
 
 ## [0.7.9] - 2021-11-02
 

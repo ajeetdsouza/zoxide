@@ -50,8 +50,11 @@ fi
 # desired.
 #
 
+__zoxide_z_prefix='z#'
+
 # Jump to a directory using only keywords.
 function __zoxide_z() {
+    # shellcheck disable=SC2199
     if [[ "$#" -eq 0 ]]; then
         __zoxide_cd ~
     elif [[ "$#" -eq 1 ]] && [[ "$1" = '-' ]]; then
@@ -64,6 +67,10 @@ function __zoxide_z() {
         fi
     elif [[ "$#" -eq 1 ]] && [[ -d "$1" ]]; then
         __zoxide_cd "$1"
+    elif [[ "$@[-1]" == "${__zoxide_z_prefix}"* ]]; then
+        # shellcheck disable=SC2124
+        \builtin local result="${@[-1]}"
+        __zoxide_cd "{{ "${result:${#__zoxide_z_prefix}}" }}"
     else
         \builtin local result
         result="$(\command zoxide query --exclude "$(__zoxide_pwd || \builtin true)" -- "$@")" &&
@@ -103,30 +110,28 @@ function {{cmd}}i() {
 
 if [[ -o zle ]]; then
   function _{{cmd}}() {
-    \builtin local buffer tokens
-    # shellcheck disable=SC2034,SC2153,SC2154
-    buffer="${BUFFER}."
-    # shellcheck disable=SC2206,SC2296
-    tokens=(${(Q)${(z)buffer}})
+    # Only show completions when the cursor is at the end of the line.
+    # shellcheck disable=SC2154
+    [[ "{{ "${#words[@]}" }}" -eq "${CURRENT}" ]] || return
 
-    if [[ "{{ "${#tokens[@]}" }}" -eq 2 ]]; then
+    if [[ "{{ "${#words[@]}" }}" -eq 2 ]]; then
         _files -/
-    elif [[ "${tokens[-1]}" == '.' ]]; then
+    elif [[ "${words[-1]}" == '' ]]; then
+        \builtin local result
+        # shellcheck disable=SC2086
+        if result="$(\command zoxide query -i -- ${words[2,-1]})"; then
+            __zoxide_result="${result}"
+        else
+            __zoxide_result=''
+        fi
         \builtin printf '\e[5n'
     fi
   }
 
   function _{{cmd}}_helper() {
-    \builtin local tokens result
-    # shellcheck disable=SC2154,SC2206,SC2296
-    tokens=(${(Q)${(z)BUFFER}})
-    # shellcheck disable=SC2086
-    if result="$(\command zoxide query -i -- ${tokens[2,-1]})"; then
-      # shellcheck disable=SC2034
-      RBUFFER=''
-      # shellcheck disable=SC2034,SC2296
-      LBUFFER="${tokens[1]} ${(q-)result}"
-    fi
+    \builtin local result="${__zoxide_z_prefix}${__zoxide_result}"
+    # shellcheck disable=SC2296
+    [[ -n "${__zoxide_result}" ]] && LBUFFER="${LBUFFER}${(q-)result}"
     \builtin zle reset-prompt
   }
 

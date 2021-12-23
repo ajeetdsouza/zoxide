@@ -216,6 +216,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Increased default value of `$_ZO_MAXAGE` to `10000`.
 - Symlinks are treated as separate directories by default, this can be changed
   by setting `_ZO_RESOLVE_SYMLINKS=1`.
+- Moved manpages to `man/man1/*.1`.
 
 ### Removed
 

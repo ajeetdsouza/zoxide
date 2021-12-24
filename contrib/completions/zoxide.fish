@@ -23,6 +23,6 @@ complete -c zoxide -n "__fish_seen_subcommand_from query" -s l -l list -d 'List 
 complete -c zoxide -n "__fish_seen_subcommand_from query" -s s -l score -d 'Print score with results'
 complete -c zoxide -n "__fish_seen_subcommand_from query" -s h -l help -d 'Print help information'
 complete -c zoxide -n "__fish_seen_subcommand_from query" -s V -l version -d 'Print version information'
-complete -c zoxide -n "__fish_seen_subcommand_from remove" -s i -l interactive -r
+complete -c zoxide -n "__fish_seen_subcommand_from remove" -s i -l interactive -d 'Use interactive selection'
 complete -c zoxide -n "__fish_seen_subcommand_from remove" -s h -l help -d 'Print help information'
 complete -c zoxide -n "__fish_seen_subcommand_from remove" -s V -l version -d 'Print version information'

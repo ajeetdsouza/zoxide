@@ -126,14 +126,6 @@ _zoxide() {
                 return 0
             fi
             case "${prev}" in
-                --interactive)
-                    COMPREPLY=($(compgen -f "${cur}"))
-                    return 0
-                    ;;
-                -i)
-                    COMPREPLY=($(compgen -f "${cur}"))
-                    return 0
-                    ;;
                 *)
                     COMPREPLY=()
                     ;;

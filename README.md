@@ -240,7 +240,8 @@ Add this to your configuration (usually `~/.zshrc`):
 eval "$(zoxide init zsh)"
 ```
 
-For completions to work, this line must be added _after_ calling `compinit`.
+For completions to work, the above line must be added _after_ `compinit` is
+called.
 
 </details>
 

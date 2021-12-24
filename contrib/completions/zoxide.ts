@@ -181,10 +181,7 @@ const completion: Fig.Spec = {
       options: [
         {
           name: ["-i", "--interactive"],
-          args: {
-            name: "interactive",
-            isOptional: true,
-          },
+          description: "Use interactive selection",
         },
         {
           name: ["-h", "--help"],

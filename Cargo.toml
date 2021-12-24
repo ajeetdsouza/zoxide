@@ -8,7 +8,7 @@ license = "MIT"
 name = "zoxide"
 repository = "https://github.com/ajeetdsouza/zoxide"
 rust-version = "1.56"
-version = "0.7.9"
+version = "0.8.0"
 
 [badges]
 maintenance = { status = "actively-developed" }

@@ -1,11 +1,11 @@
 use std::io::{self, Read};
 use std::mem;
-use std::process::{Child, ChildStdin, Command, Stdio};
+use std::process::{Child, ChildStdin, Stdio};
 
 use anyhow::{bail, Context, Result};
 
-use crate::config;
-use crate::error::SilentExit;
+use crate::error::{FzfNotFound, SilentExit};
+use crate::{config, util};
 
 pub struct Fzf {
     child: Child,
@@ -13,7 +13,8 @@ pub struct Fzf {
 
 impl Fzf {
     pub fn new(multiple: bool) -> Result<Self> {
-        let mut command = Command::new("fzf");
+        let bin = if cfg!(windows) { "fzf.exe" } else { "fzf" };
+        let mut command = util::get_command(bin).map_err(|_| FzfNotFound)?;
         if multiple {
             command.arg("-m");
         }
@@ -37,9 +38,7 @@ impl Fzf {
 
         let child = match command.spawn() {
             Ok(child) => child,
-            Err(e) if e.kind() == io::ErrorKind::NotFound => {
-                bail!("could not find fzf, is it installed?")
-            }
+            Err(e) if e.kind() == io::ErrorKind::NotFound => bail!(FzfNotFound),
             Err(e) => Err(e).context("could not launch fzf")?,
         };
 

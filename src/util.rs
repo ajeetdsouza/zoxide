@@ -1,5 +1,6 @@
 use std::env;
 use std::path::{Component, Path, PathBuf};
+use std::process::Command;
 use std::time::SystemTime;
 
 use anyhow::{bail, Context, Result};
@@ -19,6 +20,35 @@ pub fn current_time() -> Result<Epoch> {
         SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).context("system clock set to invalid time")?.as_secs();
 
     Ok(current_time)
+}
+
+/// Constructs a new [`Command`] for launching the program with the name
+/// `program`.
+///
+/// On Windows, CreateProcess implicitly searches the current working directory
+/// for the executable, which is a potential security issue. Instead, we resolve
+/// the path to the executable and then pass it to CreateProcess.
+///
+/// On other platforms, this is a no-op.
+///
+pub fn get_command<P: AsRef<Path>>(program: P) -> Result<Command> {
+    let program = program.as_ref();
+    if !cfg!(windows) {
+        return Ok(Command::new(program));
+    }
+
+    let paths = env::var_os("PATH").context("PATH environment variable not set")?;
+    for path in env::split_paths(&paths) {
+        if path.as_os_str().is_empty() {
+            continue;
+        }
+        let path = path.join(program);
+        if path.metadata().map_or(false, |m| !m.is_dir()) {
+            return Ok(Command::new(path));
+        }
+    }
+
+    bail!("executable not found in PATH: {}", program.display());
 }
 
 pub fn path_to_str<P: AsRef<Path>>(path: &P) -> Result<&str> {

@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Parse error on Cygwin/MSYS due to CRLF line endings.
 - Fzf: handle spaces correctly in preview window.
 - Bash: avoid initializing completions on older versions.
+- Fzf: avoid launching binary from current directory on Windows.
 
 ## [0.7.9] - 2021-11-02
 

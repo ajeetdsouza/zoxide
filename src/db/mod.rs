@@ -120,6 +120,12 @@ impl<'file> Database<'file> {
     }
 }
 
+#[cfg(unix)]
+fn persist<P: AsRef<Path>>(file: NamedTempFile, path: P) -> Result<(), PersistError> {
+    file.persist(path)?;
+    Ok(())
+}
+
 #[cfg(windows)]
 fn persist<P: AsRef<Path>>(mut file: NamedTempFile, path: P) -> Result<(), PersistError> {
     use std::thread;
@@ -149,12 +155,6 @@ fn persist<P: AsRef<Path>>(mut file: NamedTempFile, path: P) -> Result<(), Persi
         }
     }
 
-    Ok(())
-}
-
-#[cfg(unix)]
-fn persist<P: AsRef<Path>>(file: NamedTempFile, path: P) -> Result<(), PersistError> {
-    file.persist(path)?;
     Ok(())
 }
 

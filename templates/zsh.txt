@@ -109,8 +109,8 @@ function {{cmd}}i() {
 }
 
 if [[ -o zle ]]; then
-    __zoxide_unset _{{cmd}}
-    function _{{cmd}}() {
+    __zoxide_unset __zoxide_z_complete
+    function __zoxide_z_complete() {
         # Only show completions when the cursor is at the end of the line.
         # shellcheck disable=SC2154
         [[ "{{ "${#words[@]}" }}" -eq "${CURRENT}" ]] || return
@@ -129,19 +129,19 @@ if [[ -o zle ]]; then
         fi
     }
 
-    __zoxide_unset _{{cmd}}_helper
-    function _{{cmd}}_helper() {
+    __zoxide_unset __zoxide_z_complete_helper
+    function __zoxide_z_complete_helper() {
         \builtin local result="${__zoxide_z_prefix}${__zoxide_result}"
         # shellcheck disable=SC2296
         [[ -n "${__zoxide_result}" ]] && LBUFFER="${LBUFFER}${(q-)result}"
         \builtin zle reset-prompt
     }
 
-    \builtin zle -N _{{cmd}}_helper
-    \builtin bindkey "\e[0n" _{{cmd}}_helper
+    \builtin zle -N __zoxide_z_complete_helper
+    \builtin bindkey "\e[0n" __zoxide_z_complete_helper
     if [[ "${+functions[compdef]}" -ne 0 ]]; then
         \compdef -d {{cmd}}
-        \compdef _{{cmd}} {{cmd}}
+        \compdef __zoxide_z_complete {{cmd}}
     fi
 fi
 

@@ -123,7 +123,7 @@ if [[ ${BASH_VERSINFO:-0} -ge 4 && :"${SHELLOPTS}": =~ :(vi|emacs): && ${TERM} !
     # Use `printf '\e[5n'` to redraw line after fzf closes.
     \builtin bind '"\e[0n": redraw-current-line' &>/dev/null
 
-    function _{{cmd}}() {
+    function __zoxide_z_complete() {
         # Only show completions when the cursor is at the end of the line.
         [[ {{ "${#COMP_WORDS[@]}" }} -eq $((COMP_CWORD + 1)) ]] || return
 
@@ -140,7 +140,7 @@ if [[ ${BASH_VERSINFO:-0} -ge 4 && :"${SHELLOPTS}": =~ :(vi|emacs): && ${TERM} !
         fi
     }
 
-    \builtin complete -F _{{cmd}} -o nospace -- {{cmd}}
+    \builtin complete -F __zoxide_z_complete -o nospace -- {{cmd}}
 fi
 
 {%- when None %}

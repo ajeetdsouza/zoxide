@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - manpages: moved to `man/man1/*.1`.
 
+### Fixed
+
+- Rename `_z` completion function to avoid conflicts with other shell plugins.
+
 ## [0.8.0] - 2021-12-25
 
 ### Added

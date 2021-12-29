@@ -74,8 +74,8 @@ end
 
 # Completions for `z`.
 function __zoxide_z_complete
-    set -l tokens (commandline -op)
-    set -l curr_tokens (commandline -cop)
+    set -l tokens (commandline --current-process --tokenize)
+    set -l curr_tokens (commandline --cut-at-cursor --current-process --tokenize)
 
     if test (count $tokens) -le 2 -a (count $curr_tokens) -eq 1
         # If there are < 2 arguments, use `cd` completions.

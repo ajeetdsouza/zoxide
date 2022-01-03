@@ -6,6 +6,6 @@ publish = false
 
 [dependencies]
 anyhow = "1.0.32"
-clap = { version = "=3.0.0-rc.8", features = ["derive"] }
+clap = { version = "3.0.0", features = ["derive"] }
 ignore = "0.4.18"
 shell-words = "1.0.0"

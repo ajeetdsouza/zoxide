@@ -37,9 +37,9 @@ fn generate_completions() -> io::Result<()> {
 
     use app::App;
     use clap::IntoApp;
-    use clap_generate::generate_to;
-    use clap_generate::generators::{Bash, Elvish, Fish, PowerShell, Zsh};
-    use clap_generate_fig::Fig;
+    use clap_complete::generate_to;
+    use clap_complete::Shell::{Bash, Elvish, Fish, PowerShell, Zsh};
+    use clap_complete_fig::Fig;
 
     let app = &mut App::into_app();
     let bin_name = env!("CARGO_PKG_NAME");

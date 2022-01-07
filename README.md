@@ -64,7 +64,7 @@ To install zoxide, run this command in your terminal:
 curl -sS https://webinstall.dev/zoxide | bash
 ```
 
-Alternatively, you can use a package manager:
+The above installs `webi`, `pathman`, `envman`, and makes changes to your `~/.bashrc` and/or `~/.zshrc`. For a less intrusive option, use a package manager:
 
 | Distribution       | Repository              | Instructions                                                                                   |
 | ------------------ | ----------------------- | ---------------------------------------------------------------------------------------------- |

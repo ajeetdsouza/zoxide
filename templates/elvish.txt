@@ -9,7 +9,7 @@ use path
 #
 
 # cd + custom logic based on the value of _ZO_ECHO.
-fn __zoxide_cd [path]{
+fn __zoxide_cd {|path|
     builtin:cd $path
 {%- if echo %}
     builtin:echo $pwd
@@ -22,7 +22,7 @@ fn __zoxide_cd [path]{
 
 # Initialize hook to track previous directory.
 var oldpwd = $builtin:pwd
-set builtin:before-chdir = [$@builtin:before-chdir [_]{ edit:add-var oldpwd $builtin:pwd }]
+set builtin:before-chdir = [$@builtin:before-chdir {|_| edit:add-var oldpwd $builtin:pwd }]
 
 # Initialize hook to add directories to zoxide.
 {%- if hook == InitHook::None %}
@@ -32,9 +32,9 @@ set builtin:before-chdir = [$@builtin:before-chdir [_]{ edit:add-var oldpwd $bui
 if (builtin:not (builtin:eq $E:__zoxide_shlvl $E:SHLVL)) {
     set E:__zoxide_shlvl = $E:SHLVL
 {%- if hook == InitHook::Prompt %}
-    set edit:before-readline = [$@edit:before-readline []{ zoxide add -- $pwd }]
+    set edit:before-readline = [$@edit:before-readline {|| zoxide add -- $pwd }]
 {%- else if hook == InitHook::Pwd %}
-    set builtin:after-chdir = [$@builtin:after-chdir [_]{ zoxide add -- $pwd }]
+    set builtin:after-chdir = [$@builtin:after-chdir {|_| zoxide add -- $pwd }]
 {%- endif %}
 }
 
@@ -46,7 +46,7 @@ if (builtin:not (builtin:eq $E:__zoxide_shlvl $E:SHLVL)) {
 #
 
 # Jump to a directory using only keywords.
-fn __zoxide_z [@rest]{
+fn __zoxide_z {|@rest|
     if (builtin:eq [] $rest) {
         __zoxide_cd ~
     } elif (builtin:eq [-] $rest) {
@@ -66,7 +66,7 @@ fn __zoxide_z [@rest]{
 edit:add-var __zoxide_z~ $__zoxide_z~
 
 # Jump to a directory using interactive search.
-fn __zoxide_zi [@rest]{
+fn __zoxide_zi {|@rest|
     var path
     try {
         set path = (zoxide query -i -- $@rest)
@@ -90,12 +90,12 @@ edit:add-var {{cmd}}i~ $__zoxide_zi~
 # Load completions.
 {# zoxide-based completions are currently not possible, because Elvish only
  # prints a completion if the current token is a prefix of it. -#}
-fn __zoxide_z_complete [@rest]{
+fn __zoxide_z_complete {|@rest|
     if (!= (builtin:count $rest) 2) {
         builtin:return
     }
     edit:complete-filename $rest[1] |
-        builtin:each [completion]{
+        builtin:each {|completion|
             var dir = $completion[stem]
             if (path:is-dir $dir) {
                 builtin:put $dir
@@ -116,4 +116,4 @@ set edit:completion:arg-completer[{{cmd}}] = $__zoxide_z_complete~
 #
 #   eval (zoxide init elvish | slurp)
 #
-# Note: zoxide only supports elvish v0.16.0 and above.
+# Note: zoxide only supports elvish v0.17.0 and above.

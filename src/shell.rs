@@ -315,7 +315,12 @@ mod tests {
         let mut source = Xonsh(&opts).render().unwrap();
         source.push('\n');
 
-        Command::new("pylint").args(&["--from-stdin", "zoxide"]).write_stdin(source).assert().success().stderr("");
+        Command::new("pylint")
+            .args(&["--from-stdin", "--persistent=n", "zoxide"])
+            .write_stdin(source)
+            .assert()
+            .success()
+            .stderr("");
     }
 
     #[rstest]

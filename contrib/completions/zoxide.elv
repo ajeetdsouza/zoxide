@@ -2,11 +2,11 @@
 use builtin;
 use str;
 
-set edit:completion:arg-completer[zoxide] = [@words]{
-    fn spaces [n]{
+set edit:completion:arg-completer[zoxide] = {|@words|
+    fn spaces {|n|
         builtin:repeat $n ' ' | str:join ''
     }
-    fn cand [text desc]{
+    fn cand {|text desc|
         edit:complex-candidate $text &display=$text' '(spaces (- 14 (wcswidth $text)))$desc
     }
     var command = 'zoxide'

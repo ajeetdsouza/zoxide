@@ -25,11 +25,11 @@ impl Fzf {
             command.args(&[
                 "--bind=ctrl-z:ignore",
                 "--exit-0",
+                "--select-1",
                 "--height=40%",
                 "--info=inline",
                 "--no-sort",
                 "--reverse",
-                "--select-1",
             ]);
             if cfg!(unix) {
                 command.arg("--preview=ls -p {2..}");

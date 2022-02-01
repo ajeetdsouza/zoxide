@@ -26,7 +26,7 @@ impl Fzf {
                 "--bind=ctrl-z:ignore",
                 "--exit-0",
                 "--height=40%",
-                "--inline-info",
+                "--info=inline",
                 "--no-sort",
                 "--reverse",
                 "--select-1",

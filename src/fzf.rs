@@ -30,6 +30,7 @@ impl Fzf {
                 "--info=inline",
                 "--no-sort",
                 "--reverse",
+                "--keep-right"
             ]);
             if cfg!(unix) {
                 command.arg("--preview=ls -p {2..}");

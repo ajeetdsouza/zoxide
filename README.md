@@ -260,7 +260,8 @@ eval "$(zoxide init posix --hook prompt)"
 ### *Step 3: Install fzf (optional)*
 
 [fzf] is a command-line fuzzy finder, used by zoxide for interactive
-selection. It can be installed from [here][fzf-installation].
+selection. It can be installed from [here][fzf-installation]. zoxide supports
+fzf v0.21.0+.
 
 ### *Step 4: Import your data (optional)*
 

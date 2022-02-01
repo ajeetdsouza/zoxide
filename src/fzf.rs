@@ -23,13 +23,19 @@ impl Fzf {
             command.env("FZF_DEFAULT_OPTS", fzf_opts);
         } else {
             command.args(&[
-                "--bind=ctrl-z:ignore",
-                "--exit-0",
-                "--height=40%",
-                "--inline-info",
+                // Search result
                 "--no-sort",
-                "--reverse",
+                // Interface
+                "--keep-right",
+                // Layout
+                "--height=40%",
+                "--info=inline",
+                "--layout=reverse",
+                // Scripting
+                "--exit-0",
                 "--select-1",
+                // Key/Event bindings
+                "--bind=ctrl-z:ignore",
             ]);
             if cfg!(unix) {
                 command.arg("--preview=ls -p {2..}");

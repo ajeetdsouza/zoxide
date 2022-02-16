@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use clap::{AppSettings, ArgEnum, Parser, ValueHint};
+use clap::{ArgEnum, Parser, ValueHint};
 
 const ENV_HELP: &str = "ENVIRONMENT VARIABLES:
     _ZO_DATA_DIR            Path for zoxide data files
@@ -16,11 +16,11 @@ const ENV_HELP: &str = "ENVIRONMENT VARIABLES:
     about,
     author,
     after_help = ENV_HELP,
-    global_setting(AppSettings::DisableHelpSubcommand),
-    global_setting(AppSettings::PropagateVersion),
+    disable_help_subcommand = true,
+    propagate_version = true,
     version = option_env!("ZOXIDE_VERSION").unwrap_or_default()
 )]
-pub enum App {
+pub enum Cmd {
     Add(Add),
     Import(Import),
     Init(Init),

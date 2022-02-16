@@ -32,25 +32,25 @@ fn git_version() -> Option<String> {
 }
 
 fn generate_completions() -> io::Result<()> {
-    #[path = "src/app/_app.rs"]
-    mod app;
+    #[path = "src/cmd/_cmd.rs"]
+    mod cmd;
 
-    use app::App;
-    use clap::IntoApp;
+    use clap::CommandFactory;
     use clap_complete::generate_to;
-    use clap_complete::Shell::{Bash, Elvish, Fish, PowerShell, Zsh};
+    use clap_complete::shells::{Bash, Elvish, Fish, PowerShell, Zsh};
     use clap_complete_fig::Fig;
+    use cmd::Cmd;
 
-    let app = &mut App::into_app();
+    let cmd = &mut Cmd::command();
     let bin_name = env!("CARGO_PKG_NAME");
     let out_dir = "contrib/completions";
 
-    generate_to(Bash, app, bin_name, out_dir)?;
-    generate_to(Elvish, app, bin_name, out_dir)?;
-    generate_to(Fig, app, bin_name, out_dir)?;
-    generate_to(Fish, app, bin_name, out_dir)?;
-    generate_to(PowerShell, app, bin_name, out_dir)?;
-    generate_to(Zsh, app, bin_name, out_dir)?;
+    generate_to(Bash, cmd, bin_name, out_dir)?;
+    generate_to(Elvish, cmd, bin_name, out_dir)?;
+    generate_to(Fig, cmd, bin_name, out_dir)?;
+    generate_to(Fish, cmd, bin_name, out_dir)?;
+    generate_to(PowerShell, cmd, bin_name, out_dir)?;
+    generate_to(Zsh, cmd, bin_name, out_dir)?;
 
     Ok(())
 }

@@ -1,4 +1,4 @@
-use crate::app::InitHook;
+use crate::cmd::InitHook;
 
 #[derive(Debug, Eq, PartialEq)]
 pub struct Opts<'a> {

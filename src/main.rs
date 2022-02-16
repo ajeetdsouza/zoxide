@@ -1,4 +1,4 @@
-mod app;
+mod cmd;
 mod config;
 mod db;
 mod error;
@@ -11,7 +11,7 @@ use std::{env, process};
 
 use clap::Parser;
 
-use crate::app::{App, Run};
+use crate::cmd::{Cmd, Run};
 use crate::error::SilentExit;
 
 pub fn main() {
@@ -19,7 +19,7 @@ pub fn main() {
     env::remove_var("RUST_LIB_BACKTRACE");
     env::remove_var("RUST_BACKTRACE");
 
-    if let Err(e) = App::parse().run() {
+    if let Err(e) = Cmd::parse().run() {
         match e.downcast::<SilentExit>() {
             Ok(SilentExit { code }) => process::exit(code),
             Err(e) => {

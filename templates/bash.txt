@@ -115,11 +115,12 @@ function {{cmd}}i() {
 }
 
 # Load completions.
-# - Bash 4.0+ is needed to use `mapfile`.
+# - Bash 4.4+ is required to use `@Q`.
 # - Completions require line editing. Since Bash supports only two modes of
 #   line editing (`vim` and `emacs`), we check if either them is enabled.
 # - Completions don't work on `dumb` terminals.
-if [[ ${BASH_VERSINFO:-0} -ge 4 && :"${SHELLOPTS}": =~ :(vi|emacs): && ${TERM} != 'dumb' ]]; then
+if [[ ${BASH_VERSINFO[0]:-0} -eq 4 && ${BASH_VERSINFO[1]:-0} -ge 4 || ${BASH_VERSINFO[0]:-0} -ge 5 ]] &&
+    [[ :"${SHELLOPTS}": =~ :(vi|emacs): && ${TERM} != 'dumb' ]]; then
     # Use `printf '\e[5n'` to redraw line after fzf closes.
     \builtin bind '"\e[0n": redraw-current-line' &>/dev/null
 

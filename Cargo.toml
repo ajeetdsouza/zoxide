@@ -7,7 +7,7 @@ keywords = ["cli"]
 license = "MIT"
 name = "zoxide"
 repository = "https://github.com/ajeetdsouza/zoxide"
-rust-version = "1.56"
+rust-version = "1.59"
 version = "0.8.0"
 
 [badges]
@@ -51,4 +51,4 @@ nix = []
 [profile.release]
 codegen-units = 1
 lto = true
-# strip = true
+strip = true

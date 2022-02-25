@@ -13,9 +13,9 @@ dependencies = [
 
 [[package]]
 name = "anyhow"
-version = "1.0.53"
+version = "1.0.55"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "94a45b455c14666b85fc40a019e8ab9eb75e3a124e05494f5397122bc9eb06e0"
+checksum = "159bb86af3a200e19a068f4224eae4c8bb2d0fa054c7e5d1cacd5cef95e684cd"
 
 [[package]]
 name = "askama"
@@ -125,9 +125,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "clap"
-version = "3.1.0"
+version = "3.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e5f1fea81f183005ced9e59cdb01737ef2423956dac5a6d731b06b2ecfaa3467"
+checksum = "5177fac1ab67102d8989464efd043c6ff44191b1557ec1ddd489b4f7e1447e77"
 dependencies = [
  "atty",
  "bitflags",
@@ -161,9 +161,9 @@ dependencies = [
 
 [[package]]
 name = "clap_derive"
-version = "3.1.0"
+version = "3.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5fd1122e63869df2cb309f449da1ad54a7c6dfeb7c7e6ccd8e0825d9eb93bb72"
+checksum = "01d42c94ce7c2252681b5fed4d3627cc807b13dfc033246bd05d5b252399000e"
 dependencies = [
  "heck",
  "proc-macro-error",
@@ -243,9 +243,9 @@ checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 
 [[package]]
 name = "getrandom"
-version = "0.2.4"
+version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "418d37c8b1d42553c93648be529cb70f920d3baf8ef469b74b9638df426e0b4c"
+checksum = "d39cd93900197114fa1fcb7ae84ca742095eed9442088988ae74fa744e930e77"
 dependencies = [
  "cfg-if",
  "libc",
@@ -346,9 +346,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
-version = "0.2.118"
+version = "0.2.119"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "06e509672465a0504304aa87f9f176f2b2b716ed8fb105ebe5c02dc6dce96a94"
+checksum = "1bf2e165bb3457c8e098ea76f3e3bc9db55f87aa90d52d0e6be741470916aaa4"
 
 [[package]]
 name = "log"
@@ -602,9 +602,9 @@ dependencies = [
 
 [[package]]
 name = "semver"
-version = "1.0.5"
+version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0486718e92ec9a68fbed73bb5ef687d71103b142595b406835649bebd33f72c7"
+checksum = "a4a3381e03edd24287172047536f20cabde766e2cd3e65e6b00fb3af51c4f38d"
 
 [[package]]
 name = "serde"

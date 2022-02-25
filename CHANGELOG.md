@@ -11,8 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- manpages: moved to `man/man1/*.1`.
-- fzf: added `--keep-right` option by default, upgraded minimum version to v0.21.0.
+- Manpages: moved to `man/man1/*.1`.
+- Fzf: added `--keep-right` option by default, upgraded minimum version to v0.21.0.
+- Bash: only enable completions on 4.4+.
 
 ### Fixed
 

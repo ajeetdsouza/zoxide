@@ -320,7 +320,7 @@ They must be set before `zoxide init` is called.
     | ----------- | ---------------------------------------- | ------------------------------------------ |
     | Linux / BSD | `$XDG_DATA_HOME` or `$HOME/.local/share` | `/home/alice/.local/share`                 |
     | macOS       | `$HOME/Library/Application Support`      | `/Users/Alice/Library/Application Support` |
-    | Windows     | `{FOLDERID_RoamingAppData}`              | `C:\Users\Alice\AppData\Roaming`           |
+    | Windows     | `%LOCALAPPDATA%`                         | `C:\Users\Alice\AppData\Local`             |
 - `_ZO_ECHO`
   - When set to 1, `z` will print the matched directory before navigating to
     it.

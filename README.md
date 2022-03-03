@@ -346,16 +346,18 @@ They must be set before `zoxide init` is called.
 
 ## Third-party integrations
 
-| Application        | Description                             | Plugin                     |
-| ------------------ | --------------------------------------- | -------------------------- |
-| [emacs]            | Text editor                             | [zoxide.el]                |
-| [nnn]              | File manager                            | [nnn-autojump]             |
-| [ranger]           | File manager                            | [ranger-zoxide]            |
-| [telescope.nvim]   | Fuzzy finder for Neovim                 | [telescope-zoxide]         |
-| [vim]              | Text editor                             | [zoxide.vim]               |
-| [xplr]             | File manager                            | [zoxide.xplr]              |
-| [xxh]              | Transports shell configuration over SSH | [xxh-plugin-prerun-zoxide] |
-| [zsh-autocomplete] | Realtime completions for zsh            | Supported by default       |
+| Application        | Description                                  | Plugin                     |
+| ------------------ | -------------------------------------------- | -------------------------- |
+| [clink]            | Improved cmd.exe for Windows                 | [clink-zoxide]             |
+| [emacs]            | Text editor                                  | [zoxide.el]                |
+| [nnn]              | File manager                                 | [nnn-autojump]             |
+| [ranger]           | File manager                                 | [ranger-zoxide]            |
+| [telescope.nvim]   | Fuzzy finder for Neovim                      | [telescope-zoxide]         |
+| [vim]              | Text editor                                  | [zoxide.vim]               |
+| [xplr]             | File manager                                 | [zoxide.xplr]              |
+| [xxh]              | Transports shell configuration over SSH      | [xxh-plugin-prerun-zoxide] |
+| [zabb]             | Finds the shortest possible query for a path | Natively supported         |
+| [zsh-autocomplete] | Realtime completions for zsh                 | Natively supported         |
 
 [algorithm-aging]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#aging
 [algorithm-matching]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#matching
@@ -364,6 +366,8 @@ They must be set before `zoxide init` is called.
 [builtwithnix-badge]: https://img.shields.io/badge/builtwith-nix-7d81f7?style=flat-square
 [builtwithnix]: https://builtwithnix.org/
 [chocolatey]: https://community.chocolatey.org/packages/zoxide
+[clink-zoxide]: https://github.com/shunsambongi/clink-zoxide
+[clink]: https://github.com/mridgers/clink
 [conda-forge]: https://anaconda.org/conda-forge/zoxide
 [copr]: https://copr.fedorainfracloud.org/coprs/atim/zoxide/
 [crates.io-badge]: https://img.shields.io/crates/v/zoxide?style=flat-square
@@ -405,6 +409,7 @@ They must be set before `zoxide init` is called.
 [xplr]: https://github.com/sayanarijit/xplr
 [xxh-plugin-prerun-zoxide]: https://github.com/xxh/xxh-plugin-prerun-zoxide
 [xxh]: https://github.com/xxh/xxh
+[zabb]: https://github.com/Mellbourn/zabb
 [zoxide.el]: https://gitlab.com/Vonfry/zoxide.el
 [zoxide.vim]: https://github.com/nanotee/zoxide.vim
 [zoxide.xplr]: https://github.com/sayanarijit/zoxide.xplr

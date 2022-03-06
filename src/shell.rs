@@ -38,16 +38,22 @@ mod tests {
     use askama::Template;
     use assert_cmd::Command;
     use rstest::rstest;
+    use rstest_reuse::{apply, template};
 
     use super::*;
 
+    #[template]
     #[rstest]
-    fn bash_bash(
+    fn opts(
         #[values(None, Some("z"))] cmd: Option<&str>,
         #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
         #[values(false, true)] echo: bool,
         #[values(false, true)] resolve_symlinks: bool,
     ) {
+    }
+
+    #[apply(opts)]
+    fn bash_bash(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Bash(&opts).render().unwrap();
         Command::new("bash")
@@ -58,13 +64,8 @@ mod tests {
             .stderr("");
     }
 
-    #[rstest]
-    fn bash_shellcheck(
-        #[values(None, Some("z"))] cmd: Option<&str>,
-        #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
-        #[values(false, true)] echo: bool,
-        #[values(false, true)] resolve_symlinks: bool,
-    ) {
+    #[apply(opts)]
+    fn bash_shellcheck(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Bash(&opts).render().unwrap();
 
@@ -77,13 +78,8 @@ mod tests {
             .stderr("");
     }
 
-    #[rstest]
-    fn bash_shfmt(
-        #[values(None, Some("z"))] cmd: Option<&str>,
-        #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
-        #[values(false, true)] echo: bool,
-        #[values(false, true)] resolve_symlinks: bool,
-    ) {
+    #[apply(opts)]
+    fn bash_shfmt(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let mut source = Bash(&opts).render().unwrap();
         source.push('\n');
@@ -97,13 +93,8 @@ mod tests {
             .stderr("");
     }
 
-    #[rstest]
-    fn elvish_elvish(
-        #[values(None, Some("z"))] cmd: Option<&str>,
-        #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
-        #[values(false, true)] echo: bool,
-        #[values(false, true)] resolve_symlinks: bool,
-    ) {
+    #[apply(opts)]
+    fn elvish_elvish(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let mut source = String::new();
 
@@ -117,13 +108,8 @@ mod tests {
         Command::new("elvish").args(&["-c", &source, "-norc"]).assert().success().stdout("").stderr("");
     }
 
-    #[rstest]
-    fn fish_fish(
-        #[values(None, Some("z"))] cmd: Option<&str>,
-        #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
-        #[values(false, true)] echo: bool,
-        #[values(false, true)] resolve_symlinks: bool,
-    ) {
+    #[apply(opts)]
+    fn fish_fish(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Fish(&opts).render().unwrap();
 
@@ -139,13 +125,8 @@ mod tests {
             .stderr("");
     }
 
-    #[rstest]
-    fn fish_fishindent(
-        #[values(None, Some("z"))] cmd: Option<&str>,
-        #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
-        #[values(false, true)] echo: bool,
-        #[values(false, true)] resolve_symlinks: bool,
-    ) {
+    #[apply(opts)]
+    fn fish_fishindent(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let mut source = Fish(&opts).render().unwrap();
         source.push('\n');
@@ -162,13 +143,8 @@ mod tests {
             .stderr("");
     }
 
-    #[rstest]
-    fn nushell_nushell(
-        #[values(None, Some("z"))] cmd: Option<&str>,
-        #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
-        #[values(false, true)] echo: bool,
-        #[values(false, true)] resolve_symlinks: bool,
-    ) {
+    #[apply(opts)]
+    fn nushell_nushell(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Nushell(&opts).render().unwrap();
 
@@ -183,13 +159,8 @@ mod tests {
         }
     }
 
-    #[rstest]
-    fn posix_bash(
-        #[values(None, Some("z"))] cmd: Option<&str>,
-        #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
-        #[values(false, true)] echo: bool,
-        #[values(false, true)] resolve_symlinks: bool,
-    ) {
+    #[apply(opts)]
+    fn posix_bash(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Posix(&opts).render().unwrap();
 
@@ -203,13 +174,8 @@ mod tests {
         }
     }
 
-    #[rstest]
-    fn posix_dash(
-        #[values(None, Some("z"))] cmd: Option<&str>,
-        #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
-        #[values(false, true)] echo: bool,
-        #[values(false, true)] resolve_symlinks: bool,
-    ) {
+    #[apply(opts)]
+    fn posix_dash(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Posix(&opts).render().unwrap();
 
@@ -219,13 +185,8 @@ mod tests {
         }
     }
 
-    #[rstest]
-    fn posix_shellcheck_(
-        #[values(None, Some("z"))] cmd: Option<&str>,
-        #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
-        #[values(false, true)] echo: bool,
-        #[values(false, true)] resolve_symlinks: bool,
-    ) {
+    #[apply(opts)]
+    fn posix_shellcheck_(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Posix(&opts).render().unwrap();
 
@@ -238,13 +199,8 @@ mod tests {
             .stderr("");
     }
 
-    #[rstest]
-    fn posix_shfmt(
-        #[values(None, Some("z"))] cmd: Option<&str>,
-        #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
-        #[values(false, true)] echo: bool,
-        #[values(false, true)] resolve_symlinks: bool,
-    ) {
+    #[apply(opts)]
+    fn posix_shfmt(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let mut source = Posix(&opts).render().unwrap();
         source.push('\n');
@@ -258,13 +214,8 @@ mod tests {
             .stderr("");
     }
 
-    #[rstest]
-    fn powershell_pwsh(
-        #[values(None, Some("z"))] cmd: Option<&str>,
-        #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
-        #[values(false, true)] echo: bool,
-        #[values(false, true)] resolve_symlinks: bool,
-    ) {
+    #[apply(opts)]
+    fn powershell_pwsh(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let mut source = "Set-StrictMode -Version latest\n".to_string();
         Powershell(&opts).render_into(&mut source).unwrap();
@@ -277,13 +228,8 @@ mod tests {
             .stderr("");
     }
 
-    #[rstest]
-    fn xonsh_black(
-        #[values(None, Some("z"))] cmd: Option<&str>,
-        #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
-        #[values(false, true)] echo: bool,
-        #[values(false, true)] resolve_symlinks: bool,
-    ) {
+    #[apply(opts)]
+    fn xonsh_black(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let mut source = Xonsh(&opts).render().unwrap();
         source.push('\n');
@@ -291,26 +237,16 @@ mod tests {
         Command::new("black").args(&["--check", "--diff", "-"]).write_stdin(source).assert().success().stdout("");
     }
 
-    #[rstest]
-    fn xonsh_mypy(
-        #[values(None, Some("z"))] cmd: Option<&str>,
-        #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
-        #[values(false, true)] echo: bool,
-        #[values(false, true)] resolve_symlinks: bool,
-    ) {
+    #[apply(opts)]
+    fn xonsh_mypy(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Xonsh(&opts).render().unwrap();
 
         Command::new("mypy").args(&["--command", &source, "--strict"]).assert().success().stderr("");
     }
 
-    #[rstest]
-    fn xonsh_pylint(
-        #[values(None, Some("z"))] cmd: Option<&str>,
-        #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
-        #[values(false, true)] echo: bool,
-        #[values(false, true)] resolve_symlinks: bool,
-    ) {
+    #[apply(opts)]
+    fn xonsh_pylint(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let mut source = Xonsh(&opts).render().unwrap();
         source.push('\n');
@@ -323,13 +259,8 @@ mod tests {
             .stderr("");
     }
 
-    #[rstest]
-    fn xonsh_xonsh(
-        #[values(None, Some("z"))] cmd: Option<&str>,
-        #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
-        #[values(false, true)] echo: bool,
-        #[values(false, true)] resolve_symlinks: bool,
-    ) {
+    #[apply(opts)]
+    fn xonsh_xonsh(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Xonsh(&opts).render().unwrap();
 
@@ -345,13 +276,8 @@ mod tests {
             .stderr("");
     }
 
-    #[rstest]
-    fn zsh_shellcheck(
-        #[values(None, Some("z"))] cmd: Option<&str>,
-        #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
-        #[values(false, true)] echo: bool,
-        #[values(false, true)] resolve_symlinks: bool,
-    ) {
+    #[apply(opts)]
+    fn zsh_shellcheck(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Zsh(&opts).render().unwrap();
 
@@ -365,13 +291,8 @@ mod tests {
             .stderr("");
     }
 
-    #[rstest]
-    fn zsh_zsh(
-        #[values(None, Some("z"))] cmd: Option<&str>,
-        #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
-        #[values(false, true)] echo: bool,
-        #[values(false, true)] resolve_symlinks: bool,
-    ) {
+    #[apply(opts)]
+    fn zsh_zsh(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Zsh(&opts).render().unwrap();
 

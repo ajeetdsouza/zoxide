@@ -1,3 +1,9 @@
+#![allow(clippy::single_component_path_imports)]
+
+// rstest_reuse must be imported at the top of the crate.
+#[cfg(test)]
+use rstest_reuse;
+
 mod cmd;
 mod config;
 mod db;

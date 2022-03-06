@@ -43,6 +43,7 @@ clap_complete_fig = "3.1.0"
 [dev-dependencies]
 assert_cmd = "2.0.0"
 rstest = "0.12.0"
+rstest_reuse = "0.3.0"
 
 [features]
 default = []

@@ -13,6 +13,7 @@
 
 [![crates.io][crates.io-badge]][crates.io]
 [![Downloads][downloads-badge]][releases]
+[![License][license-badge]][license]
 [![Built with Nix][builtwithnix-badge]][builtwithnix]
 
 zoxide is a **smarter cd command**, inspired by z and autojump.
@@ -243,8 +244,9 @@ Add this to your configuration (usually `~/.zshrc`):
 eval "$(zoxide init zsh)"
 ```
 
-For completions to work, the above line must be added _after_ `compinit` is
-called. You may have to rebuild your cache by running `rm ~/.zcompdump*; compinit`.
+For completions to work, the above line must be added *after* `compinit` is
+called. You may have to rebuild your cache by running
+`rm ~/.zcompdump*; compinit`.
 
 </details>
 
@@ -388,6 +390,8 @@ They must be set before `zoxide init` is called.
 [guru overlay]: https://github.com/gentoo-mirror/guru
 [homebrew]: https://formulae.brew.sh/formula/zoxide
 [issues]: https://github.com/ajeetdsouza/zoxide/issues/new
+[license-badge]: https://img.shields.io/github/license/ajeetdsouza/zoxide?color=lightgray&style=flat-square
+[license]: https://github.com/ajeetdsouza/zoxide/blob/main/LICENSE
 [linuxbrew]: https://formulae.brew.sh/formula-linux/zoxide
 [macports]: https://ports.macports.org/port/zoxide/summary
 [neovim]: https://github.com/neovim/neovim

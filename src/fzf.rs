@@ -38,7 +38,8 @@ impl Fzf {
                 "--bind=ctrl-z:ignore",
             ]);
             if cfg!(unix) {
-                command.arg("--preview=ls -p {2..}");
+                command.env("SHELL", "sh");
+                command.arg(r"--preview=\command -p ls -p {2..}");
             }
         }
 

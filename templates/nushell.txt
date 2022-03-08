@@ -25,7 +25,7 @@ let-env __zoxide_oldprompt = (if '__zoxide_oldprompt' in (env).name {
 
 # Hook to add new entries to the database.
 def __zoxide_hook [] {
-  zoxide add -- $nu.cwd
+  zoxide add -- $env.PWD
 }
 
 # Initialize hook.
@@ -51,11 +51,11 @@ def-env __zoxide_z [...rest:string] {
   let path = if ($rest | length) <= 1 && ($arg0 | path expand | path type) == dir {
     $arg0
   } else {
-    (zoxide query --exclude $nu.cwd -- $rest | str trim -r -c (char newline))
+    (zoxide query --exclude $env.PWD -- $rest | str trim -r -c (char newline))
   }
   cd $path
 {%- if echo %}
-  echo $nu.cwd
+  echo $env.PWD
 {%- endif %}
 }
 
@@ -63,7 +63,7 @@ def-env __zoxide_z [...rest:string] {
 def-env __zoxide_zi  [...rest:string] {
   cd $'(zoxide query -i -- $rest | str trim -r -c (char newline))'
 {%- if echo %}
-  echo $nu.cwd
+  echo $env.PWD
 {%- endif %}
 }
 
@@ -84,8 +84,13 @@ alias {{cmd}}i = __zoxide_zi
 {%- endmatch %}
 
 {{ section }}
-# To initialize zoxide, add this to your configuration (find it by running
-# `$nu.config-path` in Nushell):
+# To initialize zoxide, first generate the Nushell initialization script (you
+# may need to do this whenever you update Nushell):
+#
+#   zoxide init nushell --hook prompt | save ~/.zoxide.nu
+#
+# Now, add this to your configuration (find it by running `$nu.config-path` in
+# Nushell):
 #
 #   zoxide init nushell --hook prompt | save ~/.zoxide.nu
 #   source ~/.zoxide.nu

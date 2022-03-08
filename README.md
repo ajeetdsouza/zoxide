@@ -190,10 +190,17 @@ zoxide init fish | source
 <details>
 <summary>Nushell</summary>
 
-Add this to your configuration (find it by running `$nu.config-path` in
+First, generate the Nushell initialization script (you may need to do this
+whenever you update Nushell):
+
+```sh
+zoxide init nushell --hook prompt | save ~/.zoxide.nu
+```
+
+Now, add this to your configuration (find it by running `$nu.config-path` in
 Nushell):
 
-```text
+```sh
 zoxide init nushell --hook prompt | save ~/.zoxide.nu
 source ~/.zoxide.nu
 ```

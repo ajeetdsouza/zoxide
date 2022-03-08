@@ -32,6 +32,7 @@ impl Fzf {
                 "--select-1",
             ]);
             if cfg!(unix) {
+                command.env("SHELL", "sh");
                 command.arg(r"--preview=\command -p ls -p {2..}");
             }
         }

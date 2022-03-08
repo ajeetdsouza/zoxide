@@ -2,7 +2,7 @@ use std::io::{self, Write};
 
 use anyhow::{Context, Result};
 
-use crate::app::{Query, Run};
+use crate::cmd::{Query, Run};
 use crate::db::{Database, DatabaseFile};
 use crate::error::BrokenPipeHandler;
 use crate::fzf::Fzf;

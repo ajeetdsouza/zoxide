@@ -2,7 +2,7 @@ use std::path::Path;
 
 use anyhow::{bail, Result};
 
-use crate::app::{Add, Run};
+use crate::cmd::{Add, Run};
 use crate::db::DatabaseFile;
 use crate::{config, util};
 

@@ -12,13 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Manpages: moved to `man/man1/*.1`.
-- Fzf: added `--keep-right` option by default, upgraded minimum version to v0.21.0.
-- Bash: only enable completions on 4.4+.
 
 ### Fixed
 
-- Rename `_z` completion function to avoid conflicts with other shell plugins.
+- Bash/Zsh: rename `_z` completion function to avoid conflicts with other shell plugins.
 - Elvish: upgrade to new lambda syntax.
+- Fzf: added `--keep-right` option by default, upgraded minimum version to v0.21.0.
+- Bash: only enable completions on 4.4+.
+- Fzf: bypass `ls` alias in preview window.
 
 ## [0.8.0] - 2021-12-25
 

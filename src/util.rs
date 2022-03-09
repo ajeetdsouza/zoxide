@@ -1,11 +1,172 @@
 use std::env;
+use std::fs::{self, File, OpenOptions};
+use std::io::{self, Read, Write};
+use std::mem;
 use std::path::{Component, Path, PathBuf};
 use std::process::Command;
+use std::process::{Child, ChildStdin, Stdio};
 use std::time::SystemTime;
 
-use anyhow::{bail, Context, Result};
+use anyhow::{anyhow, bail, Context, Result};
 
+use crate::config;
 use crate::db::Epoch;
+use crate::error::SilentExit;
+
+pub struct Fzf {
+    child: Child,
+}
+
+impl Fzf {
+    const ERR_NOT_FOUND: &'static str = "could not find fzf, is it installed?";
+
+    pub fn new(multiple: bool) -> Result<Self> {
+        let bin = if cfg!(windows) { "fzf.exe" } else { "fzf" };
+        let mut command = get_command(bin).map_err(|_| anyhow!(Self::ERR_NOT_FOUND))?;
+        if multiple {
+            command.arg("-m");
+        }
+        command.arg("-n2..").stdin(Stdio::piped()).stdout(Stdio::piped());
+        if let Some(fzf_opts) = config::fzf_opts() {
+            command.env("FZF_DEFAULT_OPTS", fzf_opts);
+        } else {
+            command.args(&[
+                // Search result
+                "--no-sort",
+                // Interface
+                "--keep-right",
+                // Layout
+                "--height=40%",
+                "--info=inline",
+                "--layout=reverse",
+                // Scripting
+                "--exit-0",
+                "--select-1",
+                // Key/Event bindings
+                "--bind=ctrl-z:ignore",
+            ]);
+            if cfg!(unix) {
+                command.env("SHELL", "sh");
+                command.arg(r"--preview=\command -p ls -p {2..}");
+            }
+        }
+
+        let child = match command.spawn() {
+            Ok(child) => child,
+            Err(e) if e.kind() == io::ErrorKind::NotFound => bail!(Self::ERR_NOT_FOUND),
+            Err(e) => Err(e).context("could not launch fzf")?,
+        };
+
+        Ok(Fzf { child })
+    }
+
+    pub fn stdin(&mut self) -> &mut ChildStdin {
+        self.child.stdin.as_mut().unwrap()
+    }
+
+    pub fn select(mut self) -> Result<String> {
+        // Drop stdin to prevent deadlock.
+        mem::drop(self.child.stdin.take());
+
+        let mut stdout = self.child.stdout.take().unwrap();
+        let mut output = String::new();
+        stdout.read_to_string(&mut output).context("failed to read from fzf")?;
+
+        let status = self.child.wait().context("wait failed on fzf")?;
+        match status.code() {
+            Some(0) => Ok(output),
+            Some(1) => bail!("no match found"),
+            Some(2) => bail!("fzf returned an error"),
+            Some(code @ 130) => bail!(SilentExit { code }),
+            Some(128..=254) | None => bail!("fzf was terminated"),
+            _ => bail!("fzf returned an unknown error"),
+        }
+    }
+}
+
+/// Similar to [`fs::write`], but atomic (best effort on Windows).
+pub fn write<P: AsRef<Path>, C: AsRef<[u8]>>(path: P, contents: C) -> Result<()> {
+    let path = path.as_ref();
+    let contents = contents.as_ref();
+    let dir = path.parent().unwrap();
+
+    // Create a tmpfile.
+    let (mut tmp_file, tmp_path) = tmpfile(dir)?;
+    let result = (|| {
+        // Write to the tmpfile.
+        let _ = tmp_file.set_len(contents.len() as u64);
+        tmp_file.write_all(contents).with_context(|| format!("could not write to file: {}", tmp_path.display()))?;
+
+        // Set the owner of the tmpfile (UNIX only).
+        #[cfg(unix)]
+        if let Ok(metadata) = path.metadata() {
+            use nix::unistd::{self, Gid, Uid};
+            use std::os::unix::fs::MetadataExt;
+            use std::os::unix::io::AsRawFd;
+
+            let uid = Uid::from_raw(metadata.uid());
+            let gid = Gid::from_raw(metadata.gid());
+            let _ = unistd::fchown(tmp_file.as_raw_fd(), Some(uid), Some(gid));
+        }
+
+        // Close and rename the tmpfile.
+        mem::drop(tmp_file);
+        rename(&tmp_path, path)
+    })();
+    // In case of an error, delete the tmpfile.
+    if result.is_err() {
+        let _ = fs::remove_file(&tmp_path);
+    }
+    result
+}
+
+/// Atomically create a tmpfile in the given directory.
+fn tmpfile<P: AsRef<Path>>(dir: P) -> Result<(File, PathBuf)> {
+    const MAX_ATTEMPTS: usize = 5;
+    const TMP_NAME_LEN: usize = 16;
+    let dir = dir.as_ref();
+
+    let mut attempts = 0;
+    loop {
+        attempts += 1;
+
+        // Generate a random name for the tmpfile.
+        let mut name = String::with_capacity(TMP_NAME_LEN);
+        name.push_str("tmp_");
+        while name.len() < TMP_NAME_LEN {
+            name.push(fastrand::alphanumeric());
+        }
+        let path = dir.join(name);
+
+        // Atomically create the tmpfile.
+        match OpenOptions::new().write(true).create_new(true).open(&path) {
+            Ok(file) => break Ok((file, path)),
+            Err(e) if e.kind() == io::ErrorKind::AlreadyExists && attempts < MAX_ATTEMPTS => (),
+            Err(e) => break Err(e).with_context(|| format!("could not create file: {}", path.display())),
+        }
+    }
+}
+
+/// Similar to [`fs::rename`], but retries on Windows.
+fn rename<P: AsRef<Path>, Q: AsRef<Path>>(from: P, to: Q) -> Result<()> {
+    const MAX_ATTEMPTS: usize = 5;
+    let from = from.as_ref();
+    let to = to.as_ref();
+
+    if cfg!(windows) {
+        let mut attempts = 0;
+        loop {
+            attempts += 1;
+            match fs::rename(from, to) {
+                Err(e) if e.kind() == io::ErrorKind::PermissionDenied && attempts < MAX_ATTEMPTS => (),
+                result => break result,
+            }
+        }
+    } else {
+        fs::rename(from, to)
+    }
+    .with_context(|| format!("could not rename file: {} -> {}", from.display(), to.display()))
+}
 
 pub fn canonicalize<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
     dunce::canonicalize(path).with_context(|| format!("could not resolve path: {}", path.as_ref().display()))

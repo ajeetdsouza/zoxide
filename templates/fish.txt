@@ -84,8 +84,8 @@ function __zoxide_z_complete
         # If the last argument is empty, use interactive selection.
         set -l query $tokens[2..-1]
         set -l result (zoxide query -i -- $query)
-        and commandline -p "$tokens[1] "(string escape $result)
-        commandline -f repaint
+        commandline --current-process "$tokens[1] "(string escape $result)
+        commandline --function repaint
     end
 end
 

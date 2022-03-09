@@ -8,7 +8,6 @@ mod cmd;
 mod config;
 mod db;
 mod error;
-mod fzf;
 mod shell;
 mod util;
 

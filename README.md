@@ -242,7 +242,8 @@ eval "$(zoxide init zsh)"
 ```
 
 For completions to work, the above line must be added *after* `compinit` is
-called. You may have to rebuild your cache by running `rm ~/.zcompdump*; compinit`.
+called. You may have to rebuild your cache by running
+`rm ~/.zcompdump*; compinit`.
 
 </details>
 

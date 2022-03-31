@@ -171,7 +171,7 @@ Add this to your configuration (usually `~/.elvish/rc.elv`):
 eval (zoxide init elvish | slurp)
 ```
 
-Note: zoxide only supports elvish v0.16.0 and above.
+Note: zoxide only supports elvish v0.18.0 and above.
 
 </details>
 
@@ -241,8 +241,9 @@ Add this to your configuration (usually `~/.zshrc`):
 eval "$(zoxide init zsh)"
 ```
 
-For completions to work, the above line must be added _after_ `compinit` is
-called. You may have to rebuild your cache by running `rm ~/.zcompdump*; compinit`.
+For completions to work, the above line must be added *after* `compinit` is
+called. You may have to rebuild your cache by running
+`rm ~/.zcompdump*; compinit`.
 
 </details>
 

@@ -32,7 +32,7 @@ make_template!(Powershell, "powershell.txt");
 make_template!(Xonsh, "xonsh.txt");
 make_template!(Zsh, "zsh.txt");
 
-#[cfg(feature = "nix")]
+#[cfg(feature = "nix-dev")]
 #[cfg(test)]
 mod tests {
     use askama::Template;

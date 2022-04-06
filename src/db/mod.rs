@@ -2,13 +2,14 @@ mod dir;
 mod stream;
 
 use std::fs;
-use std::io::{self, Write};
+use std::io;
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 pub use dir::{Dir, DirList, Epoch, Rank};
 pub use stream::Stream;
-use tempfile::{NamedTempFile, PersistError};
+
+use crate::util;
 
 #[derive(Debug)]
 pub struct Database<'file> {
@@ -24,18 +25,8 @@ impl<'file> Database<'file> {
         }
 
         let buffer = self.dirs.to_bytes()?;
-        let mut file = NamedTempFile::new_in(self.data_dir)
-            .with_context(|| format!("could not create temporary database in: {}", self.data_dir.display()))?;
-
-        // Preallocate enough space on the file, preventing copying later on. This optimization may
-        // fail on some filesystems, but it is safe to ignore it and proceed.
-        let _ = file.as_file().set_len(buffer.len() as _);
-        file.write_all(&buffer)
-            .with_context(|| format!("could not write to temporary database: {}", file.path().display()))?;
-
         let path = db_path(&self.data_dir);
-        persist(file, &path).with_context(|| format!("could not replace database: {}", path.display()))?;
-
+        util::write(&path, &buffer).context("could not write to database")?;
         self.modified = false;
         Ok(())
     }
@@ -118,44 +109,6 @@ impl<'file> Database<'file> {
             self.modified = true;
         }
     }
-}
-
-#[cfg(unix)]
-fn persist<P: AsRef<Path>>(file: NamedTempFile, path: P) -> Result<(), PersistError> {
-    file.persist(path)?;
-    Ok(())
-}
-
-#[cfg(windows)]
-fn persist<P: AsRef<Path>>(mut file: NamedTempFile, path: P) -> Result<(), PersistError> {
-    use std::thread;
-    use std::time::Duration;
-
-    use rand::distributions::{Distribution, Uniform};
-    use rand::rngs::SmallRng;
-    use rand::SeedableRng;
-
-    // File renames on Windows are not atomic and sometimes fail with `PermissionDenied`. This is
-    // extremely unlikely unless it's running in a loop on multiple threads. Nevertheless, we guard
-    // against it by retrying the rename a fixed number of times.
-    const MAX_TRIES: usize = 10;
-    let mut rng = None;
-
-    for _ in 0..MAX_TRIES {
-        match file.persist(&path) {
-            Ok(_) => break,
-            Err(e) if e.error.kind() == io::ErrorKind::PermissionDenied => {
-                let mut rng = rng.get_or_insert_with(SmallRng::from_entropy);
-                let between = Uniform::from(50..150);
-                let duration = Duration::from_millis(between.sample(&mut rng));
-                thread::sleep(duration);
-                file = e.file;
-            }
-            Err(e) => return Err(e),
-        }
-    }
-
-    Ok(())
 }
 
 pub struct DatabaseFile {

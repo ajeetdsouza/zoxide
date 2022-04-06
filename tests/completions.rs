@@ -1,5 +1,5 @@
 //! Test clap generated completions.
-#![cfg(feature = "nix")]
+#![cfg(feature = "nix-dev")]
 
 use assert_cmd::Command;
 

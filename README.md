@@ -172,7 +172,7 @@ Add this to your configuration (usually `~/.elvish/rc.elv`):
 eval (zoxide init elvish | slurp)
 ```
 
-Note: zoxide only supports elvish v0.16.0 and above.
+Note: zoxide only supports elvish v0.18.0 and above.
 
 </details>
 

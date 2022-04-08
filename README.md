@@ -205,7 +205,7 @@ zoxide init nushell --hook prompt | save ~/.zoxide.nu
 source ~/.zoxide.nu
 ```
 
-Note: zoxide only supports Nushell v0.59.0 and above.
+Note: zoxide only supports Nushell v0.60.0 and above.
 
 </details>
 

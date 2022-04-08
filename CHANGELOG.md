@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Manpages: moved to `man/man1/*.1`.
-- Nushell: upgrade minimum supported version to v0.59.0.
+- Nushell: upgrade minimum supported version to v0.60.0.
 
 ### Fixed
 

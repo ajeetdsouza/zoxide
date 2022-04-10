@@ -67,7 +67,7 @@ if ($__zoxide_hooked -ne 1) {
 }
 
 {{ section }}
-# When using zoxide with --no-aliases, alias these internal functions as
+# When using zoxide with --no-cmd, alias these internal functions as
 # desired.
 #
 
@@ -105,7 +105,7 @@ function __zoxide_zi {
 }
 
 {{ section }}
-# Convenient aliases for zoxide. Disable these using --no-aliases.
+# Commands for zoxide. Disable these using --no-cmd.
 #
 
 {%- match cmd %}

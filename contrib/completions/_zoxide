@@ -50,9 +50,9 @@ _arguments "${_arguments_options[@]}" \
 ;;
 (init)
 _arguments "${_arguments_options[@]}" \
-'--cmd=[Renames the '\''z'\'' command and corresponding aliases]:CMD: ' \
-'--hook=[Chooses event upon which an entry is added to the database]:HOOK:(none prompt pwd)' \
-'--no-aliases[Prevents zoxide from defining any commands]' \
+'--cmd=[Changes the prefix of the `z` and `zi` commands]:CMD: ' \
+'--hook=[Changes how often zoxide increments a directory'\''s score]:HOOK:(none prompt pwd)' \
+'--no-cmd[Prevents zoxide from defining the `z` and `zi` commands]' \
 '-h[Print help information]' \
 '--help[Print help information]' \
 '-V[Print version information]' \

@@ -74,9 +74,9 @@ Add this to your configuration:
 .SH OPTIONS
 .TP
 .B --cmd
-Changes the prefix of predefined aliases (\fBz\fR, \fBzi\fR).
+Changes the prefix of the \fBz\fR and \fBzi\fR commands.
 .br
-\fB--cmd j\fR would change the aliases to (\fBj\fR, \fBji\fR).
+\fB--cmd j\fR would change the commands to (\fBj\fR, \fBji\fR).
 .br
 \fB--cmd cd\fR would replace the \fBcd\fR command (doesn't work on Nushell /
 POSIX shells).
@@ -94,10 +94,10 @@ l l.
     \fBpwd\fR|Whenever the directory is changed
 .TE
 .TP
-.B --no-aliases
-Don't define extra aliases (\fBz\fR, \fBzi\fR). These functions will still be
-available in your shell as \fB__zoxide_z\fR and \fB__zoxide_zi\fR, should you
-choose to redefine them.
+.B --no-cmd
+Prevents zoxide from defining the \fBz\fR and \fBzi\fR commands. These functions
+will still be available in your shell as \fB__zoxide_z\fR and \fB__zoxide_zi\fR,
+should you choose to redefine them.
 .SH REPORTING BUGS
 For any issues, feature requests, or questions, please visit:
 .sp

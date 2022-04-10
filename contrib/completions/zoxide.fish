@@ -11,9 +11,9 @@ complete -c zoxide -n "__fish_seen_subcommand_from import" -l from -d 'Applicati
 complete -c zoxide -n "__fish_seen_subcommand_from import" -l merge -d 'Merge into existing database'
 complete -c zoxide -n "__fish_seen_subcommand_from import" -s h -l help -d 'Print help information'
 complete -c zoxide -n "__fish_seen_subcommand_from import" -s V -l version -d 'Print version information'
-complete -c zoxide -n "__fish_seen_subcommand_from init" -l cmd -d 'Renames the \'z\' command and corresponding aliases' -r
-complete -c zoxide -n "__fish_seen_subcommand_from init" -l hook -d 'Chooses event upon which an entry is added to the database' -r -f -a "{none	,prompt	,pwd	}"
-complete -c zoxide -n "__fish_seen_subcommand_from init" -l no-aliases -d 'Prevents zoxide from defining any commands'
+complete -c zoxide -n "__fish_seen_subcommand_from init" -l cmd -d 'Changes the prefix of the `z` and `zi` commands' -r
+complete -c zoxide -n "__fish_seen_subcommand_from init" -l hook -d 'Changes how often zoxide increments a directory\'s score' -r -f -a "{none	,prompt	,pwd	}"
+complete -c zoxide -n "__fish_seen_subcommand_from init" -l no-cmd -d 'Prevents zoxide from defining the `z` and `zi` commands'
 complete -c zoxide -n "__fish_seen_subcommand_from init" -s h -l help -d 'Print help information'
 complete -c zoxide -n "__fish_seen_subcommand_from init" -s V -l version -d 'Print version information'
 complete -c zoxide -n "__fish_seen_subcommand_from query" -l exclude -d 'Exclude a path from results' -r -f -a "(__fish_complete_directories)"

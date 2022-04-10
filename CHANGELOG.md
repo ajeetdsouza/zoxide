@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Manpages: moved to `man/man1/*.1`.
+- Replace `--no-aliases` with `--no-cmd`.
 
 ### Fixed
 

@@ -359,6 +359,7 @@ They must be set before `zoxide init` is called.
 | [xxh]              | Transports shell configuration over SSH      | [xxh-plugin-prerun-zoxide] |
 | [zabb]             | Finds the shortest possible query for a path | Natively supported         |
 | [zsh-autocomplete] | Realtime completions for zsh                 | Natively supported         |
+| [felix]            | File manager                                 | Natively supported         |
 
 [algorithm-aging]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#aging
 [algorithm-matching]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#matching
@@ -415,3 +416,4 @@ They must be set before `zoxide init` is called.
 [zoxide.vim]: https://github.com/nanotee/zoxide.vim
 [zoxide.xplr]: https://github.com/sayanarijit/zoxide.xplr
 [zsh-autocomplete]: https://github.com/marlonrichert/zsh-autocomplete
+[felix]: https://github.com/kyoheiu/felix

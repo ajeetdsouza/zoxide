@@ -351,6 +351,7 @@ They must be set before `zoxide init` is called.
 | ------------------ | -------------------------------------------- | -------------------------- |
 | [clink]            | Improved cmd.exe for Windows                 | [clink-zoxide]             |
 | [emacs]            | Text editor                                  | [zoxide.el]                |
+| [felix]            | File manager                                 | Natively supported         |
 | [nnn]              | File manager                                 | [nnn-autojump]             |
 | [ranger]           | File manager                                 | [ranger-zoxide]            |
 | [telescope.nvim]   | Fuzzy finder for Neovim                      | [telescope-zoxide]         |
@@ -379,6 +380,7 @@ They must be set before `zoxide init` is called.
 [dports]: https://github.com/DragonFlyBSD/DPorts/tree/master/sysutils/zoxide
 [emacs]: https://www.gnu.org/software/emacs/
 [fedora packages]: https://src.fedoraproject.org/rpms/rust-zoxide
+[felix]: https://github.com/kyoheiu/felix
 [freshports]: https://www.freshports.org/sysutils/zoxide/
 [fzf-installation]: https://github.com/junegunn/fzf#installation
 [fzf-man]: https://manpages.ubuntu.com/manpages/en/man1/fzf.1.html

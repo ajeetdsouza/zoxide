@@ -136,6 +136,7 @@ fn enable_nix() -> bool {
     }
     let nix_enabled = env::var_os("IN_NIX_SHELL").unwrap_or_default() == "pure";
     if nix_enabled {
+        env::set_var("CARGO_TARGET_DIR", "target_nix");
         return true;
     }
     let nix_detected = Command::new("nix-shell").arg("--version").status().map(|s| s.success()).unwrap_or(false);
@@ -147,10 +148,6 @@ fn enable_nix() -> bool {
     let args = env::args();
     let cmd = shell_words::join(args);
 
-    let status = Command::new("nix-shell")
-        .args(&["--pure", "--run", &cmd, "--", "shell.nix"])
-        .env("CARGO_TARGET_DIR", "target_nix")
-        .status()
-        .unwrap();
+    let status = Command::new("nix-shell").args(&["--pure", "--run", &cmd, "--", "shell.nix"]).status().unwrap();
     process::exit(status.code().unwrap_or(1));
 }

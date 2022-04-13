@@ -58,8 +58,7 @@ fi
 {% endif -%}
 
 {{ section }}
-# When using zoxide with --no-cmd, alias these internal functions as
-# desired.
+# When using zoxide with --no-cmd, alias these internal functions as desired.
 #
 
 __zoxide_z_prefix='z#'

@@ -35,6 +35,8 @@ make_template!(Zsh, "zsh.txt");
 #[cfg(feature = "nix-dev")]
 #[cfg(test)]
 mod tests {
+    use std::{ffi::OsString, os::unix::prelude::OpenOptionsExt};
+
     use askama::Template;
     use assert_cmd::Command;
     use rstest::rstest;
@@ -149,7 +151,7 @@ mod tests {
         let source = Nushell(&opts).render().unwrap();
 
         let tempdir = tempfile::tempdir().unwrap();
-        let tempdir = tempdir.path().to_str().unwrap();
+        let tempdir = tempdir.path();
 
         let assert =
             Command::new("nu").env("HOME", tempdir).args(&["--commands", &source]).assert().success().stderr("");

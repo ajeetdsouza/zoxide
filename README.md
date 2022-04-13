@@ -351,6 +351,7 @@ They must be set before `zoxide init` is called.
 | ------------------ | -------------------------------------------- | -------------------------- |
 | [clink]            | Improved cmd.exe for Windows                 | [clink-zoxide]             |
 | [emacs]            | Text editor                                  | [zoxide.el]                |
+| [felix]            | File manager                                 | Natively supported         |
 | [nnn]              | File manager                                 | [nnn-autojump]             |
 | [ranger]           | File manager                                 | [ranger-zoxide]            |
 | [telescope.nvim]   | Fuzzy finder for Neovim                      | [telescope-zoxide]         |
@@ -359,7 +360,6 @@ They must be set before `zoxide init` is called.
 | [xxh]              | Transports shell configuration over SSH      | [xxh-plugin-prerun-zoxide] |
 | [zabb]             | Finds the shortest possible query for a path | Natively supported         |
 | [zsh-autocomplete] | Realtime completions for zsh                 | Natively supported         |
-| [felix]            | File manager                                 | Natively supported         |
 
 [algorithm-aging]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#aging
 [algorithm-matching]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#matching
@@ -380,6 +380,7 @@ They must be set before `zoxide init` is called.
 [dports]: https://github.com/DragonFlyBSD/DPorts/tree/master/sysutils/zoxide
 [emacs]: https://www.gnu.org/software/emacs/
 [fedora packages]: https://src.fedoraproject.org/rpms/rust-zoxide
+[felix]: https://github.com/kyoheiu/felix
 [freshports]: https://www.freshports.org/sysutils/zoxide/
 [fzf-installation]: https://github.com/junegunn/fzf#installation
 [fzf-man]: https://manpages.ubuntu.com/manpages/en/man1/fzf.1.html
@@ -416,4 +417,3 @@ They must be set before `zoxide init` is called.
 [zoxide.vim]: https://github.com/nanotee/zoxide.vim
 [zoxide.xplr]: https://github.com/sayanarijit/zoxide.xplr
 [zsh-autocomplete]: https://github.com/marlonrichert/zsh-autocomplete
-[felix]: https://github.com/kyoheiu/felix

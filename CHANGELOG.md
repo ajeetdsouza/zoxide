@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Retain ownership of database file.
 - Elvish: upgrade to new try-catch syntax, upgrade minimum supported version to
   v0.18.0.
+- `zoxide query --interactive` should not conflict with `--score`.
 
 ## [0.8.0] - 2021-12-25
 

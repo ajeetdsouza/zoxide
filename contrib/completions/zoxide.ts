@@ -31,13 +31,9 @@ const completion: Fig.Spec = {
           args: {
             name: "from",
             suggestions: [
-              {
-                name: "autojump",
-              },
-              {
-                name: "z",
-              },
-            ]
+              "autojump",
+              "z",
+            ],
           },
         },
         {
@@ -64,7 +60,7 @@ const completion: Fig.Spec = {
       options: [
         {
           name: "--cmd",
-          description: "Renames the 'z' command and corresponding aliases",
+          description: "Changes the prefix of the `z` and `zi` commands",
           args: {
             name: "cmd",
             isOptional: true,
@@ -72,26 +68,20 @@ const completion: Fig.Spec = {
         },
         {
           name: "--hook",
-          description: "Chooses event upon which an entry is added to the database",
+          description: "Changes how often zoxide increments a directory's score",
           args: {
             name: "hook",
             isOptional: true,
             suggestions: [
-              {
-                name: "none",
-              },
-              {
-                name: "prompt",
-              },
-              {
-                name: "pwd",
-              },
-            ]
+              "none",
+              "prompt",
+              "pwd",
+            ],
           },
         },
         {
-          name: "--no-aliases",
-          description: "Prevents zoxide from defining any commands",
+          name: "--no-cmd",
+          description: "Prevents zoxide from defining the `z` and `zi` commands",
         },
         {
           name: ["-h", "--help"],
@@ -105,31 +95,15 @@ const completion: Fig.Spec = {
       args: {
         name: "shell",
         suggestions: [
-          {
-            name: "bash",
-          },
-          {
-            name: "elvish",
-          },
-          {
-            name: "fish",
-          },
-          {
-            name: "nushell",
-          },
-          {
-            name: "posix",
-          },
-          {
-            name: "powershell",
-          },
-          {
-            name: "xonsh",
-          },
-          {
-            name: "zsh",
-          },
-        ]
+          "bash",
+          "elvish",
+          "fish",
+          "nushell",
+          "posix",
+          "powershell",
+          "xonsh",
+          "zsh",
+        ],
       },
     },
     {
@@ -152,14 +126,26 @@ const completion: Fig.Spec = {
         {
           name: ["-i", "--interactive"],
           description: "Use interactive selection",
+          exclusiveOn: [
+            "-l",
+            "--list",
+          ],
         },
         {
           name: ["-l", "--list"],
           description: "List all matching directories",
+          exclusiveOn: [
+            "-i",
+            "--interactive",
+          ],
         },
         {
           name: ["-s", "--score"],
           description: "Print score with results",
+          exclusiveOn: [
+            "-i",
+            "--interactive",
+          ],
         },
         {
           name: ["-h", "--help"],

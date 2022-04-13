@@ -1,17 +1,18 @@
+use std::fmt::{self, Display, Formatter};
 use std::io;
 
 use anyhow::{bail, Context, Result};
-use thiserror::Error;
-
-#[derive(Debug, Error)]
-#[error("could not find fzf, is it installed?")]
-pub struct FzfNotFound;
 
 /// Custom error type for early exit.
-#[derive(Debug, Error)]
-#[error("")]
+#[derive(Debug)]
 pub struct SilentExit {
     pub code: i32,
+}
+
+impl Display for SilentExit {
+    fn fmt(&self, _: &mut Formatter<'_>) -> fmt::Result {
+        Ok(())
+    }
 }
 
 pub trait BrokenPipeHandler {

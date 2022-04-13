@@ -53,7 +53,7 @@ end
 {%- endif %}
 
 {{ section }}
-# When using zoxide with --no-aliases, alias these internal functions as
+# When using zoxide with --no-cmd, alias these internal functions as
 # desired.
 #
 
@@ -84,8 +84,8 @@ function __zoxide_z_complete
         # If the last argument is empty, use interactive selection.
         set -l query $tokens[2..-1]
         set -l result (zoxide query -i -- $query)
-        and commandline -p "$tokens[1] "(string escape $result)
-        commandline -f repaint
+        commandline --current-process "$tokens[1] "(string escape $result)
+        commandline --function repaint
     end
 end
 
@@ -96,7 +96,7 @@ function __zoxide_zi
 end
 
 {{ section }}
-# Convenient aliases for zoxide. Disable these using --no-aliases.
+# Commands for zoxide. Disable these using --no-cmd.
 #
 
 {%- match cmd %}

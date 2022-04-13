@@ -2,10 +2,10 @@ use std::io::{self, Write};
 
 use anyhow::{bail, Context, Result};
 
-use crate::app::{Remove, Run};
+use crate::cmd::{Remove, Run};
+use crate::config;
 use crate::db::DatabaseFile;
-use crate::fzf::Fzf;
-use crate::{config, util};
+use crate::util::{self, Fzf};
 
 impl Run for Remove {
     fn run(&self) -> Result<()> {

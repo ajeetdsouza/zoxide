@@ -2,7 +2,7 @@ use std::fs;
 
 use anyhow::{bail, Context, Result};
 
-use crate::app::{Import, ImportFrom, Run};
+use crate::cmd::{Import, ImportFrom, Run};
 use crate::config;
 use crate::db::{Database, DatabaseFile, Dir};
 

@@ -43,9 +43,9 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand --version 'Print version information'
         }
         &'zoxide;init'= {
-            cand --cmd 'Renames the ''z'' command and corresponding aliases'
-            cand --hook 'Chooses event upon which an entry is added to the database'
-            cand --no-aliases 'Prevents zoxide from defining any commands'
+            cand --cmd 'Changes the prefix of the `z` and `zi` commands'
+            cand --hook 'Changes how often zoxide increments a directory''s score'
+            cand --no-cmd 'Prevents zoxide from defining the `z` and `zi` commands'
             cand -h 'Print help information'
             cand --help 'Print help information'
             cand -V 'Print version information'

@@ -44,7 +44,7 @@ z -                # cd into previous directory
 
 zi foo             # cd with interactive selection (using fzf)
 
-z foo<SPACE><TAB>  # show interactive completions (zoxide v0.8.0+, bash/fish/zsh only)
+z foo<SPACE><TAB>  # show interactive completions (zoxide v0.8.0+, bash 4.4+/fish/zsh only)
 ```
 
 Read more about the matching algorithm [here][algorithm-matching].
@@ -171,7 +171,7 @@ Add this to your configuration (usually `~/.elvish/rc.elv`):
 eval (zoxide init elvish | slurp)
 ```
 
-Note: zoxide only supports elvish v0.16.0 and above.
+Note: zoxide only supports elvish v0.18.0 and above.
 
 </details>
 
@@ -241,8 +241,9 @@ Add this to your configuration (usually `~/.zshrc`):
 eval "$(zoxide init zsh)"
 ```
 
-For completions to work, the above line must be added _after_ `compinit` is
-called. You may have to rebuild your cache by running `rm ~/.zcompdump*; compinit`.
+For completions to work, the above line must be added *after* `compinit` is
+called. You may have to rebuild your cache by running
+`rm ~/.zcompdump*; compinit`.
 
 </details>
 
@@ -260,7 +261,8 @@ eval "$(zoxide init posix --hook prompt)"
 ### *Step 3: Install fzf (optional)*
 
 [fzf] is a command-line fuzzy finder, used by zoxide for interactive
-selection. It can be installed from [here][fzf-installation].
+selection. It can be installed from [here][fzf-installation]. zoxide supports
+fzf v0.21.0+.
 
 ### *Step 4: Import your data (optional)*
 
@@ -292,8 +294,8 @@ zoxide import --from z path/to/db
 When calling `zoxide init`, the following flags are available:
 
 - `--cmd`
-  - Changes the prefix of predefined aliases (`z`, `zi`).
-  - `--cmd j` would change the aliases to (`j`, `ji`).
+  - Changes the prefix of the `z` and `zi` commands.
+  - `--cmd j` would change the commands to (`j`, `ji`).
   - `--cmd cd` would replace the `cd` command (doesn't work on Nushell / POSIX shells).
 - `--hook <HOOK>`
   - Changes how often zoxide increments a directory's score:
@@ -302,8 +304,8 @@ When calling `zoxide init`, the following flags are available:
     | `none`   | Never                             |
     | `prompt` | At every shell prompt             |
     | `pwd`    | Whenever the directory is changed |
-- `--no-aliases`
-  - Don't define aliases (`z`, `zi`).
+- `--no-cmd`
+  - Prevents zoxide from defining the `z` and `zi` commands.
   - These functions will still be available in your shell as `__zoxide_z` and
     `__zoxide_zi`, should you choose to redefine them.
 
@@ -319,7 +321,7 @@ They must be set before `zoxide init` is called.
     | ----------- | ---------------------------------------- | ------------------------------------------ |
     | Linux / BSD | `$XDG_DATA_HOME` or `$HOME/.local/share` | `/home/alice/.local/share`                 |
     | macOS       | `$HOME/Library/Application Support`      | `/Users/Alice/Library/Application Support` |
-    | Windows     | `{FOLDERID_RoamingAppData}`              | `C:\Users\Alice\AppData\Roaming`           |
+    | Windows     | `%LOCALAPPDATA%`                         | `C:\Users\Alice\AppData\Local`             |
 - `_ZO_ECHO`
   - When set to 1, `z` will print the matched directory before navigating to
     it.
@@ -345,16 +347,19 @@ They must be set before `zoxide init` is called.
 
 ## Third-party integrations
 
-| Application        | Description                             | Plugin                     |
-| ------------------ | --------------------------------------- | -------------------------- |
-| [emacs]            | Text editor                             | [zoxide.el]                |
-| [nnn]              | File manager                            | [nnn-autojump]             |
-| [ranger]           | File manager                            | [ranger-zoxide]            |
-| [telescope.nvim]   | Fuzzy finder for Neovim                 | [telescope-zoxide]         |
-| [vim]              | Text editor                             | [zoxide.vim]               |
-| [xplr]             | File manager                            | [zoxide.xplr]              |
-| [xxh]              | Transports shell configuration over SSH | [xxh-plugin-prerun-zoxide] |
-| [zsh-autocomplete] | Realtime completions for zsh            | Supported by default       |
+| Application        | Description                                  | Plugin                     |
+| ------------------ | -------------------------------------------- | -------------------------- |
+| [clink]            | Improved cmd.exe for Windows                 | [clink-zoxide]             |
+| [emacs]            | Text editor                                  | [zoxide.el]                |
+| [felix]            | File manager                                 | Natively supported         |
+| [nnn]              | File manager                                 | [nnn-autojump]             |
+| [ranger]           | File manager                                 | [ranger-zoxide]            |
+| [telescope.nvim]   | Fuzzy finder for Neovim                      | [telescope-zoxide]         |
+| [vim]              | Text editor                                  | [zoxide.vim]               |
+| [xplr]             | File manager                                 | [zoxide.xplr]              |
+| [xxh]              | Transports shell configuration over SSH      | [xxh-plugin-prerun-zoxide] |
+| [zabb]             | Finds the shortest possible query for a path | Natively supported         |
+| [zsh-autocomplete] | Realtime completions for zsh                 | Natively supported         |
 
 [algorithm-aging]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#aging
 [algorithm-matching]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#matching
@@ -363,6 +368,8 @@ They must be set before `zoxide init` is called.
 [builtwithnix-badge]: https://img.shields.io/badge/builtwith-nix-7d81f7?style=flat-square
 [builtwithnix]: https://builtwithnix.org/
 [chocolatey]: https://community.chocolatey.org/packages/zoxide
+[clink-zoxide]: https://github.com/shunsambongi/clink-zoxide
+[clink]: https://github.com/mridgers/clink
 [conda-forge]: https://anaconda.org/conda-forge/zoxide
 [copr]: https://copr.fedorainfracloud.org/coprs/atim/zoxide/
 [crates.io-badge]: https://img.shields.io/crates/v/zoxide?style=flat-square
@@ -373,6 +380,7 @@ They must be set before `zoxide init` is called.
 [dports]: https://github.com/DragonFlyBSD/DPorts/tree/master/sysutils/zoxide
 [emacs]: https://www.gnu.org/software/emacs/
 [fedora packages]: https://src.fedoraproject.org/rpms/rust-zoxide
+[felix]: https://github.com/kyoheiu/felix
 [freshports]: https://www.freshports.org/sysutils/zoxide/
 [fzf-installation]: https://github.com/junegunn/fzf#installation
 [fzf-man]: https://manpages.ubuntu.com/manpages/en/man1/fzf.1.html
@@ -404,6 +412,7 @@ They must be set before `zoxide init` is called.
 [xplr]: https://github.com/sayanarijit/xplr
 [xxh-plugin-prerun-zoxide]: https://github.com/xxh/xxh-plugin-prerun-zoxide
 [xxh]: https://github.com/xxh/xxh
+[zabb]: https://github.com/Mellbourn/zabb
 [zoxide.el]: https://gitlab.com/Vonfry/zoxide.el
 [zoxide.vim]: https://github.com/nanotee/zoxide.vim
 [zoxide.xplr]: https://github.com/sayanarijit/zoxide.xplr

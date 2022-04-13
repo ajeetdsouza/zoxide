@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use clap::{AppSettings, ArgEnum, Parser, ValueHint};
+use clap::{ArgEnum, Parser, ValueHint};
 
 const ENV_HELP: &str = "ENVIRONMENT VARIABLES:
     _ZO_DATA_DIR            Path for zoxide data files
@@ -16,11 +16,11 @@ const ENV_HELP: &str = "ENVIRONMENT VARIABLES:
     about,
     author,
     after_help = ENV_HELP,
-    global_setting(AppSettings::DisableHelpSubcommand),
-    global_setting(AppSettings::PropagateVersion),
+    disable_help_subcommand = true,
+    propagate_version = true,
     version = option_env!("ZOXIDE_VERSION").unwrap_or_default()
 )]
-pub enum App {
+pub enum Cmd {
     Add(Add),
     Import(Import),
     Init(Init),
@@ -62,15 +62,15 @@ pub struct Init {
     #[clap(arg_enum)]
     pub shell: InitShell,
 
-    /// Prevents zoxide from defining any commands
-    #[clap(long)]
-    pub no_aliases: bool,
+    /// Prevents zoxide from defining the `z` and `zi` commands
+    #[clap(long, alias = "no-aliases")]
+    pub no_cmd: bool,
 
-    /// Renames the 'z' command and corresponding aliases
+    /// Changes the prefix of the `z` and `zi` commands
     #[clap(long, default_value = "z")]
     pub cmd: String,
 
-    /// Chooses event upon which an entry is added to the database
+    /// Changes how often zoxide increments a directory's score
     #[clap(arg_enum, long, default_value = "pwd")]
     pub hook: InitHook,
 }

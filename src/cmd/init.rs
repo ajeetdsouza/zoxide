@@ -3,14 +3,14 @@ use std::io::{self, Write};
 use anyhow::{Context, Result};
 use askama::Template;
 
-use crate::app::{Init, InitShell, Run};
+use crate::cmd::{Init, InitShell, Run};
 use crate::config;
 use crate::error::BrokenPipeHandler;
 use crate::shell::{self, Opts};
 
 impl Run for Init {
     fn run(&self) -> Result<()> {
-        let cmd = if self.no_aliases { None } else { Some(self.cmd.as_str()) };
+        let cmd = if self.no_cmd { None } else { Some(self.cmd.as_str()) };
 
         let echo = config::echo();
         let resolve_symlinks = config::resolve_symlinks();

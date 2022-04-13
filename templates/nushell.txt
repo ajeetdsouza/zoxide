@@ -45,7 +45,7 @@ $'zoxide: PWD hooks are not supported on Nushell.(char nl)Use (char sq)zoxide in
 {%- endmatch %}
 
 {{ section }}
-# When using zoxide with --no-aliases, alias these internal functions as
+# When using zoxide with --no-cmd, alias these internal functions as
 # desired.
 #
 
@@ -86,7 +86,7 @@ def __zoxide_zi  [...rest:string] {
 }
 
 {{ section }}
-# Convenient aliases for zoxide. Disable these using --no-aliases.
+# Commands for zoxide. Disable these using --no-cmd.
 #
 
 {%- match cmd %}

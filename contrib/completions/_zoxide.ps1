@@ -49,9 +49,9 @@ Register-ArgumentCompleter -Native -CommandName 'zoxide' -ScriptBlock {
             break
         }
         'zoxide;init' {
-            [CompletionResult]::new('--cmd', 'cmd', [CompletionResultType]::ParameterName, 'Renames the ''z'' command and corresponding aliases')
-            [CompletionResult]::new('--hook', 'hook', [CompletionResultType]::ParameterName, 'Chooses event upon which an entry is added to the database')
-            [CompletionResult]::new('--no-aliases', 'no-aliases', [CompletionResultType]::ParameterName, 'Prevents zoxide from defining any commands')
+            [CompletionResult]::new('--cmd', 'cmd', [CompletionResultType]::ParameterName, 'Changes the prefix of the `z` and `zi` commands')
+            [CompletionResult]::new('--hook', 'hook', [CompletionResultType]::ParameterName, 'Changes how often zoxide increments a directory''s score')
+            [CompletionResult]::new('--no-cmd', 'no-cmd', [CompletionResultType]::ParameterName, 'Prevents zoxide from defining the `z` and `zi` commands')
             [CompletionResult]::new('-h', 'h', [CompletionResultType]::ParameterName, 'Print help information')
             [CompletionResult]::new('--help', 'help', [CompletionResultType]::ParameterName, 'Print help information')
             [CompletionResult]::new('-V', 'V', [CompletionResultType]::ParameterName, 'Print version information')

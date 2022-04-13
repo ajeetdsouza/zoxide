@@ -8,11 +8,10 @@ use std::path::PathBuf;
 use std::process::{self, Command};
 
 fn main() -> Result<()> {
-    let nix_enabled = enable_nix();
-
     let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let dir = dir.parent().with_context(|| format!("could not find workspace root: {}", dir.display()))?;
     env::set_current_dir(dir).with_context(|| format!("could not set current directory: {}", dir.display()))?;
+    let nix_enabled = enable_nix();
 
     let app = App::parse();
     match app {
@@ -147,8 +146,11 @@ fn enable_nix() -> bool {
     println!("Detected Nix in environment, re-running in Nix.");
     let args = env::args();
     let cmd = shell_words::join(args);
-    let mut nix_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    nix_path.push("../shell.nix");
-    let status = Command::new("nix-shell").args(&["--pure", "--run", &cmd, "--"]).arg(nix_path).status().unwrap();
+
+    let status = Command::new("nix-shell")
+        .args(&["--pure", "--run", &cmd, "--", "shell.nix"])
+        .env("CARGO_TARGET_DIR", "target_nix")
+        .status()
+        .unwrap();
     process::exit(status.code().unwrap_or(1));
 }

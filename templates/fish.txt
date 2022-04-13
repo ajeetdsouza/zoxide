@@ -53,7 +53,7 @@ end
 {%- endif %}
 
 {{ section }}
-# When using zoxide with --no-aliases, alias these internal functions as
+# When using zoxide with --no-cmd, alias these internal functions as
 # desired.
 #
 
@@ -96,7 +96,7 @@ function __zoxide_zi
 end
 
 {{ section }}
-# Convenient aliases for zoxide. Disable these using --no-aliases.
+# Commands for zoxide. Disable these using --no-cmd.
 #
 
 {%- match cmd %}

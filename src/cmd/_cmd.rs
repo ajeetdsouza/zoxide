@@ -62,15 +62,15 @@ pub struct Init {
     #[clap(arg_enum)]
     pub shell: InitShell,
 
-    /// Prevents zoxide from defining any commands
-    #[clap(long)]
-    pub no_aliases: bool,
+    /// Prevents zoxide from defining the `z` and `zi` commands
+    #[clap(long, alias = "no-aliases")]
+    pub no_cmd: bool,
 
-    /// Renames the 'z' command and corresponding aliases
+    /// Changes the prefix of the `z` and `zi` commands
     #[clap(long, default_value = "z")]
     pub cmd: String,
 
-    /// Chooses event upon which an entry is added to the database
+    /// Changes how often zoxide increments a directory's score
     #[clap(arg_enum, long, default_value = "pwd")]
     pub hook: InitHook,
 }

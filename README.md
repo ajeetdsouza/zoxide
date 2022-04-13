@@ -304,8 +304,8 @@ zoxide import --from z path/to/db
 When calling `zoxide init`, the following flags are available:
 
 - `--cmd`
-  - Changes the prefix of predefined aliases (`z`, `zi`).
-  - `--cmd j` would change the aliases to (`j`, `ji`).
+  - Changes the prefix of the `z` and `zi` commands.
+  - `--cmd j` would change the commands to (`j`, `ji`).
   - `--cmd cd` would replace the `cd` command (doesn't work on Nushell / POSIX shells).
 - `--hook <HOOK>`
   - Changes how often zoxide increments a directory's score:
@@ -314,8 +314,8 @@ When calling `zoxide init`, the following flags are available:
     | `none`   | Never                             |
     | `prompt` | At every shell prompt             |
     | `pwd`    | Whenever the directory is changed |
-- `--no-aliases`
-  - Don't define aliases (`z`, `zi`).
+- `--no-cmd`
+  - Prevents zoxide from defining the `z` and `zi` commands.
   - These functions will still be available in your shell as `__zoxide_z` and
     `__zoxide_zi`, should you choose to redefine them.
 
@@ -361,6 +361,7 @@ They must be set before `zoxide init` is called.
 | ------------------ | -------------------------------------------- | -------------------------- |
 | [clink]            | Improved cmd.exe for Windows                 | [clink-zoxide]             |
 | [emacs]            | Text editor                                  | [zoxide.el]                |
+| [felix]            | File manager                                 | Natively supported         |
 | [nnn]              | File manager                                 | [nnn-autojump]             |
 | [ranger]           | File manager                                 | [ranger-zoxide]            |
 | [telescope.nvim]   | Fuzzy finder for Neovim                      | [telescope-zoxide]         |
@@ -389,6 +390,7 @@ They must be set before `zoxide init` is called.
 [dports]: https://github.com/DragonFlyBSD/DPorts/tree/master/sysutils/zoxide
 [emacs]: https://www.gnu.org/software/emacs/
 [fedora packages]: https://src.fedoraproject.org/rpms/rust-zoxide
+[felix]: https://github.com/kyoheiu/felix
 [freshports]: https://www.freshports.org/sysutils/zoxide/
 [fzf-installation]: https://github.com/junegunn/fzf#installation
 [fzf-man]: https://manpages.ubuntu.com/manpages/en/man1/fzf.1.html

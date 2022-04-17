@@ -102,20 +102,18 @@ end
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-# Remove definitions.
-function __zoxide_unset
-    set --erase $argv >/dev/null 2>&1
-    abbr --erase $argv >/dev/null 2>&1
-    builtin functions --erase $argv >/dev/null 2>&1
+function {{cmd}}
+    __zoxide_z $argv
 end
-
-__zoxide_unset {{cmd}}
-alias {{cmd}}=__zoxide_z
+abbr --erase {{cmd}}
 complete -c {{cmd}} -e
 complete -c {{cmd}} -f -a '(__zoxide_z_complete)'
 
-__zoxide_unset {{cmd}}i
-alias {{cmd}}i=__zoxide_zi
+function {{cmd}}i
+    __zoxide_zi $argv
+end
+abbr --erase {{cmd}}i
+complete -c {{cmd}}i -e
 
 {%- when None %}
 

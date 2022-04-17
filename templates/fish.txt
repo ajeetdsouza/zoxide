@@ -105,12 +105,15 @@ end
 function {{cmd}}
     __zoxide_z $argv
 end
+abbr --erase {{cmd}}
 complete -c {{cmd}} -e
 complete -c {{cmd}} -f -a '(__zoxide_z_complete)'
 
 function {{cmd}}i
     __zoxide_zi $argv
 end
+abbr --erase {{cmd}}i
+complete -c {{cmd}}i -e
 
 {%- when None %}
 

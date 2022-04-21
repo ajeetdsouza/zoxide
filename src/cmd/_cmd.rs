@@ -112,7 +112,7 @@ pub struct Query {
     pub list: bool,
 
     /// Print score with results
-    #[clap(long, short, conflicts_with = "interactive")]
+    #[clap(long, short)]
     pub score: bool,
 
     /// Exclude a path from results

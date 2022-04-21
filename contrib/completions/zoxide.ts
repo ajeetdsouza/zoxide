@@ -142,10 +142,6 @@ const completion: Fig.Spec = {
         {
           name: ["-s", "--score"],
           description: "Print score with results",
-          exclusiveOn: [
-            "-i",
-            "--interactive",
-          ],
         },
         {
           name: ["-h", "--help"],

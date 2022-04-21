@@ -35,8 +35,6 @@ make_template!(Zsh, "zsh.txt");
 #[cfg(feature = "nix-dev")]
 #[cfg(test)]
 mod tests {
-    use std::{ffi::OsString, os::unix::prelude::OpenOptionsExt};
-
     use askama::Template;
     use assert_cmd::Command;
     use rstest::rstest;

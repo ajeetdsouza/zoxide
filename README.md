@@ -13,6 +13,7 @@
 
 [![crates.io][crates.io-badge]][crates.io]
 [![Downloads][downloads-badge]][releases]
+[![License][license-badge]][license]
 [![Built with Nix][builtwithnix-badge]][builtwithnix]
 
 zoxide is a **smarter cd command**, inspired by z and autojump.
@@ -189,13 +190,20 @@ zoxide init fish | source
 <details>
 <summary>Nushell</summary>
 
-Add this to your configuration (find it by running `config path` in Nushell):
+Add this to your env file (find it by running `$nu.env-path` in Nushell):
 
-```toml
-startup = ["zoxide init nushell --hook prompt | save ~/.zoxide.nu", "source ~/.zoxide.nu"]
+```sh
+zoxide init nushell --hook prompt | save ~/.zoxide.nu
 ```
 
-Note: zoxide only supports Nushell v0.37.0 and above.
+Now, add this to the end of your config file (find it by running
+`$nu.config-path` in Nushell):
+
+```sh
+source ~/.zoxide.nu
+```
+
+Note: zoxide only supports Nushell v0.61.0 and above.
 
 </details>
 
@@ -389,6 +397,8 @@ They must be set before `zoxide init` is called.
 [guru overlay]: https://github.com/gentoo-mirror/guru
 [homebrew]: https://formulae.brew.sh/formula/zoxide
 [issues]: https://github.com/ajeetdsouza/zoxide/issues/new
+[license-badge]: https://img.shields.io/github/license/ajeetdsouza/zoxide?color=lightgray&style=flat-square
+[license]: https://github.com/ajeetdsouza/zoxide/blob/main/LICENSE
 [linuxbrew]: https://formulae.brew.sh/formula-linux/zoxide
 [macports]: https://ports.macports.org/port/zoxide/summary
 [neovim]: https://github.com/neovim/neovim

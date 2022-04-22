@@ -149,7 +149,7 @@ mod tests {
         let source = Nushell(&opts).render().unwrap();
 
         let tempdir = tempfile::tempdir().unwrap();
-        let tempdir = tempdir.path().to_str().unwrap();
+        let tempdir = tempdir.path();
 
         let assert =
             Command::new("nu").env("HOME", tempdir).args(&["--commands", &source]).assert().success().stderr("");

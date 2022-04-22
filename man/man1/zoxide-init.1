@@ -30,14 +30,20 @@ Add this to your configuration (usually \fB~/.config/fish/config.fish\fR):
 .fi
 .TP
 .B nushell
-Add this to your configuration (find it by running \fBconfig path\fR in
-Nushell):
+Add this to your env file (find it by running \fB$nu.env-path\fR in Nushell):
 .sp
 .nf
-    \fBstartup = ["zoxide init nushell --hook prompt | save ~/.zoxide.nu", "source ~/.zoxide.nu"]\fR
+    \fBzoxide init nushell --hook prompt | save ~/.zoxide.nu\fR
 .fi
 .sp
-Note: zoxide only supports Nushell v0.37.0 and above.
+Now, add this to the end of your config file (find it by running
+\fB$nu.config-path\fR in Nushell):
+.sp
+.nf
+    \fBsource ~/.zoxide.nu\fR
+.fi
+.sp
+Note: zoxide only supports Nushell v0.61.0 and above.
 .TP
 .B powershell
 Add this to your configuration (find it by running \fBecho $profile\fR in

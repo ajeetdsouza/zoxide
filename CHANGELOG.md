@@ -13,19 +13,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Manpages: moved to `man/man1/*.1`.
 - Replace `--no-aliases` with `--no-cmd`.
+- Elvish: upgrade minimum supported version to v0.18.0.
+- Nushell: upgrade minimum supported version to v0.61.0.
 
 ### Fixed
 
 - Bash/Zsh: rename `_z` completion function to avoid conflicts with other shell
   plugins.
-- Elvish: upgrade to new lambda syntax.
 - Fzf: added `--keep-right` option by default, upgrade minimum supported version
   to v0.21.0.
 - Bash: only enable completions on 4.4+.
 - Fzf: bypass `ls` alias in preview window.
 - Retain ownership of database file.
-- Elvish: upgrade to new try-catch syntax, upgrade minimum supported version to
-  v0.18.0.
 - `zoxide query --interactive` should not conflict with `--score`.
 
 ## [0.8.0] - 2021-12-25

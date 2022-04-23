@@ -8,7 +8,7 @@ license = "MIT"
 name = "zoxide"
 repository = "https://github.com/ajeetdsouza/zoxide"
 rust-version = "1.59"
-version = "0.8.0"
+version = "0.8.1"
 
 [badges]
 maintenance = { status = "actively-developed" }
@@ -29,7 +29,7 @@ ordered-float = "2.0.0"
 serde = { version = "1.0.116", features = ["derive"] }
 
 [target.'cfg(unix)'.dependencies]
-nix = "0.23.1"
+nix = "0.24.1"
 
 [build-dependencies]
 clap = { version = "3.1.0", features = ["derive"] }

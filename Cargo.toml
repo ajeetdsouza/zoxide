@@ -29,7 +29,10 @@ ordered-float = "2.0.0"
 serde = { version = "1.0.116", features = ["derive"] }
 
 [target.'cfg(unix)'.dependencies]
-nix = { version = "0.24.1", default-features = false, features = ["fs", "user"] }
+nix = { version = "0.24.1", default-features = false, features = [
+    "fs",
+    "user",
+] }
 
 [build-dependencies]
 clap = { version = "3.1.0", features = ["derive"] }
@@ -46,7 +49,11 @@ tempfile = "3.1.0"
 default = []
 nix-dev = []
 
+[profile.dev]
+debug = 0
+
 [profile.release]
 codegen-units = 1
+debug = 0
 lto = true
 strip = true

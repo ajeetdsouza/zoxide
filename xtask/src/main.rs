@@ -54,8 +54,13 @@ impl CommandExt for &mut Command {
 }
 
 fn run_ci(nix_enabled: bool) -> Result<()> {
+    // Run cargo-clippy.
     let color: &[&str] = if is_ci() { &["--color=always"] } else { &[] };
-    Command::new("cargo").args(&["check", "--all-features"]).args(color)._run()?;
+    Command::new("cargo")
+        .args(&["clippy", "--all-features", "--all-targets"])
+        .args(color)
+        .args(&["--", "-Dwarnings"])
+        ._run()?;
 
     run_fmt(nix_enabled, true)?;
     run_lint(nix_enabled)?;
@@ -84,14 +89,6 @@ fn run_fmt(nix_enabled: bool, check: bool) -> Result<()> {
 }
 
 fn run_lint(nix_enabled: bool) -> Result<()> {
-    // Run cargo-clippy.
-    let color: &[&str] = if is_ci() { &["--color=always"] } else { &[] };
-    Command::new("cargo")
-        .args(&["clippy", "--all-features", "--all-targets"])
-        .args(color)
-        .args(&["--", "-Dwarnings"])
-        ._run()?;
-
     if nix_enabled {
         // Run cargo-audit.
         let color: &[&str] = if is_ci() { &["--color=always"] } else { &[] };
@@ -136,7 +133,6 @@ fn enable_nix() -> bool {
     }
     let nix_enabled = env::var_os("IN_NIX_SHELL").unwrap_or_default() == "pure";
     if nix_enabled {
-        env::set_var("CARGO_TARGET_DIR", "target_nix");
         return true;
     }
     let nix_detected = Command::new("nix-shell").arg("--version").status().map(|s| s.success()).unwrap_or(false);

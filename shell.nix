@@ -38,5 +38,6 @@ in pkgs.mkShell {
     pkgs.libiconv
   ];
 
-  RUST_BACKTRACE = 1;
+  CARGO_INCREMENTAL = builtins.getEnv "CI" != "";
+  CARGO_TARGET_DIR = "target_nix";
 }

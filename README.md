@@ -268,9 +268,10 @@ eval "$(zoxide init posix --hook prompt)"
 
 ### *Step 3: Install fzf (optional)*
 
-[fzf] is a command-line fuzzy finder, used by zoxide for interactive
-selection. It can be installed from [here][fzf-installation]. zoxide supports
-fzf v0.21.0+.
+[fzf] is a command-line fuzzy finder, used by zoxide for interactive selection.
+It can be installed from [here][fzf-installation].
+
+Note: zoxide only supports fzf v0.21.0 and above.
 
 ### *Step 4: Import your data (optional)*
 
@@ -384,7 +385,7 @@ They must be set before `zoxide init` is called.
 [crates.io]: https://crates.io/crates/zoxide
 [debian packages]: https://packages.debian.org/stable/admin/zoxide
 [devuan packages]: https://pkginfo.devuan.org/cgi-bin/package-query.html?c=package&q=zoxide
-[downloads-badge]: https://img.shields.io/github/downloads/ajeetdsouza/zoxide/total?style=flat-square
+[downloads-badge]: https://img.shields.io/endpoint?color=bright-green&label=downloads&style=flat-square&cacheSeconds=3600&url=https%3A%2F%2Fzoxide-dl-rlvir7rbe5ac.runkit.sh%2F
 [dports]: https://github.com/DragonFlyBSD/DPorts/tree/master/sysutils/zoxide
 [emacs]: https://www.gnu.org/software/emacs/
 [fedora packages]: https://src.fedoraproject.org/rpms/rust-zoxide

@@ -7,7 +7,9 @@
 
 # pwd based on the value of _ZO_RESOLVE_SYMLINKS.
 function __zoxide_pwd
-{%- if resolve_symlinks %}
+{%- if cfg!(windows) %}
+    command cygpath -w (builtin pwd -P)
+{%- else if resolve_symlinks %}
     builtin pwd -P
 {%- else %}
     builtin pwd -L
@@ -26,7 +28,11 @@ end
 
 # cd + custom logic based on the value of _ZO_ECHO.
 function __zoxide_cd
+{%- if cfg!(windows) %}
+    __zoxide_cd_internal (cygpath -u $argv)
+{%- else %}
     __zoxide_cd_internal $argv
+{%- endif %}
 {%- if echo %}
     and __zoxide_pwd
 {%- endif %}
@@ -83,7 +89,7 @@ function __zoxide_z_complete
         # If the last argument is empty, use interactive selection.
         set -l query $tokens[2..-1]
         set -l result (zoxide query -i -- $query)
-        commandline --current-process "$tokens[1] "(string escape $result)
+        and commandline --current-process "$tokens[1] "(string escape $result)
         commandline --function repaint
     end
 end

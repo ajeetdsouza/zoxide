@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fzf: show preview window below results.
 
+### Fixed
+
+- Fish: fix paths on Cygwin.
+
 ## [0.8.1] - 2021-04-23
 
 ### Changed

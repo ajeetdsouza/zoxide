@@ -7,7 +7,9 @@
 
 # pwd based on the value of _ZO_RESOLVE_SYMLINKS.
 function __zoxide_pwd() {
-{%- if resolve_symlinks %}
+{%- if cfg!(windows) %}
+    \command cygpath -w "$(\builtin pwd -P)"
+{%- else if resolve_symlinks %}
     \builtin pwd -P
 {%- else %}
     \builtin pwd -L

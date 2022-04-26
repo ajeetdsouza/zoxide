@@ -34,6 +34,9 @@ nix = { version = "0.24.1", default-features = false, features = [
     "user",
 ] }
 
+[target.'cfg(windows)'.dependencies]
+which = "4.2.5"
+
 [build-dependencies]
 clap = { version = "3.1.0", features = ["derive"] }
 clap_complete = "3.1.0"

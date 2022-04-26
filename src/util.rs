@@ -7,7 +7,9 @@ use std::process::Command;
 use std::process::{Child, ChildStdin, Stdio};
 use std::time::SystemTime;
 
-use anyhow::{anyhow, bail, Context, Result};
+#[cfg(windows)]
+use anyhow::anyhow;
+use anyhow::{bail, Context, Result};
 
 use crate::config;
 use crate::db::Epoch;
@@ -18,15 +20,21 @@ pub struct Fzf {
 }
 
 impl Fzf {
-    const ERR_NOT_FOUND: &'static str = "could not find fzf, is it installed?";
-
     pub fn new(multiple: bool) -> Result<Self> {
-        let bin = if cfg!(windows) { "fzf.exe" } else { "fzf" };
-        let mut command = get_command(bin).map_err(|_| anyhow!(Self::ERR_NOT_FOUND))?;
+        const ERR_FZF_NOT_FOUND: &str = "could not find fzf, is it installed?";
+
+        // On Windows, CreateProcess implicitly searches the current working
+        // directory for the executable, which is a potential security issue.
+        // Instead, we resolve the path to the executable and then pass it to
+        // CreateProcess.
+        #[cfg(windows)]
+        let mut command = Command::new(which::which("fzf.exe").map_err(|_| anyhow!(ERR_FZF_NOT_FOUND))?);
+        #[cfg(not(windows))]
+        let mut command = Command::new("fzf");
         if multiple {
             command.arg("-m");
         }
-        command.arg("-n2..").stdin(Stdio::piped()).stdout(Stdio::piped());
+        command.arg("--nth=2..").stdin(Stdio::piped()).stdout(Stdio::piped());
         if let Some(fzf_opts) = config::fzf_opts() {
             command.env("FZF_DEFAULT_OPTS", fzf_opts);
         } else {
@@ -36,7 +44,7 @@ impl Fzf {
                 // Interface
                 "--keep-right",
                 // Layout
-                "--height=40%",
+                "--height=50%",
                 "--info=inline",
                 "--layout=reverse",
                 // Scripting
@@ -47,13 +55,13 @@ impl Fzf {
             ]);
             if cfg!(unix) {
                 command.env("SHELL", "sh");
-                command.arg(r"--preview=\command -p ls -p {2..}");
+                command.args(&[r"--preview=\command -p ls -p {2..}", "--preview-window=down"]);
             }
         }
 
         let child = match command.spawn() {
             Ok(child) => child,
-            Err(e) if e.kind() == io::ErrorKind::NotFound => bail!(Self::ERR_NOT_FOUND),
+            Err(e) if e.kind() == io::ErrorKind::NotFound => bail!(ERR_FZF_NOT_FOUND),
             Err(e) => Err(e).context("could not launch fzf")?,
         };
 
@@ -181,35 +189,6 @@ pub fn current_time() -> Result<Epoch> {
         SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).context("system clock set to invalid time")?.as_secs();
 
     Ok(current_time)
-}
-
-/// Constructs a new [`Command`] for launching the program with the name
-/// `program`.
-///
-/// On Windows, CreateProcess implicitly searches the current working directory
-/// for the executable, which is a potential security issue. Instead, we resolve
-/// the path to the executable and then pass it to CreateProcess.
-///
-/// On other platforms, this is a no-op.
-///
-pub fn get_command<P: AsRef<Path>>(program: P) -> Result<Command> {
-    let program = program.as_ref();
-    if !cfg!(windows) {
-        return Ok(Command::new(program));
-    }
-
-    let paths = env::var_os("PATH").context("PATH environment variable not set")?;
-    for path in env::split_paths(&paths) {
-        if path.as_os_str().is_empty() {
-            continue;
-        }
-        let path = path.join(program);
-        if path.metadata().map_or(false, |m| !m.is_dir()) {
-            return Ok(Command::new(path));
-        }
-    }
-
-    bail!("executable not found in PATH: {}", program.display());
 }
 
 pub fn path_to_str<P: AsRef<Path>>(path: &P) -> Result<&str> {

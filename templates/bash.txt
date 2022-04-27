@@ -13,7 +13,7 @@ function __zoxide_pwd() {
     \builtin pwd -P
 {%- else %}
     \builtin pwd -L
-{%- endif %} || \builtin true
+{%- endif %}
 }
 
 # cd + custom logic based on the value of _ZO_ECHO.
@@ -34,6 +34,7 @@ function __zoxide_cd() {
 {%- if hook == InitHook::Prompt %}
 function __zoxide_hook() {
     \builtin local -r retval="$?"
+    # shellcheck disable=SC2312
     \command zoxide add -- "$(__zoxide_pwd)"
     return "${retval}"
 }
@@ -80,6 +81,7 @@ function __zoxide_z() {
         __zoxide_cd "{{ "${result:${#__zoxide_z_prefix}}" }}"
     else
         \builtin local result
+        # shellcheck disable=SC2312
         result="$(\command zoxide query --exclude "$(__zoxide_pwd)" -- "$@")" &&
             __zoxide_cd "${result}"
     fi
@@ -129,6 +131,7 @@ if [[ ${BASH_VERSINFO[0]:-0} -eq 4 && ${BASH_VERSINFO[1]:-0} -ge 4 || ${BASH_VER
         # If there is a space after the last word, use interactive selection.
         elif [[ -z ${COMP_WORDS[-1]} ]]; then
             \builtin local result
+            # shellcheck disable=SC2312
             result="$(\command zoxide query --exclude "$(__zoxide_pwd)" -i -- "{{ "${COMP_WORDS[@]:1:${#COMP_WORDS[@]}-2}" }}")" &&
                 COMPREPLY=("${__zoxide_z_prefix}${result@Q}")
             \builtin printf '\e[5n'

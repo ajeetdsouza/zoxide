@@ -32,7 +32,8 @@ function __zoxide_cd() {
 {% else -%}
 # Hook to add new entries to the database.
 function __zoxide_hook() {
-    \command zoxide add -- "$(__zoxide_pwd || \builtin true)"
+    # shellcheck disable=SC2312
+    \command zoxide add -- "$(__zoxide_pwd)"
 }
 
 # Initialize hook.
@@ -74,7 +75,8 @@ function __zoxide_z() {
         __zoxide_cd "{{ "${result:${#__zoxide_z_prefix}}" }}"
     else
         \builtin local result
-        result="$(\command zoxide query --exclude "$(__zoxide_pwd || \builtin true)" -- "$@")" &&
+        # shellcheck disable=SC2312
+        result="$(\command zoxide query --exclude "$(__zoxide_pwd)" -- "$@")" &&
             __zoxide_cd "${result}"
     fi
 }
@@ -92,25 +94,17 @@ function __zoxide_zi() {
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-# Remove definitions.
-function __zoxide_unset() {
-    \builtin unalias "$@" &>/dev/null || \builtin true
-    \builtin unfunction "$@" &>/dev/null || \builtin true
-    \builtin unset "$@" &>/dev/null
-}
-
-__zoxide_unset {{cmd}}
+\builtin unalias {{cmd}} &>/dev/null || \builtin true
 function {{cmd}}() {
     __zoxide_z "$@"
 }
 
-__zoxide_unset {{cmd}}i
+\builtin unalias {{cmd}}i &>/dev/null || \builtin true
 function {{cmd}}i() {
     __zoxide_zi "$@"
 }
 
 if [[ -o zle ]]; then
-    __zoxide_unset __zoxide_z_complete
     function __zoxide_z_complete() {
         # Only show completions when the cursor is at the end of the line.
         # shellcheck disable=SC2154
@@ -120,8 +114,8 @@ if [[ -o zle ]]; then
             _files -/
         elif [[ "${words[-1]}" == '' ]]; then
             \builtin local result
-            # shellcheck disable=SC2086
-            if result="$(\command zoxide query -i -- ${words[2,-1]})"; then
+            # shellcheck disable=SC2086,SC2312
+            if result="$(\command zoxide query --exclude "$(__zoxide_pwd)" -i -- ${words[2,-1]})"; then
                 __zoxide_result="${result}"
             else
                 __zoxide_result=''
@@ -130,7 +124,6 @@ if [[ -o zle ]]; then
         fi
     }
 
-    __zoxide_unset __zoxide_z_complete_helper
     function __zoxide_z_complete_helper() {
         \builtin local result="${__zoxide_z_prefix}${__zoxide_result}"
         # shellcheck disable=SC2296
@@ -142,6 +135,7 @@ if [[ -o zle ]]; then
     \builtin bindkey "\e[0n" __zoxide_z_complete_helper
     if [[ "${+functions[compdef]}" -ne 0 ]]; then
         \compdef -d {{cmd}}
+        \compdef -d {{cmd}}i
         \compdef __zoxide_z_complete {{cmd}}
     fi
 fi

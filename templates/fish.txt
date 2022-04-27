@@ -62,15 +62,21 @@ end
 # When using zoxide with --no-cmd, alias these internal functions as desired.
 #
 
+set __zoxide_z_prefix 'z#'
+
 # Jump to a directory using only keywords.
 function __zoxide_z
-    set argc (count $argv)
+    set -l argc (count $argv)
+    set -l completion_regex '^'(string escape --style=regex $__zoxide_z_prefix)'(.*)$'
+
     if test $argc -eq 0
         __zoxide_cd $HOME
     else if test "$argv" = -
         __zoxide_cd -
     else if test $argc -eq 1 -a -d $argv[1]
         __zoxide_cd $argv[1]
+    else if set -l result (string match --groups-only --regex $completion_regex $argv[-1])
+        __zoxide_cd $result
     else
         set -l result (command zoxide query --exclude (__zoxide_pwd) -- $argv)
         and __zoxide_cd $result
@@ -88,8 +94,8 @@ function __zoxide_z_complete
     else if test (count $tokens) -eq (count $curr_tokens)
         # If the last argument is empty, use interactive selection.
         set -l query $tokens[2..-1]
-        set -l result (zoxide query -i -- $query)
-        and commandline --current-process "$tokens[1] "(string escape $result)
+        set -l result (zoxide query --exclude (__zoxide_pwd) -i -- $query)
+        and echo $__zoxide_z_prefix$result
         commandline --function repaint
     end
 end
@@ -107,18 +113,18 @@ end
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
+abbr --erase {{cmd}}
+complete -c {{cmd}} -e
 function {{cmd}}
     __zoxide_z $argv
 end
-abbr --erase {{cmd}}
-complete -c {{cmd}} -e
 complete -c {{cmd}} -f -a '(__zoxide_z_complete)'
 
+abbr --erase {{cmd}}i
+complete -c {{cmd}}i -e
 function {{cmd}}i
     __zoxide_zi $argv
 end
-abbr --erase {{cmd}}i
-complete -c {{cmd}}i -e
 
 {%- when None %}
 

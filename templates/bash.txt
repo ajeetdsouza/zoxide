@@ -34,7 +34,8 @@ function __zoxide_cd() {
 {%- if hook == InitHook::Prompt %}
 function __zoxide_hook() {
     \builtin local -r retval="$?"
-    \command zoxide add -- "$(__zoxide_pwd || \builtin true)"
+    # shellcheck disable=SC2312
+    \command zoxide add -- "$(__zoxide_pwd)"
     return "${retval}"
 }
 {%- else if hook == InitHook::Pwd %}
@@ -80,7 +81,8 @@ function __zoxide_z() {
         __zoxide_cd "{{ "${result:${#__zoxide_z_prefix}}" }}"
     else
         \builtin local result
-        result="$(\command zoxide query --exclude "$(__zoxide_pwd || \builtin true)" -- "$@")" &&
+        # shellcheck disable=SC2312
+        result="$(\command zoxide query --exclude "$(__zoxide_pwd)" -- "$@")" &&
             __zoxide_cd "${result}"
     fi
 }
@@ -98,19 +100,12 @@ function __zoxide_zi() {
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-# Remove definitions.
-function __zoxide_unset() {
-    \builtin unset -f "$@" &>/dev/null
-    \builtin unset -v "$@" &>/dev/null
-    \builtin unalias "$@" &>/dev/null || \builtin :
-}
-
-__zoxide_unset {{cmd}}
+\builtin unalias {{cmd}} &>/dev/null || \builtin true
 function {{cmd}}() {
     __zoxide_z "$@"
 }
 
-__zoxide_unset {{cmd}}i
+\builtin unalias {{cmd}}i &>/dev/null || \builtin true
 function {{cmd}}i() {
     __zoxide_zi "$@"
 }
@@ -136,13 +131,15 @@ if [[ ${BASH_VERSINFO[0]:-0} -eq 4 && ${BASH_VERSINFO[1]:-0} -ge 4 || ${BASH_VER
         # If there is a space after the last word, use interactive selection.
         elif [[ -z ${COMP_WORDS[-1]} ]]; then
             \builtin local result
-            result="$(\command zoxide query -i -- "{{ "${COMP_WORDS[@]:1:${#COMP_WORDS[@]}-2}" }}")" &&
+            # shellcheck disable=SC2312
+            result="$(\command zoxide query --exclude "$(__zoxide_pwd)" -i -- "{{ "${COMP_WORDS[@]:1:${#COMP_WORDS[@]}-2}" }}")" &&
                 COMPREPLY=("${__zoxide_z_prefix}${result@Q}")
             \builtin printf '\e[5n'
         fi
     }
 
     \builtin complete -F __zoxide_z_complete -o nospace -- {{cmd}}
+    \builtin complete -r {{cmd}}i &>/dev/null || \builtin true
 fi
 
 {%- when None %}

@@ -7,7 +7,9 @@
 
 # pwd based on the value of _ZO_RESOLVE_SYMLINKS.
 __zoxide_pwd() {
-{%- if resolve_symlinks %}
+{%- if cfg!(windows) %}
+    \command cygpath -w "$(\builtin pwd -P)"
+{%- else if resolve_symlinks %}
     \command pwd -P
 {%- else %}
     \command pwd -L
@@ -82,20 +84,12 @@ __zoxide_zi() {
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-# Remove definitions.
-__zoxide_unset() {
-    \command unset -f "$@" >/dev/null 2>&1
-    \command unset -v "$@" >/dev/null 2>&1
-    # shellcheck disable=SC1001
-    \command unalias "$@" >/dev/null 2>&1 || \:
-}
-
-__zoxide_unset '{{cmd}}'
+\command unalias {{cmd}} >/dev/null 2>&1 || \true
 {{cmd}}() {
     __zoxide_z "$@"
 }
 
-__zoxide_unset '{{cmd}}i'
+\command unalias {{cmd}}i >/dev/null 2>&1 || \true
 {{cmd}}i() {
     __zoxide_zi "$@"
 }

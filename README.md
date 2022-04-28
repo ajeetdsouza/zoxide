@@ -281,8 +281,16 @@ your data into zoxide:
 <details>
 <summary>autojump</summary>
 
+- For Linux:
+
 ```sh
-zoxide import --from autojump path/to/db
+zoxide import --from autojump ~/.local/share/autojump/autojump.txt --merge
+```
+
+- For macOS:
+
+```sh
+zoxide import --from autojump ~/Library/autojump/autojump.txt --merge
 ```
 
 </details>

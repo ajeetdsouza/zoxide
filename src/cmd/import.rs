@@ -7,23 +7,39 @@ use crate::db::Database;
 
 impl Run for Import {
     fn run(&self) -> Result<()> {
-        let buffer = fs::read_to_string(&self.path).with_context(|| {
-            format!("could not open database for importing: {}", &self.path.display())
-        })?;
-
         let mut db = Database::open()?;
         if !self.merge && !db.dirs().is_empty() {
             bail!("current database is not empty, specify --merge to continue anyway");
         }
 
-        match self.from {
-            ImportFrom::Autojump => import_autojump(&mut db, &buffer),
-            ImportFrom::Z => import_z(&mut db, &buffer),
+        let buffer = fs::read(&self.path).with_context(|| {
+            format!("could not open database for importing: {}", &self.path.display())
+        })?;
+
+        if matches!(self.from, ImportFrom::Zoxide) {
+            from_self(&mut db, &buffer)?;
+        } else {
+            let buffer = std::str::from_utf8(&buffer).with_context(|| {
+                format!("could not open database for importing: {}", &self.path.display())
+            })?;
+            match self.from {
+                ImportFrom::Autojump => import_autojump(&mut db, buffer),
+                ImportFrom::Z => import_z(&mut db, buffer),
+                ImportFrom::Zoxide => unreachable!(),
+            }
+            .context("import error")?;
         }
-        .context("import error")?;
 
         db.save()
     }
+}
+
+fn from_self(db: &mut Database, buffer: &[u8]) -> Result<()> {
+    for dir in Database::deserialize(buffer).context("could not deserialize database")? {
+        db.add_unchecked(dir.path, dir.rank, dir.last_accessed);
+    }
+    db.dedup();
+    Ok(())
 }
 
 fn import_autojump(db: &mut Database, buffer: &str) -> Result<()> {
@@ -80,8 +96,10 @@ fn sigmoid(x: f64) -> f64 {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::db::Dir;
+    use std::fs;
+
+    use super::{sigmoid, *};
+    use crate::db::{Database, Dir};
 
     #[test]
     fn from_autojump() {
@@ -162,5 +180,45 @@ mod tests {
             assert!((dir1.rank - dir2.rank).abs() < 0.01);
             assert_eq!(dir1.last_accessed, dir2.last_accessed);
         }
+    }
+
+    #[test]
+    fn test_from_self() {
+        let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
+        let second_path = if cfg!(windows) { r"C:\bar\foo" } else { "/bar/foo" };
+        let now = 946684800;
+        let before = 946684700;
+
+        let source_data_dir = tempfile::tempdir().unwrap();
+        {
+            let mut db = Database::open_dir(source_data_dir.path()).unwrap();
+            db.add(path, 1.0, now);
+            db.save().unwrap();
+            assert_eq!(db.dirs().len(), 1);
+            let dir = &db.dirs()[0];
+            assert_eq!(dir.path, path);
+            assert_eq!(dir.last_accessed, now);
+            assert_eq!(dir.rank, 1.0);
+        }
+
+        let dest_data_dir = tempfile::tempdir().unwrap();
+        let mut db = Database::open_dir(dest_data_dir.path()).unwrap();
+        db.add(path, 1.0, before);
+        db.add(second_path, 1.0, before);
+        db.save().unwrap();
+
+        let source_buf = fs::read(source_data_dir.path().join("db.zo")).unwrap();
+
+        super::from_self(&mut db, &source_buf).unwrap();
+
+        assert_eq!(db.dirs().len(), 2);
+        let dir = &db.dirs()[0];
+        assert_eq!(dir.path, second_path);
+        assert_eq!(dir.last_accessed, before);
+        assert_eq!(dir.rank, 1.0);
+        let dir2 = &db.dirs()[1];
+        assert_eq!(dir2.path, path);
+        assert_eq!(dir2.last_accessed, now);
+        assert_eq!(dir2.rank, 2.0);
     }
 }

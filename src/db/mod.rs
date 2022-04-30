@@ -206,7 +206,7 @@ impl Database {
         .context("could not serialize database")
     }
 
-    fn deserialize(bytes: &[u8]) -> Result<Vec<Dir>> {
+    pub(crate) fn deserialize(bytes: &[u8]) -> Result<Vec<Dir>> {
         // Assume a maximum size for the database. This prevents bincode from throwing
         // strange errors when it encounters invalid data.
         const MAX_SIZE: u64 = 32 << 20; // 32 MiB

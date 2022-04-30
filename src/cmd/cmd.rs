@@ -97,6 +97,7 @@ pub enum ImportFrom {
     Autojump,
     #[clap(alias = "fasd")]
     Z,
+    Zoxide,
 }
 
 /// Generate shell configuration

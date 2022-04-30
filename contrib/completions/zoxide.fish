@@ -22,7 +22,7 @@ complete -c zoxide -n "__fish_seen_subcommand_from edit; and __fish_seen_subcomm
 complete -c zoxide -n "__fish_seen_subcommand_from edit; and __fish_seen_subcommand_from increment" -s V -l version -d 'Print version'
 complete -c zoxide -n "__fish_seen_subcommand_from edit; and __fish_seen_subcommand_from reload" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_seen_subcommand_from edit; and __fish_seen_subcommand_from reload" -s V -l version -d 'Print version'
-complete -c zoxide -n "__fish_seen_subcommand_from import" -l from -d 'Application to import from' -r -f -a "{autojump	,z	}"
+complete -c zoxide -n "__fish_seen_subcommand_from import" -l from -d 'Application to import from' -r -f -a "{autojump	,z	,zoxide	}"
 complete -c zoxide -n "__fish_seen_subcommand_from import" -l merge -d 'Merge into existing database'
 complete -c zoxide -n "__fish_seen_subcommand_from import" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_seen_subcommand_from import" -s V -l version -d 'Print version'

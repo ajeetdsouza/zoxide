@@ -154,7 +154,7 @@ _zoxide() {
             fi
             case "${prev}" in
                 --from)
-                    COMPREPLY=($(compgen -W "autojump z" -- "${cur}"))
+                    COMPREPLY=($(compgen -W "autojump z zoxide" -- "${cur}"))
                     return 0
                     ;;
                 *)

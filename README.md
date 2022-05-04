@@ -361,6 +361,7 @@ They must be set before `zoxide init` is called.
 | [clink]            | Improved cmd.exe for Windows                 | [clink-zoxide]             |
 | [emacs]            | Text editor                                  | [zoxide.el]                |
 | [felix]            | File manager                                 | Natively supported         |
+| [joshuto]          | File manager                                 | Natively supported         |
 | [lf]               | File manager                                 | See the [wiki][lf-wiki]    |
 | [nnn]              | File manager                                 | [nnn-autojump]             |
 | [ranger]           | File manager                                 | [ranger-zoxide]            |
@@ -399,6 +400,7 @@ They must be set before `zoxide init` is called.
 [guru overlay]: https://github.com/gentoo-mirror/guru
 [homebrew]: https://formulae.brew.sh/formula/zoxide
 [issues]: https://github.com/ajeetdsouza/zoxide/issues/new
+[joshuto]: https://github.com/kamiyaa/joshuto
 [lf]: https://github.com/gokcehan/lf
 [lf-wiki]: https://github.com/gokcehan/lf/wiki/Integrations#zoxide
 [license-badge]: https://img.shields.io/github/license/ajeetdsouza/zoxide?color=lightgray&style=flat-square

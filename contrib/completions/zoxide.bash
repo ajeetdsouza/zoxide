@@ -69,7 +69,7 @@ _zoxide() {
             fi
             case "${prev}" in
                 --from)
-                    COMPREPLY=($(compgen -W "" -- "${cur}"))
+                    COMPREPLY=($(compgen -W "autojump z" -- "${cur}"))
                     return 0
                     ;;
                 *)
@@ -91,7 +91,7 @@ _zoxide() {
                     return 0
                     ;;
                 --hook)
-                    COMPREPLY=($(compgen -W "" -- "${cur}"))
+                    COMPREPLY=($(compgen -W "none prompt pwd" -- "${cur}"))
                     return 0
                     ;;
                 *)

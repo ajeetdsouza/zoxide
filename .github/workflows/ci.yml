@@ -8,6 +8,7 @@ on:
 env:
   CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
   CARGO_INCREMENTAL: 0
+  CARGO_TERM_COLOR: always
 
 jobs:
   ci:

@@ -285,6 +285,14 @@ your data into zoxide:
 zoxide import --from autojump path/to/db
 ```
 
+The default path varies according to your system:
+
+| OS      | Path                                                                                 | Example                                                |
+| ------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------ |
+| Linux   | `$XDG_DATA_HOME/autojump/autojump.txt` or `$HOME/.local/share/autojump/autojump.txt` | `/home/alice/.local/share/autojump/autojump.txt`       |
+| macOS   | `$HOME/Library/autojump/autojump.txt`                                                | `/Users/Alice/Library/autojump/autojump.txt`           |
+| Windows | `%APPDATA%\autojump\autojump.txt`                                                    | `C:\Users\Alice\AppData\Roaming\autojump\autojump.txt` |
+
 </details>
 
 <details>

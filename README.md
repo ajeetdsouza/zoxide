@@ -281,17 +281,17 @@ your data into zoxide:
 <details>
 <summary>autojump</summary>
 
-- For Linux:
-
 ```sh
-zoxide import --from autojump ~/.local/share/autojump/autojump.txt --merge
+zoxide import --from autojump path/to/db
 ```
 
-- For macOS:
+The default path varies according to your system:
 
-```sh
-zoxide import --from autojump ~/Library/autojump/autojump.txt --merge
-```
+| OS      | Path                                                                                 | Example                                                |
+| ------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------ |
+| Linux   | `$XDG_DATA_HOME/autojump/autojump.txt` or `$HOME/.local/share/autojump/autojump.txt` | `/home/alice/.local/share/autojump/autojump.txt`       |
+| macOS   | `$HOME/Library/autojump/autojump.txt`                                                | `/Users/Alice/Library/autojump/autojump.txt`           |
+| Windows | `%APPDATA%\autojump\autojump.txt`                                                    | `C:\Users\Alice\AppData\Roaming\autojump\autojump.txt` |
 
 </details>
 

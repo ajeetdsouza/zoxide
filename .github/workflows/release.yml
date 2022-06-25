@@ -74,9 +74,10 @@ jobs:
 
       - name: Install cargo-deb
         if: ${{ matrix.deb == true }}
-        uses: actions-rs/install@v0.1
+        uses: actions-rs/cargo@v1
         with:
-          crate: cargo-deb
+          command: install
+          args: cargo-deb --locked
 
       - name: Build deb
         if: ${{ matrix.deb == true }}
@@ -113,7 +114,7 @@ jobs:
             *.zip
 
       - name: Create release
-        if: contains(github.event.head_commit.message, '#release')
+        if: startsWith(github.event.head_commit.message, 'chore(release)')
         uses: softprops/action-gh-release@v1
         with:
           draft: true
@@ -121,5 +122,5 @@ jobs:
             *.deb
             *.tar.gz
             *.zip
-          name: "#release"
+          name: ${{ github.event.head_commit.id }}
           tag_name: ""

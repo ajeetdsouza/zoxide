@@ -134,12 +134,12 @@ if [[ ${BASH_VERSINFO[0]:-0} -eq 4 && ${BASH_VERSINFO[1]:-0} -ge 4 || ${BASH_VER
             \builtin local result
             # shellcheck disable=SC2312
             result="$(\command zoxide query --exclude "$(__zoxide_pwd)" -i -- "{{ "${COMP_WORDS[@]:1:${#COMP_WORDS[@]}-2}" }}")" &&
-                COMPREPLY=("${__zoxide_z_prefix}${result@Q}")
+                COMPREPLY=("${__zoxide_z_prefix}${result}/")
             \builtin printf '\e[5n'
         fi
     }
 
-    \builtin complete -F __zoxide_z_complete -o nospace -- {{cmd}}
+    \builtin complete -F __zoxide_z_complete -o filenames -- {{cmd}}
     \builtin complete -r {{cmd}}i &>/dev/null || \builtin true
 fi
 

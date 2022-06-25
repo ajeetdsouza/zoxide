@@ -3,9 +3,11 @@ authors = ["Ajeet D'Souza <98ajeet@gmail.com>"]
 categories = ["command-line-utilities", "filesystem"]
 description = "A smarter cd command for your terminal"
 edition = "2021"
+homepage = "https://github.com/ajeetdsouza/zoxide"
 keywords = ["cli"]
 license = "MIT"
 name = "zoxide"
+readme = "README.md"
 repository = "https://github.com/ajeetdsouza/zoxide"
 rust-version = "1.59"
 version = "0.8.1"
@@ -60,3 +62,53 @@ codegen-units = 1
 debug = 0
 lto = true
 strip = true
+
+[package.metadata.deb]
+assets = [
+    [
+        "target/release/zoxide",
+        "usr/local/bin/",
+        "755",
+    ],
+    [
+        "contrib/completions/zoxide.bash",
+        "usr/share/bash-completion/completions/zoxide",
+        "644",
+    ],
+    [
+        "contrib/completions/zoxide.fish",
+        "usr/share/fish/completions/",
+        "664",
+    ],
+    [
+        "contrib/completions/_zoxide",
+        "usr/share/zsh/vendor-completions/",
+        "644",
+    ],
+    [
+        "man/man1/*",
+        "usr/share/man/man1/",
+        "644",
+    ],
+    [
+        "README.md",
+        "usr/share/doc/zoxide/",
+        "644",
+    ],
+    [
+        "CHANGELOG.md",
+        "usr/share/doc/zoxide/",
+        "644",
+    ],
+    [
+        "LICENSE",
+        "usr/share/doc/zoxide/",
+        "644",
+    ],
+]
+extended-description = """\
+zoxide is a smarter cd command, inspired by z and autojump. It remembers which \
+directories you use most frequently, so you can "jump" to them in just a few \
+keystrokes."""
+priority = "optional"
+section = "admin"

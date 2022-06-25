@@ -113,14 +113,14 @@ end
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-abbr --erase {{cmd}}
+abbr --erase {{cmd}} &>/dev/null
 complete -c {{cmd}} -e
 function {{cmd}}
     __zoxide_z $argv
 end
 complete -c {{cmd}} -f -a '(__zoxide_z_complete)'
 
-abbr --erase {{cmd}}i
+abbr --erase {{cmd}}i &>/dev/null
 complete -c {{cmd}}i -e
 function {{cmd}}i
     __zoxide_zi $argv

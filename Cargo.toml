@@ -6,7 +6,6 @@ edition = "2021"
 homepage = "https://github.com/ajeetdsouza/zoxide"
 keywords = ["cli"]
 license = "MIT"
-license-file = "LICENSE"
 name = "zoxide"
 readme = "README.md"
 repository = "https://github.com/ajeetdsouza/zoxide"
@@ -65,8 +64,6 @@ lto = true
 strip = true
 
 [package.metadata.deb]
-section = "admin"
-priority = "optional"
 assets = [
     [
         "target/release/zoxide",
@@ -113,3 +110,5 @@ extended-description = """\
 zoxide is a smarter cd command, inspired by z and autojump. It remembers which \
 directories you use most frequently, so you can "jump" to them in just a few \
 keystrokes."""
+priority = "optional"
+section = "admin"

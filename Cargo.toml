@@ -10,7 +10,7 @@ name = "zoxide"
 readme = "README.md"
 repository = "https://github.com/ajeetdsouza/zoxide"
 rust-version = "1.59"
-version = "0.8.1"
+version = "0.8.2"
 
 [badges]
 maintenance = { status = "actively-developed" }
@@ -67,7 +67,7 @@ strip = true
 assets = [
     [
         "target/release/zoxide",
-        "usr/local/bin/",
+        "usr/bin/",
         "755",
     ],
     [
@@ -77,7 +77,7 @@ assets = [
     ],
     [
         "contrib/completions/zoxide.fish",
-        "usr/share/fish/completions/",
+        "usr/share/fish/vendor_completions.d/",
         "664",
     ],
     [
@@ -111,4 +111,4 @@ zoxide is a smarter cd command, inspired by z and autojump. It remembers which \
 directories you use most frequently, so you can "jump" to them in just a few \
 keystrokes."""
 priority = "optional"
-section = "admin"
+section = "utils"

@@ -44,6 +44,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Get version
+        id: get_version
+        uses: SebRollen/toml-action@v1.0.0
+        with:
+          file: Cargo.toml
+          field: package.version
+
       - name: Set artifact name
         shell: bash
         run: |
@@ -74,10 +81,9 @@ jobs:
 
       - name: Install cargo-deb
         if: ${{ matrix.deb == true }}
-        uses: actions-rs/cargo@v1
+        uses: actions-rs/install@v0.1
         with:
-          command: install
-          args: cargo-deb --locked
+          crate: cargo-deb
 
       - name: Build deb
         if: ${{ matrix.deb == true }}
@@ -94,11 +100,12 @@ jobs:
           man/
           -C contrib/ completions/ -C ../
           -C target/${{ matrix.target }}/release/ zoxide
-          | gzip --best > '${{ env.ARTIFACT_NAME }}.tar.gz'
+          | gzip --best
+          > 'zoxide-${{ steps.get_version.outputs.value }}-${{ matrix.target }}.tar.gz'
       - name: Package (Windows)
         if: runner.os == 'Windows'
         run: >
-          7z a ${{ env.ARTIFACT_NAME }}.zip
+          7z a 'zoxide-${{ steps.get_version.outputs.value }}-${{ matrix.target }}.zip'
           CHANGELOG.md LICENSE README.md
           ./man/
           ./contrib/completions/
@@ -122,5 +129,5 @@ jobs:
             *.deb
             *.tar.gz
             *.zip
-          name: ${{ github.event.head_commit.id }}
+          name: ${{ steps.get_version.outputs.value }}
           tag_name: ""

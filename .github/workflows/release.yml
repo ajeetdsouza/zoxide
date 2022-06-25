@@ -63,13 +63,6 @@ jobs:
           override: true
           target: ${{ matrix.target }}
 
-      - name: Install cargo-deb
-        if: ${{ matrix.deb == true }}
-        uses: actions-rs/install@v0.1
-        with:
-          crate: cargo-deb
-          version: latest
-
       - name: Setup cache
         uses: Swatinem/rust-cache@v1
 
@@ -80,12 +73,18 @@ jobs:
           args: --release --locked --target=${{ matrix.target }} --color=always --verbose
           use-cross: ${{ runner.os == 'Linux' }}
 
+      - name: Install cargo-deb
+        if: ${{ matrix.deb == true }}
+        uses: actions-rs/install@v0.1
+        with:
+          crate: cargo-deb
+
       - name: Build deb
         if: ${{ matrix.deb == true }}
         uses: actions-rs/cargo@v1
         with:
           command: deb
-          args: --no-build --target=${{ matrix.target }}
+          args: --no-build --no-strip --output=. --target=${{ matrix.target }}
 
       - name: Package (*nix)
         if: runner.os != 'Windows'
@@ -110,8 +109,9 @@ jobs:
         with:
           name: ${{ matrix.target }}
           path: |
-            *.zip
+            *.deb
             *.tar.gz
+            *.zip
 
       - name: Create release
         if: startsWith(github.ref, 'refs/tags/v')

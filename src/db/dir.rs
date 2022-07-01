@@ -132,14 +132,7 @@ pub struct DirDisplayScore<'a> {
 
 impl Display for DirDisplayScore<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let score = self.dir.score(self.now);
-        let score = if score > 9999.0 {
-            9999
-        } else if score > 0.0 {
-            score as u32
-        } else {
-            0
-        };
+        let score = self.dir.score(self.now).clamp(0.0, 9999.0) as u32;
         write!(f, "{:>4} {}", score, self.dir.path)
     }
 }

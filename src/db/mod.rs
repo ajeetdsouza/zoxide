@@ -94,10 +94,8 @@ impl<'file> Database<'file> {
 
     pub fn age(&mut self, max_age: Rank) {
         let sum_age = self.dirs.iter().map(|dir| dir.rank).sum::<Rank>();
-
         if sum_age > max_age {
             let factor = 0.9 * max_age / sum_age;
-
             for idx in (0..self.dirs.len()).rev() {
                 let dir = &mut self.dirs[idx];
                 dir.rank *= factor;
@@ -105,7 +103,6 @@ impl<'file> Database<'file> {
                     self.dirs.swap_remove(idx);
                 }
             }
-
             self.modified = true;
         }
     }

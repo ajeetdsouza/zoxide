@@ -2,9 +2,7 @@ use std::iter::Rev;
 use std::ops::Range;
 use std::{fs, path};
 
-use ordered_float::OrderedFloat;
-
-use super::{Database, Dir, Epoch};
+use crate::db::{Database, Dir, Epoch};
 use crate::util;
 
 pub struct Stream<'db, 'file> {
@@ -23,7 +21,7 @@ pub struct Stream<'db, 'file> {
 impl<'db, 'file> Stream<'db, 'file> {
     pub fn new(db: &'db mut Database<'file>, now: Epoch) -> Self {
         // Iterate in descending order of score.
-        db.dirs.sort_unstable_by_key(|dir| OrderedFloat(dir.score(now)));
+        db.dirs.sort_unstable_by(|dir1, dir2| dir1.score(now).total_cmp(&dir2.score(now)));
         let idxs = (0..db.dirs.len()).rev();
 
         // If a directory is deleted and hasn't been used for 90 days, delete it from the database.

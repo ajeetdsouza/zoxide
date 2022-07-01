@@ -185,6 +185,8 @@ Add this to your configuration (usually `~/.config/fish/config.fish`):
 zoxide init fish | source
 ```
 
+Note: zoxide only supports fish v3.4.0 and above.
+
 </details>
 
 <details>

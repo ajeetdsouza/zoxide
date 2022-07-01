@@ -9,7 +9,7 @@ license = "MIT"
 name = "zoxide"
 readme = "README.md"
 repository = "https://github.com/ajeetdsouza/zoxide"
-rust-version = "1.59"
+rust-version = "1.62"
 version = "0.8.2"
 
 [badges]
@@ -27,7 +27,6 @@ dirs = "4.0.0"
 dunce = "1.0.1"
 fastrand = "1.7.0"
 glob = "0.3.0"
-ordered-float = "3.0.0"
 serde = { version = "1.0.116", features = ["derive"] }
 
 [target.'cfg(unix)'.dependencies]
@@ -46,7 +45,7 @@ clap_complete_fig = "3.1.0"
 
 [dev-dependencies]
 assert_cmd = "2.0.0"
-rstest = "0.13.0"
+rstest = "0.15.0"
 rstest_reuse = "0.3.0"
 tempfile = "3.1.0"
 

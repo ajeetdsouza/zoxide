@@ -62,7 +62,7 @@ end
 # When using zoxide with --no-cmd, alias these internal functions as desired.
 #
 
-set __zoxide_z_prefix 'z#'
+set __zoxide_z_prefix 'z!'
 
 # Jump to a directory using only keywords.
 function __zoxide_z

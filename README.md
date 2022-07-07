@@ -68,24 +68,25 @@ curl -sS https://webinstall.dev/zoxide | bash
 
 Alternatively, you can use a package manager:
 
-| Distribution       | Repository              | Instructions                                                                                   |
-| ------------------ | ----------------------- | ---------------------------------------------------------------------------------------------- |
-| ***Any***          | **[crates.io]**         | `cargo install zoxide --locked`                                                                |
-| *Any*              | [conda-forge]           | `conda install -c conda-forge zoxide`                                                          |
-| *Any*              | [Linuxbrew]             | `brew install zoxide`                                                                          |
-| Alpine Linux 3.13+ | [Alpine Linux Packages] | `apk add zoxide`                                                                               |
-| Arch Linux         | [Arch Linux Community]  | `pacman -S zoxide`                                                                             |
-| CentOS 7+          | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide`                                      |
-| Debian 11+         | [Debian Packages]       | `apt install zoxide`                                                                           |
-| Devuan 4.0+        | [Devuan Packages]       | `apt install zoxide`                                                                           |
-| Fedora 32+         | [Fedora Packages]       | `dnf install zoxide`                                                                           |
-| Gentoo             | [GURU Overlay]          | `eselect repository enable guru` <br /> `emerge --sync guru` <br /> `emerge app-shells/zoxide` |
-| Manjaro            |                         | `pacman -S zoxide`                                                                             |
-| NixOS              | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                                                                   |
-| Parrot OS          |                         | `apt install zoxide`                                                                           |
-| Raspbian 11+       | [Raspbian Packages]     | `apt install zoxide`                                                                           |
-| Ubuntu 21.04+      | [Ubuntu Packages]       | `apt install zoxide`                                                                           |
-| Void Linux         | [Void Linux Packages]   | `xbps-install -S zoxide`                                                                       |
+| Distribution        | Repository              | Instructions                                                                                   |
+| ------------------- | ----------------------- | ---------------------------------------------------------------------------------------------- |
+| ***Any***           | **[crates.io]**         | `cargo install zoxide --locked`                                                                |
+| *Any*               | [conda-forge]           | `conda install -c conda-forge zoxide`                                                          |
+| *Any*               | [Linuxbrew]             | `brew install zoxide`                                                                          |
+| Alpine Linux 3.13+  | [Alpine Linux Packages] | `apk add zoxide`                                                                               |
+| Arch Linux          | [Arch Linux Community]  | `pacman -S zoxide`                                                                             |
+| CentOS 7+           | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide`                                      |
+| Debian 11+          | [Debian Packages]       | `apt install zoxide`                                                                           |
+| Devuan 4.0+         | [Devuan Packages]       | `apt install zoxide`                                                                           |
+| Fedora 32+          | [Fedora Packages]       | `dnf install zoxide`                                                                           |
+| Gentoo              | [GURU Overlay]          | `eselect repository enable guru` <br /> `emerge --sync guru` <br /> `emerge app-shells/zoxide` |
+| Manjaro             |                         | `pacman -S zoxide`                                                                             |
+| NixOS               | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                                                                   |
+| openSUSE Tumbleweed | [openSUSE Factory]      | `zypper install zoxide`                                                                        |
+| Parrot OS           |                         | `apt install zoxide`                                                                           |
+| Raspbian 11+        | [Raspbian Packages]     | `apt install zoxide`                                                                           |
+| Ubuntu 21.04+       | [Ubuntu Packages]       | `apt install zoxide`                                                                           |
+| Void Linux          | [Void Linux Packages]   | `xbps-install -S zoxide`                                                                       |
 
 </details>
 
@@ -421,6 +422,7 @@ They must be set before `zoxide init` is called.
 [nixpkgs]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/tools/misc/zoxide/default.nix
 [nnn-autojump]: https://github.com/jarun/nnn/blob/master/plugins/autojump
 [nnn]: https://github.com/jarun/nnn
+[opensuse factory]: https://build.opensuse.org/package/show/openSUSE:Factory/zoxide
 [pkgsrc]: https://pkgsrc.se/sysutils/zoxide
 [ranger-zoxide]: https://github.com/jchook/ranger-zoxide
 [ranger]: https://github.com/ranger/ranger

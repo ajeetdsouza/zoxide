@@ -33,6 +33,10 @@ Register-ArgumentCompleter -Native -CommandName 'zoxide' -ScriptBlock {
             break
         }
         'zoxide;add' {
+            [CompletionResult]::new('-i', 'i', [CompletionResultType]::ParameterName, 'Increment path(s) score by specified amount')
+            [CompletionResult]::new('--increment', 'increment', [CompletionResultType]::ParameterName, 'Increment path(s) score by specified amount')
+            [CompletionResult]::new('-d', 'd', [CompletionResultType]::ParameterName, 'Decrement path(s) score by specified amount. Score won''t go below 0')
+            [CompletionResult]::new('--decrement', 'decrement', [CompletionResultType]::ParameterName, 'Decrement path(s) score by specified amount. Score won''t go below 0')
             [CompletionResult]::new('-h', 'h', [CompletionResultType]::ParameterName, 'Print help information')
             [CompletionResult]::new('--help', 'help', [CompletionResultType]::ParameterName, 'Print help information')
             [CompletionResult]::new('-V', 'V', [CompletionResultType]::ParameterName, 'Print version information')

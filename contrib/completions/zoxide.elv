@@ -29,6 +29,10 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand remove 'Remove a directory from the database'
         }
         &'zoxide;add'= {
+            cand -i 'Increment path(s) score by specified amount'
+            cand --increment 'Increment path(s) score by specified amount'
+            cand -d 'Decrement path(s) score by specified amount. Score won''t go below 0'
+            cand --decrement 'Decrement path(s) score by specified amount. Score won''t go below 0'
             cand -h 'Print help information'
             cand --help 'Print help information'
             cand -V 'Print version information'

@@ -33,6 +33,14 @@ pub enum Cmd {
 pub struct Add {
     #[clap(min_values = 1, required = true, value_hint = ValueHint::DirPath)]
     pub paths: Vec<PathBuf>,
+
+    /// Increment path(s) score by specified amount.
+    #[clap(long, short, conflicts_with = "decrement")]
+    pub increment: Option<u16>,
+
+    /// Decrement path(s) score by specified amount. Score won't go below 0.
+    #[clap(long, short, conflicts_with = "increment")]
+    pub decrement: Option<u16>,
 }
 
 /// Import entries from another application

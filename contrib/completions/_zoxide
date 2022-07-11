@@ -30,6 +30,10 @@ _zoxide() {
         case $line[1] in
             (add)
 _arguments "${_arguments_options[@]}" \
+'(-d --decrement)-i+[Increment path(s) score by specified amount]:INCREMENT: ' \
+'(-d --decrement)--increment=[Increment path(s) score by specified amount]:INCREMENT: ' \
+'(-i --increment)-d+[Decrement path(s) score by specified amount. Score won'\''t go below 0]:DECREMENT: ' \
+'(-i --increment)--decrement=[Decrement path(s) score by specified amount. Score won'\''t go below 0]:DECREMENT: ' \
 '-h[Print help information]' \
 '--help[Print help information]' \
 '-V[Print version information]' \

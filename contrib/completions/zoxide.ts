@@ -7,6 +7,30 @@ const completion: Fig.Spec = {
       description: "Add a new directory or increment its rank",
       options: [
         {
+          name: ["-i", "--increment"],
+          description: "Increment path(s) score by specified amount",
+          exclusiveOn: [
+            "-d",
+            "--decrement",
+          ],
+          args: {
+            name: "increment",
+            isOptional: true,
+          },
+        },
+        {
+          name: ["-d", "--decrement"],
+          description: "Decrement path(s) score by specified amount. Score won't go below 0",
+          exclusiveOn: [
+            "-i",
+            "--increment",
+          ],
+          args: {
+            name: "decrement",
+            isOptional: true,
+          },
+        },
+        {
           name: ["-h", "--help"],
           description: "Print help information",
         },

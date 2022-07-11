@@ -16,6 +16,13 @@ impl Run for Add {
         let exclude_dirs = config::exclude_dirs()?;
         let max_age = config::maxage()?;
         let now = util::current_time()?;
+        let increment = if let Some(num) = self.increment {
+            num as f64
+        } else if let Some(num) = self.decrement {
+            -(num as f64)
+        } else {
+            1.0
+        };
 
         let mut db = DatabaseFile::new(data_dir);
         let mut db = db.open()?;
@@ -31,7 +38,7 @@ impl Run for Add {
             if !Path::new(path).is_dir() {
                 bail!("not a directory: {}", path);
             }
-            db.add(path, now);
+            db.add(path, now, increment);
         }
 
         if db.modified {

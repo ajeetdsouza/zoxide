@@ -6,6 +6,10 @@ use anyhow::{bail, Context, Result};
 use bincode::Options as _;
 use serde::{Deserialize, Serialize};
 
+pub const HOUR: Epoch = 60 * 60;
+pub const DAY: Epoch = 24 * HOUR;
+pub const WEEK: Epoch = 7 * DAY;
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct DirList<'a>(#[serde(borrow)] pub Vec<Dir<'a>>);
 
@@ -89,10 +93,6 @@ pub struct Dir<'a> {
 
 impl Dir<'_> {
     pub fn score(&self, now: Epoch) -> Rank {
-        const HOUR: Epoch = 60 * 60;
-        const DAY: Epoch = 24 * HOUR;
-        const WEEK: Epoch = 7 * DAY;
-
         // The older the entry, the lesser its importance.
         let duration = now.saturating_sub(self.last_accessed);
         if duration < HOUR {

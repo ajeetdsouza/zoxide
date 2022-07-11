@@ -5,6 +5,8 @@ complete -c zoxide -n "__fish_use_subcommand" -f -a "import" -d 'Import entries 
 complete -c zoxide -n "__fish_use_subcommand" -f -a "init" -d 'Generate shell configuration'
 complete -c zoxide -n "__fish_use_subcommand" -f -a "query" -d 'Search for a directory in the database'
 complete -c zoxide -n "__fish_use_subcommand" -f -a "remove" -d 'Remove a directory from the database'
+complete -c zoxide -n "__fish_seen_subcommand_from add" -s i -l increment -d 'Increment path(s) score by specified amount' -r
+complete -c zoxide -n "__fish_seen_subcommand_from add" -s d -l decrement -d 'Decrement path(s) score by specified amount. Score won\'t go below 0' -r
 complete -c zoxide -n "__fish_seen_subcommand_from add" -s h -l help -d 'Print help information'
 complete -c zoxide -n "__fish_seen_subcommand_from add" -s V -l version -d 'Print version information'
 complete -c zoxide -n "__fish_seen_subcommand_from import" -l from -d 'Application to import from' -r -f -a "{autojump	,z	}"

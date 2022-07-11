@@ -32,16 +32,19 @@ impl<'file> Database<'file> {
     }
 
     /// Adds a new directory or increments its rank. Also updates its last accessed time.
-    pub fn add<S: AsRef<str>>(&mut self, path: S, now: Epoch) {
+    pub fn add<S: AsRef<str>>(&mut self, path: S, now: Epoch, increment: f64) {
         let path = path.as_ref();
 
         match self.dirs.iter_mut().find(|dir| dir.path == path) {
             None => {
-                self.dirs.push(Dir { path: path.to_string().into(), last_accessed: now, rank: 1.0 });
+                self.dirs.push(Dir { path: path.to_string().into(), last_accessed: now, rank: increment });
             }
             Some(dir) => {
                 dir.last_accessed = now;
-                dir.rank += 1.0;
+                dir.rank += increment;
+                if dir.rank < 0.0 {
+                    dir.rank = 0.0;
+                }
             }
         };
 
@@ -148,7 +151,9 @@ fn db_path<P: AsRef<Path>>(data_dir: P) -> PathBuf {
 
 #[cfg(test)]
 mod tests {
+    use super::dir::{DAY, HOUR, WEEK};
     use super::*;
+    use rstest::rstest;
 
     #[test]
     fn add() {
@@ -159,8 +164,8 @@ mod tests {
         {
             let mut db = DatabaseFile::new(data_dir.path());
             let mut db = db.open().unwrap();
-            db.add(path, now);
-            db.add(path, now);
+            db.add(path, now, 1.0);
+            db.add(path, now, 1.0);
             db.save().unwrap();
         }
         {
@@ -174,6 +179,53 @@ mod tests {
         }
     }
 
+    #[rstest]
+    // Nominal case
+    #[case(1.0, None, HOUR - 10, 4.0)]
+    #[case(1.0, None, DAY - 10, 2.0)]
+    #[case(1.0, None, WEEK - 10, 0.5)]
+    #[case(1.0, None, WEEK + 10, 0.25)]
+    // Start with higher priority
+    #[case(10.0, None, HOUR - 10, 40.0)]
+    #[case(10.0, None, DAY - 10, 20.0)]
+    #[case(10.0, None, WEEK - 10, 5.0)]
+    #[case(10.0, None, WEEK + 10, 2.5)]
+    // Increment priority
+    #[case(1.0, Some(9.0), HOUR - 10, 40.0)]
+    #[case(1.0, Some(9.0), DAY - 10, 20.0)]
+    #[case(1.0, Some(9.0), WEEK - 10, 5.0)]
+    #[case(1.0, Some(9.0), WEEK + 10, 2.5)]
+    // Decrement priority
+    #[case(10.0, Some(-5.0), HOUR - 10, 20.0)]
+    #[case(10.0, Some(-5.0), DAY - 10, 10.0)]
+    #[case(10.0, Some(-5.0), WEEK - 10, 2.5)]
+    #[case(10.0, Some(-5.0), WEEK + 10, 1.25)]
+    // Attempt decrement < 0
+    #[case(1.0, Some(-5.0), HOUR - 10, 0.0)]
+    #[case(1.0, Some(-5.0), DAY - 10, 0.0)]
+    #[case(1.0, Some(-5.0), WEEK - 10, 0.0)]
+    #[case(1.0, Some(-5.0), WEEK + 10, 0.0)]
+    fn add_increment(
+        #[case] first_increment: f64,
+        #[case] second_increment: Option<f64>,
+        #[case] accessed: u64,
+        #[case] expected: f64,
+    ) {
+        let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
+        let data_dir = tempfile::tempdir().unwrap();
+        let mut db = DatabaseFile::new(data_dir.path());
+        let mut db = db.open().unwrap();
+
+        let now = 10000000;
+        db.add(path, now - accessed, first_increment);
+        if let Some(more) = second_increment {
+            db.add(path, now - accessed, more);
+        }
+        let dir = &db.dirs[0];
+        // Float version of assert dir.score(now) == expected
+        assert!((dir.score(now) - expected).abs() < 0.0001);
+    }
+
     #[test]
     fn remove() {
         let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
@@ -183,7 +235,7 @@ mod tests {
         {
             let mut db = DatabaseFile::new(data_dir.path());
             let mut db = db.open().unwrap();
-            db.add(path, now);
+            db.add(path, now, 1.0);
             db.save().unwrap();
         }
         {

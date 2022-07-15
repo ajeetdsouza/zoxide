@@ -63,10 +63,10 @@ please [open an issue][issues].
 To install zoxide, run this command in your terminal:
 
 ```sh
-curl -sS https://webinstall.dev/zoxide | bash
+curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
 ```
 
-Alternatively, you can use a package manager:
+Or, you can use a package manager:
 
 | Distribution        | Repository              | Instructions                                                                                   |
 | ------------------- | ----------------------- | ---------------------------------------------------------------------------------------------- |
@@ -102,6 +102,12 @@ To install zoxide, use a package manager:
 | [Homebrew]      | `brew install zoxide`                 |
 | [MacPorts]      | `port install zoxide`                 |
 
+Or, run this command in your terminal:
+
+```sh
+curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+```
+
 </details>
 
 <details>
@@ -113,7 +119,7 @@ To install zoxide, run this command in your command prompt:
 curl.exe -A "MS" https://webinstall.dev/zoxide | powershell
 ```
 
-Alternatively, you can use a package manager:
+Or, you can use a package manager:
 
 | Repository      | Instructions                          |
 | --------------- | ------------------------------------- |

@@ -38,7 +38,8 @@ main() {
         ensure tar -xf "$_package"
         ;;
     *.zip)
-        # TODO: unzip on Windows
+        need_cmd unzip
+        ensure unzip -oq "$_package"
         ;;
     *)
         err "unsupported package format: $_package"
@@ -93,7 +94,7 @@ download_zoxide() {
 
     local _package_url
     _package_url="$(echo "$_releases" | grep "browser_download_url" | cut -d '"' -f 4 | grep "$_arch")" ||
-        err "could not extract release URL from GitHub API"
+        err "zoxide has not yet been packaged for your architecture ($_arch), please file an issue at https://github.com/ajeetdsouza/zoxide/issues"
 
     local _ext
     case "$_package_url" in

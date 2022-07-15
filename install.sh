@@ -1,10 +1,7 @@
 #!/bin/sh
 # shellcheck shell=dash
 
-# This is a script that installs zoxide. Major parts of it have been taken from
-# the Rustup install script, and belong to The Rust Project Developers:
-#
-#   https://github.com/rust-lang/rustup/blob/4c1289b2c3f3702783900934a38d7c5f912af787/rustup-init.sh
+# The official zoxide installer.
 #
 # It runs on Unix shells like {a,ba,da,k,z}sh. It uses the common `local`
 # extension. Note: Most shells limit `local` to 1 var per line, contra bash.
@@ -14,18 +11,110 @@ main() {
         # The version of ksh93 that ships with many illumos systems does not
         # support the "local" extension.  Print a message rather than fail in
         # subtle ways later on:
-        err 'The installer does not work with this ksh93 version; please try bash!' >&2
+        err 'the installer does not work with this ksh93 version; please try bash'
     fi
 
     set -u
 
-    echo "Installing zoxide..."
-
-    get_architecture || return 1
+    # Detect and print host target triple.
+    ensure get_architecture
     local _arch="$RETVAL"
     assert_nz "$_arch" "arch"
     echo "Detected architecture: $_arch"
+
+    # Create and enter a temporary directory.
+    local _tmp_dir
+    _tmp_dir="$(mktemp -d)" || err "mktemp: could not create temporary directory"
+    cd "$_tmp_dir" || err "cd: failed to enter directory: $_tmp_dir"
+
+    # Download and extract zoxide.
+    ensure download_zoxide "$_arch"
+    local _package="$RETVAL"
+    assert_nz "$_package" "package"
+    echo "Downloaded package: $_package"
+    case "$_package" in
+    *.tar.gz)
+        need_cmd tar
+        ensure tar -xf "$_package"
+        ;;
+    *.zip)
+        # TODO: unzip on Windows
+        ;;
+    *)
+        err "unsupported package format: $_package"
+        ;;
+    esac
+
+    # Install binary.
+    local _bin_dir="$HOME/.local/bin"
+    local _bin_name
+    case "$_arch" in
+    *windows*) _bin_name="zoxide.exe" ;;
+    *) _bin_name="zoxide" ;;
+    esac
+    ensure mkdir -p "$_bin_dir"
+    ensure cp "$_bin_name" "$_bin_dir"
+    echo "Installed zoxide to $_bin_dir"
+
+    # Install manpages.
+    local _man_dir="$HOME/.local/share/man"
+    ensure mkdir -p "$_man_dir/man1"
+    ensure cp "man/man1/"* "$_man_dir/man1/"
+    echo "Installed manpages to $_man_dir"
+
+    # Print success message and check $PATH.
+    echo ""
+    echo "zoxide is installed!"
+    if ! echo ":$PATH:" | grep -Fq ":$_bin_dir:"; then
+        echo "NOTE: $_bin_dir is not on your \$PATH. zoxide will not work unless it is added to \$PATH."
+    fi
 }
+
+download_zoxide() {
+    local _arch="$1"
+
+    if check_cmd curl; then
+        _dld=curl
+    elif check_cmd wget; then
+        _dld=wget
+    else
+        need_cmd 'curl or wget'
+    fi
+    need_cmd grep
+
+    local _releases_url="https://api.github.com/repos/ajeetdsouza/zoxide/releases/latest"
+    local _releases
+    case "$_dld" in
+    curl) _releases="$(curl -sL "$_releases_url")" ||
+        err "curl: failed to download $_releases_url" ;;
+    wget) _releases="$(wget -qO- "$_releases_url")" ||
+        err "wget: failed to download $_releases_url" ;;
+    esac
+
+    local _package_url
+    _package_url="$(echo "$_releases" | grep "browser_download_url" | cut -d '"' -f 4 | grep "$_arch")" ||
+        err "could not extract release URL from GitHub API"
+
+    local _ext
+    case "$_package_url" in
+    *.tar.gz) _ext="tar.gz" ;;
+    *.zip) _ext="zip" ;;
+    *) err "unsupported package format: $_package_url" ;;
+    esac
+
+    local _package="zoxide.$_ext"
+    case "$_dld" in
+    curl) _releases="$(curl -sLo "$_package" "$_package_url")" || err "curl: failed to download $_package_url" ;;
+    wget) _releases="$(wget -qO "$_package" "$_package_url")" || err "wget: failed to download $_package_url" ;;
+    esac
+
+    RETVAL="$_package"
+}
+
+# The below functions have been extracted with minor modifications from the
+# Rustup install script:
+#
+#   https://github.com/rust-lang/rustup/blob/4c1289b2c3f3702783900934a38d7c5f912af787/rustup-init.sh
 
 get_architecture() {
     local _ostype _cputype _bitness _arch _clibtype
@@ -258,7 +347,7 @@ check_proc() {
     # Check for /proc by looking for the /proc/self/exe link.
     # This is only run on Linux.
     if ! test -L /proc/self/exe; then
-        err "fatal: Unable to find /proc/self/exe.  Is /proc mounted?  Installation cannot proceed without /proc."
+        err "unable to find /proc/self/exe. Is /proc mounted? Installation cannot proceed without /proc."
     fi
 }
 
@@ -280,16 +369,12 @@ ensure() {
 }
 
 assert_nz() {
-    if [ -z "$1" ]; then err "assert_nz $2"; fi
+    if [ -z "$1" ]; then err "found empty string: $2"; fi
 }
 
 err() {
-    say "$1" >&2
+    echo "Error: $1" >&2
     exit 1
-}
-
-say() {
-    printf 'zoxide: %s\n' "$1"
 }
 
 # This is put in braces to ensure that the script does not run until it is

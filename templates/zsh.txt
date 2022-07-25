@@ -67,7 +67,7 @@ function __zoxide_z() {
             \builtin printf 'zoxide: $OLDPWD is not set'
             return 1
         fi
-    elif [[ "$#" -eq 1 ]] && [[ -d "$1" ]]; then
+    elif [[ "$#" -eq 1 ]] && [[ -d "$1" ]] || [[ "$1" =~ ^[-+][1-9]$ ]]; then
         __zoxide_cd "$1"
     elif [[ "$@[-1]" == "${__zoxide_z_prefix}"* ]]; then
         # shellcheck disable=SC2124

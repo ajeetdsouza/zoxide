@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Fish: change fuzzy completion prefix to `z!`.
+- Zsh: allow `z` to navigate dirstack via `+n` and `-n`.
 
 ## [0.8.2] - 2022-06-26
 

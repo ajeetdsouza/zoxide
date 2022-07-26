@@ -19,7 +19,7 @@ function __zoxide_pwd() {
 # cd + custom logic based on the value of _ZO_ECHO.
 function __zoxide_cd() {
     # shellcheck disable=SC2164
-    \builtin cd -- "$@" {%- if echo %} && __zoxide_pwd {%- endif %}
+    \builtin cd -- "$@" >/dev/null {%- if echo %} && __zoxide_pwd {%- endif %}
 }
 
 {{ section }}
@@ -59,15 +59,7 @@ function __zoxide_z() {
     # shellcheck disable=SC2199
     if [[ "$#" -eq 0 ]]; then
         __zoxide_cd ~
-    elif [[ "$#" -eq 1 ]] && [[ "$1" = '-' ]]; then
-        if [[ -n "${OLDPWD}" ]]; then
-            __zoxide_cd "${OLDPWD}"
-        else
-            # shellcheck disable=SC2016
-            \builtin printf 'zoxide: $OLDPWD is not set'
-            return 1
-        fi
-    elif [[ "$#" -eq 1 ]] && [[ -d "$1" ]]; then
+    elif [[ "$#" -eq 1 ]] && { [[ -d "$1" ]] || [[ "$1" = '-' ]] || [[ "$1" =~ ^[-+][0-9]$ ]]; }; then
         __zoxide_cd "$1"
     elif [[ "$@[-1]" == "${__zoxide_z_prefix}"* ]]; then
         # shellcheck disable=SC2124

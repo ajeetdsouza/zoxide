@@ -114,14 +114,14 @@ end
 {%- when Some with (cmd) %}
 
 abbr --erase {{cmd}} &>/dev/null
-complete -c {{cmd}} -e
+complete --command {{cmd}} --erase
 function {{cmd}}
     __zoxide_z $argv
 end
-complete -c {{cmd}} -f -a '(__zoxide_z_complete)'
+complete --command {{cmd}} --no-files --arguments '(__zoxide_z_complete)'
 
 abbr --erase {{cmd}}i &>/dev/null
-complete -c {{cmd}}i -e
+complete --command {{cmd}}i --erase
 function {{cmd}}i
     __zoxide_zi $argv
 end

@@ -54,8 +54,17 @@ impl Fzf {
                 "--bind=ctrl-z:ignore",
             ]);
             if cfg!(unix) {
-                command.env("SHELL", "sh");
-                command.args(&[r"--preview=\command -p ls -p {2..}", "--preview-window=down"]);
+                // Non-POSIX args are only available on certain operating systems.
+                const LS_ARGS: &str = if cfg!(target_os = "linux") {
+                    "--color=always --group-directories-first"
+                } else if cfg!(target_os = "macos") {
+                    "--color=always"
+                } else {
+                    ""
+                };
+                command
+                    .args(&[&format!(r"--preview=\command -p ls -Cp {LS_ARGS} {{2..}}"), "--preview-window=down,30%"])
+                    .env("SHELL", "sh");
             }
         }
 

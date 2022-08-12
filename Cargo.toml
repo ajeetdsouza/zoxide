@@ -45,8 +45,8 @@ clap_complete_fig = "3.1.0"
 
 [dev-dependencies]
 assert_cmd = "2.0.0"
-rstest = "0.15.0"
-rstest_reuse = "0.3.0"
+rstest = { version = "0.15.0", default-features = false }
+rstest_reuse = "0.4.0"
 tempfile = "3.1.0"
 
 [features]

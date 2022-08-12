@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Zsh: allow `z` to navigate dirstack via `+n` and `-n`.
 - Fzf: improved preview window.
 
+### Fixed
+
+- Bash: double forward slash in completions.
+
 ## [0.8.2] - 2022-06-26
 
 ### Changed

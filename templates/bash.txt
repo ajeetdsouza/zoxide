@@ -127,7 +127,7 @@ if [[ ${BASH_VERSINFO[0]:-0} -eq 4 && ${BASH_VERSINFO[1]:-0} -ge 4 || ${BASH_VER
         # If there is only one argument, use `cd` completions.
         if [[ {{ "${#COMP_WORDS[@]}" }} -eq 2 ]]; then
             \builtin mapfile -t COMPREPLY < <(
-                \builtin compgen -A directory -S / -- "${COMP_WORDS[-1]}" || \builtin true
+                \builtin compgen -A directory -- "${COMP_WORDS[-1]}" || \builtin true
             )
         # If there is a space after the last word, use interactive selection.
         elif [[ -z ${COMP_WORDS[-1]} ]]; then

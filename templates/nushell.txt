@@ -6,35 +6,30 @@
 {{ section }}
 # Hook configuration for zoxide.
 #
-{% match hook %}
-{%- when InitHook::None %}
+
+{% if hook == InitHook::None -%}
 {{ not_configured }}
 
-{%- when InitHook::Prompt %}
-# Default prompt for Nushell.
-let-env __zoxide_oldprompt = (if '__zoxide_oldprompt' in (env).name {
-  $env.__zoxide_oldprompt
-} else if 'PROMPT_COMMAND' in (env).name {
-  $env.PROMPT_COMMAND
-} else {
-  { $env.PWD }
-})
-
-# Hook to add new entries to the database.
-def __zoxide_hook [] {
+{%- else -%}
+# Initialize hook to add new entries to the database.
+{%- if hook == InitHook::Prompt %}
+let-env config = ($env | default {} config).config
+let-env config = ($env.config | default {} hooks)
+let-env config = ($env.config | update hooks ($env.config.hooks | default [] pre_prompt))
+let-env config = ($env.config | update hooks.pre_prompt ($env.config.hooks.pre_prompt | append {
   zoxide add -- $env.PWD
-}
+}))
+{%- else if hook == InitHook::Pwd %}
+let-env config = ($env | default {} config).config
+let-env config = ($env.config | default {} hooks)
+let-env config = ($env.config | update hooks ($env.config.hooks | default {} env_change))
+let-env config = ($env.config | update hooks.env_change ($env.config.hooks.env_change | default [] PWD))
+let-env config = ($env.config | update hooks.env_change.PWD ($env.config.hooks.env_change.PWD | append {|_, dir|
+  zoxide add -- $dir
+}))
+{%- endif %}
 
-# Initialize hook.
-let-env PROMPT_COMMAND = {
-  __zoxide_hook
-  do $env.__zoxide_oldprompt
-}
-
-{%- when InitHook::Pwd %}
-echo "zoxide: PWD hooks are not supported on Nushell.\nUse `zoxide init nushell --hook prompt` instead."
-
-{%- endmatch %}
+{%- endif %}
 
 {{ section }}
 # When using zoxide with --no-cmd, alias these internal functions as desired.
@@ -89,4 +84,4 @@ alias {{cmd}}i = __zoxide_zi
 #
 #   source ~/.zoxide.nu
 #
-# Note: zoxide only supports Nushell v0.62.0 and above.
+# Note: zoxide only supports Nushell v0.63.0 and above.

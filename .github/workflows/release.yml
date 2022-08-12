@@ -71,6 +71,8 @@ jobs:
 
       - name: Setup cache
         uses: Swatinem/rust-cache@v1
+        with:
+          key: ${{ matrix.target }}
 
       - name: Build binary
         uses: actions-rs/cargo@v1

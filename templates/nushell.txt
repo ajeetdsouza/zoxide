@@ -44,7 +44,7 @@ echo "zoxide: PWD hooks are not supported on Nushell.\nUse `zoxide init nushell 
 def-env __zoxide_z [...rest:string] {
   # `z -` does not work yet, see https://github.com/nushell/nushell/issues/4769
   let arg0 = ($rest | append '~').0
-  let path = if ($rest | length) <= 1 && ($arg0 | path expand | path type) == dir {
+  let path = if (($rest | length) <= 1) && ($arg0 == '-' || ($arg0 | path expand | path type) == dir) {
     $arg0
   } else {
     (zoxide query --exclude $env.PWD -- $rest | str trim -r -c "\n")
@@ -89,4 +89,4 @@ alias {{cmd}}i = __zoxide_zi
 #
 #   source ~/.zoxide.nu
 #
-# Note: zoxide only supports Nushell v0.61.0 and above.
+# Note: zoxide only supports Nushell v0.62.0 and above.

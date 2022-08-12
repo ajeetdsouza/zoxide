@@ -212,7 +212,7 @@ Now, add this to the end of your config file (find it by running
 source ~/.zoxide.nu
 ```
 
-Note: zoxide only supports Nushell v0.61.0 and above.
+Note: zoxide only supports Nushell v0.62.0 and above.
 
 </details>
 

@@ -42,8 +42,8 @@ jobs:
 
       - name: Setup cache
         uses: Swatinem/rust-cache@v1
-        if:
-          ${{ matrix.os == 'windows-latest' }}
+        with:
+          key: ${{ matrix.target }}
 
       - run: cargo xtask ci
         if: ${{ matrix.os == 'windows-latest' }}

@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Bash: extra `/` in completions.
+- Bash: double forward slash in completions.
 
 ## [0.8.2] - 2022-06-26
 

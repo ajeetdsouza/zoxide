@@ -202,7 +202,7 @@ Note: zoxide only supports fish v3.4.0 and above.
 Add this to your env file (find it by running `$nu.env-path` in Nushell):
 
 ```sh
-zoxide init nushell --hook prompt | save ~/.zoxide.nu
+zoxide init nushell | save ~/.zoxide.nu
 ```
 
 Now, add this to the end of your config file (find it by running
@@ -212,7 +212,7 @@ Now, add this to the end of your config file (find it by running
 source ~/.zoxide.nu
 ```
 
-Note: zoxide only supports Nushell v0.62.0 and above.
+Note: zoxide only supports Nushell v0.63.0 and above.
 
 </details>
 

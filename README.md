@@ -313,6 +313,17 @@ zoxide import --from z path/to/db
 
 </details>
 
+<details>
+<summary>ZLocation</summary>
+
+```powershell
+$db = New-TemporaryFile
+(Get-ZLocation).GetEnumerator() | ForEach-Object { Write-Output ($_.Name+'|'+$_.Value+'|0') } | Out-File $db
+zoxide import --from z $db
+```
+
+</details>
+
 ## Configuration
 
 ### Flags

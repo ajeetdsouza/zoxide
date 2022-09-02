@@ -53,16 +53,6 @@ jobs:
           file: Cargo.toml
           field: package.version
 
-      - name: Set artifact name
-        shell: bash
-        run: |
-          version="$(git describe --tags --match='v*.*.*' --always)"
-          name="zoxide-$version-${{ matrix.target }}"
-          echo "ARTIFACT_NAME=$name" >> $GITHUB_ENV
-
-          echo "version: $version"
-          echo "artifact: $name"
-
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -125,7 +115,7 @@ jobs:
             *.zip
 
       - name: Create release
-        if: startsWith(github.event.head_commit.message, 'chore(release)')
+        if: ${{ github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'chore(release)') }}
         uses: softprops/action-gh-release@v1
         with:
           draft: true

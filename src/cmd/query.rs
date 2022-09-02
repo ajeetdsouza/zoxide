@@ -53,8 +53,7 @@ impl Query {
                 print!("{}", path);
             }
         } else if self.list {
-            let stdout = io::stdout();
-            let handle = &mut stdout.lock();
+            let handle = &mut io::stdout().lock();
             while let Some(dir) = stream.next() {
                 if self.score {
                     writeln!(handle, "{}", dir.display_score(now))

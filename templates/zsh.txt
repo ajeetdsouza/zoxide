@@ -109,17 +109,17 @@ if [[ -o zle ]]; then
             # shellcheck disable=SC2086,SC2312
             if result="$(\command zoxide query --exclude "$(__zoxide_pwd)" -i -- ${words[2,-1]})"; then
                 __zoxide_result="${result}"
+                \builtin local result="${__zoxide_z_prefix}${__zoxide_result}"
+                compadd -Q "${(q-)result}"
             else
                 __zoxide_result=''
+                compadd ""
             fi
             \builtin printf '\e[5n'
         fi
     }
 
     function __zoxide_z_complete_helper() {
-        \builtin local result="${__zoxide_z_prefix}${__zoxide_result}"
-        # shellcheck disable=SC2296
-        [[ -n "${__zoxide_result}" ]] && LBUFFER="${LBUFFER}${(q-)result}"
         \builtin zle reset-prompt
     }
 

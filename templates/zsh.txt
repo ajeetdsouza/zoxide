@@ -112,6 +112,10 @@ if [[ -o zle ]]; then
             else
                 __zoxide_result=''
             fi
+            if [[ -v functions[.autocomplete._complete] ]]; then
+                # zsh-autocomplete needs a match or it will run __zoxide_z_complete multiple times
+                compadd ""
+            fi
             \builtin printf '\e[5n'
         fi
     }

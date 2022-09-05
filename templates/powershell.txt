@@ -38,8 +38,10 @@ function __zoxide_hook {
 }
 
 # Initialize hook.
-{# Initialize $__zoxide_hooked if it does not exist. Removing this will cause
- # an unset variable error in StrictMode. #}
+{#-
+  Initialize $__zoxide_hooked if it does not exist. Removing this will cause an
+  unset variable error in StrictMode.
+#}
 $__zoxide_hooked = (Get-Variable __zoxide_hooked -ValueOnly -ErrorAction SilentlyContinue)
 if ($__zoxide_hooked -ne 1) {
     $__zoxide_hooked = 1

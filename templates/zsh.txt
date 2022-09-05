@@ -122,12 +122,7 @@ if [[ -o zle ]]; then
         fi
     }
 
-    function __zoxide_z_complete_helper() {
-        \builtin zle reset-prompt
-    }
-
-    \builtin zle -N __zoxide_z_complete_helper
-    \builtin bindkey "\e[0n" __zoxide_z_complete_helper
+    \builtin bindkey "\e[0n" 'reset-prompt'
     if [[ "${+functions[compdef]}" -ne 0 ]]; then
         \compdef -d {{cmd}}
         \compdef -d {{cmd}}i

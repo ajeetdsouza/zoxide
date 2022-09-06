@@ -35,12 +35,11 @@ make_template!(Zsh, "zsh.txt");
 #[cfg(feature = "nix-dev")]
 #[cfg(test)]
 mod tests {
+    use super::*;
     use askama::Template;
     use assert_cmd::Command;
     use rstest::rstest;
     use rstest_reuse::{apply, template};
-
-    use super::*;
 
     #[template]
     #[rstest]

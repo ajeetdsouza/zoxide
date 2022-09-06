@@ -1,7 +1,6 @@
 use anyhow::{bail, Context, Result};
 use clap::Parser;
 use ignore::Walk;
-
 use std::env;
 use std::ffi::OsStr;
 use std::path::PathBuf;
@@ -44,10 +43,10 @@ trait CommandExt {
 
 impl CommandExt for &mut Command {
     fn run(self) -> Result<()> {
-        println!(">>> {:?}", self);
-        let status = self.status().with_context(|| format!("command failed to start: {:?}", self))?;
+        println!(">>> {self:?}");
+        let status = self.status().with_context(|| format!("command failed to start: {self:?}"))?;
         if !status.success() {
-            bail!("command failed: {:?} with status: {:?}", self, status);
+            bail!("command failed: {self:?} with status: {status:?}");
         }
         Ok(())
     }

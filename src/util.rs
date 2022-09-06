@@ -1,3 +1,9 @@
+use crate::config;
+use crate::db::Epoch;
+use crate::error::SilentExit;
+#[cfg(windows)]
+use anyhow::anyhow;
+use anyhow::{bail, Context, Result};
 use std::env;
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, Read, Write};
@@ -6,14 +12,6 @@ use std::path::{Component, Path, PathBuf};
 use std::process::Command;
 use std::process::{Child, ChildStdin, Stdio};
 use std::time::SystemTime;
-
-#[cfg(windows)]
-use anyhow::anyhow;
-use anyhow::{bail, Context, Result};
-
-use crate::config;
-use crate::db::Epoch;
-use crate::error::SilentExit;
 
 pub struct Fzf {
     child: Child,
@@ -94,7 +92,7 @@ impl Fzf {
             Some(0) => Ok(output),
             Some(1) => bail!("no match found"),
             Some(2) => bail!("fzf returned an error"),
-            Some(code @ 130) => bail!(SilentExit { code }),
+            Some(130) => bail!(SilentExit { code: 130 }),
             Some(128..=254) | None => bail!("fzf was terminated"),
             _ => bail!("fzf returned an unknown error"),
         }

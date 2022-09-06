@@ -1,10 +1,9 @@
-use std::borrow::Cow;
-use std::fmt::{self, Display, Formatter};
-use std::ops::{Deref, DerefMut};
-
 use anyhow::{bail, Context, Result};
 use bincode::Options as _;
 use serde::{Deserialize, Serialize};
+use std::borrow::Cow;
+use std::fmt::{self, Display, Formatter};
+use std::ops::{Deref, DerefMut};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct DirList<'a>(#[serde(borrow)] pub Vec<Dir<'a>>);
@@ -142,9 +141,8 @@ pub type Epoch = u64;
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use std::borrow::Cow;
-
-    use super::{Dir, DirList};
 
     #[test]
     fn zero_copy() {

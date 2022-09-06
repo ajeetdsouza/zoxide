@@ -1,6 +1,5 @@
-use std::path::PathBuf;
-
 use clap::{ArgEnum, Parser, ValueHint};
+use std::path::PathBuf;
 
 const ENV_HELP: &str = "ENVIRONMENT VARIABLES:
     _ZO_DATA_DIR            Path for zoxide data files

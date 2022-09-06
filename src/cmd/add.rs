@@ -1,10 +1,8 @@
-use std::path::Path;
-
-use anyhow::{bail, Result};
-
 use crate::cmd::{Add, Run};
 use crate::db::DatabaseFile;
 use crate::{config, util};
+use anyhow::{bail, Result};
+use std::path::Path;
 
 impl Run for Add {
     fn run(&self) -> Result<()> {

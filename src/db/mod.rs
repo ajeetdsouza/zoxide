@@ -1,15 +1,14 @@
 mod dir;
 mod stream;
 
-use std::fs;
-use std::io;
-use std::path::{Path, PathBuf};
-
-use anyhow::{Context, Result};
 pub use dir::{Dir, DirList, Epoch, Rank};
 pub use stream::Stream;
 
 use crate::util;
+use anyhow::{Context, Result};
+use std::fs;
+use std::io;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug)]
 pub struct Database<'file> {

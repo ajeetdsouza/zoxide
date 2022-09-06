@@ -1,10 +1,8 @@
-use std::fs;
-
-use anyhow::{bail, Context, Result};
-
 use crate::cmd::{Import, ImportFrom, Run};
 use crate::config;
 use crate::db::{Database, DatabaseFile, Dir};
+use anyhow::{bail, Context, Result};
+use std::fs;
 
 impl Run for Import {
     fn run(&self) -> Result<()> {
@@ -120,7 +118,7 @@ mod tests {
             Dir { path: "/waldo/fred/plugh".into(), rank: 3.0, last_accessed: 300 },
             Dir { path: "/xyzzy/thud".into(), rank: 8.0, last_accessed: 800 },
         ];
-        println!("exp: {:?}", &exp);
+        println!("exp: {exp:?}");
 
         for (dir1, dir2) in db.dirs.iter().zip(exp) {
             assert_eq!(dir1.path, dir2.path);
@@ -161,7 +159,7 @@ mod tests {
             Dir { path: "/waldo/fred/plugh".into(), rank: 3.0, last_accessed: 300 },
             Dir { path: "/xyzzy/thud".into(), rank: 8.0, last_accessed: 800 },
         ];
-        println!("exp: {:?}", &exp);
+        println!("exp: {exp:?}");
 
         for (dir1, dir2) in db.dirs.iter().zip(exp) {
             assert_eq!(dir1.path, dir2.path);

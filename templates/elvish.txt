@@ -87,8 +87,10 @@ edit:add-var {{cmd}}~ $__zoxide_z~
 edit:add-var {{cmd}}i~ $__zoxide_zi~
 
 # Load completions.
-{# zoxide-based completions are currently not possible, because Elvish only
- # prints a completion if the current token is a prefix of it. -#}
+{#-
+  zoxide-based completions are currently not possible, because Elvish only prints
+  a completion if the current token is a prefix of it.
+#}
 fn __zoxide_z_complete {|@rest|
     if (!= (builtin:count $rest) 2) {
         builtin:return

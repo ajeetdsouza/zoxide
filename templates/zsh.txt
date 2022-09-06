@@ -108,23 +108,21 @@ if [[ -o zle ]]; then
             \builtin local result
             # shellcheck disable=SC2086,SC2312
             if result="$(\command zoxide query --exclude "$(__zoxide_pwd)" -i -- ${words[2,-1]})"; then
-                __zoxide_result="${result}"
+                result="${__zoxide_z_prefix}${result}"
+                # shellcheck disable=SC2296
+                compadd -Q "${(q-)result}"
             else
-                __zoxide_result=''
+{#-
+  zsh-autocomplete calls the completion function multiple times if no match is
+  returned.
+#}
+                compadd ""
             fi
             \builtin printf '\e[5n'
         fi
     }
 
-    function __zoxide_z_complete_helper() {
-        \builtin local result="${__zoxide_z_prefix}${__zoxide_result}"
-        # shellcheck disable=SC2296
-        [[ -n "${__zoxide_result}" ]] && LBUFFER="${LBUFFER}${(q-)result}"
-        \builtin zle reset-prompt
-    }
-
-    \builtin zle -N __zoxide_z_complete_helper
-    \builtin bindkey "\e[0n" __zoxide_z_complete_helper
+    \builtin bindkey "\e[0n" 'reset-prompt'
     if [[ "${+functions[compdef]}" -ne 0 ]]; then
         \compdef -d {{cmd}}
         \compdef -d {{cmd}}i

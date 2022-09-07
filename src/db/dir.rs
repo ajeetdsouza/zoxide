@@ -34,7 +34,7 @@ impl DirList<'_> {
             match version {
                 Self::VERSION => Ok(deserializer.deserialize(bytes_dirs)?),
                 version => {
-                    bail!("unsupported version (got {}, supports {})", version, Self::VERSION,)
+                    bail!("unsupported version (got {version}, supports {})", Self::VERSION)
                 }
             }
         })()

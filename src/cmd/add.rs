@@ -27,7 +27,7 @@ impl Run for Add {
                 continue;
             }
             if !Path::new(path).is_dir() {
-                bail!("not a directory: {}", path);
+                bail!("not a directory: {path}");
             }
             db.add(path, now);
         }

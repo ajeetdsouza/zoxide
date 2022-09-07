@@ -45,10 +45,10 @@ impl Query {
             };
 
             if self.score {
-                print!("{}", selection);
+                print!("{selection}");
             } else {
                 let path = selection.get(5..).context("could not read selection from fzf")?;
-                print!("{}", path);
+                print!("{path}");
             }
         } else if self.list {
             let handle = &mut io::stdout().lock();

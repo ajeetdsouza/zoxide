@@ -33,13 +33,13 @@ fn from_autojump<'a>(db: &mut Database<'a>, buffer: &'a str) -> Result<()> {
         }
         let mut split = line.splitn(2, '\t');
 
-        let rank = split.next().with_context(|| format!("invalid entry: {}", line))?;
-        let mut rank = rank.parse::<f64>().with_context(|| format!("invalid rank: {}", rank))?;
+        let rank = split.next().with_context(|| format!("invalid entry: {line}"))?;
+        let mut rank = rank.parse::<f64>().with_context(|| format!("invalid rank: {rank}"))?;
         // Normalize the rank using a sigmoid function. Don't import actual ranks from autojump,
         // since its scoring algorithm is very different and might take a while to get normalized.
         rank = sigmoid(rank);
 
-        let path = split.next().with_context(|| format!("invalid entry: {}", line))?;
+        let path = split.next().with_context(|| format!("invalid entry: {line}"))?;
 
         db.dirs.push(Dir { path: path.into(), rank, last_accessed: 0 });
         db.modified = true;
@@ -59,13 +59,13 @@ fn from_z<'a>(db: &mut Database<'a>, buffer: &'a str) -> Result<()> {
         }
         let mut split = line.rsplitn(3, '|');
 
-        let last_accessed = split.next().with_context(|| format!("invalid entry: {}", line))?;
-        let last_accessed = last_accessed.parse().with_context(|| format!("invalid epoch: {}", last_accessed))?;
+        let last_accessed = split.next().with_context(|| format!("invalid entry: {line}"))?;
+        let last_accessed = last_accessed.parse().with_context(|| format!("invalid epoch: {last_accessed}"))?;
 
-        let rank = split.next().with_context(|| format!("invalid entry: {}", line))?;
-        let rank = rank.parse().with_context(|| format!("invalid rank: {}", rank))?;
+        let rank = split.next().with_context(|| format!("invalid entry: {line}"))?;
+        let rank = rank.parse().with_context(|| format!("invalid rank: {rank}"))?;
 
-        let path = split.next().with_context(|| format!("invalid entry: {}", line))?;
+        let path = split.next().with_context(|| format!("invalid entry: {line}"))?;
 
         db.dirs.push(Dir { path: path.into(), rank, last_accessed });
         db.modified = true;

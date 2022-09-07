@@ -4,10 +4,10 @@ use std::{env, io};
 fn main() {
     let pkg_version = env!("CARGO_PKG_VERSION");
     let version = match env::var_os("PROFILE") {
-        Some(profile) if profile == "release" => format!("v{}", pkg_version),
-        _ => git_version().unwrap_or_else(|| format!("v{}-unknown", pkg_version)),
+        Some(profile) if profile == "release" => format!("v{pkg_version}"),
+        _ => git_version().unwrap_or_else(|| format!("v{pkg_version}-unknown")),
     };
-    println!("cargo:rustc-env=ZOXIDE_VERSION={}", version);
+    println!("cargo:rustc-env=ZOXIDE_VERSION={version}");
 
     // Since we are generating completions in the package directory, we need to set this so that
     // Cargo doesn't rebuild every time.

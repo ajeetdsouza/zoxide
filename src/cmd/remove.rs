@@ -34,7 +34,8 @@ impl Run for Remove {
             let paths = selection.lines().filter_map(|line| line.get(5..));
             for path in paths {
                 if !db.remove(path) {
-                    bail!("path not found in database: {}", path);
+                    db.modified = false;
+                    bail!("path not found in database: {path}");
                 }
             }
         } else {
@@ -42,8 +43,9 @@ impl Run for Remove {
                 if !db.remove(path) {
                     let path_abs = util::resolve_path(path)?;
                     let path_abs = util::path_to_str(&path_abs)?;
-                    if path_abs != path && !db.remove(path_abs) {
-                        bail!("path not found in database: {} ({})", path, path_abs)
+                    if path_abs == path || !db.remove(path_abs) {
+                        db.modified = false;
+                        bail!("path not found in database: {path}")
                     }
                 }
             }

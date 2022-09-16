@@ -56,9 +56,9 @@ impl Fzf {
                 const LS_ARGS: &str = if cfg!(target_os = "linux") {
                     "--color=always --group-directories-first"
                 } else if cfg!(target_os = "macos") {
-                    "--color=always"
-                } else {
                     ""
+                } else {
+                    "--color=always"
                 };
                 command
                     .args(&[&format!(r"--preview=\command -p ls -Cp {LS_ARGS} {{2..}}"), "--preview-window=down,30%"])

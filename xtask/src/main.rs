@@ -1,10 +1,11 @@
-use anyhow::{bail, Context, Result};
-use clap::Parser;
-use ignore::Walk;
 use std::env;
 use std::ffi::OsStr;
 use std::path::PathBuf;
 use std::process::{self, Command};
+
+use anyhow::{bail, Context, Result};
+use clap::Parser;
+use ignore::Walk;
 
 fn main() -> Result<()> {
     let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
@@ -62,8 +63,8 @@ fn run_ci(nix_enabled: bool) -> Result<()> {
 
 fn run_fmt(nix_enabled: bool, check: bool) -> Result<()> {
     // Run cargo-fmt.
-    let check_args: &[&str] = if check { &["--check", "--files-with-diff"] } else { &[] };
-    Command::new("cargo").args(&["fmt", "--all", "--"]).args(check_args).run()?;
+    // let check_args: &[&str] = if check { &["--check", "--files-with-diff"] } else { &[] };
+    // Command::new("cargo").args(&["fmt", "--all", "--"]).args(check_args).run()?;
 
     // Run nixfmt.
     if nix_enabled {

@@ -1,17 +1,17 @@
-use crate::config;
-use crate::db::Epoch;
-use crate::error::SilentExit;
+use std::fs::{self, File, OpenOptions};
+use std::io::{self, Read, Write};
+use std::path::{Component, Path, PathBuf};
+use std::process::{Child, ChildStdin, Command, Stdio};
+use std::time::SystemTime;
+use std::{env, mem};
+
 #[cfg(windows)]
 use anyhow::anyhow;
 use anyhow::{bail, Context, Result};
-use std::env;
-use std::fs::{self, File, OpenOptions};
-use std::io::{self, Read, Write};
-use std::mem;
-use std::path::{Component, Path, PathBuf};
-use std::process::Command;
-use std::process::{Child, ChildStdin, Stdio};
-use std::time::SystemTime;
+
+use crate::config;
+use crate::db::Epoch;
+use crate::error::SilentExit;
 
 pub struct Fzf {
     child: Child,
@@ -115,9 +115,10 @@ pub fn write<P: AsRef<Path>, C: AsRef<[u8]>>(path: P, contents: C) -> Result<()>
         // Set the owner of the tmpfile (UNIX only).
         #[cfg(unix)]
         if let Ok(metadata) = path.metadata() {
-            use nix::unistd::{self, Gid, Uid};
             use std::os::unix::fs::MetadataExt;
             use std::os::unix::io::AsRawFd;
+
+            use nix::unistd::{self, Gid, Uid};
 
             let uid = Uid::from_raw(metadata.uid());
             let gid = Gid::from_raw(metadata.gid());
@@ -312,9 +313,5 @@ pub fn resolve_path<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
 /// Convert a string to lowercase, with a fast path for ASCII strings.
 pub fn to_lowercase<S: AsRef<str>>(s: S) -> String {
     let s = s.as_ref();
-    if s.is_ascii() {
-        s.to_ascii_lowercase()
-    } else {
-        s.to_lowercase()
-    }
+    if s.is_ascii() { s.to_ascii_lowercase() } else { s.to_lowercase() }
 }

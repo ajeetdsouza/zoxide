@@ -1,10 +1,12 @@
+use std::io::{self, Write};
+
+use anyhow::{Context, Result};
+
 use crate::cmd::{Query, Run};
 use crate::config;
 use crate::db::{Database, DatabaseFile};
 use crate::error::BrokenPipeHandler;
 use crate::util::{self, Fzf};
-use anyhow::{Context, Result};
-use std::io::{self, Write};
 
 impl Run for Query {
     fn run(&self) -> Result<()> {

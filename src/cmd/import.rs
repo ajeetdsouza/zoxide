@@ -1,8 +1,10 @@
+use std::fs;
+
+use anyhow::{bail, Context, Result};
+
 use crate::cmd::{Import, ImportFrom, Run};
 use crate::config;
 use crate::db::{Database, DatabaseFile, Dir};
-use anyhow::{bail, Context, Result};
-use std::fs;
 
 impl Run for Import {
     fn run(&self) -> Result<()> {

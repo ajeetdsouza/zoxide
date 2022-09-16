@@ -1,5 +1,8 @@
-use clap::{ArgEnum, Parser, ValueHint};
+#![allow(clippy::module_inception)]
+
 use std::path::PathBuf;
+
+use clap::{ArgEnum, Parser, ValueHint};
 
 const ENV_HELP: &str = "ENVIRONMENT VARIABLES:
     _ZO_DATA_DIR            Path for zoxide data files

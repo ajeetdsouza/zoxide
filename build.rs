@@ -32,7 +32,7 @@ fn git_version() -> Option<String> {
 }
 
 fn generate_completions() -> io::Result<()> {
-    #[path = "src/cmd/_cmd.rs"]
+    #[path = "src/cmd/cmd.rs"]
     mod cmd;
 
     use clap::CommandFactory;

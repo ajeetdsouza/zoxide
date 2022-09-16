@@ -1,8 +1,9 @@
-use crate::db::{Database, Dir, Epoch};
-use crate::util;
 use std::iter::Rev;
 use std::ops::Range;
 use std::{fs, path};
+
+use crate::db::{Database, Dir, Epoch};
+use crate::util;
 
 pub struct Stream<'db, 'file> {
     db: &'db mut Database<'file>,
@@ -119,9 +120,11 @@ impl<'db, 'file> Stream<'db, 'file> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use rstest::rstest;
     use std::path::PathBuf;
+
+    use rstest::rstest;
+
+    use super::*;
 
     #[rstest]
     // Case normalization

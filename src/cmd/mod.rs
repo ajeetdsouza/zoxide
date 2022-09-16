@@ -1,13 +1,13 @@
-mod _cmd;
 mod add;
+mod cmd;
 mod import;
 mod init;
 mod query;
 mod remove;
 
-pub use crate::cmd::_cmd::*;
-
 use anyhow::Result;
+
+pub use crate::cmd::cmd::*;
 
 pub trait Run {
     fn run(&self) -> Result<()>;

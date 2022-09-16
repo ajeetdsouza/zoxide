@@ -11,12 +11,14 @@ mod error;
 mod shell;
 mod util;
 
-use crate::cmd::{Cmd, Run};
-use crate::error::SilentExit;
-use clap::Parser;
 use std::env;
 use std::io::{self, Write};
 use std::process::ExitCode;
+
+use clap::Parser;
+
+use crate::cmd::{Cmd, Run};
+use crate::error::SilentExit;
 
 pub fn main() -> ExitCode {
     // Forcibly disable backtraces.

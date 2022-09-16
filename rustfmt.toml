@@ -1,12 +1,10 @@
-# comment_width = 100
-# error_on_line_overflow = true
-# error_on_unformatted = true
-# group_imports = "StdExternalCrate"
-# imports_granularity = "Module"
+comment_width = 100
+group_imports = "StdExternalCrate"
+imports_granularity = "Module"
 max_width = 120
 newline_style = "Native"
 use_field_init_shorthand = true
 use_small_heuristics = "Max"
 use_try_shorthand = true
-# wrap_comments = true
-# version = "Two"
+wrap_comments = true
+version = "Two"

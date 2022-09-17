@@ -53,16 +53,12 @@ impl Fzf {
             ]);
             if cfg!(unix) {
                 // Non-POSIX args are only available on certain operating systems.
-                const LS_ARGS: &str = if cfg!(target_os = "linux") {
-                    "--color=always --group-directories-first"
-                } else if cfg!(target_os = "macos") {
-                    "--color=always"
+                const PREVIEW_CMD: &str = if cfg!(target_os = "linux") {
+                    r"\command -p ls -Cp --color=always --group-directories-first {2..}"
                 } else {
-                    ""
+                    r"\command -p ls -Cp {2..}"
                 };
-                command
-                    .args(&[&format!(r"--preview=\command -p ls -Cp {LS_ARGS} {{2..}}"), "--preview-window=down,30%"])
-                    .env("SHELL", "sh");
+                command.args(&["--preview", PREVIEW_CMD, "--preview-window=down,30%"]).env("SHELL", "sh");
             }
         }
 

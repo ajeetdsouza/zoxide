@@ -5,6 +5,18 @@
 # Utility functions for zoxide.
 #
 
+# Call zoxide binary, returning the output as UTF-8.
+function __zoxide_bin {
+    $encoding = [Console]::OutputEncoding
+    try {
+        [Console]::OutputEncoding = [System.Text.Utf8Encoding]::new()
+        $result = zoxide @args
+        return $result
+    } finally {
+        [Console]::OutputEncoding = $encoding
+    }
+}
+
 # pwd based on zoxide's format.
 function __zoxide_pwd {
     $cwd = Get-Location
@@ -86,10 +98,10 @@ function __zoxide_z {
     else {
         $result = __zoxide_pwd
         if ($null -ne $result) {
-            $result = zoxide query --exclude $result -- @args
+            $result = __zoxide_bin query --exclude $result -- @args
         }
         else {
-            $result = zoxide query -- @args
+            $result = __zoxide_bin query -- @args
         }
         if ($LASTEXITCODE -eq 0) {
             __zoxide_cd $result $true
@@ -99,7 +111,7 @@ function __zoxide_z {
 
 # Jump to a directory using interactive search.
 function __zoxide_zi {
-    $result = zoxide query -i -- @args
+    $result = __zoxide_bin query -i -- @args
     if ($LASTEXITCODE -eq 0) {
         __zoxide_cd $result $true
     }

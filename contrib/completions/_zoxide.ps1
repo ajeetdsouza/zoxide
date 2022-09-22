@@ -26,6 +26,7 @@ Register-ArgumentCompleter -Native -CommandName 'zoxide' -ScriptBlock {
             [CompletionResult]::new('-V', 'V', [CompletionResultType]::ParameterName, 'Print version information')
             [CompletionResult]::new('--version', 'version', [CompletionResultType]::ParameterName, 'Print version information')
             [CompletionResult]::new('add', 'add', [CompletionResultType]::ParameterValue, 'Add a new directory or increment its rank')
+            [CompletionResult]::new('edit', 'edit', [CompletionResultType]::ParameterValue, 'Modify list of paths and rankings in default editor')
             [CompletionResult]::new('import', 'import', [CompletionResultType]::ParameterValue, 'Import entries from another application')
             [CompletionResult]::new('init', 'init', [CompletionResultType]::ParameterValue, 'Generate shell configuration')
             [CompletionResult]::new('query', 'query', [CompletionResultType]::ParameterValue, 'Search for a directory in the database')
@@ -33,6 +34,13 @@ Register-ArgumentCompleter -Native -CommandName 'zoxide' -ScriptBlock {
             break
         }
         'zoxide;add' {
+            [CompletionResult]::new('-h', 'h', [CompletionResultType]::ParameterName, 'Print help information')
+            [CompletionResult]::new('--help', 'help', [CompletionResultType]::ParameterName, 'Print help information')
+            [CompletionResult]::new('-V', 'V', [CompletionResultType]::ParameterName, 'Print version information')
+            [CompletionResult]::new('--version', 'version', [CompletionResultType]::ParameterName, 'Print version information')
+            break
+        }
+        'zoxide;edit' {
             [CompletionResult]::new('-h', 'h', [CompletionResultType]::ParameterName, 'Print help information')
             [CompletionResult]::new('--help', 'help', [CompletionResultType]::ParameterName, 'Print help information')
             [CompletionResult]::new('-V', 'V', [CompletionResultType]::ParameterName, 'Print version information')

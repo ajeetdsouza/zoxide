@@ -23,12 +23,19 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand -V 'Print version information'
             cand --version 'Print version information'
             cand add 'Add a new directory or increment its rank'
+            cand edit 'Modify list of paths and rankings in default editor'
             cand import 'Import entries from another application'
             cand init 'Generate shell configuration'
             cand query 'Search for a directory in the database'
             cand remove 'Remove a directory from the database'
         }
         &'zoxide;add'= {
+            cand -h 'Print help information'
+            cand --help 'Print help information'
+            cand -V 'Print version information'
+            cand --version 'Print version information'
+        }
+        &'zoxide;edit'= {
             cand -h 'Print help information'
             cand --help 'Print help information'
             cand -V 'Print version information'

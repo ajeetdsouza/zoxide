@@ -160,7 +160,7 @@ fn tmpfile<P: AsRef<Path>>(dir: P) -> Result<(File, PathBuf)> {
 }
 
 /// Similar to [`fs::rename`], but retries on Windows.
-fn rename<P: AsRef<Path>, Q: AsRef<Path>>(from: P, to: Q) -> Result<()> {
+pub fn rename<P: AsRef<Path>, Q: AsRef<Path>>(from: P, to: Q) -> Result<()> {
     const MAX_ATTEMPTS: usize = 5;
     let from = from.as_ref();
     let to = to.as_ref();

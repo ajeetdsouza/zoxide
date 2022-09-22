@@ -22,6 +22,20 @@ const completion: Fig.Spec = {
       },
     },
     {
+      name: "edit",
+      description: "Modify list of paths and rankings in default editor",
+      options: [
+        {
+          name: ["-h", "--help"],
+          description: "Print help information",
+        },
+        {
+          name: ["-V", "--version"],
+          description: "Print version information",
+        },
+      ],
+    },
+    {
       name: "import",
       description: "Import entries from another application",
       options: [

@@ -15,6 +15,9 @@ _zoxide() {
             add)
                 cmd+="__add"
                 ;;
+            edit)
+                cmd+="__edit"
+                ;;
             import)
                 cmd+="__import"
                 ;;
@@ -34,7 +37,7 @@ _zoxide() {
 
     case "${cmd}" in
         zoxide)
-            opts="-h -V --help --version add import init query remove"
+            opts="-h -V --help --version add edit import init query remove"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -49,6 +52,20 @@ _zoxide() {
             ;;
         zoxide__add)
             opts="-h -V --help --version <PATHS>..."
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__edit)
+            opts="-h -V --help --version"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0

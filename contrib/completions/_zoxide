@@ -37,6 +37,14 @@ _arguments "${_arguments_options[@]}" \
 '*::paths:_files -/' \
 && ret=0
 ;;
+(edit)
+_arguments "${_arguments_options[@]}" \
+'-h[Print help information]' \
+'--help[Print help information]' \
+'-V[Print version information]' \
+'--version[Print version information]' \
+&& ret=0
+;;
 (import)
 _arguments "${_arguments_options[@]}" \
 '--from=[Application to import from]:FROM:(autojump z)' \
@@ -97,6 +105,7 @@ esac
 _zoxide_commands() {
     local commands; commands=(
 'add:Add a new directory or increment its rank' \
+'edit:Modify list of paths and rankings in default editor' \
 'import:Import entries from another application' \
 'init:Generate shell configuration' \
 'query:Search for a directory in the database' \
@@ -108,6 +117,11 @@ _zoxide_commands() {
 _zoxide__add_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide add commands' commands "$@"
+}
+(( $+functions[_zoxide__edit_commands] )) ||
+_zoxide__edit_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide edit commands' commands "$@"
 }
 (( $+functions[_zoxide__import_commands] )) ||
 _zoxide__import_commands() {

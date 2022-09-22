@@ -32,15 +32,19 @@ impl<'file> Database<'file> {
 
     /// Adds a new directory or increments its rank. Also updates its last accessed time.
     pub fn add<S: AsRef<str>>(&mut self, path: S, now: Epoch) {
+        self.add_raw(path, now, 1.0)
+    }
+
+    pub fn add_raw<S: AsRef<str>>(&mut self, path: S, last_accessed: Epoch, rank: Rank) {
         let path = path.as_ref();
 
         match self.dirs.iter_mut().find(|dir| dir.path == path) {
             None => {
-                self.dirs.push(Dir { path: path.to_string().into(), last_accessed: now, rank: 1.0 });
+                self.dirs.push(Dir { path: path.to_string().into(), last_accessed, rank });
             }
             Some(dir) => {
-                dir.last_accessed = now;
-                dir.rank += 1.0;
+                dir.last_accessed = last_accessed;
+                dir.rank += rank;
             }
         };
 
@@ -140,7 +144,7 @@ impl DatabaseFile {
     }
 }
 
-fn db_path<P: AsRef<Path>>(data_dir: P) -> PathBuf {
+pub fn db_path<P: AsRef<Path>>(data_dir: P) -> PathBuf {
     const DB_FILENAME: &str = "db.zo";
     data_dir.as_ref().join(DB_FILENAME)
 }

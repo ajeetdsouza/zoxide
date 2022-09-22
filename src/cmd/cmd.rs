@@ -24,6 +24,7 @@ const ENV_HELP: &str = "ENVIRONMENT VARIABLES:
 )]
 pub enum Cmd {
     Add(Add),
+    Edit(Edit),
     Import(Import),
     Init(Init),
     Query(Query),
@@ -36,6 +37,10 @@ pub struct Add {
     #[clap(min_values = 1, required = true, value_hint = ValueHint::DirPath)]
     pub paths: Vec<PathBuf>,
 }
+
+/// Modify list of paths and rankings in default editor
+#[derive(Debug, Parser)]
+pub struct Edit {}
 
 /// Import entries from another application
 #[derive(Debug, Parser)]

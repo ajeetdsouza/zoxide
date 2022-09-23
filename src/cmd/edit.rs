@@ -20,6 +20,22 @@ enum ValidationResult {
     Exit,
 }
 
+struct Problem {
+    line_number: usize,
+    text: String,
+}
+
+struct Problems {
+    warnings: Vec<Problem>,
+    errors: Vec<Problem>,
+}
+
+impl Problem {
+    fn new(line_number: usize, text: String) -> Self {
+        Problem { line_number, text }
+    }
+}
+
 impl Run for Edit {
     fn run(&self) -> Result<()> {
         while let Some(db_edits) = get_db_edits()? {
@@ -61,11 +77,11 @@ fn get_db_edits() -> Result<Option<String>> {
     }
 }
 
-fn validate_db(db: &mut Database, db_edits: String) -> ValidationResult {
+fn get_problems(db: &mut Database, db_edits: String) -> Problems {
     let lines = db_edits.lines();
 
-    let mut errors: Vec<(usize, String)> = Vec::new();
-    let mut warnings: Vec<(usize, String)> = Vec::new();
+    let mut errors: Vec<Problem> = Vec::new();
+    let mut warnings: Vec<Problem> = Vec::new();
 
     for (index, line) in lines.enumerate() {
         let line_number = index + 1;
@@ -80,19 +96,20 @@ fn validate_db(db: &mut Database, db_edits: String) -> ValidationResult {
         let mut split = line.split(',');
         let (last_accessed_txt, rank_txt, path_txt) = (split.next(), split.next(), split.next());
         if split.next().is_some() {
-            errors.push((line_number, "Too many values on line".to_string()));
+            errors.push(Problem::new(line_number, "too many values on line".to_string()));
+            continue;
         }
 
         let last_accessed: Option<Epoch> = match last_accessed_txt {
             Some(value) => match value.trim().parse::<Epoch>() {
                 Ok(value) => Some(value),
                 Err(e) => {
-                    errors.push((line_number, e.to_string()));
+                    errors.push(Problem::new(line_number, e.to_string()));
                     None
                 }
             },
             None => {
-                errors.push((line_number, "Cannot parse 'last_accessed' field".to_string()));
+                errors.push(Problem::new(line_number, "Cannot parse 'last_accessed' field".to_string()));
                 None
             }
         };
@@ -101,12 +118,12 @@ fn validate_db(db: &mut Database, db_edits: String) -> ValidationResult {
             Some(value) => match value.trim().parse::<Rank>() {
                 Ok(value) => Some(value),
                 Err(e) => {
-                    errors.push((line_number, e.to_string()));
+                    errors.push(Problem::new(line_number, e.to_string()));
                     None
                 }
             },
             None => {
-                errors.push((line_number, "Cannot parse 'rank' field".to_string()));
+                errors.push(Problem::new(line_number, "Cannot parse 'rank' field".to_string()));
                 None
             }
         };
@@ -114,23 +131,23 @@ fn validate_db(db: &mut Database, db_edits: String) -> ValidationResult {
         let path: Option<String> = match path_txt {
             Some(value) => {
                 if value.trim() != value {
-                    warnings.push((line_number, "path contains trailing whitespace".to_string()));
+                    warnings.push(Problem::new(line_number, "path contains trailing whitespace".to_string()));
                 }
                 match resolve_path(&PathBuf::from(value)) {
                     Ok(v) => {
                         if v.to_str().unwrap() != value {
-                            errors.push((line_number, "path must be an absolute path".to_string()));
+                            errors.push(Problem::new(line_number, "path must be an absolute path".to_string()));
                         }
                         Some(value.to_string())
                     }
                     Err(e) => {
-                        errors.push((line_number, e.to_string()));
+                        errors.push(Problem::new(line_number, e.to_string()));
                         None
                     }
                 }
             }
             None => {
-                errors.push((line_number, "Cannot parse 'path' field".to_string()));
+                errors.push(Problem::new(line_number, "cannot parse 'path' field".to_string()));
                 None
             }
         };
@@ -139,19 +156,25 @@ fn validate_db(db: &mut Database, db_edits: String) -> ValidationResult {
             db.add(&path, last_accessed, rank);
         }
     }
+    Problems { warnings, errors }
+}
+
+fn handle_problems(problems: Problems) -> ValidationResult {
+    let warnings = problems.warnings;
+    let errors = problems.errors;
     let has_warnings = !warnings.is_empty();
     let has_errors = !errors.is_empty();
     if has_warnings {
         println!("Warnings:");
-        for (line_num, warning) in warnings {
-            println!("{line_num}: {warning}");
+        for problem in warnings {
+            println!("{}: {}", problem.line_number, problem.text);
         }
         println!();
     }
     if has_errors {
         println!("Errors:");
-        for (line_num, error) in errors {
-            println!("line {line_num}: {error}");
+        for problem in errors {
+            println!("line {}: {}", problem.line_number, problem.text);
         }
         println!();
     }
@@ -181,4 +204,55 @@ fn validate_db(db: &mut Database, db_edits: String) -> ValidationResult {
         };
     }
     ValidationResult::Success
+}
+
+#[cfg(test)]
+mod tests {
+    use rstest::rstest;
+
+    use crate::db::DatabaseFile;
+
+    use super::get_problems;
+
+    #[test]
+    fn no_validtion_problems() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let mut db_file = DatabaseFile::new(temp_dir.path());
+        let mut db = db_file.open().unwrap();
+        let problems = get_problems(&mut db, "1,1,/tmp".to_string());
+        assert!(problems.errors.is_empty());
+        assert!(problems.warnings.is_empty());
+    }
+
+    #[rstest]
+    #[case::invalid_accessed("1z,1,/tmp", "invalid digit found in string")]
+    #[case::negative_accessed("-1,1,/tmp", "invalid digit found in string")]
+    #[case::invalid_path("1,1,cool", "path must be an absolute path")]
+    #[case::invalid_rank("1,1z,/tmp", "invalid float literal")]
+    #[case::too_many_fields("1,1,1,/tmp", "too many values on line")]
+    #[case::too_few_fields("1,1", "cannot parse 'path' field")]
+    #[case::relative_path("1,1,~", "path must be an absolute path")]
+    fn validation_error(#[case] invalid_line: String, #[case] err_text: &str) {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let mut db_file = DatabaseFile::new(temp_dir.path());
+        let mut db = db_file.open().unwrap();
+        let problems = get_problems(&mut db, invalid_line);
+        assert_eq!(problems.errors.len(), 1);
+        assert!(problems.warnings.is_empty());
+        assert_eq!(problems.errors[0].line_number, 1);
+        assert_eq!(problems.errors[0].text, err_text);
+    }
+
+    #[test]
+    fn validation_warning() {
+        let invalid_line = "1,1,/tmp ".to_string();
+        let temp_dir = tempfile::tempdir().unwrap();
+        let mut db_file = DatabaseFile::new(temp_dir.path());
+        let mut db = db_file.open().unwrap();
+        let problems = get_problems(&mut db, invalid_line);
+        assert_eq!(problems.warnings.len(), 1);
+        assert!(problems.errors.is_empty());
+        assert_eq!(problems.warnings[0].line_number, 1);
+        assert_eq!(problems.warnings[0].text, "path contains trailing whitespace");
+    }
 }

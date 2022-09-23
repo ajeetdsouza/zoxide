@@ -26,10 +26,10 @@ clap = { version = "3.1.0", features = ["derive"] }
 dialoguer = "0.10.2"
 dirs = "4.0.0"
 dunce = "1.0.1"
+edit = "0.1.4"
 fastrand = "1.7.0"
 glob = "0.3.0"
 serde = { version = "1.0.116", features = ["derive"] }
-tempfile = "3.1.0"
 
 [target.'cfg(unix)'.dependencies]
 nix = { version = "0.24.1", default-features = false, features = [
@@ -49,6 +49,8 @@ clap_complete_fig = "3.1.0"
 assert_cmd = "2.0.0"
 rstest = { version = "0.15.0", default-features = false }
 rstest_reuse = "0.4.0"
+tempfile = "3.1.0"
+
 
 [features]
 default = []

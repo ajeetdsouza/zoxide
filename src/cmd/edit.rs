@@ -1,14 +1,13 @@
 use crate::cmd::{Edit, Run};
-use crate::db::{db_path, Database, DatabaseFile, Epoch, Rank};
-use crate::util::{rename, resolve_path};
+use crate::db::{Database, DatabaseFile, Epoch, Rank};
+use crate::util::resolve_path;
 use crate::{config, util};
 use anyhow::Result;
 use std::fmt::Write as FmtWrite;
 use std::path::PathBuf;
 
-use core::mem;
-use dialoguer::{Editor, Input};
-use tempfile::tempdir;
+use dialoguer::Input;
+use edit::edit;
 
 const HEADER: &str = "\
 # Blank lines and lines prepended with '#' are ignored; Line order is insignificant
@@ -23,18 +22,16 @@ enum ValidationResult {
 
 impl Run for Edit {
     fn run(&self) -> Result<()> {
-        let temp_dir = tempdir()?;
-        let temp_dir_path = temp_dir.path();
         while let Some(db_edits) = get_db_edits()? {
-            let mut db_file = DatabaseFile::new(temp_dir_path);
+            let data_dir = config::data_dir()?;
+            let mut db_file = DatabaseFile::new(data_dir);
             let mut db = db_file.open()?;
-            let result = validate_db(&mut db, db_edits);
+            db.clear();
+            let problems = get_problems(&mut db, db_edits);
+            let result = handle_problems(problems);
             match result {
                 ValidationResult::Success => {
                     db.save()?;
-                    mem::drop(db);
-                    mem::drop(db_file);
-                    rename(db_path(temp_dir_path), db_path(config::data_dir()?))?;
                     return Ok(());
                 }
                 ValidationResult::Exit => break,
@@ -55,7 +52,13 @@ fn get_db_edits() -> Result<Option<String>> {
     while let Some(dir) = stream.next() {
         writeln!(&mut to_edit, "{},{},{}", dir.last_accessed, dir.rank, dir.path)?;
     }
-    Ok(Editor::new().edit(&to_edit)?)
+    let edit_result = edit(&to_edit)?;
+    if edit_result == to_edit {
+        // The file was not changed at all so we don't want to attempt to overwrite the original
+        Ok(None)
+    } else {
+        Ok(Some(edit_result))
+    }
 }
 
 fn validate_db(db: &mut Database, db_edits: String) -> ValidationResult {
@@ -133,7 +136,7 @@ fn validate_db(db: &mut Database, db_edits: String) -> ValidationResult {
         };
 
         if let (Some(path), Some(last_accessed), Some(rank)) = (path, last_accessed, rank) {
-            db.add_raw(&path, last_accessed, rank);
+            db.add(&path, last_accessed, rank);
         }
     }
     let has_warnings = !warnings.is_empty();

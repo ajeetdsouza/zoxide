@@ -31,11 +31,7 @@ impl<'file> Database<'file> {
     }
 
     /// Adds a new directory or increments its rank. Also updates its last accessed time.
-    pub fn add<S: AsRef<str>>(&mut self, path: S, now: Epoch) {
-        self.add_raw(path, now, 1.0)
-    }
-
-    pub fn add_raw<S: AsRef<str>>(&mut self, path: S, last_accessed: Epoch, rank: Rank) {
+    pub fn add<S: AsRef<str>>(&mut self, path: S, last_accessed: Epoch, rank: Rank) {
         let path = path.as_ref();
 
         match self.dirs.iter_mut().find(|dir| dir.path == path) {
@@ -93,6 +89,11 @@ impl<'file> Database<'file> {
         }
 
         false
+    }
+
+    /// Removes all entries from the store.
+    pub fn clear(&mut self) {
+        self.dirs = DirList::new();
     }
 
     pub fn age(&mut self, max_age: Rank) {
@@ -162,8 +163,8 @@ mod tests {
         {
             let mut db = DatabaseFile::new(data_dir.path());
             let mut db = db.open().unwrap();
-            db.add(path, now);
-            db.add(path, now);
+            db.add(path, now, 1.0);
+            db.add(path, now, 1.0);
             db.save().unwrap();
         }
         {
@@ -186,7 +187,7 @@ mod tests {
         {
             let mut db = DatabaseFile::new(data_dir.path());
             let mut db = db.open().unwrap();
-            db.add(path, now);
+            db.add(path, now, 1.0);
             db.save().unwrap();
         }
         {

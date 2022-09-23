@@ -214,12 +214,20 @@ mod tests {
 
     use super::get_problems;
 
+    fn maybe_translate_to_windows(line: String) -> String {
+        if cfg!(windows) && line.contains("/tmp") {
+            line.replace("/tmp", r"C:\tmp")
+        } else {
+            line
+        }
+    }
+
     #[test]
     fn no_validtion_problems() {
         let temp_dir = tempfile::tempdir().unwrap();
         let mut db_file = DatabaseFile::new(temp_dir.path());
         let mut db = db_file.open().unwrap();
-        let problems = get_problems(&mut db, "1,1,/tmp".to_string());
+        let problems = get_problems(&mut db, maybe_translate_to_windows("1,1,/tmp".to_string()));
         assert!(problems.errors.is_empty());
         assert!(problems.warnings.is_empty());
     }
@@ -232,7 +240,8 @@ mod tests {
     #[case::too_many_fields("1,1,1,/tmp", "too many values on line")]
     #[case::too_few_fields("1,1", "cannot parse 'path' field")]
     #[case::relative_path("1,1,~", "path must be an absolute path")]
-    fn validation_error(#[case] invalid_line: String, #[case] err_text: &str) {
+    fn validation_error(#[case] line: String, #[case] err_text: &str) {
+        let invalid_line = maybe_translate_to_windows(line);
         let temp_dir = tempfile::tempdir().unwrap();
         let mut db_file = DatabaseFile::new(temp_dir.path());
         let mut db = db_file.open().unwrap();
@@ -245,7 +254,7 @@ mod tests {
 
     #[test]
     fn validation_warning() {
-        let invalid_line = "1,1,/tmp ".to_string();
+        let invalid_line = maybe_translate_to_windows("1,1,/tmp ".to_string());
         let temp_dir = tempfile::tempdir().unwrap();
         let mut db_file = DatabaseFile::new(temp_dir.path());
         let mut db = db_file.open().unwrap();

@@ -179,7 +179,8 @@ Add this to your configuration (usually `~/.elvish/rc.elv`):
 eval (zoxide init elvish | slurp)
 ```
 
-Note: zoxide only supports elvish v0.18.0 and above.
+> **Note**
+> zoxide only supports elvish v0.18.0 and above.
 
 </details>
 
@@ -192,7 +193,8 @@ Add this to your configuration (usually `~/.config/fish/config.fish`):
 zoxide init fish | source
 ```
 
-Note: zoxide only supports fish v3.4.0 and above.
+> **Note**
+> zoxide only supports fish v3.4.0 and above.
 
 </details>
 
@@ -212,7 +214,8 @@ Now, add this to the end of your config file (find it by running
 source ~/.zoxide.nu
 ```
 
-Note: zoxide only supports Nushell v0.63.0 and above.
+> **Note**
+> zoxide only supports Nushell v0.63.0 and above.
 
 </details>
 
@@ -280,7 +283,8 @@ eval "$(zoxide init posix --hook prompt)"
 [fzf] is a command-line fuzzy finder, used by zoxide for interactive selection.
 It can be installed from [here][fzf-installation].
 
-Note: zoxide only supports fzf v0.21.0 and above.
+> **Note**
+> zoxide only supports fzf v0.21.0 and above.
 
 ### *Step 4: Import your data (optional)*
 

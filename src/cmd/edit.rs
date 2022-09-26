@@ -1,10 +1,9 @@
 use crate::cmd::{Edit, Run};
-use crate::db::{Database, DatabaseFile, Epoch, Rank};
-use crate::util::resolve_path;
-use crate::{config, util};
+use crate::config;
+use crate::db::{Database, DatabaseFile, Dir, Epoch, Rank};
 use anyhow::Result;
-use std::fmt::Write as FmtWrite;
-use std::path::PathBuf;
+use std::fmt::Write as _;
+use std::path::{Path, PathBuf};
 
 use dialoguer::Input;
 use edit::edit;
@@ -62,12 +61,9 @@ impl Run for Edit {
 fn get_db_edits() -> Result<Option<String>> {
     let data_dir = config::data_dir()?;
     let mut db = DatabaseFile::new(data_dir);
-    let mut db = db.open()?;
-    let mut stream = db.stream(util::current_time().unwrap());
+    let db = db.open()?;
     let mut to_edit = String::from(HEADER);
-    while let Some(dir) = stream.next() {
-        writeln!(&mut to_edit, "{},{},{}", dir.last_accessed, dir.rank, dir.path)?;
-    }
+    db.dirs.iter().try_for_each(|dir| writeln!(&mut to_edit, "{},{:.2},{}", dir.last_accessed, dir.rank, dir.path))?;
     let edit_result = edit(&to_edit)?;
     if edit_result == to_edit {
         // The file was not changed at all so we don't want to attempt to overwrite the original
@@ -93,13 +89,8 @@ fn get_problems(db: &mut Database, db_edits: String) -> Problems {
         } else {
             continue;
         }
-        let mut split = line.split(',');
+        let mut split = line.splitn(3, ',');
         let (last_accessed_txt, rank_txt, path_txt) = (split.next(), split.next(), split.next());
-        if split.next().is_some() {
-            errors.push(Problem::new(line_number, "too many values on line".to_string()));
-            continue;
-        }
-
         let last_accessed: Option<Epoch> = match last_accessed_txt {
             Some(value) => match value.trim().parse::<Epoch>() {
                 Ok(value) => Some(value),
@@ -133,17 +124,11 @@ fn get_problems(db: &mut Database, db_edits: String) -> Problems {
                 if value.trim() != value {
                     warnings.push(Problem::new(line_number, "path contains trailing whitespace".to_string()));
                 }
-                match resolve_path(&PathBuf::from(value)) {
-                    Ok(v) => {
-                        if v.to_str().unwrap() != value {
-                            errors.push(Problem::new(line_number, "path must be an absolute path".to_string()));
-                        }
-                        Some(value.to_string())
-                    }
-                    Err(e) => {
-                        errors.push(Problem::new(line_number, e.to_string()));
-                        None
-                    }
+                if Path::is_absolute(&PathBuf::from(value)) {
+                    Some(value.to_string())
+                } else {
+                    errors.push(Problem::new(line_number, "path must be an absolute path".to_string()));
+                    None
                 }
             }
             None => {
@@ -153,7 +138,8 @@ fn get_problems(db: &mut Database, db_edits: String) -> Problems {
         };
 
         if let (Some(path), Some(last_accessed), Some(rank)) = (path, last_accessed, rank) {
-            db.add(&path, last_accessed, rank);
+            db.dirs.push(Dir { path: path.into(), last_accessed, rank });
+            db.modified = true;
         }
     }
     Problems { warnings, errors }
@@ -237,7 +223,6 @@ mod tests {
     #[case::negative_accessed("-1,1,/tmp", "invalid digit found in string")]
     #[case::invalid_path("1,1,cool", "path must be an absolute path")]
     #[case::invalid_rank("1,1z,/tmp", "invalid float literal")]
-    #[case::too_many_fields("1,1,1,/tmp", "too many values on line")]
     #[case::too_few_fields("1,1", "cannot parse 'path' field")]
     #[case::relative_path("1,1,~", "path must be an absolute path")]
     fn validation_error(#[case] line: String, #[case] err_text: &str) {

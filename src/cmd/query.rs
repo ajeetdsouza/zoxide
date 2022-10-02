@@ -1,6 +1,8 @@
-use std::io::{self, Write};
-
 use anyhow::{Context, Result};
+use std::env;
+use std::io::{self, Write};
+use std::path::PathBuf;
+use std::str::FromStr;
 
 use crate::cmd::{Query, Run};
 use crate::config;
@@ -64,7 +66,21 @@ impl Query {
             }
             handle.flush().pipe_exit("stdout")?;
         } else {
-            let dir = stream.next().context("no match found")?;
+            let excluded_dir = self.exclude.as_ref().map_or(PathBuf::new(), |path| PathBuf::from_str(path).unwrap());
+
+            let try_dir = stream.next();
+            let dir = match try_dir {
+                Some(dir) => dir,
+                None => {
+                    // Current Directory is passed as excluded in __zoxide_z
+                    if excluded_dir == env::current_dir()? {
+                        try_dir.context("already in the matched directory")?
+                    } else {
+                        try_dir.context("no match found")?
+                    }
+                }
+            };
+
             if self.score {
                 writeln!(io::stdout(), "{}", dir.display_score(now))
             } else {

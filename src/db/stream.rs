@@ -5,6 +5,8 @@ use std::{fs, path};
 use crate::db::{Database, Dir, Epoch};
 use crate::util;
 
+use std::env;
+
 pub struct Stream<'db, 'file> {
     db: &'db mut Database<'file>,
     idxs: Rev<Range<usize>>,
@@ -14,6 +16,7 @@ pub struct Stream<'db, 'file> {
     check_exists: bool,
     expire_below: Epoch,
     resolve_symlinks: bool,
+    workingdir: bool,
 
     exclude_path: Option<String>,
 }
@@ -34,12 +37,18 @@ impl<'db, 'file> Stream<'db, 'file> {
             check_exists: false,
             expire_below,
             resolve_symlinks: false,
+            workingdir: false,
             exclude_path: None,
         }
     }
 
     pub fn with_exclude<S: Into<String>>(mut self, path: S) -> Self {
         self.exclude_path = Some(path.into());
+        self
+    }
+
+    pub fn with_workingdir(mut self, workingdir: bool) -> Self {
+        self.workingdir = workingdir;
         self
     }
 
@@ -71,6 +80,11 @@ impl<'db, 'file> Stream<'db, 'file> {
             }
 
             if Some(dir.path.as_ref()) == self.exclude_path.as_deref() {
+                continue;
+            }
+
+            // Check if working directory only mode is on and do the check if it is a sub directory of the working directory
+            if self.workingdir && !dir.path.starts_with(env::current_dir().unwrap().to_str().unwrap()) {
                 continue;
             }
 

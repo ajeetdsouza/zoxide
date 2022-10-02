@@ -29,6 +29,9 @@ impl Query {
         if let Some(path) = &self.exclude {
             stream = stream.with_exclude(path);
         }
+        if self.workingdir {
+            stream = stream.with_workingdir(self.workingdir);
+        }
 
         if self.interactive {
             let mut fzf = Fzf::new(false)?;

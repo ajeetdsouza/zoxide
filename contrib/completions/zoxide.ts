@@ -144,6 +144,10 @@ const completion: Fig.Spec = {
           description: "Print score with results",
         },
         {
+          name: ["-w", "--workingdir"],
+          description: "Search only through current working directory",
+        },
+        {
           name: ["-h", "--help"],
           description: "Print help information",
         },

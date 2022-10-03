@@ -84,7 +84,9 @@ impl<'db, 'file> Stream<'db, 'file> {
             }
 
             // Check if working directory only mode is on and do the check if it is a sub directory of the working directory
-            if self.workingdir && !dir.path.starts_with(env::current_dir().unwrap().to_str().unwrap()) {
+            if self.workingdir
+                && !dir.path.starts_with(env::current_dir().unwrap_or_default().to_str().unwrap_or_default())
+            {
                 continue;
             }
 

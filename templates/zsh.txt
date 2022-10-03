@@ -79,6 +79,12 @@ function __zoxide_zi() {
     result="$(\command zoxide query -i -- "$@")" && __zoxide_cd "${result}"
 }
 
+# Jump to sub directories of current directory.
+function __zoxide_zw() {
+    \builtin local result
+    result="$(\command zoxide query --workingdir -- "$@")" && __zoxide_cd "${result}"
+}
+
 {{ section }}
 # Commands for zoxide. Disable these using --no-cmd.
 #
@@ -94,6 +100,11 @@ function {{cmd}}() {
 \builtin unalias {{cmd}}i &>/dev/null || \builtin true
 function {{cmd}}i() {
     __zoxide_zi "$@"
+}
+
+\builtin unalias {{cmd}}w &>/dev/null || \builtin true
+function {{cmd}}w() {
+    __zoxide_zw "$@"
 }
 
 if [[ -o zle ]]; then

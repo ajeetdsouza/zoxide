@@ -59,7 +59,18 @@ impl<'db, 'file> Stream<'db, 'file> {
     }
 
     pub fn with_keywords<S: AsRef<str>>(mut self, keywords: &[S]) -> Self {
-        self.keywords = keywords.iter().map(util::to_lowercase).collect();
+        let mut keywords_iter = keywords.iter();
+
+        let workigdir_mode = keywords[0].as_ref();
+        if workigdir_mode == "." {
+            self.workingdir = true;
+            keywords_iter.next();
+        } else if workigdir_mode == env!("HOME") {
+            self.workingdir = false;
+            keywords_iter.next();
+        }
+
+        self.keywords = keywords_iter.map(util::to_lowercase).collect();
         self
     }
 

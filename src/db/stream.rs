@@ -65,7 +65,7 @@ impl<'db, 'file> Stream<'db, 'file> {
         if workigdir_mode == "." {
             self.workingdir = true;
             keywords_iter.next();
-        } else if workigdir_mode == env!("HOME") {
+        } else if workigdir_mode == env::var("HOME").unwrap_or_else(|_| String::from("~")) {
             self.workingdir = false;
             keywords_iter.next();
         }

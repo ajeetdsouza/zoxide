@@ -144,8 +144,20 @@ const completion: Fig.Spec = {
           description: "Print score with results",
         },
         {
-          name: ["-w", "--workingdir"],
+          name: ["-c", "--currentdir"],
           description: "Search only through current working directory",
+          exclusiveOn: [
+            "-m",
+            "--homedir",
+          ],
+        },
+        {
+          name: ["-m", "--homedir"],
+          description: "Search only through home directory",
+          exclusiveOn: [
+            "-c",
+            "--currentdir",
+          ],
         },
         {
           name: ["-h", "--help"],

@@ -4,7 +4,7 @@ use anyhow::{Context, Result};
 
 use crate::cmd::{Query, Run};
 use crate::config;
-use crate::db::{Database, DatabaseFile};
+use crate::db::{Database, DatabaseFile, WorkingMode};
 use crate::error::BrokenPipeHandler;
 use crate::util::{self, Fzf};
 
@@ -29,8 +29,18 @@ impl Query {
         if let Some(path) = &self.exclude {
             stream = stream.with_exclude(path);
         }
-        if self.workingdir {
-            stream = stream.with_workingdir(self.workingdir);
+
+        match stream.working_mode {
+            WorkingMode::NoKeywordPass => {
+                if self.currentdir {
+                    stream = stream.with_currentdir();
+                } else if self.homedir {
+                    stream = stream.with_homedir();
+                } else {
+                    stream = stream.with_globaldir();
+                }
+            }
+            WorkingMode::Current | WorkingMode::Home | WorkingMode::Global => {}
         }
 
         if self.interactive {

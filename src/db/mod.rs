@@ -17,6 +17,14 @@ pub struct Database<'file> {
     pub data_dir: &'file Path,
 }
 
+#[derive(Debug)]
+pub enum WorkingMode {
+    Current,
+    Home,
+    Global,
+    NoKeywordPass,
+}
+
 impl<'file> Database<'file> {
     pub fn save(&mut self) -> Result<()> {
         if !self.modified {

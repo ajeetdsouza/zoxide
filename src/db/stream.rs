@@ -2,10 +2,14 @@ use std::iter::Rev;
 use std::ops::Range;
 use std::{fs, path};
 
-use crate::db::{Database, Dir, Epoch};
+use crate::db::{Database, Dir, Epoch, WorkingMode};
 use crate::util;
 
+use std::env;
+
 pub struct Stream<'db, 'file> {
+    pub working_mode: WorkingMode,
+
     db: &'db mut Database<'file>,
     idxs: Rev<Range<usize>>,
 
@@ -34,12 +38,28 @@ impl<'db, 'file> Stream<'db, 'file> {
             check_exists: false,
             expire_below,
             resolve_symlinks: false,
+            working_mode: WorkingMode::Global,
             exclude_path: None,
         }
     }
 
     pub fn with_exclude<S: Into<String>>(mut self, path: S) -> Self {
         self.exclude_path = Some(path.into());
+        self
+    }
+
+    pub fn with_globaldir(mut self) -> Self {
+        self.working_mode = WorkingMode::Global;
+        self
+    }
+
+    pub fn with_homedir(mut self) -> Self {
+        self.working_mode = WorkingMode::Home;
+        self
+    }
+
+    pub fn with_currentdir(mut self) -> Self {
+        self.working_mode = WorkingMode::Current;
         self
     }
 
@@ -50,7 +70,20 @@ impl<'db, 'file> Stream<'db, 'file> {
     }
 
     pub fn with_keywords<S: AsRef<str>>(mut self, keywords: &[S]) -> Self {
-        self.keywords = keywords.iter().map(util::to_lowercase).collect();
+        let mut keywords_iter = keywords.iter();
+
+        let workingdir_mode = keywords[0].as_ref();
+        if workingdir_mode == "." {
+            self.working_mode = WorkingMode::Current;
+            keywords_iter.next();
+        } else if workingdir_mode == env::var("HOME").unwrap_or_else(|_| String::from("~")) {
+            self.working_mode = WorkingMode::Home;
+            keywords_iter.next();
+        } else {
+            self.working_mode = WorkingMode::NoKeywordPass;
+        }
+
+        self.keywords = keywords_iter.map(util::to_lowercase).collect();
         self
     }
 
@@ -72,6 +105,29 @@ impl<'db, 'file> Stream<'db, 'file> {
 
             if Some(dir.path.as_ref()) == self.exclude_path.as_deref() {
                 continue;
+            }
+
+            match self.working_mode {
+                WorkingMode::Current => {
+                    if !dir.path.starts_with(env::current_dir().unwrap_or_default().to_str().unwrap_or_default()) {
+                        {
+                            continue;
+                        }
+                    }
+                }
+
+                WorkingMode::Home => {
+                    if !dir
+                        .path
+                        .starts_with(&env::var("HOME").unwrap_or_else(|_| env::var("UserProfile").unwrap_or_default()))
+                    {
+                        {
+                            continue;
+                        }
+                    }
+                }
+
+                WorkingMode::Global | WorkingMode::NoKeywordPass => {}
             }
 
             let dir = &self.db.dirs[idx];

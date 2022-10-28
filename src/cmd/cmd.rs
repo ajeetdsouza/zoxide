@@ -117,6 +117,14 @@ pub struct Query {
     #[clap(long, short)]
     pub score: bool,
 
+    /// Search only through current working directory
+    #[clap(long, short, conflicts_with = "homedir")]
+    pub currentdir: bool,
+
+    /// Search only through home directory
+    #[clap(long, short, conflicts_with = "currentdir", short = 'm')]
+    pub homedir: bool,
+
     /// Exclude a path from results
     #[clap(long, value_hint = ValueHint::DirPath, value_name = "path")]
     pub exclude: Option<String>,

@@ -106,6 +106,12 @@ function __zoxide_zi
     and __zoxide_cd $result
 end
 
+# Jump to sub directories of current directory.
+function __zoxide_zw
+    set -l result (command zoxide query --workingdir -- $argv)
+    and __zoxide_cd $result
+end
+
 {{ section }}
 # Commands for zoxide. Disable these using --no-cmd.
 #
@@ -124,6 +130,12 @@ abbr --erase {{cmd}}i &>/dev/null
 complete --command {{cmd}}i --erase
 function {{cmd}}i
     __zoxide_zi $argv
+end
+
+abbr --erase {{cmd}}w &>/dev/null
+complete --command {{cmd}}w --erase
+function {{cmd}}w
+    __zoxide_zw $argv
 end
 
 {%- when None %}

@@ -70,6 +70,10 @@ _arguments "${_arguments_options[@]}" \
 '(-i --interactive)--list[List all matching directories]' \
 '-s[Print score with results]' \
 '--score[Print score with results]' \
+'(-m --homedir)-c[Search only through current working directory]' \
+'(-m --homedir)--currentdir[Search only through current working directory]' \
+'(-c --currentdir)-m[Search only through home directory]' \
+'(-c --currentdir)--homedir[Search only through home directory]' \
 '-h[Print help information]' \
 '--help[Print help information]' \
 '-V[Print version information]' \

@@ -81,10 +81,11 @@ Or, you can use a package manager:
 | Fedora 32+          | [Fedora Packages]       | `dnf install zoxide`                                                                           |
 | Gentoo              | [GURU Overlay]          | `eselect repository enable guru` <br /> `emerge --sync guru` <br /> `emerge app-shells/zoxide` |
 | Manjaro             |                         | `pacman -S zoxide`                                                                             |
-| NixOS               | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                                                                   |
+| NixOS 21.05+        | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                                                                   |
 | openSUSE Tumbleweed | [openSUSE Factory]      | `zypper install zoxide`                                                                        |
 | Parrot OS           |                         | `apt install zoxide`                                                                           |
 | Raspbian 11+        | [Raspbian Packages]     | `apt install zoxide`                                                                           |
+| Slackware 15.0+     | [SlackBuilds]           | [Instructions][slackbuilds-howto]                                                              |
 | Ubuntu 21.04+       | [Ubuntu Packages]       | `apt install zoxide`                                                                           |
 | Void Linux          | [Void Linux Packages]   | `xbps-install -S zoxide`                                                                       |
 
@@ -450,6 +451,7 @@ They must be set before `zoxide init` is called.
 [raspbian packages]: https://archive.raspbian.org/raspbian/pool/main/r/rust-zoxide/
 [releases]: https://github.com/ajeetdsouza/zoxide/releases
 [scoop]: https://github.com/ScoopInstaller/Main/tree/master/bucket/zoxide.json
+[slackbuilds-howto]: https://slackbuilds.org/howto/
 [telescope-zoxide]: https://github.com/jvgrootveld/telescope-zoxide
 [telescope.nvim]: https://github.com/nvim-telescope/telescope.nvim
 [termux]: https://github.com/termux/termux-packages/tree/master/packages/zoxide

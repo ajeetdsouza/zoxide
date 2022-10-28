@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Zsh: completions clashing with `zsh-autocomplete`.
 - Fzf: 'invalid option' on macOS.
 - PowerShell: handle UTF-8 encoding correctly.
+- Zsh: don't hide output from `chpwd` hooks.
 
 ## [0.8.3] - 2022-09-02
 

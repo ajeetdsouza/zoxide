@@ -28,6 +28,7 @@ const completion: Fig.Spec = {
         {
           name: "--from",
           description: "Application to import from",
+          isRepeatable: true,
           args: {
             name: "from",
             suggestions: [
@@ -61,6 +62,7 @@ const completion: Fig.Spec = {
         {
           name: "--cmd",
           description: "Changes the prefix of the `z` and `zi` commands",
+          isRepeatable: true,
           args: {
             name: "cmd",
             isOptional: true,
@@ -69,6 +71,7 @@ const completion: Fig.Spec = {
         {
           name: "--hook",
           description: "Changes how often zoxide increments a directory's score",
+          isRepeatable: true,
           args: {
             name: "hook",
             isOptional: true,
@@ -113,6 +116,7 @@ const completion: Fig.Spec = {
         {
           name: "--exclude",
           description: "Exclude a path from results",
+          isRepeatable: true,
           args: {
             name: "exclude",
             isOptional: true,
@@ -154,6 +158,7 @@ const completion: Fig.Spec = {
       ],
       args: {
         name: "keywords",
+        isVariadic: true,
         isOptional: true,
       },
     },
@@ -176,6 +181,7 @@ const completion: Fig.Spec = {
       ],
       args: {
         name: "paths",
+        isVariadic: true,
         isOptional: true,
         template: "folders",
       },

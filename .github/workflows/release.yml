@@ -48,10 +48,7 @@ jobs:
 
       - name: Get version
         id: get_version
-        uses: SebRollen/toml-action@v1.0.0
-        with:
-          file: Cargo.toml
-          field: package.version
+        run: sed -En 's/^version = "(.*)"/value=\1/p' Cargo.toml >> $GITHUB_OUTPUT
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1

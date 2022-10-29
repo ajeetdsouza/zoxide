@@ -1,6 +1,6 @@
 let
   rust = import (builtins.fetchTarball
-    "https://github.com/oxalica/rust-overlay/archive/60c2cfaa8b90ed8cebd18b214fac8682dcf222dd.tar.gz");
+    "https://github.com/oxalica/rust-overlay/archive/34d76c0a001d81a0fac342698ce7926da37b8ea5.tar.gz");
   pkgs = import (builtins.fetchTarball
     "https://github.com/NixOS/nixpkgs/archive/0323e1f8bac882f19905174639a89397db1930f1.tar.gz") {
       overlays = [ rust ];

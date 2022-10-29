@@ -5,7 +5,7 @@ edition = "2021"
 publish = false
 
 [dependencies]
-anyhow = "1.0.32"
-clap = { version = "3.1.0", features = ["derive"] }
-ignore = "0.4.18"
-shell-words = "1.0.0"
+anyhow.workspace = true
+clap.workspace = true
+ignore.workspace = true
+shell-words.workspace = true

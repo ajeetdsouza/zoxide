@@ -8,24 +8,24 @@ _zoxide() {
 
     for i in ${COMP_WORDS[@]}
     do
-        case "${i}" in
-            "$1")
+        case "${cmd},${i}" in
+            ",$1")
                 cmd="zoxide"
                 ;;
-            add)
-                cmd+="__add"
+            zoxide,add)
+                cmd="zoxide__add"
                 ;;
-            import)
-                cmd+="__import"
+            zoxide,import)
+                cmd="zoxide__import"
                 ;;
-            init)
-                cmd+="__init"
+            zoxide,init)
+                cmd="zoxide__init"
                 ;;
-            query)
-                cmd+="__query"
+            zoxide,query)
+                cmd="zoxide__query"
                 ;;
-            remove)
-                cmd+="__remove"
+            zoxide,remove)
+                cmd="zoxide__remove"
                 ;;
             *)
                 ;;
@@ -102,7 +102,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__query)
-            opts="-i -l -s -h -V --all --interactive --list --score --exclude --help --version <KEYWORDS>..."
+            opts="-i -l -s -h -V --all --interactive --list --score --exclude --help --version [KEYWORDS]..."
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -120,7 +120,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__remove)
-            opts="-i -h -V --interactive --help --version <PATHS>..."
+            opts="-i -h -V --interactive --help --version [PATHS]..."
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0

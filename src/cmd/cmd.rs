@@ -2,7 +2,7 @@
 
 use std::path::PathBuf;
 
-use clap::{ArgEnum, Parser, ValueHint};
+use clap::{Parser, ValueEnum, ValueHint};
 
 const ENV_HELP: &str = "ENVIRONMENT VARIABLES:
     _ZO_DATA_DIR            Path for zoxide data files
@@ -33,7 +33,7 @@ pub enum Cmd {
 /// Add a new directory or increment its rank
 #[derive(Debug, Parser)]
 pub struct Add {
-    #[clap(min_values = 1, required = true, value_hint = ValueHint::DirPath)]
+    #[clap(num_args = 1.., required = true, value_hint = ValueHint::DirPath)]
     pub paths: Vec<PathBuf>,
 }
 
@@ -44,7 +44,7 @@ pub struct Import {
     pub path: PathBuf,
 
     /// Application to import from
-    #[clap(arg_enum, long)]
+    #[clap(value_enum, long)]
     pub from: ImportFrom,
 
     /// Merge into existing database
@@ -52,7 +52,7 @@ pub struct Import {
     pub merge: bool,
 }
 
-#[derive(ArgEnum, Clone, Debug)]
+#[derive(ValueEnum, Clone, Debug)]
 pub enum ImportFrom {
     Autojump,
     Z,
@@ -61,7 +61,7 @@ pub enum ImportFrom {
 /// Generate shell configuration
 #[derive(Debug, Parser)]
 pub struct Init {
-    #[clap(arg_enum)]
+    #[clap(value_enum)]
     pub shell: InitShell,
 
     /// Prevents zoxide from defining the `z` and `zi` commands
@@ -73,18 +73,18 @@ pub struct Init {
     pub cmd: String,
 
     /// Changes how often zoxide increments a directory's score
-    #[clap(arg_enum, long, default_value = "pwd")]
+    #[clap(value_enum, long, default_value = "pwd")]
     pub hook: InitHook,
 }
 
-#[derive(ArgEnum, Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(ValueEnum, Clone, Copy, Debug, Eq, PartialEq)]
 pub enum InitHook {
     None,
     Prompt,
     Pwd,
 }
 
-#[derive(ArgEnum, Clone, Debug)]
+#[derive(ValueEnum, Clone, Debug)]
 pub enum InitShell {
     Bash,
     Elvish,

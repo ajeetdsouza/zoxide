@@ -36,7 +36,7 @@ impl Fzf {
         if let Some(fzf_opts) = config::fzf_opts() {
             command.env("FZF_DEFAULT_OPTS", fzf_opts);
         } else {
-            command.args(&[
+            command.args([
                 // Search result
                 "--no-sort",
                 // Interface
@@ -58,7 +58,7 @@ impl Fzf {
                 } else {
                     r"\command -p ls -Cp {2..}"
                 };
-                command.args(&["--preview", PREVIEW_CMD, "--preview-window=down,30%"]).env("SHELL", "sh");
+                command.args(["--preview", PREVIEW_CMD, "--preview-window=down,30%"]).env("SHELL", "sh");
             }
         }
 

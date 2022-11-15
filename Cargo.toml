@@ -9,7 +9,7 @@ license = "MIT"
 name = "zoxide"
 readme = "README.md"
 repository = "https://github.com/ajeetdsouza/zoxide"
-rust-version = "1.64"
+rust-version = "1.65"
 version = "0.8.3"
 
 [badges]

@@ -24,7 +24,7 @@ impl<'file> Database<'file> {
         }
 
         let buffer = self.dirs.to_bytes()?;
-        let path = db_path(&self.data_dir);
+        let path = db_path(self.data_dir);
         util::write(&path, &buffer).context("could not write to database")?;
         self.modified = false;
         Ok(())
@@ -35,13 +35,11 @@ impl<'file> Database<'file> {
         let path = path.as_ref();
 
         match self.dirs.iter_mut().find(|dir| dir.path == path) {
-            None => {
-                self.dirs.push(Dir { path: path.to_string().into(), last_accessed: now, rank: 1.0 });
-            }
             Some(dir) => {
                 dir.last_accessed = now;
                 dir.rank += 1.0;
             }
+            None => self.dirs.push(Dir { path: path.to_string().into(), last_accessed: now, rank: 1.0 }),
         };
 
         self.modified = true;

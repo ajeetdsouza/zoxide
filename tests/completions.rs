@@ -6,7 +6,7 @@ use assert_cmd::Command;
 #[test]
 fn completions_bash() {
     let source = include_str!("../contrib/completions/zoxide.bash");
-    Command::new("bash").args(&["--noprofile", "--norc", "-c", source]).assert().success().stdout("").stderr("");
+    Command::new("bash").args(["--noprofile", "--norc", "-c", source]).assert().success().stdout("").stderr("");
 }
 
 // Elvish: the completions file uses editor commands to add completions to the shell. However,
@@ -21,7 +21,7 @@ fn completions_fish() {
 
     Command::new("fish")
         .env("HOME", tempdir)
-        .args(&["--command", source, "--private"])
+        .args(["--command", source, "--private"])
         .assert()
         .success()
         .stdout("")
@@ -32,7 +32,7 @@ fn completions_fish() {
 fn completions_powershell() {
     let source = include_str!("../contrib/completions/_zoxide.ps1");
     Command::new("pwsh")
-        .args(&["-NoLogo", "-NonInteractive", "-NoProfile", "-Command", source])
+        .args(["-NoLogo", "-NonInteractive", "-NoProfile", "-Command", source])
         .assert()
         .success()
         .stdout("")
@@ -50,5 +50,5 @@ fn completions_zsh() {
     compinit -u
     "#;
 
-    Command::new("zsh").args(&["-c", source, "--no-rcs"]).assert().success().stdout("").stderr("");
+    Command::new("zsh").args(["-c", source, "--no-rcs"]).assert().success().stdout("").stderr("");
 }

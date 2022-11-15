@@ -13,7 +13,6 @@
 
 [![crates.io][crates.io-badge]][crates.io]
 [![Downloads][downloads-badge]][releases]
-[![License][license-badge]][license]
 [![Built with Nix][builtwithnix-badge]][builtwithnix]
 
 zoxide is a **smarter cd command**, inspired by z and autojump.
@@ -399,7 +398,7 @@ They must be set before `zoxide init` is called.
 | [nnn]              | File manager                                 | [nnn-autojump]             |
 | [ranger]           | File manager                                 | [ranger-zoxide]            |
 | [telescope.nvim]   | Fuzzy finder for Neovim                      | [telescope-zoxide]         |
-| [vim]              | Text editor                                  | [zoxide.vim]               |
+| [vim] / [neovim]   | Text editor                                  | [zoxide.vim]               |
 | [xplr]             | File manager                                 | [zoxide.xplr]              |
 | [xxh]              | Transports shell configuration over SSH      | [xxh-plugin-prerun-zoxide] |
 | [zabb]             | Finds the shortest possible query for a path | Natively supported         |
@@ -409,18 +408,18 @@ They must be set before `zoxide init` is called.
 [algorithm-matching]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#matching
 [alpine linux packages]: https://pkgs.alpinelinux.org/packages?name=zoxide
 [arch linux community]: https://archlinux.org/packages/community/x86_64/zoxide/
-[builtwithnix-badge]: https://img.shields.io/badge/builtwith-nix-7d81f7?style=flat-square
+[builtwithnix-badge]: https://img.shields.io/badge/builtwith-nix-7d81f7?logo=nixos&logoColor=white&style=flat-square
 [builtwithnix]: https://builtwithnix.org/
 [chocolatey]: https://community.chocolatey.org/packages/zoxide
 [clink-zoxide]: https://github.com/shunsambongi/clink-zoxide
 [clink]: https://github.com/mridgers/clink
 [conda-forge]: https://anaconda.org/conda-forge/zoxide
 [copr]: https://copr.fedorainfracloud.org/coprs/atim/zoxide/
-[crates.io-badge]: https://img.shields.io/crates/v/zoxide?style=flat-square
+[crates.io-badge]: https://img.shields.io/crates/v/zoxide?logo=rust&logoColor=white&style=flat-square
 [crates.io]: https://crates.io/crates/zoxide
 [debian packages]: https://packages.debian.org/stable/admin/zoxide
 [devuan packages]: https://pkginfo.devuan.org/cgi-bin/package-query.html?c=package&q=zoxide
-[downloads-badge]: https://img.shields.io/endpoint?color=bright-green&label=downloads&style=flat-square&cacheSeconds=3600&url=https%3A%2F%2Fzoxide-dl-rlvir7rbe5ac.runkit.sh%2F
+[downloads-badge]: https://img.shields.io/github/downloads/ajeetdsouza/zoxide/total?logo=github&logoColor=white&style=flat-square
 [dports]: https://github.com/DragonFlyBSD/DPorts/tree/master/sysutils/zoxide
 [emacs]: https://www.gnu.org/software/emacs/
 [fedora packages]: https://src.fedoraproject.org/rpms/rust-zoxide
@@ -436,8 +435,6 @@ They must be set before `zoxide init` is called.
 [joshuto]: https://github.com/kamiyaa/joshuto
 [lf]: https://github.com/gokcehan/lf
 [lf-wiki]: https://github.com/gokcehan/lf/wiki/Integrations#zoxide
-[license-badge]: https://img.shields.io/github/license/ajeetdsouza/zoxide?color=lightgray&style=flat-square
-[license]: https://github.com/ajeetdsouza/zoxide/blob/main/LICENSE
 [linuxbrew]: https://formulae.brew.sh/formula-linux/zoxide
 [macports]: https://ports.macports.org/port/zoxide/summary
 [neovim]: https://github.com/neovim/neovim

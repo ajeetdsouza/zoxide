@@ -35,11 +35,7 @@ impl Query {
             let stdin = fzf.stdin();
 
             let selection = loop {
-                let dir = match stream.next() {
-                    Some(dir) => dir,
-                    None => break fzf.select()?,
-                };
-
+                let Some(dir) = stream.next() else { break fzf.select()? };
                 match writeln!(stdin, "{}", dir.display_score(now)) {
                     Err(e) if e.kind() == io::ErrorKind::BrokenPipe => break fzf.select()?,
                     result => result.context("could not write to fzf")?,

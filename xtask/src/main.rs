@@ -83,9 +83,6 @@ fn run_fmt(nix_enabled: bool, check: bool) -> Result<()> {
 
 fn run_lint(nix_enabled: bool) -> Result<()> {
     if nix_enabled {
-        // Run cargo-audit.
-        Command::new("cargo").args(["audit", "--deny=warnings"]).run()?;
-
         // Run markdownlint.
         for result in Walk::new("./") {
             let entry = result.unwrap();

@@ -21,7 +21,6 @@ in pkgs.mkShell {
     pkgs.zsh
 
     # Tools
-    pkgs.cargo-audit
     pkgs.cargo-nextest
     pkgs.mandoc
     pkgs.nixfmt

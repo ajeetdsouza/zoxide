@@ -100,7 +100,7 @@ if [[ -o zle ]]; then
     function __zoxide_z_complete() {
         # Only show completions when the cursor is at the end of the line.
         # shellcheck disable=SC2154
-        [[ "{{ "${#words[@]}" }}" -eq "${CURRENT}" ]] || return
+        [[ "{{ "${#words[@]}" }}" -eq "${CURRENT}" ]] || return 0
 
         if [[ "{{ "${#words[@]}" }}" -eq 2 ]]; then
             _files -/
@@ -111,14 +111,13 @@ if [[ -o zle ]]; then
                 result="${__zoxide_z_prefix}${result}"
                 # shellcheck disable=SC2296
                 compadd -Q "${(q-)result}"
-            else
-                return 0
             fi
             \builtin printf '\e[5n'
         fi
+        return 0
     }
 
-    \builtin bindkey "\e[0n" 'reset-prompt'
+    \builtin bindkey '\e[0n' 'reset-prompt'
     if [[ "${+functions[compdef]}" -ne 0 ]]; then
         \compdef -d {{cmd}}
         \compdef -d {{cmd}}i

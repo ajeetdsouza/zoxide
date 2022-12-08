@@ -61,7 +61,11 @@ impl Fzf {
                 } else {
                     r"\command -p ls -Cp {2..}"
                 };
-                command.args(["--preview", PREVIEW_CMD, "--preview-window=down,30%"]).env("SHELL", "sh");
+                command.args(["--preview", PREVIEW_CMD, "--preview-window=down,30%"]).envs([
+                    ("CLICOLOR", "1"),
+                    ("CLICOLOR_FORCE", "1"),
+                    ("SHELL", "sh"),
+                ]);
             }
         }
 

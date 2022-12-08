@@ -112,11 +112,7 @@ if [[ -o zle ]]; then
                 # shellcheck disable=SC2296
                 compadd -Q "${(q-)result}"
             else
-{#-
-  zsh-autocomplete calls the completion function multiple times if no match is
-  returned.
-#}
-                compadd ""
+                return 0
             fi
             \builtin printf '\e[5n'
         fi

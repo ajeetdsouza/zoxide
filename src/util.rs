@@ -30,7 +30,9 @@ impl Fzf {
         #[cfg(not(windows))]
         let mut command = Command::new("fzf");
         if multiple {
-            command.arg("-m");
+            command.arg("--multi");
+        } else {
+            command.arg("--bind=tab:down,btab:up");
         }
         command.arg("--nth=2..").stdin(Stdio::piped()).stdout(Stdio::piped());
         if let Some(fzf_opts) = config::fzf_opts() {
@@ -40,6 +42,7 @@ impl Fzf {
                 // Search result
                 "--no-sort",
                 // Interface
+                "--cycle",
                 "--keep-right",
                 // Layout
                 "--height=50%",

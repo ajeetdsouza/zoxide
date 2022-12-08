@@ -22,6 +22,83 @@ const completion: Fig.Spec = {
       },
     },
     {
+      name: "edit",
+      description: "Edit the database",
+      subcommands: [
+        {
+          name: "decrement",
+          options: [
+            {
+              name: ["-h", "--help"],
+              description: "Print help information",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version information",
+            },
+          ],
+          args: {
+            name: "path",
+          },
+        },
+        {
+          name: "delete",
+          options: [
+            {
+              name: ["-h", "--help"],
+              description: "Print help information",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version information",
+            },
+          ],
+          args: {
+            name: "path",
+          },
+        },
+        {
+          name: "increment",
+          options: [
+            {
+              name: ["-h", "--help"],
+              description: "Print help information",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version information",
+            },
+          ],
+          args: {
+            name: "path",
+          },
+        },
+        {
+          name: "reload",
+          options: [
+            {
+              name: ["-h", "--help"],
+              description: "Print help information",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version information",
+            },
+          ],
+        },
+      ],
+      options: [
+        {
+          name: ["-h", "--help"],
+          description: "Print help information",
+        },
+        {
+          name: ["-V", "--version"],
+          description: "Print version information",
+        },
+      ],
+    },
+    {
       name: "import",
       description: "Import entries from another application",
       options: [

@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PowerShell: handle UTF-8 encoding correctly.
 - Zsh: don't hide output from `chpwd` hooks.
 - Nushell: upgrade minimum supported version to v0.73.0.
+- Zsh: fix extra space in interactive completions when no match is found.
+- Fzf: `<TAB>` now cycles through completions.
 
 ## [0.8.3] - 2022-09-02
 

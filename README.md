@@ -204,7 +204,7 @@ zoxide init fish | source
 Add this to your env file (find it by running `$nu.env-path` in Nushell):
 
 ```sh
-zoxide init nushell | save ~/.zoxide.nu
+zoxide init nushell | save -f ~/.zoxide.nu
 ```
 
 Now, add this to the end of your config file (find it by running
@@ -215,7 +215,7 @@ source ~/.zoxide.nu
 ```
 
 > **Note**
-> zoxide only supports Nushell v0.63.0 and above.
+> zoxide only supports Nushell v0.73.0 and above.
 
 </details>
 

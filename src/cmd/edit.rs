@@ -36,10 +36,11 @@ impl Run for Edit {
                 let mut fzf = Command::new("fzf");
                 fzf.args([
                     // Search mode
-                    "--delimiter=\\x00 ",
+                    "--delimiter=\t",
                     "--nth=2",
+                    "--scheme=path",
                     // Search result
-                    "--no-sort",
+                    "--tiebreak=end,chunk,index",
                     // Interface
                     "--bind=\
 ctrl-r:reload(zoxide edit reload),\
@@ -52,15 +53,37 @@ enter:abort",
                     "--cycle",
                     "--keep-right",
                     // Layout
+                    "--border=rounded",
+                    "--border-label= zoxide-edit ",
                     "--header=\
-ctrl-r:reload     ctrl-w:delete
-ctrl-a:increment  ctrl-d:decrement
+ctrl-r:reload   \tctrl-w:delete
+ctrl-a:increment\tctrl-d:decrement
 
-SCORE PATH",
+SCORE\tPATH",
                     "--info=inline",
                     "--layout=reverse",
+                    "--padding=1",
+                    // Display
+                    "--color=label:bold",
+                    "--tabstop=2",
+                    // Scripting
+                    "--read0",
                 ])
-                .envs([("FZF_DEFAULT_COMMAND", "zoxide edit reload")]);
+                .envs([
+                    ("CLICOLOR", "1"),
+                    ("CLICOLOR_FORCE", "1"),
+                    ("FZF_DEFAULT_COMMAND", "zoxide edit reload"),
+                ]);
+
+                if cfg!(unix) {
+                    // Non-POSIX args are only available on certain operating systems.
+                    const PREVIEW_ARG: &str = if cfg!(target_os = "linux") {
+                        r"--preview=\command -p ls -Cp --color=always --group-directories-first {2..}"
+                    } else {
+                        r"--preview=\command -p ls -Cp {2..}"
+                    };
+                    fzf.args([PREVIEW_ARG, "--preview-window=down,30%"]).env("SHELL", "sh");
+                }
 
                 let mut fzf = fzf.spawn().unwrap();
                 fzf.wait().unwrap();
@@ -74,6 +97,6 @@ SCORE PATH",
 fn print_dirs(db: &Store, now: Epoch) {
     let stdout = &mut io::stdout().lock();
     for dir in db.dirs().iter().rev() {
-        writeln!(stdout, "{:>5}\x00 {}", dir.score(now), &dir.path).unwrap();
+        write!(stdout, "{:>5}\t{}\x00", dir.score(now), &dir.path).unwrap();
     }
 }

@@ -141,9 +141,6 @@ pub struct Query {
 /// Remove a directory from the database
 #[derive(Debug, Parser)]
 pub struct Remove {
-    /// Use interactive selection
-    #[clap(long, short)]
-    pub interactive: bool,
     #[clap(value_hint = ValueHint::DirPath)]
     pub paths: Vec<String>,
 }

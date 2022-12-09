@@ -9,6 +9,7 @@ mod config;
 mod db;
 mod error;
 mod shell;
+mod store;
 mod util;
 
 use std::env;

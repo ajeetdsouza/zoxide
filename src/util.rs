@@ -161,7 +161,9 @@ fn tmpfile<P: AsRef<Path>>(dir: P) -> Result<(File, PathBuf)> {
         match OpenOptions::new().write(true).create_new(true).open(&path) {
             Ok(file) => break Ok((file, path)),
             Err(e) if e.kind() == io::ErrorKind::AlreadyExists && attempts < MAX_ATTEMPTS => (),
-            Err(e) => break Err(e).with_context(|| format!("could not create file: {}", path.display())),
+            Err(e) => {
+                break Err(e).with_context(|| format!("could not create file: {}", path.display()));
+            }
         }
     }
 }

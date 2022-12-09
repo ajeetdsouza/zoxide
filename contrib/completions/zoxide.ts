@@ -244,10 +244,6 @@ const completion: Fig.Spec = {
       description: "Remove a directory from the database",
       options: [
         {
-          name: ["-i", "--interactive"],
-          description: "Use interactive selection",
-        },
-        {
           name: ["-h", "--help"],
           description: "Print help information",
         },

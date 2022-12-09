@@ -134,8 +134,6 @@ _arguments "${_arguments_options[@]}" \
 ;;
 (remove)
 _arguments "${_arguments_options[@]}" \
-'-i[Use interactive selection]' \
-'--interactive[Use interactive selection]' \
 '-h[Print help information]' \
 '--help[Print help information]' \
 '-V[Print version information]' \

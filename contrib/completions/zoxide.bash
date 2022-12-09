@@ -205,7 +205,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__remove)
-            opts="-i -h -V --interactive --help --version [PATHS]..."
+            opts="-h -V --help --version [PATHS]..."
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0

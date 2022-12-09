@@ -35,6 +35,7 @@ nix = { version = "0.25.0", default-features = false, features = [
     "fs",
     "user",
 ] }
+ouroboros = "0.15.5"
 rstest = { version = "0.15.0", default-features = false }
 rstest_reuse = "0.4.0"
 serde = { version = "1.0.116", features = ["derive"] }
@@ -51,6 +52,7 @@ dirs.workspace = true
 dunce.workspace = true
 fastrand.workspace = true
 glob.workspace = true
+ouroboros.workspace = true
 serde.workspace = true
 
 [target.'cfg(unix)'.dependencies]

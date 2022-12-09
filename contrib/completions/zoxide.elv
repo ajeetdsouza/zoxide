@@ -101,8 +101,6 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand --version 'Print version information'
         }
         &'zoxide;remove'= {
-            cand -i 'Use interactive selection'
-            cand --interactive 'Use interactive selection'
             cand -h 'Print help information'
             cand --help 'Print help information'
             cand -V 'Print version information'

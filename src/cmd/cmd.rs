@@ -47,9 +47,13 @@ pub struct Edit {
 
 #[derive(Clone, Debug, Subcommand)]
 pub enum EditCommand {
+    #[clap(hide = true)]
     Decrement { path: String },
+    #[clap(hide = true)]
     Delete { path: String },
+    #[clap(hide = true)]
     Increment { path: String },
+    #[clap(hide = true)]
     Reload,
 }
 

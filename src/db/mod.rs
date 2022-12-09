@@ -30,78 +30,9 @@ impl<'file> Database<'file> {
         Ok(())
     }
 
-    /// Adds a new directory or increments its rank. Also updates its last accessed time.
-    pub fn add<S: AsRef<str>>(&mut self, path: S, now: Epoch) {
-        let path = path.as_ref();
-
-        match self.dirs.iter_mut().find(|dir| dir.path == path) {
-            Some(dir) => {
-                dir.last_accessed = now;
-                dir.rank += 1.0;
-            }
-            None => self.dirs.push(Dir { path: path.to_string().into(), last_accessed: now, rank: 1.0 }),
-        };
-
-        self.modified = true;
-    }
-
-    pub fn dedup(&mut self) {
-        // Sort by path, so that equal paths are next to each other.
-        self.dirs.sort_by(|dir1, dir2| dir1.path.cmp(&dir2.path));
-
-        for idx in (1..self.dirs.len()).rev() {
-            // Check if curr_dir and next_dir have equal paths.
-            let curr_dir = &self.dirs[idx];
-            let next_dir = &self.dirs[idx - 1];
-            if next_dir.path != curr_dir.path {
-                continue;
-            }
-
-            // Merge curr_dir's rank and last_accessed into next_dir.
-            let rank = curr_dir.rank;
-            let last_accessed = curr_dir.last_accessed;
-            let next_dir = &mut self.dirs[idx - 1];
-            next_dir.last_accessed = next_dir.last_accessed.max(last_accessed);
-            next_dir.rank += rank;
-
-            // Delete curr_dir.
-            self.dirs.swap_remove(idx);
-            self.modified = true;
-        }
-    }
-
     // Streaming iterator for directories.
     pub fn stream(&mut self, now: Epoch) -> Stream<'_, 'file> {
         Stream::new(self, now)
-    }
-
-    /// Removes the directory with `path` from the store. This does not preserve ordering, but is
-    /// O(1).
-    pub fn remove<S: AsRef<str>>(&mut self, path: S) -> bool {
-        let path = path.as_ref();
-
-        if let Some(idx) = self.dirs.iter().position(|dir| dir.path == path) {
-            self.dirs.swap_remove(idx);
-            self.modified = true;
-            return true;
-        }
-
-        false
-    }
-
-    pub fn age(&mut self, max_age: Rank) {
-        let sum_age = self.dirs.iter().map(|dir| dir.rank).sum::<Rank>();
-        if sum_age > max_age {
-            let factor = 0.9 * max_age / sum_age;
-            for idx in (0..self.dirs.len()).rev() {
-                let dir = &mut self.dirs[idx];
-                dir.rank *= factor;
-                if dir.rank < 1.0 {
-                    self.dirs.swap_remove(idx);
-                }
-            }
-            self.modified = true;
-        }
     }
 }
 
@@ -141,60 +72,4 @@ impl DatabaseFile {
 fn db_path<P: AsRef<Path>>(data_dir: P) -> PathBuf {
     const DB_FILENAME: &str = "db.zo";
     data_dir.as_ref().join(DB_FILENAME)
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn add() {
-        let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
-        let now = 946684800;
-
-        let data_dir = tempfile::tempdir().unwrap();
-        {
-            let mut db = DatabaseFile::new(data_dir.path());
-            let mut db = db.open().unwrap();
-            db.add(path, now);
-            db.add(path, now);
-            db.save().unwrap();
-        }
-        {
-            let mut db = DatabaseFile::new(data_dir.path());
-            let db = db.open().unwrap();
-            assert_eq!(db.dirs.len(), 1);
-
-            let dir = &db.dirs[0];
-            assert_eq!(dir.path, path);
-            assert_eq!(dir.last_accessed, now);
-        }
-    }
-
-    #[test]
-    fn remove() {
-        let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
-        let now = 946684800;
-
-        let data_dir = tempfile::tempdir().unwrap();
-        {
-            let mut db = DatabaseFile::new(data_dir.path());
-            let mut db = db.open().unwrap();
-            db.add(path, now);
-            db.save().unwrap();
-        }
-        {
-            let mut db = DatabaseFile::new(data_dir.path());
-            let mut db = db.open().unwrap();
-            assert!(db.remove(path));
-            db.save().unwrap();
-        }
-        {
-            let mut db = DatabaseFile::new(data_dir.path());
-            let mut db = db.open().unwrap();
-            assert!(db.dirs.is_empty());
-            assert!(!db.remove(path));
-            db.save().unwrap();
-        }
-    }
 }

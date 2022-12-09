@@ -27,6 +27,7 @@ const completion: Fig.Spec = {
       subcommands: [
         {
           name: "decrement",
+          hidden: true,
           options: [
             {
               name: ["-h", "--help"],
@@ -43,6 +44,7 @@ const completion: Fig.Spec = {
         },
         {
           name: "delete",
+          hidden: true,
           options: [
             {
               name: ["-h", "--help"],
@@ -59,6 +61,7 @@ const completion: Fig.Spec = {
         },
         {
           name: "increment",
+          hidden: true,
           options: [
             {
               name: ["-h", "--help"],
@@ -75,6 +78,7 @@ const completion: Fig.Spec = {
         },
         {
           name: "reload",
+          hidden: true,
           options: [
             {
               name: ["-h", "--help"],

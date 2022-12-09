@@ -1,5 +1,5 @@
 use std::borrow::Cow;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::{fs, io};
 
 use anyhow::{bail, Context, Result};
@@ -24,6 +24,10 @@ impl Store {
 
     pub fn open() -> Result<Self> {
         let data_dir = config::data_dir()?;
+        Self::open_dir(&data_dir)
+    }
+
+    pub fn open_dir(data_dir: &Path) -> Result<Self> {
         let path = data_dir.join("db.zo");
 
         match fs::read(&path) {
@@ -31,9 +35,9 @@ impl Store {
             Err(e) if e.kind() == io::ErrorKind::NotFound => {
                 // Create data directory, but don't create any file yet. The file will be created
                 // later by [`Database::save`] if any data is modified.
-                fs::create_dir_all(&data_dir)
+                fs::create_dir_all(data_dir)
                     .with_context(|| format!("unable to create data directory: {}", data_dir.display()))?;
-                Ok(Self::new(data_dir, Vec::new(), |_| Vec::new(), false))
+                Ok(Self::new(path, Vec::new(), |_| Vec::new(), false))
             }
             Err(e) => Err(e).with_context(|| format!("could not read from database: {}", path.display())),
         }
@@ -41,11 +45,11 @@ impl Store {
 
     pub fn save(&mut self) -> Result<()> {
         // Only write to disk if the database is modified.
-        if !self.borrow_dirty() {
+        if !self.dirty() {
             return Ok(());
         }
 
-        let bytes = Self::serialize(self.borrow_dirs())?;
+        let bytes = Self::serialize(self.dirs())?;
         util::write(self.borrow_path(), &bytes).context("could not write to database")?;
         self.with_dirty_mut(|dirty| *dirty = false);
 
@@ -53,7 +57,7 @@ impl Store {
     }
 
     /// Increments the rank of a directory, or creates it if it does not exist.
-    pub fn increment(&mut self, path: impl AsRef<str> + Into<String>, by: Rank, now: Epoch) {
+    pub fn add(&mut self, path: impl AsRef<str> + Into<String>, by: Rank, now: Epoch) {
         self.with_dirs_mut(|dirs| match dirs.iter_mut().find(|dir| dir.path == path.as_ref()) {
             Some(dir) => dir.rank = (dir.rank + by).max(0.0),
             None => dirs.push(Dir { path: path.into().into(), rank: by.max(0.0), last_accessed: now }),
@@ -61,9 +65,17 @@ impl Store {
         self.with_dirty_mut(|dirty| *dirty = true);
     }
 
+    /// Creates a new directory. This will create a duplicate entry if this
+    /// directory is always in the database, it is expected that the user either
+    /// does a check before calling this, or calls `dedup()` afterward.
+    pub fn add_unchecked(&mut self, path: impl AsRef<str> + Into<String>, rank: Rank, now: Epoch) {
+        self.with_dirs_mut(|dirs| dirs.push(Dir { path: path.into().into(), rank, last_accessed: now }));
+        self.with_dirty_mut(|dirty| *dirty = true);
+    }
+
     /// Increments the rank and updates the last_accessed of a directory, or
     /// creates it if it does not exist.
-    pub fn increment_update(&mut self, path: impl AsRef<str> + Into<String>, by: Rank, now: Epoch) {
+    pub fn add_update(&mut self, path: impl AsRef<str> + Into<String>, by: Rank, now: Epoch) {
         self.with_dirs_mut(|dirs| match dirs.iter_mut().find(|dir| dir.path == path.as_ref()) {
             Some(dir) => {
                 dir.rank = (dir.rank + by).max(0.0);
@@ -74,6 +86,8 @@ impl Store {
         self.with_dirty_mut(|dirty| *dirty = true);
     }
 
+    /// Removes the directory with `path` from the store. This does not preserve ordering, but is
+    /// O(1).
     pub fn remove(&mut self, path: impl AsRef<str>) -> bool {
         let deleted = self.with_dirs_mut(|dirs| match dirs.iter().position(|dir| dir.path == path.as_ref()) {
             Some(idx) => {
@@ -144,6 +158,10 @@ impl Store {
             dirs.sort_unstable_by(|dir1: &Dir, dir2: &Dir| dir1.score(now).total_cmp(&dir2.score(now)))
         });
         self.with_dirty_mut(|dirty| *dirty = true);
+    }
+
+    pub fn dirty(&self) -> bool {
+        *self.borrow_dirty()
     }
 
     pub fn dirs(&self) -> &[Dir] {
@@ -221,3 +239,58 @@ impl Dir<'_> {
 
 pub type Rank = f64;
 pub type Epoch = u64;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn add() {
+        let data_dir = tempfile::tempdir().unwrap();
+        let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
+        let now = 946684800;
+
+        {
+            let mut db = Store::open_dir(data_dir.path()).unwrap();
+            db.add(path, 1.0, now);
+            db.add(path, 1.0, now);
+            db.save().unwrap();
+        }
+
+        {
+            let db = Store::open_dir(data_dir.path()).unwrap();
+            assert_eq!(db.dirs().len(), 1);
+
+            let dir = &db.dirs()[0];
+            assert_eq!(dir.path, path);
+            assert!((dir.rank - 2.0).abs() < 0.01);
+            assert_eq!(dir.last_accessed, now);
+        }
+    }
+
+    #[test]
+    fn remove() {
+        let data_dir = tempfile::tempdir().unwrap();
+        let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
+        let now = 946684800;
+
+        {
+            let mut db = Store::open_dir(data_dir.path()).unwrap();
+            db.add(path, 1.0, now);
+            db.save().unwrap();
+        }
+
+        {
+            let mut db = Store::open_dir(data_dir.path()).unwrap();
+            assert!(db.remove(path));
+            db.save().unwrap();
+        }
+
+        {
+            let mut db = Store::open_dir(data_dir.path()).unwrap();
+            assert!(db.dirs().is_empty());
+            assert!(!db.remove(path));
+            db.save().unwrap();
+        }
+    }
+}

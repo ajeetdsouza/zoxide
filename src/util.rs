@@ -1,5 +1,6 @@
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, Read, Write};
+use std::ops::{Deref, DerefMut};
 use std::path::{Component, Path, PathBuf};
 use std::process::{Child, ChildStdin, Command, Stdio};
 use std::time::SystemTime;
@@ -10,8 +11,97 @@ use anyhow::anyhow;
 use anyhow::{bail, Context, Result};
 
 use crate::config;
-use crate::db::Epoch;
+use crate::db2::Epoch;
 use crate::error::SilentExit;
+
+pub const SECOND: Epoch = 1;
+pub const MINUTE: Epoch = 60 * SECOND;
+pub const HOUR: Epoch = 60 * MINUTE;
+pub const DAY: Epoch = 24 * HOUR;
+pub const WEEK: Epoch = 7 * DAY;
+pub const MONTH: Epoch = 30 * DAY;
+
+pub struct Fz(Command);
+
+impl Fz {
+    const ERR_FZF_NOT_FOUND: &str = "could not find fzf, is it installed?";
+
+    pub fn new() -> Result<Self> {
+        // On Windows, CreateProcess implicitly searches the current working
+        // directory for the executable, which is a potential security issue.
+        // Instead, we resolve the path to the executable and then pass it to
+        // CreateProcess.
+        #[cfg(windows)]
+        let program = which::which("fzf.exe").map_err(|_| anyhow!(Self::ERR_FZF_NOT_FOUND))?;
+        #[cfg(not(windows))]
+        let program = "fzf";
+        Ok(Fz(Command::new(program)))
+    }
+
+    pub fn spawn(&mut self) -> Result<FzfChild> {
+        match self.0.spawn() {
+            Ok(child) => Ok(FzfChild(child)),
+            Err(e) if e.kind() == io::ErrorKind::NotFound => bail!(Self::ERR_FZF_NOT_FOUND),
+            Err(e) => Err(e).context("could not launch fzf"),
+        }
+    }
+}
+
+impl Deref for Fz {
+    type Target = Command;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for Fz {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+pub struct FzfChild(Child);
+
+impl FzfChild {
+    pub fn select(&mut self) -> Result<String> {
+        // Drop stdin to prevent deadlock.
+        mem::drop(self.stdin.take());
+
+        let mut stdout = self.stdout.take().unwrap();
+        let mut output = String::new();
+        stdout.read_to_string(&mut output).context("failed to read from fzf")?;
+
+        self.wait()?;
+        Ok(output)
+    }
+
+    pub fn wait(&mut self) -> Result<()> {
+        let status = self.0.wait().context("wait failed on fzf")?;
+        match status.code() {
+            Some(0) => Ok(()),
+            Some(1) => bail!("no match found"),
+            Some(2) => bail!("fzf returned an error"),
+            Some(130) => bail!(SilentExit { code: 130 }),
+            Some(128..=254) | None => bail!("fzf was terminated"),
+            _ => bail!("fzf returned an unknown error"),
+        }
+    }
+}
+
+impl Deref for FzfChild {
+    type Target = Child;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for FzfChild {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
 
 pub struct Fzf {
     child: Child,

@@ -2,8 +2,8 @@ use std::iter::Rev;
 use std::ops::Range;
 use std::{fs, path};
 
-use crate::db::{Database, Dir, Epoch};
-use crate::util;
+use crate::db2::{Database, Dir, Epoch};
+use crate::util::{self, MONTH};
 
 pub struct Stream<'db, 'file> {
     db: &'db mut Database<'file>,
@@ -24,8 +24,9 @@ impl<'db, 'file> Stream<'db, 'file> {
         db.dirs.sort_unstable_by(|dir1, dir2| dir1.score(now).total_cmp(&dir2.score(now)));
         let idxs = (0..db.dirs.len()).rev();
 
-        // If a directory is deleted and hasn't been used for 90 days, delete it from the database.
-        let expire_below = now.saturating_sub(90 * 24 * 60 * 60);
+        // If a directory is deleted and hasn't been used for 3 months, delete
+        // it from the database.
+        let expire_below = now.saturating_sub(3 * MONTH);
 
         Stream {
             db,

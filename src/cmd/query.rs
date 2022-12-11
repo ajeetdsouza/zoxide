@@ -4,7 +4,7 @@ use anyhow::{Context, Result};
 
 use crate::cmd::{Query, Run};
 use crate::config;
-use crate::db::{Database, DatabaseFile};
+use crate::db2::{Database, DatabaseFile};
 use crate::error::BrokenPipeHandler;
 use crate::util::{self, Fzf};
 

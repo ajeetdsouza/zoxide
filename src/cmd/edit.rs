@@ -1,39 +1,35 @@
 use std::io::{self, Write};
-use std::process::Command;
 
 use anyhow::Result;
 
 use crate::cmd::{Edit, EditCommand, Run};
-use crate::store::{Epoch, Store};
-use crate::util;
+use crate::db::{Database, Epoch};
+use crate::error::BrokenPipeHandler;
+use crate::util::{self, Fz};
 
 impl Run for Edit {
     fn run(&self) -> Result<()> {
         let now = util::current_time()?;
-        let db = &mut Store::open()?;
+        let db = &mut Database::open()?;
 
         match &self.cmd {
-            Some(EditCommand::Decrement { path }) => {
-                db.add(path, -1.0, now);
+            Some(cmd) => {
+                match cmd {
+                    EditCommand::Decrement { path } => db.add(path, -1.0, now),
+                    EditCommand::Delete { path } => {
+                        db.remove(path);
+                    }
+                    EditCommand::Increment { path } => db.add(path, 1.0, now),
+                    EditCommand::Reload => {}
+                }
                 db.save()?;
-                print_dirs(db, now);
+                print_dirs(db, now)
             }
-            Some(EditCommand::Delete { path }) => {
-                db.remove(path);
-                db.save()?;
-                print_dirs(db, now);
-            }
-            Some(EditCommand::Increment { path }) => {
-                db.add(path, 1.0, now);
-                db.save()?;
-                print_dirs(db, now);
-            }
-            Some(EditCommand::Reload) => print_dirs(db, now),
             None => {
                 db.sort_by_score(now);
                 db.save()?;
 
-                let mut fzf = Command::new("fzf");
+                let mut fzf = Fz::new()?;
                 fzf.args([
                     // Search mode
                     "--delimiter=\t",
@@ -54,18 +50,18 @@ enter:abort",
                     "--keep-right",
                     // Layout
                     "--border=rounded",
-                    "--border-label= zoxide-edit ",
+                    "--border-label=  zoxide-edit  ",
                     "--header=\
 ctrl-r:reload   \tctrl-w:delete
 ctrl-a:increment\tctrl-d:decrement
 
-SCORE\tPATH",
+ SCORE\tPATH",
                     "--info=inline",
                     "--layout=reverse",
-                    "--padding=1",
+                    "--padding=1,0,0,0",
                     // Display
                     "--color=label:bold",
-                    "--tabstop=2",
+                    "--tabstop=1",
                     // Scripting
                     "--read0",
                 ])
@@ -85,18 +81,18 @@ SCORE\tPATH",
                     fzf.args([PREVIEW_ARG, "--preview-window=down,30%"]).env("SHELL", "sh");
                 }
 
-                let mut fzf = fzf.spawn().unwrap();
-                fzf.wait().unwrap();
+                let mut fzf = fzf.spawn()?;
+                fzf.wait()
             }
         }
-
-        Ok(())
     }
 }
 
-fn print_dirs(db: &Store, now: Epoch) {
+fn print_dirs(db: &Database, now: Epoch) -> Result<()> {
     let stdout = &mut io::stdout().lock();
     for dir in db.dirs().iter().rev() {
-        write!(stdout, "{:>5}\t{}\x00", dir.score(now), &dir.path).unwrap();
+        let score = dir.score(now).clamp(0.0, 9999.0);
+        write!(stdout, "{:>6.1}\t{}\x00", score, &dir.path).pipe_exit("fzf")?;
     }
+    Ok(())
 }

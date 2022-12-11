@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use anyhow::{Context, Result};
 use glob::Pattern;
 
-use crate::db::Rank;
+use crate::db2::Rank;
 
 pub fn data_dir() -> Result<PathBuf> {
     let path = match env::var_os("_ZO_DATA_DIR") {

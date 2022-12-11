@@ -3,14 +3,14 @@ use std::fs;
 use anyhow::{bail, Context, Result};
 
 use crate::cmd::{Import, ImportFrom, Run};
-use crate::store::Store;
+use crate::db::Database;
 
 impl Run for Import {
     fn run(&self) -> Result<()> {
         let buffer = fs::read_to_string(&self.path)
             .with_context(|| format!("could not open database for importing: {}", &self.path.display()))?;
 
-        let mut db = Store::open()?;
+        let mut db = Database::open()?;
         if !self.merge && !db.dirs().is_empty() {
             bail!("current database is not empty, specify --merge to continue anyway");
         }
@@ -25,7 +25,7 @@ impl Run for Import {
     }
 }
 
-fn import_autojump(db: &mut Store, buffer: &str) -> Result<()> {
+fn import_autojump(db: &mut Database, buffer: &str) -> Result<()> {
     for line in buffer.lines() {
         if line.is_empty() {
             continue;
@@ -49,7 +49,7 @@ fn import_autojump(db: &mut Store, buffer: &str) -> Result<()> {
     Ok(())
 }
 
-fn import_z(db: &mut Store, buffer: &str) -> Result<()> {
+fn import_z(db: &mut Database, buffer: &str) -> Result<()> {
     for line in buffer.lines() {
         if line.is_empty() {
             continue;
@@ -80,12 +80,12 @@ fn sigmoid(x: f64) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::store::Dir;
+    use crate::db::Dir;
 
     #[test]
     fn from_autojump() {
         let data_dir = tempfile::tempdir().unwrap();
-        let mut db = Store::open_dir(data_dir.path()).unwrap();
+        let mut db = Database::open_dir(data_dir.path()).unwrap();
         for (path, rank, last_accessed) in [
             ("/quux/quuz", 1.0, 100),
             ("/corge/grault/garply", 6.0, 600),
@@ -125,7 +125,7 @@ mod tests {
     #[test]
     fn from_z() {
         let data_dir = tempfile::tempdir().unwrap();
-        let mut db = Store::open_dir(data_dir.path()).unwrap();
+        let mut db = Database::open_dir(data_dir.path()).unwrap();
         for (path, rank, last_accessed) in [
             ("/quux/quuz", 1.0, 100),
             ("/corge/grault/garply", 6.0, 600),

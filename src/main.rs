@@ -7,9 +7,9 @@ use rstest_reuse;
 mod cmd;
 mod config;
 mod db;
+mod db2;
 mod error;
 mod shell;
-mod store;
 mod util;
 
 use std::env;

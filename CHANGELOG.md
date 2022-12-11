@@ -21,8 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Zsh: don't hide output from `chpwd` hooks.
 - Nushell: upgrade minimum supported version to v0.73.0.
 - Zsh: fix extra space in interactive completions when no match is found.
-- Fzf: `<TAB>` now cycles through completions.
-- Fzf: enable colors in preview when possible on macOS / BSD.
+- Fzf: various improvements.
 
 ### Removed
 

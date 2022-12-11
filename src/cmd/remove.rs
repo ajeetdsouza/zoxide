@@ -1,12 +1,12 @@
 use anyhow::{bail, Result};
 
 use crate::cmd::{Remove, Run};
-use crate::store::Store;
+use crate::db::Database;
 use crate::util;
 
 impl Run for Remove {
     fn run(&self) -> Result<()> {
-        let mut db = Store::open()?;
+        let mut db = Database::open()?;
 
         for path in &self.paths {
             if !db.remove(path) {

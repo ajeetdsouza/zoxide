@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::{bail, Result};
 
 use crate::cmd::{Add, Run};
-use crate::store::Store;
+use crate::db::Database;
 use crate::{config, util};
 
 impl Run for Add {
@@ -16,7 +16,7 @@ impl Run for Add {
         let max_age = config::maxage()?;
         let now = util::current_time()?;
 
-        let mut db = Store::open()?;
+        let mut db = Database::open()?;
 
         for path in &self.paths {
             let path = if config::resolve_symlinks() { util::canonicalize } else { util::resolve_path }(path)?;

@@ -215,7 +215,7 @@ source ~/.zoxide.nu
 ```
 
 > **Note**
-> zoxide only supports Nushell v0.63.0 and above.
+> zoxide only supports Nushell v0.63.0 and above, and `-f` is needed and supported only in Nushell v0.73 and above.
 
 </details>
 

@@ -215,7 +215,7 @@ source ~/.zoxide.nu
 ```
 
 > **Note**
-> zoxide only supports Nushell v0.73.0 and above.
+> zoxide only supports Nushell v0.63.0 and above.
 
 </details>
 

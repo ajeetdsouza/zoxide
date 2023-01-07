@@ -1,12 +1,27 @@
 complete -c zoxide -n "__fish_use_subcommand" -s h -l help -d 'Print help information'
 complete -c zoxide -n "__fish_use_subcommand" -s V -l version -d 'Print version information'
 complete -c zoxide -n "__fish_use_subcommand" -f -a "add" -d 'Add a new directory or increment its rank'
+complete -c zoxide -n "__fish_use_subcommand" -f -a "edit" -d 'Edit the database'
 complete -c zoxide -n "__fish_use_subcommand" -f -a "import" -d 'Import entries from another application'
 complete -c zoxide -n "__fish_use_subcommand" -f -a "init" -d 'Generate shell configuration'
 complete -c zoxide -n "__fish_use_subcommand" -f -a "query" -d 'Search for a directory in the database'
 complete -c zoxide -n "__fish_use_subcommand" -f -a "remove" -d 'Remove a directory from the database'
 complete -c zoxide -n "__fish_seen_subcommand_from add" -s h -l help -d 'Print help information'
 complete -c zoxide -n "__fish_seen_subcommand_from add" -s V -l version -d 'Print version information'
+complete -c zoxide -n "__fish_seen_subcommand_from edit; and not __fish_seen_subcommand_from decrement; and not __fish_seen_subcommand_from delete; and not __fish_seen_subcommand_from increment; and not __fish_seen_subcommand_from reload" -s h -l help -d 'Print help information'
+complete -c zoxide -n "__fish_seen_subcommand_from edit; and not __fish_seen_subcommand_from decrement; and not __fish_seen_subcommand_from delete; and not __fish_seen_subcommand_from increment; and not __fish_seen_subcommand_from reload" -s V -l version -d 'Print version information'
+complete -c zoxide -n "__fish_seen_subcommand_from edit; and not __fish_seen_subcommand_from decrement; and not __fish_seen_subcommand_from delete; and not __fish_seen_subcommand_from increment; and not __fish_seen_subcommand_from reload" -f -a "decrement"
+complete -c zoxide -n "__fish_seen_subcommand_from edit; and not __fish_seen_subcommand_from decrement; and not __fish_seen_subcommand_from delete; and not __fish_seen_subcommand_from increment; and not __fish_seen_subcommand_from reload" -f -a "delete"
+complete -c zoxide -n "__fish_seen_subcommand_from edit; and not __fish_seen_subcommand_from decrement; and not __fish_seen_subcommand_from delete; and not __fish_seen_subcommand_from increment; and not __fish_seen_subcommand_from reload" -f -a "increment"
+complete -c zoxide -n "__fish_seen_subcommand_from edit; and not __fish_seen_subcommand_from decrement; and not __fish_seen_subcommand_from delete; and not __fish_seen_subcommand_from increment; and not __fish_seen_subcommand_from reload" -f -a "reload"
+complete -c zoxide -n "__fish_seen_subcommand_from edit; and __fish_seen_subcommand_from decrement" -s h -l help -d 'Print help information'
+complete -c zoxide -n "__fish_seen_subcommand_from edit; and __fish_seen_subcommand_from decrement" -s V -l version -d 'Print version information'
+complete -c zoxide -n "__fish_seen_subcommand_from edit; and __fish_seen_subcommand_from delete" -s h -l help -d 'Print help information'
+complete -c zoxide -n "__fish_seen_subcommand_from edit; and __fish_seen_subcommand_from delete" -s V -l version -d 'Print version information'
+complete -c zoxide -n "__fish_seen_subcommand_from edit; and __fish_seen_subcommand_from increment" -s h -l help -d 'Print help information'
+complete -c zoxide -n "__fish_seen_subcommand_from edit; and __fish_seen_subcommand_from increment" -s V -l version -d 'Print version information'
+complete -c zoxide -n "__fish_seen_subcommand_from edit; and __fish_seen_subcommand_from reload" -s h -l help -d 'Print help information'
+complete -c zoxide -n "__fish_seen_subcommand_from edit; and __fish_seen_subcommand_from reload" -s V -l version -d 'Print version information'
 complete -c zoxide -n "__fish_seen_subcommand_from import" -l from -d 'Application to import from' -r -f -a "{autojump	,z	}"
 complete -c zoxide -n "__fish_seen_subcommand_from import" -l merge -d 'Merge into existing database'
 complete -c zoxide -n "__fish_seen_subcommand_from import" -s h -l help -d 'Print help information'
@@ -23,6 +38,5 @@ complete -c zoxide -n "__fish_seen_subcommand_from query" -s l -l list -d 'List 
 complete -c zoxide -n "__fish_seen_subcommand_from query" -s s -l score -d 'Print score with results'
 complete -c zoxide -n "__fish_seen_subcommand_from query" -s h -l help -d 'Print help information'
 complete -c zoxide -n "__fish_seen_subcommand_from query" -s V -l version -d 'Print version information'
-complete -c zoxide -n "__fish_seen_subcommand_from remove" -s i -l interactive -d 'Use interactive selection'
 complete -c zoxide -n "__fish_seen_subcommand_from remove" -s h -l help -d 'Print help information'
 complete -c zoxide -n "__fish_seen_subcommand_from remove" -s V -l version -d 'Print version information'

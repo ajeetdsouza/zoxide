@@ -2,7 +2,7 @@
 
 use std::path::PathBuf;
 
-use clap::{Parser, ValueEnum, ValueHint};
+use clap::{Parser, Subcommand, ValueEnum, ValueHint};
 
 const ENV_HELP: &str = "Environment variables:
   _ZO_DATA_DIR          Path for zoxide data files
@@ -24,6 +24,7 @@ const ENV_HELP: &str = "Environment variables:
 )]
 pub enum Cmd {
     Add(Add),
+    Edit(Edit),
     Import(Import),
     Init(Init),
     Query(Query),
@@ -35,6 +36,25 @@ pub enum Cmd {
 pub struct Add {
     #[clap(num_args = 1.., required = true, value_hint = ValueHint::DirPath)]
     pub paths: Vec<PathBuf>,
+}
+
+/// Edit the database
+#[derive(Debug, Parser)]
+pub struct Edit {
+    #[clap(subcommand)]
+    pub cmd: Option<EditCommand>,
+}
+
+#[derive(Clone, Debug, Subcommand)]
+pub enum EditCommand {
+    #[clap(hide = true)]
+    Decrement { path: String },
+    #[clap(hide = true)]
+    Delete { path: String },
+    #[clap(hide = true)]
+    Increment { path: String },
+    #[clap(hide = true)]
+    Reload,
 }
 
 /// Import entries from another application
@@ -125,9 +145,6 @@ pub struct Query {
 /// Remove a directory from the database
 #[derive(Debug, Parser)]
 pub struct Remove {
-    /// Use interactive selection
-    #[clap(long, short)]
-    pub interactive: bool,
     #[clap(value_hint = ValueHint::DirPath)]
     pub paths: Vec<String>,
 }

@@ -31,11 +31,12 @@ dunce = "1.0.1"
 fastrand = "1.7.0"
 glob = "0.3.0"
 ignore = "0.4.18"
-nix = { version = "0.25.0", default-features = false, features = [
+nix = { version = "0.26.1", default-features = false, features = [
     "fs",
     "user",
 ] }
-rstest = { version = "0.15.0", default-features = false }
+ouroboros = "0.15.5"
+rstest = { version = "0.16.0", default-features = false }
 rstest_reuse = "0.4.0"
 serde = { version = "1.0.116", features = ["derive"] }
 shell-words = "1.0.0"
@@ -51,6 +52,7 @@ dirs.workspace = true
 dunce.workspace = true
 fastrand.workspace = true
 glob.workspace = true
+ouroboros.workspace = true
 serde.workspace = true
 
 [target.'cfg(unix)'.dependencies]

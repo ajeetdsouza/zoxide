@@ -3,22 +3,20 @@ use std::path::Path;
 use anyhow::{bail, Result};
 
 use crate::cmd::{Add, Run};
-use crate::db::DatabaseFile;
+use crate::db::Database;
 use crate::{config, util};
 
 impl Run for Add {
     fn run(&self) -> Result<()> {
         // These characters can't be printed cleanly to a single line, so they can cause confusion
-        // when writing to fzf / stdout.
+        // when writing to stdout.
         const EXCLUDE_CHARS: &[char] = &['\n', '\r'];
 
-        let data_dir = config::data_dir()?;
         let exclude_dirs = config::exclude_dirs()?;
         let max_age = config::maxage()?;
         let now = util::current_time()?;
 
-        let mut db = DatabaseFile::new(data_dir);
-        let mut db = db.open()?;
+        let mut db = Database::open()?;
 
         for path in &self.paths {
             let path = if config::resolve_symlinks() { util::canonicalize } else { util::resolve_path }(path)?;
@@ -31,14 +29,12 @@ impl Run for Add {
             if !Path::new(path).is_dir() {
                 bail!("not a directory: {path}");
             }
-            db.add(path, now);
+            db.add_update(path, 1.0, now);
         }
 
-        if db.modified {
+        if db.dirty() {
             db.age(max_age);
-            db.save()?;
         }
-
-        Ok(())
+        db.save()
     }
 }

@@ -3,24 +3,21 @@ use std::fs;
 use anyhow::{bail, Context, Result};
 
 use crate::cmd::{Import, ImportFrom, Run};
-use crate::config;
-use crate::db::{Database, DatabaseFile, Dir};
+use crate::db::Database;
 
 impl Run for Import {
     fn run(&self) -> Result<()> {
         let buffer = fs::read_to_string(&self.path)
             .with_context(|| format!("could not open database for importing: {}", &self.path.display()))?;
 
-        let data_dir = config::data_dir()?;
-        let mut db = DatabaseFile::new(data_dir);
-        let db = &mut db.open()?;
-        if !self.merge && !db.dirs.is_empty() {
+        let mut db = Database::open()?;
+        if !self.merge && !db.dirs().is_empty() {
             bail!("current database is not empty, specify --merge to continue anyway");
         }
 
         match self.from {
-            ImportFrom::Autojump => from_autojump(db, &buffer),
-            ImportFrom::Z => from_z(db, &buffer),
+            ImportFrom::Autojump => import_autojump(&mut db, &buffer),
+            ImportFrom::Z => import_z(&mut db, &buffer),
         }
         .context("import error")?;
 
@@ -28,7 +25,7 @@ impl Run for Import {
     }
 }
 
-fn from_autojump<'a>(db: &mut Database<'a>, buffer: &'a str) -> Result<()> {
+fn import_autojump(db: &mut Database, buffer: &str) -> Result<()> {
     for line in buffer.lines() {
         if line.is_empty() {
             continue;
@@ -43,18 +40,16 @@ fn from_autojump<'a>(db: &mut Database<'a>, buffer: &'a str) -> Result<()> {
 
         let path = split.next().with_context(|| format!("invalid entry: {line}"))?;
 
-        db.dirs.push(Dir { path: path.into(), rank, last_accessed: 0 });
-        db.modified = true;
+        db.add_unchecked(path, rank, 0);
     }
 
-    if db.modified {
+    if db.dirty() {
         db.dedup();
     }
-
     Ok(())
 }
 
-fn from_z<'a>(db: &mut Database<'a>, buffer: &'a str) -> Result<()> {
+fn import_z(db: &mut Database, buffer: &str) -> Result<()> {
     for line in buffer.lines() {
         if line.is_empty() {
             continue;
@@ -69,14 +64,12 @@ fn from_z<'a>(db: &mut Database<'a>, buffer: &'a str) -> Result<()> {
 
         let path = split.next().with_context(|| format!("invalid entry: {line}"))?;
 
-        db.dirs.push(Dir { path: path.into(), rank, last_accessed });
-        db.modified = true;
+        db.add_unchecked(path, rank, last_accessed);
     }
 
-    if db.modified {
+    if db.dirty() {
         db.dedup();
     }
-
     Ok(())
 }
 
@@ -86,33 +79,33 @@ fn sigmoid(x: f64) -> f64 {
 
 #[cfg(test)]
 mod tests {
-    use super::sigmoid;
-    use crate::db::{Database, Dir};
+    use super::*;
+    use crate::db::Dir;
 
     #[test]
     fn from_autojump() {
-        let buffer = r#"
+        let data_dir = tempfile::tempdir().unwrap();
+        let mut db = Database::open_dir(data_dir.path()).unwrap();
+        for (path, rank, last_accessed) in [
+            ("/quux/quuz", 1.0, 100),
+            ("/corge/grault/garply", 6.0, 600),
+            ("/waldo/fred/plugh", 3.0, 300),
+            ("/xyzzy/thud", 8.0, 800),
+            ("/foo/bar", 9.0, 900),
+        ] {
+            db.add_unchecked(path, rank, last_accessed);
+        }
+
+        let buffer = "\
 7.0	/baz
 2.0	/foo/bar
-5.0	/quux/quuz
-"#;
+5.0	/quux/quuz";
+        import_autojump(&mut db, buffer).unwrap();
 
-        let dirs = vec![
-            Dir { path: "/quux/quuz".into(), rank: 1.0, last_accessed: 100 },
-            Dir { path: "/corge/grault/garply".into(), rank: 6.0, last_accessed: 600 },
-            Dir { path: "/waldo/fred/plugh".into(), rank: 3.0, last_accessed: 300 },
-            Dir { path: "/xyzzy/thud".into(), rank: 8.0, last_accessed: 800 },
-            Dir { path: "/foo/bar".into(), rank: 9.0, last_accessed: 900 },
-        ];
-        let data_dir = tempfile::tempdir().unwrap();
-        let data_dir = &data_dir.path().to_path_buf();
-        let mut db = Database { dirs: dirs.into(), modified: false, data_dir };
+        db.sort_by_path();
+        println!("got: {:?}", &db.dirs());
 
-        super::from_autojump(&mut db, buffer).unwrap();
-        db.dirs.sort_by(|dir1, dir2| dir1.path.cmp(&dir2.path));
-        println!("got: {:?}", &db.dirs.as_slice());
-
-        let exp = &[
+        let exp = [
             Dir { path: "/baz".into(), rank: sigmoid(7.0), last_accessed: 0 },
             Dir { path: "/corge/grault/garply".into(), rank: 6.0, last_accessed: 600 },
             Dir { path: "/foo/bar".into(), rank: 9.0 + sigmoid(2.0), last_accessed: 900 },
@@ -122,7 +115,7 @@ mod tests {
         ];
         println!("exp: {exp:?}");
 
-        for (dir1, dir2) in db.dirs.iter().zip(exp) {
+        for (dir1, dir2) in db.dirs().iter().zip(exp) {
             assert_eq!(dir1.path, dir2.path);
             assert!((dir1.rank - dir2.rank).abs() < 0.01);
             assert_eq!(dir1.last_accessed, dir2.last_accessed);
@@ -131,29 +124,29 @@ mod tests {
 
     #[test]
     fn from_z() {
-        let buffer = r#"
+        let data_dir = tempfile::tempdir().unwrap();
+        let mut db = Database::open_dir(data_dir.path()).unwrap();
+        for (path, rank, last_accessed) in [
+            ("/quux/quuz", 1.0, 100),
+            ("/corge/grault/garply", 6.0, 600),
+            ("/waldo/fred/plugh", 3.0, 300),
+            ("/xyzzy/thud", 8.0, 800),
+            ("/foo/bar", 9.0, 900),
+        ] {
+            db.add_unchecked(path, rank, last_accessed);
+        }
+
+        let buffer = "\
 /baz|7|700
 /quux/quuz|4|400
 /foo/bar|2|200
-/quux/quuz|5|500
-"#;
+/quux/quuz|5|500";
+        import_z(&mut db, buffer).unwrap();
 
-        let dirs = vec![
-            Dir { path: "/quux/quuz".into(), rank: 1.0, last_accessed: 100 },
-            Dir { path: "/corge/grault/garply".into(), rank: 6.0, last_accessed: 600 },
-            Dir { path: "/waldo/fred/plugh".into(), rank: 3.0, last_accessed: 300 },
-            Dir { path: "/xyzzy/thud".into(), rank: 8.0, last_accessed: 800 },
-            Dir { path: "/foo/bar".into(), rank: 9.0, last_accessed: 900 },
-        ];
-        let data_dir = tempfile::tempdir().unwrap();
-        let data_dir = &data_dir.path().to_path_buf();
-        let mut db = Database { dirs: dirs.into(), modified: false, data_dir };
+        db.sort_by_path();
+        println!("got: {:?}", &db.dirs());
 
-        super::from_z(&mut db, buffer).unwrap();
-        db.dirs.sort_by(|dir1, dir2| dir1.path.cmp(&dir2.path));
-        println!("got: {:?}", &db.dirs.as_slice());
-
-        let exp = &[
+        let exp = [
             Dir { path: "/baz".into(), rank: 7.0, last_accessed: 700 },
             Dir { path: "/corge/grault/garply".into(), rank: 6.0, last_accessed: 600 },
             Dir { path: "/foo/bar".into(), rank: 11.0, last_accessed: 900 },
@@ -163,7 +156,7 @@ mod tests {
         ];
         println!("exp: {exp:?}");
 
-        for (dir1, dir2) in db.dirs.iter().zip(exp) {
+        for (dir1, dir2) in db.dirs().iter().zip(exp) {
             assert_eq!(dir1.path, dir2.path);
             assert!((dir1.rank - dir2.rank).abs() < 0.01);
             assert_eq!(dir1.last_accessed, dir2.last_accessed);

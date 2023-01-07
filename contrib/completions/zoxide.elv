@@ -23,12 +23,47 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand -V 'Print version information'
             cand --version 'Print version information'
             cand add 'Add a new directory or increment its rank'
+            cand edit 'Edit the database'
             cand import 'Import entries from another application'
             cand init 'Generate shell configuration'
             cand query 'Search for a directory in the database'
             cand remove 'Remove a directory from the database'
         }
         &'zoxide;add'= {
+            cand -h 'Print help information'
+            cand --help 'Print help information'
+            cand -V 'Print version information'
+            cand --version 'Print version information'
+        }
+        &'zoxide;edit'= {
+            cand -h 'Print help information'
+            cand --help 'Print help information'
+            cand -V 'Print version information'
+            cand --version 'Print version information'
+            cand decrement 'decrement'
+            cand delete 'delete'
+            cand increment 'increment'
+            cand reload 'reload'
+        }
+        &'zoxide;edit;decrement'= {
+            cand -h 'Print help information'
+            cand --help 'Print help information'
+            cand -V 'Print version information'
+            cand --version 'Print version information'
+        }
+        &'zoxide;edit;delete'= {
+            cand -h 'Print help information'
+            cand --help 'Print help information'
+            cand -V 'Print version information'
+            cand --version 'Print version information'
+        }
+        &'zoxide;edit;increment'= {
+            cand -h 'Print help information'
+            cand --help 'Print help information'
+            cand -V 'Print version information'
+            cand --version 'Print version information'
+        }
+        &'zoxide;edit;reload'= {
             cand -h 'Print help information'
             cand --help 'Print help information'
             cand -V 'Print version information'
@@ -66,8 +101,6 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand --version 'Print version information'
         }
         &'zoxide;remove'= {
-            cand -i 'Use interactive selection'
-            cand --interactive 'Use interactive selection'
             cand -h 'Print help information'
             cand --help 'Print help information'
             cand -V 'Print version information'

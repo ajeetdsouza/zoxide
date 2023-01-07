@@ -22,6 +22,87 @@ const completion: Fig.Spec = {
       },
     },
     {
+      name: "edit",
+      description: "Edit the database",
+      subcommands: [
+        {
+          name: "decrement",
+          hidden: true,
+          options: [
+            {
+              name: ["-h", "--help"],
+              description: "Print help information",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version information",
+            },
+          ],
+          args: {
+            name: "path",
+          },
+        },
+        {
+          name: "delete",
+          hidden: true,
+          options: [
+            {
+              name: ["-h", "--help"],
+              description: "Print help information",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version information",
+            },
+          ],
+          args: {
+            name: "path",
+          },
+        },
+        {
+          name: "increment",
+          hidden: true,
+          options: [
+            {
+              name: ["-h", "--help"],
+              description: "Print help information",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version information",
+            },
+          ],
+          args: {
+            name: "path",
+          },
+        },
+        {
+          name: "reload",
+          hidden: true,
+          options: [
+            {
+              name: ["-h", "--help"],
+              description: "Print help information",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version information",
+            },
+          ],
+        },
+      ],
+      options: [
+        {
+          name: ["-h", "--help"],
+          description: "Print help information",
+        },
+        {
+          name: ["-V", "--version"],
+          description: "Print version information",
+        },
+      ],
+    },
+    {
       name: "import",
       description: "Import entries from another application",
       options: [
@@ -166,10 +247,6 @@ const completion: Fig.Spec = {
       name: "remove",
       description: "Remove a directory from the database",
       options: [
-        {
-          name: ["-i", "--interactive"],
-          description: "Use interactive selection",
-        },
         {
           name: ["-h", "--help"],
           description: "Print help information",

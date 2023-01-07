@@ -11,10 +11,8 @@ use crate::shell::{self, Opts};
 impl Run for Init {
     fn run(&self) -> Result<()> {
         let cmd = if self.no_cmd { None } else { Some(self.cmd.as_str()) };
-
         let echo = config::echo();
         let resolve_symlinks = config::resolve_symlinks();
-
         let opts = &Opts { cmd, hook: self.hook, echo, resolve_symlinks };
 
         let source = match self.shell {

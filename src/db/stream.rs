@@ -3,10 +3,10 @@ use std::ops::Range;
 use std::{fs, path};
 
 use crate::db::{Database, Dir, Epoch};
-use crate::util;
+use crate::util::{self, MONTH};
 
-pub struct Stream<'db, 'file> {
-    db: &'db mut Database<'file>,
+pub struct Stream<'a> {
+    db: &'a mut Database,
     idxs: Rev<Range<usize>>,
 
     keywords: Vec<String>,
@@ -18,14 +18,14 @@ pub struct Stream<'db, 'file> {
     exclude_path: Option<String>,
 }
 
-impl<'db, 'file> Stream<'db, 'file> {
-    pub fn new(db: &'db mut Database<'file>, now: Epoch) -> Self {
-        // Iterate in descending order of score.
-        db.dirs.sort_unstable_by(|dir1, dir2| dir1.score(now).total_cmp(&dir2.score(now)));
-        let idxs = (0..db.dirs.len()).rev();
+impl<'a> Stream<'a> {
+    pub fn new(db: &'a mut Database, now: Epoch) -> Self {
+        db.sort_by_score(now);
+        let idxs = (0..db.dirs().len()).rev();
 
-        // If a directory is deleted and hasn't been used for 90 days, delete it from the database.
-        let expire_below = now.saturating_sub(90 * 24 * 60 * 60);
+        // If a directory is deleted and hasn't been used for 3 months, delete
+        // it from the database.
+        let expire_below = now.saturating_sub(3 * MONTH);
 
         Stream {
             db,
@@ -54,9 +54,9 @@ impl<'db, 'file> Stream<'db, 'file> {
         self
     }
 
-    pub fn next(&mut self) -> Option<&Dir<'file>> {
+    pub fn next(&mut self) -> Option<&Dir> {
         while let Some(idx) = self.idxs.next() {
-            let dir = &self.db.dirs[idx];
+            let dir = &self.db.dirs()[idx];
 
             if !self.matches_keywords(&dir.path) {
                 continue;
@@ -64,8 +64,7 @@ impl<'db, 'file> Stream<'db, 'file> {
 
             if !self.matches_exists(&dir.path) {
                 if dir.last_accessed < self.expire_below {
-                    self.db.dirs.swap_remove(idx);
-                    self.db.modified = true;
+                    self.db.swap_remove(idx);
                 }
                 continue;
             }
@@ -74,7 +73,7 @@ impl<'db, 'file> Stream<'db, 'file> {
                 continue;
             }
 
-            let dir = &self.db.dirs[idx];
+            let dir = &self.db.dirs()[idx];
             return Some(dir);
         }
 
@@ -147,8 +146,8 @@ mod tests {
     #[case(&["/foo/", "/bar"], "/foo/bar", false)]
     #[case(&["/foo/", "/bar"], "/foo/baz/bar", true)]
     fn query(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
-        let mut db = Database { dirs: Vec::new().into(), modified: false, data_dir: &PathBuf::new() };
-        let stream = db.stream(0).with_keywords(keywords);
+        let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
+        let stream = Stream::new(db, 0).with_keywords(keywords);
         assert_eq!(is_match, stream.matches_keywords(path));
     }
 }

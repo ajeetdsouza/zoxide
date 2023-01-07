@@ -15,6 +15,9 @@ _zoxide() {
             zoxide,add)
                 cmd="zoxide__add"
                 ;;
+            zoxide,edit)
+                cmd="zoxide__edit"
+                ;;
             zoxide,import)
                 cmd="zoxide__import"
                 ;;
@@ -27,6 +30,18 @@ _zoxide() {
             zoxide,remove)
                 cmd="zoxide__remove"
                 ;;
+            zoxide__edit,decrement)
+                cmd="zoxide__edit__decrement"
+                ;;
+            zoxide__edit,delete)
+                cmd="zoxide__edit__delete"
+                ;;
+            zoxide__edit,increment)
+                cmd="zoxide__edit__increment"
+                ;;
+            zoxide__edit,reload)
+                cmd="zoxide__edit__reload"
+                ;;
             *)
                 ;;
         esac
@@ -34,7 +49,7 @@ _zoxide() {
 
     case "${cmd}" in
         zoxide)
-            opts="-h -V --help --version add import init query remove"
+            opts="-h -V --help --version add edit import init query remove"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -50,6 +65,76 @@ _zoxide() {
         zoxide__add)
             opts="-h -V --help --version <PATHS>..."
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__edit)
+            opts="-h -V --help --version decrement delete increment reload"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__edit__decrement)
+            opts="-h -V --help --version <PATH>"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__edit__delete)
+            opts="-h -V --help --version <PATH>"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__edit__increment)
+            opts="-h -V --help --version <PATH>"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__edit__reload)
+            opts="-h -V --help --version"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
             fi
@@ -120,7 +205,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__remove)
-            opts="-i -h -V --interactive --help --version [PATHS]..."
+            opts="-h -V --help --version [PATHS]..."
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0

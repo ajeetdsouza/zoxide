@@ -37,6 +37,61 @@ _arguments "${_arguments_options[@]}" \
 '*::paths:_files -/' \
 && ret=0
 ;;
+(edit)
+_arguments "${_arguments_options[@]}" \
+'-h[Print help information]' \
+'--help[Print help information]' \
+'-V[Print version information]' \
+'--version[Print version information]' \
+":: :_zoxide__edit_commands" \
+"*::: :->edit" \
+&& ret=0
+
+    case $state in
+    (edit)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:zoxide-edit-command-$line[1]:"
+        case $line[1] in
+            (decrement)
+_arguments "${_arguments_options[@]}" \
+'-h[Print help information]' \
+'--help[Print help information]' \
+'-V[Print version information]' \
+'--version[Print version information]' \
+':path:' \
+&& ret=0
+;;
+(delete)
+_arguments "${_arguments_options[@]}" \
+'-h[Print help information]' \
+'--help[Print help information]' \
+'-V[Print version information]' \
+'--version[Print version information]' \
+':path:' \
+&& ret=0
+;;
+(increment)
+_arguments "${_arguments_options[@]}" \
+'-h[Print help information]' \
+'--help[Print help information]' \
+'-V[Print version information]' \
+'--version[Print version information]' \
+':path:' \
+&& ret=0
+;;
+(reload)
+_arguments "${_arguments_options[@]}" \
+'-h[Print help information]' \
+'--help[Print help information]' \
+'-V[Print version information]' \
+'--version[Print version information]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
 (import)
 _arguments "${_arguments_options[@]}" \
 '--from=[Application to import from]:FROM:(autojump z)' \
@@ -79,8 +134,6 @@ _arguments "${_arguments_options[@]}" \
 ;;
 (remove)
 _arguments "${_arguments_options[@]}" \
-'-i[Use interactive selection]' \
-'--interactive[Use interactive selection]' \
 '-h[Print help information]' \
 '--help[Print help information]' \
 '-V[Print version information]' \
@@ -97,6 +150,7 @@ esac
 _zoxide_commands() {
     local commands; commands=(
 'add:Add a new directory or increment its rank' \
+'edit:Edit the database' \
 'import:Import entries from another application' \
 'init:Generate shell configuration' \
 'query:Search for a directory in the database' \
@@ -109,10 +163,35 @@ _zoxide__add_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide add commands' commands "$@"
 }
+(( $+functions[_zoxide__edit__decrement_commands] )) ||
+_zoxide__edit__decrement_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide edit decrement commands' commands "$@"
+}
+(( $+functions[_zoxide__edit__delete_commands] )) ||
+_zoxide__edit__delete_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide edit delete commands' commands "$@"
+}
+(( $+functions[_zoxide__edit_commands] )) ||
+_zoxide__edit_commands() {
+    local commands; commands=(
+'decrement:' \
+'delete:' \
+'increment:' \
+'reload:' \
+    )
+    _describe -t commands 'zoxide edit commands' commands "$@"
+}
 (( $+functions[_zoxide__import_commands] )) ||
 _zoxide__import_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide import commands' commands "$@"
+}
+(( $+functions[_zoxide__edit__increment_commands] )) ||
+_zoxide__edit__increment_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide edit increment commands' commands "$@"
 }
 (( $+functions[_zoxide__init_commands] )) ||
 _zoxide__init_commands() {
@@ -123,6 +202,11 @@ _zoxide__init_commands() {
 _zoxide__query_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide query commands' commands "$@"
+}
+(( $+functions[_zoxide__edit__reload_commands] )) ||
+_zoxide__edit__reload_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide edit reload commands' commands "$@"
 }
 (( $+functions[_zoxide__remove_commands] )) ||
 _zoxide__remove_commands() {

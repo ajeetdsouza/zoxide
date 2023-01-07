@@ -10,7 +10,7 @@ name = "zoxide"
 readme = "README.md"
 repository = "https://github.com/ajeetdsouza/zoxide"
 rust-version = "1.65"
-version = "0.8.3"
+version = "0.9.0"
 
 [badges]
 maintenance = { status = "actively-developed" }

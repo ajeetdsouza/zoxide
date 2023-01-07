@@ -1,4 +1,5 @@
 mod dir;
+mod stream;
 
 use std::path::{Path, PathBuf};
 use std::{fs, io};
@@ -8,6 +9,7 @@ use bincode::Options;
 use ouroboros::self_referencing;
 
 pub use crate::db::dir::{Dir, Epoch, Rank};
+pub use crate::db::stream::Stream;
 use crate::{config, util};
 
 #[self_referencing]
@@ -16,7 +18,7 @@ pub struct Database {
     bytes: Vec<u8>,
     #[borrows(bytes)]
     #[covariant]
-    dirs: Vec<Dir<'this>>,
+    pub dirs: Vec<Dir<'this>>,
     dirty: bool,
 }
 
@@ -25,10 +27,11 @@ impl Database {
 
     pub fn open() -> Result<Self> {
         let data_dir = config::data_dir()?;
-        Self::open_dir(&data_dir)
+        Self::open_dir(data_dir)
     }
 
-    pub fn open_dir(data_dir: &Path) -> Result<Self> {
+    pub fn open_dir(data_dir: impl AsRef<Path>) -> Result<Self> {
+        let data_dir = data_dir.as_ref();
         let path = data_dir.join("db.zo");
 
         match fs::read(&path) {
@@ -90,15 +93,18 @@ impl Database {
     /// Removes the directory with `path` from the store. This does not preserve
     /// ordering, but is O(1).
     pub fn remove(&mut self, path: impl AsRef<str>) -> bool {
-        let deleted = self.with_dirs_mut(|dirs| match dirs.iter().position(|dir| dir.path == path.as_ref()) {
+        match self.dirs().iter().position(|dir| dir.path == path.as_ref()) {
             Some(idx) => {
-                dirs.swap_remove(idx);
+                self.swap_remove(idx);
                 true
             }
             None => false,
-        });
-        self.with_dirty_mut(|dirty| *dirty |= deleted);
-        deleted
+        }
+    }
+
+    pub fn swap_remove(&mut self, idx: usize) {
+        self.with_dirs_mut(|dirs| dirs.swap_remove(idx));
+        self.with_dirty_mut(|dirty| *dirty = true);
     }
 
     pub fn age(&mut self, max_age: Rank) {
@@ -118,6 +124,10 @@ impl Database {
             }
         });
         self.with_dirty_mut(|dirty_prev| *dirty_prev |= dirty);
+    }
+
+    pub fn stream(&mut self, now: Epoch) -> Stream {
+        Stream::new(self, now)
     }
 
     pub fn dedup(&mut self) {

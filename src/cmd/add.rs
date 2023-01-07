@@ -9,7 +9,7 @@ use crate::{config, util};
 impl Run for Add {
     fn run(&self) -> Result<()> {
         // These characters can't be printed cleanly to a single line, so they can cause confusion
-        // when writing to fzf / stdout.
+        // when writing to stdout.
         const EXCLUDE_CHARS: &[char] = &['\n', '\r'];
 
         let exclude_dirs = config::exclude_dirs()?;

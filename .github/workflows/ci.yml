@@ -1,24 +1,19 @@
 name: ci
 on:
   push:
-    branches:
-    - main
-    - next
+    branches: [main]
   pull_request:
   workflow_dispatch:
-
 env:
   CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
   CARGO_INCREMENTAL: 0
   CARGO_TERM_COLOR: always
-
 jobs:
   ci:
     name: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # FIXME: Enable macos-latest when this is merged: https://nixpk.gs/pr-tracker.html?pr=163924
         os: [ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@v2

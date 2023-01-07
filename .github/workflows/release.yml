@@ -1,15 +1,11 @@
 name: release
 on:
   push:
-    branches:
-    - main
-    - next
+    branches: [main]
   pull_request:
   workflow_dispatch:
-
 env:
   CARGO_INCREMENTAL: 0
-
 jobs:
   release:
     name: ${{ matrix.target }}

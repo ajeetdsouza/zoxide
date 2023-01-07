@@ -25,7 +25,7 @@ impl<'file> Database<'file> {
 
         let buffer = self.dirs.to_bytes()?;
         let path = db_path(self.data_dir);
-        util::write(&path, &buffer).context("could not write to database")?;
+        util::write(path, buffer).context("could not write to database")?;
         self.modified = false;
         Ok(())
     }

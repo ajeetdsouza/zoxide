@@ -51,7 +51,7 @@ impl Database {
         }
 
         let bytes = Self::serialize(self.dirs())?;
-        util::write(self.borrow_path(), &bytes).context("could not write to database")?;
+        util::write(self.borrow_path(), bytes).context("could not write to database")?;
         self.with_dirty_mut(|dirty| *dirty = false);
 
         Ok(())

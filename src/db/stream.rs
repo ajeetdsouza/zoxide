@@ -8,13 +8,10 @@ use crate::util::{self, MONTH};
 pub struct Stream<'a> {
     db: &'a mut Database,
     idxs: Rev<Range<usize>>,
-
     keywords: Vec<String>,
-
     check_exists: bool,
     expire_below: Epoch,
     resolve_symlinks: bool,
-
     exclude_path: Option<String>,
 }
 
@@ -38,7 +35,7 @@ impl<'a> Stream<'a> {
         }
     }
 
-    pub fn with_exclude<S: Into<String>>(mut self, path: S) -> Self {
+    pub fn with_exclude(mut self, path: impl Into<String>) -> Self {
         self.exclude_path = Some(path.into());
         self
     }
@@ -49,7 +46,7 @@ impl<'a> Stream<'a> {
         self
     }
 
-    pub fn with_keywords<S: AsRef<str>>(mut self, keywords: &[S]) -> Self {
+    pub fn with_keywords(mut self, keywords: &[impl AsRef<str>]) -> Self {
         self.keywords = keywords.iter().map(util::to_lowercase).collect();
         self
     }
@@ -80,15 +77,15 @@ impl<'a> Stream<'a> {
         None
     }
 
-    fn matches_exists<S: AsRef<str>>(&self, path: S) -> bool {
+    fn matches_exists(&self, path: &str) -> bool {
         if !self.check_exists {
             return true;
         }
         let resolver = if self.resolve_symlinks { fs::symlink_metadata } else { fs::metadata };
-        resolver(path.as_ref()).map(|m| m.is_dir()).unwrap_or_default()
+        resolver(path).map(|m| m.is_dir()).unwrap_or_default()
     }
 
-    fn matches_keywords<S: AsRef<str>>(&self, path: S) -> bool {
+    fn matches_keywords(&self, path: &str) -> bool {
         let (keywords_last, keywords) = match self.keywords.split_last() {
             Some(split) => split,
             None => return true,

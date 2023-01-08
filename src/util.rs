@@ -149,7 +149,7 @@ impl FzfChild {
 }
 
 /// Similar to [`fs::write`], but atomic (best effort on Windows).
-pub fn write<P: AsRef<Path>, C: AsRef<[u8]>>(path: P, contents: C) -> Result<()> {
+pub fn write(path: impl AsRef<Path>, contents: impl AsRef<[u8]>) -> Result<()> {
     let path = path.as_ref();
     let contents = contents.as_ref();
     let dir = path.parent().unwrap();
@@ -186,7 +186,7 @@ pub fn write<P: AsRef<Path>, C: AsRef<[u8]>>(path: P, contents: C) -> Result<()>
 }
 
 /// Atomically create a tmpfile in the given directory.
-fn tmpfile<P: AsRef<Path>>(dir: P) -> Result<(File, PathBuf)> {
+fn tmpfile(dir: impl AsRef<Path>) -> Result<(File, PathBuf)> {
     const MAX_ATTEMPTS: usize = 5;
     const TMP_NAME_LEN: usize = 16;
     let dir = dir.as_ref();
@@ -215,7 +215,7 @@ fn tmpfile<P: AsRef<Path>>(dir: P) -> Result<(File, PathBuf)> {
 }
 
 /// Similar to [`fs::rename`], but with retries on Windows.
-fn rename<P: AsRef<Path>, Q: AsRef<Path>>(from: P, to: Q) -> Result<()> {
+fn rename(from: impl AsRef<Path>, to: impl AsRef<Path>) -> Result<()> {
     let from = from.as_ref();
     let to = to.as_ref();
 
@@ -232,8 +232,8 @@ fn rename<P: AsRef<Path>, Q: AsRef<Path>>(from: P, to: Q) -> Result<()> {
     }
 }
 
-pub fn canonicalize<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
-    dunce::canonicalize(path).with_context(|| format!("could not resolve path: {}", path.as_ref().display()))
+pub fn canonicalize(path: impl AsRef<Path>) -> Result<PathBuf> {
+    dunce::canonicalize(&path).with_context(|| format!("could not resolve path: {}", path.as_ref().display()))
 }
 
 pub fn current_dir() -> Result<PathBuf> {
@@ -247,14 +247,14 @@ pub fn current_time() -> Result<Epoch> {
     Ok(current_time)
 }
 
-pub fn path_to_str<P: AsRef<Path>>(path: &P) -> Result<&str> {
+pub fn path_to_str(path: &impl AsRef<Path>) -> Result<&str> {
     let path = path.as_ref();
     path.to_str().with_context(|| format!("invalid unicode in path: {}", path.display()))
 }
 
 /// Returns the absolute version of a path. Like [`std::path::Path::canonicalize`], but doesn't
 /// resolve symlinks.
-pub fn resolve_path<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
+pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
     let path = path.as_ref();
     let base_path;
 
@@ -265,7 +265,7 @@ pub fn resolve_path<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
     if cfg!(windows) {
         use std::path::Prefix;
 
-        fn get_drive_letter<P: AsRef<Path>>(path: P) -> Option<u8> {
+        fn get_drive_letter(path: impl AsRef<Path>) -> Option<u8> {
             let path = path.as_ref();
             let mut components = path.components();
 
@@ -359,7 +359,7 @@ pub fn resolve_path<P: AsRef<Path>>(path: &P) -> Result<PathBuf> {
 }
 
 /// Convert a string to lowercase, with a fast path for ASCII strings.
-pub fn to_lowercase<S: AsRef<str>>(s: S) -> String {
+pub fn to_lowercase(s: impl AsRef<str>) -> String {
     let s = s.as_ref();
     if s.is_ascii() {
         s.to_ascii_lowercase()

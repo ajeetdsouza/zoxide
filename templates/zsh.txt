@@ -79,23 +79,7 @@ function __zoxide_zi() {
     result="$(\command zoxide query -i -- "$@")" && __zoxide_cd "${result}"
 }
 
-{{ section }}
-# Commands for zoxide. Disable these using --no-cmd.
-#
-
-{%- match cmd %}
-{%- when Some with (cmd) %}
-
-\builtin unalias {{cmd}} &>/dev/null || \builtin true
-function {{cmd}}() {
-    __zoxide_z "$@"
-}
-
-\builtin unalias {{cmd}}i &>/dev/null || \builtin true
-function {{cmd}}i() {
-    __zoxide_zi "$@"
-}
-
+# Completions.
 if [[ -o zle ]]; then
     function __zoxide_z_complete() {
         # Only show completions when the cursor is at the end of the line.
@@ -118,12 +102,18 @@ if [[ -o zle ]]; then
     }
 
     \builtin bindkey '\e[0n' 'reset-prompt'
-    if [[ "${+functions[compdef]}" -ne 0 ]]; then
-        \compdef -d {{cmd}}
-        \compdef -d {{cmd}}i
-        \compdef __zoxide_z_complete {{cmd}}
-    fi
+    [[ "${+functions[compdef]}" -ne 0 ]] && \compdef __zoxide_z_complete __zoxide_z
 fi
+
+{{ section }}
+# Commands for zoxide. Disable these using --no-cmd.
+#
+
+{%- match cmd %}
+{%- when Some with (cmd) %}
+
+\builtin alias {{cmd}}=__zoxide_z
+\builtin alias {{cmd}}i=__zoxide_zi
 
 {%- when None %}
 

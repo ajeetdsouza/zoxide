@@ -48,10 +48,11 @@ impl Query {
         } else {
             let handle = &mut io::stdout();
             let Some(dir) = stream.next() else {
-                if stream.did_exclude() {
-                    bail!("you are already in the only match");
-                }
-                bail!("no match found");
+                bail!(if stream.did_exclude() {
+                    "you are already in the only match"
+                } else {
+                    "no match found"
+                });
             };
             let dir = if self.score { dir.display().with_score(now) } else { dir.display() };
             writeln!(handle, "{dir}").pipe_exit("stdout")?;

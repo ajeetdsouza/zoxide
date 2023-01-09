@@ -159,7 +159,9 @@ pub fn write(path: impl AsRef<Path>, contents: impl AsRef<[u8]>) -> Result<()> {
     let result = (|| {
         // Write to the tmpfile.
         let _ = tmp_file.set_len(contents.len() as u64);
-        tmp_file.write_all(contents).with_context(|| format!("could not write to file: {}", tmp_path.display()))?;
+        tmp_file
+            .write_all(contents)
+            .with_context(|| format!("could not write to file: {}", tmp_path.display()))?;
 
         // Set the owner of the tmpfile (UNIX only).
         #[cfg(unix)]
@@ -224,16 +226,21 @@ fn rename(from: impl AsRef<Path>, to: impl AsRef<Path>) -> Result<()> {
 
     loop {
         match fs::rename(from, to) {
-            Err(e) if e.kind() == io::ErrorKind::PermissionDenied && attempts < MAX_ATTEMPTS => attempts += 1,
+            Err(e) if e.kind() == io::ErrorKind::PermissionDenied && attempts < MAX_ATTEMPTS => {
+                attempts += 1
+            }
             result => {
-                break result.with_context(|| format!("could not rename file: {} -> {}", from.display(), to.display()));
+                break result.with_context(|| {
+                    format!("could not rename file: {} -> {}", from.display(), to.display())
+                });
             }
         }
     }
 }
 
 pub fn canonicalize(path: impl AsRef<Path>) -> Result<PathBuf> {
-    dunce::canonicalize(&path).with_context(|| format!("could not resolve path: {}", path.as_ref().display()))
+    dunce::canonicalize(&path)
+        .with_context(|| format!("could not resolve path: {}", path.as_ref().display()))
 }
 
 pub fn current_dir() -> Result<PathBuf> {
@@ -241,8 +248,10 @@ pub fn current_dir() -> Result<PathBuf> {
 }
 
 pub fn current_time() -> Result<Epoch> {
-    let current_time =
-        SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).context("system clock set to invalid time")?.as_secs();
+    let current_time = SystemTime::now()
+        .duration_since(SystemTime::UNIX_EPOCH)
+        .context("system clock set to invalid time")?
+        .as_secs();
 
     Ok(current_time)
 }
@@ -271,7 +280,9 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
 
             match components.next() {
                 Some(Component::Prefix(prefix)) => match prefix.kind() {
-                    Prefix::Disk(drive_letter) | Prefix::VerbatimDisk(drive_letter) => Some(drive_letter),
+                    Prefix::Disk(drive_letter) | Prefix::VerbatimDisk(drive_letter) => {
+                        Some(drive_letter)
+                    }
                     _ => None,
                 },
                 _ => None,
@@ -324,8 +335,9 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
                 components.next();
 
                 let current_dir = env::current_dir()?;
-                let drive_letter = get_drive_letter(&current_dir)
-                    .with_context(|| format!("could not get drive letter: {}", current_dir.display()))?;
+                let drive_letter = get_drive_letter(&current_dir).with_context(|| {
+                    format!("could not get drive letter: {}", current_dir.display())
+                })?;
                 base_path = get_drive_path(drive_letter);
                 stack.extend(base_path.components());
             }

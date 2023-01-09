@@ -26,7 +26,8 @@ impl Run for Edit {
 
                 let stdout = &mut io::stdout().lock();
                 for dir in db.dirs().iter().rev() {
-                    write!(stdout, "{}\0", dir.display().with_score(now).with_separator('\t')).pipe_exit("fzf")?;
+                    write!(stdout, "{}\0", dir.display().with_score(now).with_separator('\t'))
+                        .pipe_exit("fzf")?;
                 }
                 Ok(())
             }

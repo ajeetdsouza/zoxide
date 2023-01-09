@@ -7,8 +7,9 @@ use crate::db::Database;
 
 impl Run for Import {
     fn run(&self) -> Result<()> {
-        let buffer = fs::read_to_string(&self.path)
-            .with_context(|| format!("could not open database for importing: {}", &self.path.display()))?;
+        let buffer = fs::read_to_string(&self.path).with_context(|| {
+            format!("could not open database for importing: {}", &self.path.display())
+        })?;
 
         let mut db = Database::open()?;
         if !self.merge && !db.dirs().is_empty() {
@@ -58,7 +59,8 @@ fn import_z(db: &mut Database, buffer: &str) -> Result<()> {
         let mut split = line.rsplitn(3, '|');
 
         let last_accessed = split.next().with_context(|| format!("invalid entry: {line}"))?;
-        let last_accessed = last_accessed.parse().with_context(|| format!("invalid epoch: {last_accessed}"))?;
+        let last_accessed =
+            last_accessed.parse().with_context(|| format!("invalid epoch: {last_accessed}"))?;
 
         let rank = split.next().with_context(|| format!("invalid entry: {line}"))?;
         let rank = rank.parse().with_context(|| format!("invalid rank: {rank}"))?;

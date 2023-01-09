@@ -137,7 +137,7 @@ pub struct Query {
     #[clap(long, short)]
     pub score: bool,
 
-    /// Exclude a path from results
+    /// Exclude the current directory
     #[clap(long, value_hint = ValueHint::DirPath, value_name = "path")]
     pub exclude: Option<String>,
 }

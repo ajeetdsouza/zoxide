@@ -1,7 +1,5 @@
-use std::{
-    borrow::Cow,
-    fmt::{self, Display, Formatter},
-};
+use std::borrow::Cow;
+use std::fmt::{self, Display, Formatter};
 
 use serde::{Deserialize, Serialize};
 

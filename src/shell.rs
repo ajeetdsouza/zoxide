@@ -98,14 +98,21 @@ mod tests {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let mut source = String::new();
 
-        // Filter out lines using edit:*, since those functions are only available in the
-        // interactive editor.
-        for line in Elvish(&opts).render().unwrap().split('\n').filter(|line| !line.contains("edit:")) {
+        // Filter out lines using edit:*, since those functions are only available in
+        // the interactive editor.
+        for line in
+            Elvish(&opts).render().unwrap().split('\n').filter(|line| !line.contains("edit:"))
+        {
             source.push_str(line);
             source.push('\n');
         }
 
-        Command::new("elvish").args(["-c", &source, "-norc"]).assert().success().stdout("").stderr("");
+        Command::new("elvish")
+            .args(["-c", &source, "-norc"])
+            .assert()
+            .success()
+            .stdout("")
+            .stderr("");
     }
 
     #[apply(opts)]
@@ -151,8 +158,12 @@ mod tests {
         let tempdir = tempfile::tempdir().unwrap();
         let tempdir = tempdir.path();
 
-        let assert =
-            Command::new("nu").env("HOME", tempdir).args(["--commands", &source]).assert().success().stderr("");
+        let assert = Command::new("nu")
+            .env("HOME", tempdir)
+            .args(["--commands", &source])
+            .assert()
+            .success()
+            .stderr("");
 
         if opts.hook != InitHook::Pwd {
             assert.stdout("");
@@ -179,7 +190,8 @@ mod tests {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Posix(&opts).render().unwrap();
 
-        let assert = Command::new("dash").args(["-e", "-u", "-c", &source]).assert().success().stderr("");
+        let assert =
+            Command::new("dash").args(["-e", "-u", "-c", &source]).assert().success().stderr("");
         if opts.hook != InitHook::Pwd {
             assert.stdout("");
         }
@@ -234,7 +246,12 @@ mod tests {
         let mut source = Xonsh(&opts).render().unwrap();
         source.push('\n');
 
-        Command::new("black").args(["--check", "--diff", "-"]).write_stdin(source).assert().success().stdout("");
+        Command::new("black")
+            .args(["--check", "--diff", "-"])
+            .write_stdin(source)
+            .assert()
+            .success()
+            .stdout("");
     }
 
     #[apply(opts)]

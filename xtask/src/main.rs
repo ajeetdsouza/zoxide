@@ -9,8 +9,11 @@ use ignore::Walk;
 
 fn main() -> Result<()> {
     let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    let dir = dir.parent().with_context(|| format!("could not find workspace root: {}", dir.display()))?;
-    env::set_current_dir(dir).with_context(|| format!("could not set current directory: {}", dir.display()))?;
+    let dir = dir
+        .parent()
+        .with_context(|| format!("could not find workspace root: {}", dir.display()))?;
+    env::set_current_dir(dir)
+        .with_context(|| format!("could not set current directory: {}", dir.display()))?;
     let nix_enabled = enable_nix();
 
     let app = App::parse();
@@ -55,7 +58,10 @@ impl CommandExt for &mut Command {
 
 fn run_ci(nix_enabled: bool) -> Result<()> {
     // Run cargo-clippy.
-    Command::new("cargo").args(["clippy", "--all-features", "--all-targets"]).args(["--", "-Dwarnings"]).run()?;
+    Command::new("cargo")
+        .args(["clippy", "--all-features", "--all-targets"])
+        .args(["--", "-Dwarnings"])
+        .run()?;
     run_fmt(nix_enabled, true)?;
     run_lint(nix_enabled)?;
     run_tests(nix_enabled, "")
@@ -63,8 +69,9 @@ fn run_ci(nix_enabled: bool) -> Result<()> {
 
 fn run_fmt(nix_enabled: bool, check: bool) -> Result<()> {
     // Run cargo-fmt.
-    // let check_args: &[&str] = if check { &["--check", "--files-with-diff"] } else { &[] };
-    // Command::new("cargo").args(&["fmt", "--all", "--"]).args(check_args).run()?;
+    // let check_args: &[&str] = if check {&["--check", "--files-with-diff"] } else
+    // { &[] }; Command::new("cargo").args(&["fmt", "--all",
+    // "--"]).args(check_args).run()?;
 
     // Run nixfmt.
     if nix_enabled {
@@ -119,7 +126,8 @@ fn enable_nix() -> bool {
     if nix_enabled {
         return true;
     }
-    let nix_detected = Command::new("nix-shell").arg("--version").status().map(|s| s.success()).unwrap_or(false);
+    let nix_detected =
+        Command::new("nix-shell").arg("--version").status().map(|s| s.success()).unwrap_or(false);
     if !nix_detected {
         return false;
     }
@@ -128,6 +136,9 @@ fn enable_nix() -> bool {
     let args = env::args();
     let cmd = shell_words::join(args);
 
-    let status = Command::new("nix-shell").args(["--pure", "--run", &cmd, "--", "shell.nix"]).status().unwrap();
+    let status = Command::new("nix-shell")
+        .args(["--pure", "--run", &cmd, "--", "shell.nix"])
+        .status()
+        .unwrap();
     process::exit(status.code().unwrap_or(1));
 }

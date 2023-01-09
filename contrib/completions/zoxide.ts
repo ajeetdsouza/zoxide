@@ -196,7 +196,7 @@ const completion: Fig.Spec = {
       options: [
         {
           name: "--exclude",
-          description: "Exclude a path from results",
+          description: "Exclude the current directory",
           isRepeatable: true,
           args: {
             name: "exclude",

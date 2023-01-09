@@ -6,8 +6,12 @@ use crate::db::{Database, Dir, Epoch};
 use crate::util::{self, MONTH};
 
 pub struct Stream<'a> {
+    // State
     db: &'a mut Database,
     idxs: Rev<Range<usize>>,
+    did_exclude: bool,
+
+    // Configuration
     keywords: Vec<String>,
     check_exists: bool,
     expire_below: Epoch,
@@ -27,6 +31,7 @@ impl<'a> Stream<'a> {
         Stream {
             db,
             idxs,
+            did_exclude: false,
             keywords: Vec::new(),
             check_exists: false,
             expire_below,
@@ -67,6 +72,7 @@ impl<'a> Stream<'a> {
             }
 
             if Some(dir.path.as_ref()) == self.exclude_path.as_deref() {
+                self.did_exclude = true;
                 continue;
             }
 
@@ -75,6 +81,10 @@ impl<'a> Stream<'a> {
         }
 
         None
+    }
+
+    pub fn did_exclude(&self) -> bool {
+        self.did_exclude
     }
 
     fn matches_exists(&self, path: &str) -> bool {

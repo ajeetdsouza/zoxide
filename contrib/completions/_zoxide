@@ -117,7 +117,7 @@ _arguments "${_arguments_options[@]}" \
 ;;
 (query)
 _arguments "${_arguments_options[@]}" \
-'--exclude=[Exclude a path from results]:path:_files -/' \
+'--exclude=[Exclude the current directory]:path:_files -/' \
 '--all[Show deleted directories]' \
 '(-l --list)-i[Use interactive selection]' \
 '(-l --list)--interactive[Use interactive selection]' \

@@ -9,8 +9,8 @@ fn main() {
     };
     println!("cargo:rustc-env=ZOXIDE_VERSION={version}");
 
-    // Since we are generating completions in the package directory, we need to set this so that
-    // Cargo doesn't rebuild every time.
+    // Since we are generating completions in the package directory, we need to set
+    // this so that Cargo doesn't rebuild every time.
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=src/");
     println!("cargo:rerun-if-changed=templates/");

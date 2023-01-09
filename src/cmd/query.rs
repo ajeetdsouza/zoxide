@@ -1,6 +1,6 @@
 use std::io::{self, Write};
 
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 
 use crate::cmd::{Query, Run};
 use crate::config;
@@ -47,7 +47,13 @@ impl Query {
             }
         } else {
             let handle = &mut io::stdout();
-            let dir = stream.next().context("no match found")?;
+            let Some(dir) = stream.next() else {
+                bail!(if stream.did_exclude() {
+                    "you are already in the only match"
+                } else {
+                    "no match found"
+                });
+            };
             let dir = if self.score { dir.display().with_score(now) } else { dir.display() };
             writeln!(handle, "{dir}").pipe_exit("stdout")?;
         }

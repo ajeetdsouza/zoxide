@@ -87,7 +87,7 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand --version 'Print version information'
         }
         &'zoxide;query'= {
-            cand --exclude 'Exclude a path from results'
+            cand --exclude 'Exclude the current directory'
             cand --all 'Show deleted directories'
             cand -i 'Use interactive selection'
             cand --interactive 'Use interactive selection'

@@ -37,13 +37,16 @@ impl Database {
         match fs::read(&path) {
             Ok(bytes) => Self::try_new(path, bytes, |bytes| Self::deserialize(bytes), false),
             Err(e) if e.kind() == io::ErrorKind::NotFound => {
-                // Create data directory, but don't create any file yet. The file will be created
-                // later by [`Database::save`] if any data is modified.
-                fs::create_dir_all(data_dir)
-                    .with_context(|| format!("unable to create data directory: {}", data_dir.display()))?;
+                // Create data directory, but don't create any file yet. The file will be
+                // created later by [`Database::save`] if any data is modified.
+                fs::create_dir_all(data_dir).with_context(|| {
+                    format!("unable to create data directory: {}", data_dir.display())
+                })?;
                 Ok(Self::new(path, Vec::new(), |_| Vec::new(), false))
             }
-            Err(e) => Err(e).with_context(|| format!("could not read from database: {}", path.display())),
+            Err(e) => {
+                Err(e).with_context(|| format!("could not read from database: {}", path.display()))
+            }
         }
     }
 
@@ -64,7 +67,9 @@ impl Database {
     pub fn add(&mut self, path: impl AsRef<str> + Into<String>, by: Rank, now: Epoch) {
         self.with_dirs_mut(|dirs| match dirs.iter_mut().find(|dir| dir.path == path.as_ref()) {
             Some(dir) => dir.rank = (dir.rank + by).max(0.0),
-            None => dirs.push(Dir { path: path.into().into(), rank: by.max(0.0), last_accessed: now }),
+            None => {
+                dirs.push(Dir { path: path.into().into(), rank: by.max(0.0), last_accessed: now })
+            }
         });
         self.with_dirty_mut(|dirty| *dirty = true);
     }
@@ -73,7 +78,9 @@ impl Database {
     /// directory is always in the database, it is expected that the user either
     /// does a check before calling this, or calls `dedup()` afterward.
     pub fn add_unchecked(&mut self, path: impl AsRef<str> + Into<String>, rank: Rank, now: Epoch) {
-        self.with_dirs_mut(|dirs| dirs.push(Dir { path: path.into().into(), rank, last_accessed: now }));
+        self.with_dirs_mut(|dirs| {
+            dirs.push(Dir { path: path.into().into(), rank, last_accessed: now })
+        });
         self.with_dirty_mut(|dirty| *dirty = true);
     }
 
@@ -85,7 +92,9 @@ impl Database {
                 dir.rank = (dir.rank + by).max(0.0);
                 dir.last_accessed = now;
             }
-            None => dirs.push(Dir { path: path.into().into(), rank: by.max(0.0), last_accessed: now }),
+            None => {
+                dirs.push(Dir { path: path.into().into(), rank: by.max(0.0), last_accessed: now })
+            }
         });
         self.with_dirty_mut(|dirty| *dirty = true);
     }
@@ -166,7 +175,9 @@ impl Database {
 
     pub fn sort_by_score(&mut self, now: Epoch) {
         self.with_dirs_mut(|dirs| {
-            dirs.sort_unstable_by(|dir1: &Dir, dir2: &Dir| dir1.score(now).total_cmp(&dir2.score(now)))
+            dirs.sort_unstable_by(|dir1: &Dir, dir2: &Dir| {
+                dir1.score(now).total_cmp(&dir2.score(now))
+            })
         });
         self.with_dirty_mut(|dirty| *dirty = true);
     }
@@ -182,7 +193,8 @@ impl Database {
     fn serialize(dirs: &[Dir<'_>]) -> Result<Vec<u8>> {
         (|| -> bincode::Result<_> {
             // Preallocate buffer with combined size of sections.
-            let buffer_size = bincode::serialized_size(&Self::VERSION)? + bincode::serialized_size(&dirs)?;
+            let buffer_size =
+                bincode::serialized_size(&Self::VERSION)? + bincode::serialized_size(&dirs)?;
             let mut buffer = Vec::with_capacity(buffer_size as usize);
 
             // Serialize sections into buffer.
@@ -195,8 +207,8 @@ impl Database {
     }
 
     fn deserialize(bytes: &[u8]) -> Result<Vec<Dir>> {
-        // Assume a maximum size for the database. This prevents bincode from throwing strange
-        // errors when it encounters invalid data.
+        // Assume a maximum size for the database. This prevents bincode from throwing
+        // strange errors when it encounters invalid data.
         const MAX_SIZE: u64 = 32 << 20; // 32 MiB
         let deserializer = &mut bincode::options().with_fixint_encoding().with_limit(MAX_SIZE);
 
@@ -210,7 +222,9 @@ impl Database {
         // Deserialize sections.
         let version = deserializer.deserialize(bytes_version)?;
         let dirs = match version {
-            Self::VERSION => deserializer.deserialize(bytes_dirs).context("could not deserialize database")?,
+            Self::VERSION => {
+                deserializer.deserialize(bytes_dirs).context("could not deserialize database")?
+            }
             version => {
                 bail!("unsupported version (got {version}, supports {})", Self::VERSION)
             }

@@ -9,8 +9,8 @@ fn main() {
     };
     println!("cargo:rustc-env=ZOXIDE_VERSION={version}");
 
-    // Since we are generating completions in the package directory, we need to set this so that
-    // Cargo doesn't rebuild every time.
+    // Since we are generating completions in the package directory, we need to set
+    // this so that Cargo doesn't rebuild every time.
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=src/");
     println!("cargo:rerun-if-changed=templates/");
@@ -22,7 +22,7 @@ fn main() {
 fn git_version() -> Option<String> {
     let dir = env!("CARGO_MANIFEST_DIR");
     let mut git = Command::new("git");
-    git.args(&["-C", dir, "describe", "--tags", "--match=v*.*.*", "--always", "--broken"]);
+    git.args(["-C", dir, "describe", "--tags", "--match=v*.*.*", "--always", "--broken"]);
 
     let output = git.output().ok()?;
     if !output.status.success() || output.stdout.is_empty() || !output.stderr.is_empty() {

@@ -55,7 +55,7 @@ impl CommandExt for &mut Command {
 
 fn run_ci(nix_enabled: bool) -> Result<()> {
     // Run cargo-clippy.
-    Command::new("cargo").args(&["clippy", "--all-features", "--all-targets"]).args(&["--", "-Dwarnings"]).run()?;
+    Command::new("cargo").args(["clippy", "--all-features", "--all-targets"]).args(["--", "-Dwarnings"]).run()?;
     run_fmt(nix_enabled, true)?;
     run_lint(nix_enabled)?;
     run_tests(nix_enabled, "")
@@ -63,8 +63,9 @@ fn run_ci(nix_enabled: bool) -> Result<()> {
 
 fn run_fmt(nix_enabled: bool, check: bool) -> Result<()> {
     // Run cargo-fmt.
-    // let check_args: &[&str] = if check { &["--check", "--files-with-diff"] } else { &[] };
-    // Command::new("cargo").args(&["fmt", "--all", "--"]).args(check_args).run()?;
+    // let check_args: &[&str] = if check {&["--check", "--files-with-diff"] } else
+    // { &[] }; Command::new("cargo").args(&["fmt", "--all",
+    // "--"]).args(check_args).run()?;
 
     // Run nixfmt.
     if nix_enabled {
@@ -83,9 +84,6 @@ fn run_fmt(nix_enabled: bool, check: bool) -> Result<()> {
 
 fn run_lint(nix_enabled: bool) -> Result<()> {
     if nix_enabled {
-        // Run cargo-audit.
-        Command::new("cargo").args(&["audit", "--deny=warnings"]).run()?;
-
         // Run markdownlint.
         for result in Walk::new("./") {
             let entry = result.unwrap();
@@ -100,7 +98,7 @@ fn run_lint(nix_enabled: bool) -> Result<()> {
             let entry = result.unwrap();
             let path = entry.path();
             if path.is_file() && path.extension() == Some(OsStr::new("1")) {
-                Command::new("mandoc").args(&["-man", "-Wall", "-Tlint", "--"]).arg(path).run()?;
+                Command::new("mandoc").args(["-man", "-Wall", "-Tlint", "--"]).arg(path).run()?;
             }
         }
     }
@@ -110,7 +108,7 @@ fn run_lint(nix_enabled: bool) -> Result<()> {
 
 fn run_tests(nix_enabled: bool, name: &str) -> Result<()> {
     let args: &[&str] = if nix_enabled { &["nextest", "run", "--all-features"] } else { &["test"] };
-    Command::new("cargo").args(args).args(&["--no-fail-fast", "--workspace", "--", name]).run()
+    Command::new("cargo").args(args).args(["--no-fail-fast", "--workspace", "--", name]).run()
 }
 
 fn enable_nix() -> bool {
@@ -131,6 +129,6 @@ fn enable_nix() -> bool {
     let args = env::args();
     let cmd = shell_words::join(args);
 
-    let status = Command::new("nix-shell").args(&["--pure", "--run", &cmd, "--", "shell.nix"]).status().unwrap();
+    let status = Command::new("nix-shell").args(["--pure", "--run", &cmd, "--", "shell.nix"]).status().unwrap();
     process::exit(status.code().unwrap_or(1));
 }

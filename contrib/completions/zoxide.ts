@@ -22,12 +22,94 @@ const completion: Fig.Spec = {
       },
     },
     {
+      name: "edit",
+      description: "Edit the database",
+      subcommands: [
+        {
+          name: "decrement",
+          hidden: true,
+          options: [
+            {
+              name: ["-h", "--help"],
+              description: "Print help information",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version information",
+            },
+          ],
+          args: {
+            name: "path",
+          },
+        },
+        {
+          name: "delete",
+          hidden: true,
+          options: [
+            {
+              name: ["-h", "--help"],
+              description: "Print help information",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version information",
+            },
+          ],
+          args: {
+            name: "path",
+          },
+        },
+        {
+          name: "increment",
+          hidden: true,
+          options: [
+            {
+              name: ["-h", "--help"],
+              description: "Print help information",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version information",
+            },
+          ],
+          args: {
+            name: "path",
+          },
+        },
+        {
+          name: "reload",
+          hidden: true,
+          options: [
+            {
+              name: ["-h", "--help"],
+              description: "Print help information",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version information",
+            },
+          ],
+        },
+      ],
+      options: [
+        {
+          name: ["-h", "--help"],
+          description: "Print help information",
+        },
+        {
+          name: ["-V", "--version"],
+          description: "Print version information",
+        },
+      ],
+    },
+    {
       name: "import",
       description: "Import entries from another application",
       options: [
         {
           name: "--from",
           description: "Application to import from",
+          isRepeatable: true,
           args: {
             name: "from",
             suggestions: [
@@ -61,6 +143,7 @@ const completion: Fig.Spec = {
         {
           name: "--cmd",
           description: "Changes the prefix of the `z` and `zi` commands",
+          isRepeatable: true,
           args: {
             name: "cmd",
             isOptional: true,
@@ -69,6 +152,7 @@ const completion: Fig.Spec = {
         {
           name: "--hook",
           description: "Changes how often zoxide increments a directory's score",
+          isRepeatable: true,
           args: {
             name: "hook",
             isOptional: true,
@@ -112,7 +196,8 @@ const completion: Fig.Spec = {
       options: [
         {
           name: "--exclude",
-          description: "Exclude a path from results",
+          description: "Exclude the current directory",
+          isRepeatable: true,
           args: {
             name: "exclude",
             isOptional: true,
@@ -154,6 +239,7 @@ const completion: Fig.Spec = {
       ],
       args: {
         name: "keywords",
+        isVariadic: true,
         isOptional: true,
       },
     },
@@ -161,10 +247,6 @@ const completion: Fig.Spec = {
       name: "remove",
       description: "Remove a directory from the database",
       options: [
-        {
-          name: ["-i", "--interactive"],
-          description: "Use interactive selection",
-        },
         {
           name: ["-h", "--help"],
           description: "Print help information",
@@ -176,6 +258,7 @@ const completion: Fig.Spec = {
       ],
       args: {
         name: "paths",
+        isVariadic: true,
         isOptional: true,
         template: "folders",
       },

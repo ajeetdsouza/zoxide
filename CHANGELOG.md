@@ -9,11 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- Fish/Zsh: Aliases on `__zoxide_z` will now use completions.
+
+## [0.9.0] - 2023-01-08
+
+### Added
+
+- `edit` subcommand to adjust the scores of entries.
+
 ### Fixed
 
 - Zsh: completions clashing with `zsh-autocomplete`.
 - Fzf: 'invalid option' on macOS.
 - PowerShell: handle UTF-8 encoding correctly.
+- Zsh: don't hide output from `chpwd` hooks.
+- Nushell: upgrade minimum supported version to v0.73.0.
+- Zsh: fix extra space in interactive completions when no match is found.
+- Fzf: various improvements.
+- Nushell: Accidental redefinition of hooks when initialized twice.
+
+### Removed
+
+- `remove -i` subcommand: use `edit` instead.
 
 ## [0.8.3] - 2022-09-02
 
@@ -411,6 +430,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions pipeline to build and upload releases.
 - Support for zsh.
 
+[0.9.0]: https://github.com/ajeetdsouza/zoxide/compare/v0.8.3...v0.9.0
 [0.8.3]: https://github.com/ajeetdsouza/zoxide/compare/v0.8.2...v0.8.3
 [0.8.2]: https://github.com/ajeetdsouza/zoxide/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/ajeetdsouza/zoxide/compare/v0.8.0...v0.8.1

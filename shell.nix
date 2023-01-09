@@ -1,8 +1,8 @@
 let
   rust = import (builtins.fetchTarball
-    "https://github.com/oxalica/rust-overlay/archive/60c2cfaa8b90ed8cebd18b214fac8682dcf222dd.tar.gz");
+    "https://github.com/oxalica/rust-overlay/archive/9096306d4a1c3adcc8d20f2c9dcaee3dee30d1ad.tar.gz");
   pkgs = import (builtins.fetchTarball
-    "https://github.com/NixOS/nixpkgs/archive/0323e1f8bac882f19905174639a89397db1930f1.tar.gz") {
+    "https://github.com/NixOS/nixpkgs/archive/5f902ae769594aaeaf326e8623a48482eeacfe89.tar.gz") {
       overlays = [ rust ];
     };
 in pkgs.mkShell {
@@ -21,7 +21,6 @@ in pkgs.mkShell {
     pkgs.zsh
 
     # Tools
-    pkgs.cargo-audit
     pkgs.cargo-nextest
     pkgs.mandoc
     pkgs.nixfmt

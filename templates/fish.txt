@@ -83,7 +83,7 @@ function __zoxide_z
     end
 end
 
-# Completions for `z`.
+# Completions.
 function __zoxide_z_complete
     set -l tokens (commandline --current-process --tokenize)
     set -l curr_tokens (commandline --cut-at-cursor --current-process --tokenize)
@@ -99,6 +99,7 @@ function __zoxide_z_complete
         commandline --function repaint
     end
 end
+complete --command __zoxide_z --no-files --arguments '(__zoxide_z_complete)'
 
 # Jump to a directory using interactive search.
 function __zoxide_zi
@@ -114,17 +115,10 @@ end
 {%- when Some with (cmd) %}
 
 abbr --erase {{cmd}} &>/dev/null
-complete --command {{cmd}} --erase
-function {{cmd}}
-    __zoxide_z $argv
-end
-complete --command {{cmd}} --no-files --arguments '(__zoxide_z_complete)'
+alias {{cmd}}=__zoxide_z
 
 abbr --erase {{cmd}}i &>/dev/null
-complete --command {{cmd}}i --erase
-function {{cmd}}i
-    __zoxide_zi $argv
-end
+alias {{cmd}}i=__zoxide_zi
 
 {%- when None %}
 

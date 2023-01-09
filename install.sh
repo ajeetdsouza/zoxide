@@ -91,10 +91,12 @@ download_zoxide() {
     wget) _releases="$(wget -qO- "$_releases_url")" ||
         err "wget: failed to download $_releases_url" ;;
     esac
+    (echo "$_releases" | grep -q 'API rate limit exceeded') &&
+        err "you have exceeded GitHub's API rate limit. Please try again later, or use a different installation method: https://github.com/ajeetdsouza/zoxide/#installation"
 
     local _package_url
     _package_url="$(echo "$_releases" | grep "browser_download_url" | cut -d '"' -f 4 | grep "$_arch")" ||
-        err "zoxide has not yet been packaged for your architecture ($_arch), please file an issue at https://github.com/ajeetdsouza/zoxide/issues"
+        err "zoxide has not yet been packaged for your architecture ($_arch), please file an issue: https://github.com/ajeetdsouza/zoxide/issues"
 
     local _ext
     case "$_package_url" in

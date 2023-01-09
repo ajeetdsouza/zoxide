@@ -2,15 +2,15 @@
 
 use std::path::PathBuf;
 
-use clap::{ArgEnum, Parser, ValueHint};
+use clap::{Parser, Subcommand, ValueEnum, ValueHint};
 
-const ENV_HELP: &str = "ENVIRONMENT VARIABLES:
-    _ZO_DATA_DIR            Path for zoxide data files
-    _ZO_ECHO                Print the matched directory before navigating to it when set to 1
-    _ZO_EXCLUDE_DIRS        List of directory globs to be excluded
-    _ZO_FZF_OPTS            Custom flags to pass to fzf
-    _ZO_MAXAGE              Maximum total age after which entries start getting deleted
-    _ZO_RESOLVE_SYMLINKS    Resolve symlinks when storing paths";
+const ENV_HELP: &str = "Environment variables:
+  _ZO_DATA_DIR          Path for zoxide data files
+  _ZO_ECHO              Print the matched directory before navigating to it when set to 1
+  _ZO_EXCLUDE_DIRS      List of directory globs to be excluded
+  _ZO_FZF_OPTS          Custom flags to pass to fzf
+  _ZO_MAXAGE            Maximum total age after which entries start getting deleted
+  _ZO_RESOLVE_SYMLINKS  Resolve symlinks when storing paths";
 
 #[derive(Debug, Parser)]
 #[clap(
@@ -24,6 +24,7 @@ const ENV_HELP: &str = "ENVIRONMENT VARIABLES:
 )]
 pub enum Cmd {
     Add(Add),
+    Edit(Edit),
     Import(Import),
     Init(Init),
     Query(Query),
@@ -33,8 +34,27 @@ pub enum Cmd {
 /// Add a new directory or increment its rank
 #[derive(Debug, Parser)]
 pub struct Add {
-    #[clap(min_values = 1, required = true, value_hint = ValueHint::DirPath)]
+    #[clap(num_args = 1.., required = true, value_hint = ValueHint::DirPath)]
     pub paths: Vec<PathBuf>,
+}
+
+/// Edit the database
+#[derive(Debug, Parser)]
+pub struct Edit {
+    #[clap(subcommand)]
+    pub cmd: Option<EditCommand>,
+}
+
+#[derive(Clone, Debug, Subcommand)]
+pub enum EditCommand {
+    #[clap(hide = true)]
+    Decrement { path: String },
+    #[clap(hide = true)]
+    Delete { path: String },
+    #[clap(hide = true)]
+    Increment { path: String },
+    #[clap(hide = true)]
+    Reload,
 }
 
 /// Import entries from another application
@@ -44,7 +64,7 @@ pub struct Import {
     pub path: PathBuf,
 
     /// Application to import from
-    #[clap(arg_enum, long)]
+    #[clap(value_enum, long)]
     pub from: ImportFrom,
 
     /// Merge into existing database
@@ -52,7 +72,7 @@ pub struct Import {
     pub merge: bool,
 }
 
-#[derive(ArgEnum, Clone, Debug)]
+#[derive(ValueEnum, Clone, Debug)]
 pub enum ImportFrom {
     Autojump,
     Z,
@@ -61,7 +81,7 @@ pub enum ImportFrom {
 /// Generate shell configuration
 #[derive(Debug, Parser)]
 pub struct Init {
-    #[clap(arg_enum)]
+    #[clap(value_enum)]
     pub shell: InitShell,
 
     /// Prevents zoxide from defining the `z` and `zi` commands
@@ -73,18 +93,18 @@ pub struct Init {
     pub cmd: String,
 
     /// Changes how often zoxide increments a directory's score
-    #[clap(arg_enum, long, default_value = "pwd")]
+    #[clap(value_enum, long, default_value = "pwd")]
     pub hook: InitHook,
 }
 
-#[derive(ArgEnum, Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(ValueEnum, Clone, Copy, Debug, Eq, PartialEq)]
 pub enum InitHook {
     None,
     Prompt,
     Pwd,
 }
 
-#[derive(ArgEnum, Clone, Debug)]
+#[derive(ValueEnum, Clone, Debug)]
 pub enum InitShell {
     Bash,
     Elvish,
@@ -117,7 +137,7 @@ pub struct Query {
     #[clap(long, short)]
     pub score: bool,
 
-    /// Exclude a path from results
+    /// Exclude the current directory
     #[clap(long, value_hint = ValueHint::DirPath, value_name = "path")]
     pub exclude: Option<String>,
 }
@@ -125,9 +145,6 @@ pub struct Query {
 /// Remove a directory from the database
 #[derive(Debug, Parser)]
 pub struct Remove {
-    /// Use interactive selection
-    #[clap(long, short)]
-    pub interactive: bool,
     #[clap(value_hint = ValueHint::DirPath)]
     pub paths: Vec<String>,
 }

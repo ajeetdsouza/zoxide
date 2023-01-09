@@ -1,0 +1,22 @@
+name: no-response
+on:
+  issue_comment:
+    types: [created]
+  schedule:
+    - cron: "0 0 * * *" # daily at 00:00
+permissions:
+  issues: write
+jobs:
+  no-response:
+    if: github.repository == 'ajeetdsouza/zoxide'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: lee-dohm/no-response@v0.5.0
+        with:
+          token: ${{ github.token }}
+          daysUntilClose: 30
+          responseRequiredLabel: waiting-for-response
+          closeComment: >
+            This issue has been automatically closed due to inactivity. If you
+            feel this is still relevant, please comment here or create a fresh
+            issue.

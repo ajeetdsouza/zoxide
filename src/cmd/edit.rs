@@ -46,9 +46,9 @@ impl Edit {
         Fzf::new()?
             .args([
                 // Search mode
-                "--scheme=path",
+                "--exact",
                 // Search result
-                "--tiebreak=end,chunk,index",
+                "--no-sort",
                 // Interface
                 "--bind=\
 btab:up,\

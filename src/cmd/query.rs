@@ -80,9 +80,9 @@ impl Query {
         } else {
             fzf.args([
                 // Search mode
-                "--scheme=path",
+                "--exact",
                 // Search result
-                "--tiebreak=end,chunk,index",
+                "--no-sort",
                 // Interface
                 "--bind=ctrl-z:ignore,btab:up,tab:down",
                 "--cycle",

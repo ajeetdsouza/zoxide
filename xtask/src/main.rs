@@ -57,14 +57,10 @@ impl CommandExt for &mut Command {
 }
 
 fn run_ci(nix_enabled: bool) -> Result<()> {
-    // Run cargo-clippy.
-    Command::new("cargo")
-        .args(["clippy", "--all-features", "--all-targets"])
-        .args(["--", "-Dwarnings"])
-        .run()?;
     run_fmt(nix_enabled, true)?;
     run_lint(nix_enabled)?;
-    run_tests(nix_enabled, "")
+    run_tests(nix_enabled, "")?;
+    run_msrv(nix_enabled)
 }
 
 fn run_fmt(nix_enabled: bool, check: bool) -> Result<()> {
@@ -89,6 +85,12 @@ fn run_fmt(nix_enabled: bool, check: bool) -> Result<()> {
 }
 
 fn run_lint(nix_enabled: bool) -> Result<()> {
+    // Run cargo-clippy.
+    Command::new("cargo")
+        .args(["clippy", "--all-features", "--all-targets"])
+        .args(["--", "-Dwarnings"])
+        .run()?;
+
     if nix_enabled {
         // Run markdownlint.
         for result in Walk::new("./") {
@@ -109,6 +111,14 @@ fn run_lint(nix_enabled: bool) -> Result<()> {
         }
     }
 
+    Ok(())
+}
+
+fn run_msrv(nix_enabled: bool) -> Result<()> {
+    if nix_enabled {
+        // Run cargo-msrv.
+        Command::new("cargo-msrv").arg("verify").run()?;
+    }
     Ok(())
 }
 

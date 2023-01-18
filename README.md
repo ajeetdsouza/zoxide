@@ -288,17 +288,17 @@ It can be installed from [here][fzf-installation].
 
 ### *Step 4: Import your data (optional)*
 
-If you currently use any of the following utilities, you may want to import
+If you currently use any of the following plugins, you may want to import
 your data into zoxide:
 
 <details>
 <summary>autojump</summary>
 
 ```sh
-zoxide import --from autojump path/to/db
+zoxide import --from=autojump "/path/to/autojump/db"
 ```
 
-The default path varies according to your system:
+The path usually varies according to your system:
 
 | OS      | Path                                                                                 | Example                                                |
 | ------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------ |
@@ -309,11 +309,21 @@ The default path varies according to your system:
 </details>
 
 <details>
-<summary>z, z.lua, or zsh-z</summary>
+<summary>fasd / z / z.lua / zsh-z</summary>
 
 ```sh
-zoxide import --from z path/to/db
+zoxide import --from=z "path/to/z/db"
 ```
+
+The path usually varies according to your system:
+
+| Plugin           | Path                                                                                |
+| ---------------- | ----------------------------------------------------------------------------------- |
+| fasd             | `$_FASD_DATA` or `$HOME/.fasd`                                                      |
+| z                | `$_Z_DATA` or `$HOME/.z`                                                            |
+| z.lua (bash/zsh) | `$_ZL_DATA` or `$HOME/.zlua`                                                        |
+| z.lua (fish)     | `$XDG_DATA_HOME/zlua/zlua.txt` or `$HOME/.local/share/zlua/zlua.txt` or `$_ZL_DATA` |
+| zsh-z            | `$ZSHZ_DATA` or `$_Z_DATA` or `$HOME/.z`                                            |
 
 </details>
 
@@ -323,7 +333,7 @@ zoxide import --from z path/to/db
 ```powershell
 $db = New-TemporaryFile
 (Get-ZLocation).GetEnumerator() | ForEach-Object { Write-Output ($_.Name+'|'+$_.Value+'|0') } | Out-File $db
-zoxide import --from z $db
+zoxide import --from=z $db
 ```
 
 </details>

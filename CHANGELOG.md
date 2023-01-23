@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Zsh: don't hide output from `chpwd` hooks.
 - Nushell: upgrade minimum supported version to v0.73.0.
 - Zsh: fix extra space in interactive completions when no match is found.
-- Fzf: various improvements.
+- Fzf: various improvements, upgrade minimum supported version to v0.33.0.
 - Nushell: Accidental redefinition of hooks when initialized twice.
 
 ### Removed

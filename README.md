@@ -284,7 +284,7 @@ eval "$(zoxide init posix --hook prompt)"
 It can be installed from [here][fzf-installation].
 
 > **Note**
-> zoxide only supports fzf v0.21.0 and above.
+> zoxide only supports fzf v0.33.0 and above.
 
 ### *Step 4: Import your data (optional)*
 

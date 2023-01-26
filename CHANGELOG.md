@@ -59,7 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Bash/Fish/Posix/Zsh: paths on Cygwin.
+- Bash/Fish/POSIX/Zsh: paths on Cygwin.
 - Fish: completions not working on certain systems.
 - Bash: completions not escaping spaces correctly.
 

@@ -117,13 +117,13 @@ zoxide can be installed in 4 easy steps:
    <details>
    <summary>Windows</summary>
 
-   > To install zoxide, run this command in your terminal:
+   > The recommended way to install zoxide is via `winget`:
    >
    > ```sh
-   > curl.exe -A "MS" https://webinstall.dev/zoxide | powershell
+   > winget install zoxide
    > ```
    >
-   > Or, you can use a package manager:
+   > Or, you can use an alternative package manager:
    >
    > | Repository      | Instructions                          |
    > | --------------- | ------------------------------------- |
@@ -131,7 +131,6 @@ zoxide can be installed in 4 easy steps:
    > | [Chocolatey]    | `choco install zoxide`                |
    > | [conda-forge]   | `conda install -c conda-forge zoxide` |
    > | [Scoop]         | `scoop install zoxide`                |
-   > | [Winget]        | `winget install zoxide`               |
 
    </details>
 
@@ -491,7 +490,6 @@ out the [wiki][wiki-env].
 [vim]: https://github.com/vim/vim
 [void linux packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide
 [wiki-env]: https://github.com/ajeetdsouza/zoxide/wiki/HOWTO:-set-environment-variables "HOWTO: set environment variables"
-[winget]: https://github.com/microsoft/winget-pkgs/tree/master/manifests/a/ajeetdsouza/zoxide
 [xplr]: https://github.com/sayanarijit/xplr
 [xxh-plugin-prerun-zoxide]: https://github.com/xxh/xxh-plugin-prerun-zoxide
 [xxh]: https://github.com/xxh/xxh

@@ -117,13 +117,13 @@ zoxide can be installed in 4 easy steps:
    <details>
    <summary>Windows</summary>
 
-   > To install zoxide, run this command in your terminal:
+   > The recommended way to install zoxide is via `winget`:
    >
    > ```sh
-   > curl.exe -A "MS" https://webinstall.dev/zoxide | powershell
+   > winget install zoxide
    > ```
    >
-   > Or, you can use a package manager:
+   > Or, you can use an alternative package manager:
    >
    > | Repository      | Instructions                          |
    > | --------------- | ------------------------------------- |

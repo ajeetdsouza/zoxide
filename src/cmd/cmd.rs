@@ -75,6 +75,7 @@ pub struct Import {
 #[derive(ValueEnum, Clone, Debug)]
 pub enum ImportFrom {
     Autojump,
+    #[clap(alias = "fasd")]
     Z,
 }
 

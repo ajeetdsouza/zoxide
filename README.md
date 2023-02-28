@@ -423,6 +423,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 | [nnn]                 | File manager                                 | [nnn-autojump]             |
 | [ranger]              | File manager                                 | [ranger-zoxide]            |
 | [telescope.nvim]      | Fuzzy finder for Neovim                      | [telescope-zoxide]         |
+| [t]                   | The smart tmux session manager               | Natively supported         |
 | [tmux-session-wizard] | Jump to a directory inside a Tmux session    | Natively supported         |
 | [vim] / [neovim]      | Text editor                                  | [zoxide.vim]               |
 | [xplr]                | File manager                                 | [zoxide.xplr]              |
@@ -481,6 +482,7 @@ out the [wiki][wiki-env].
 [releases]: https://github.com/ajeetdsouza/zoxide/releases
 [scoop]: https://github.com/ScoopInstaller/Main/tree/master/bucket/zoxide.json
 [slackbuilds-howto]: https://slackbuilds.org/howto/
+[t]: https://github.com/joshmedeski/t-smart-tmux-session-manager
 [telescope-zoxide]: https://github.com/jvgrootveld/telescope-zoxide
 [telescope.nvim]: https://github.com/nvim-telescope/telescope.nvim
 [termux]: https://github.com/termux/termux-packages/tree/master/packages/zoxide

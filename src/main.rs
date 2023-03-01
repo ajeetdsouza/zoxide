@@ -30,7 +30,7 @@ pub fn main() -> ExitCode {
         Err(e) => match e.downcast::<SilentExit>() {
             Ok(SilentExit { code }) => code.into(),
             Err(e) => {
-                let _ = writeln!(io::stderr(), "zoxide: {e:?}");
+                _ = writeln!(io::stderr(), "zoxide: {e:?}");
                 ExitCode::FAILURE
             }
         },

@@ -158,7 +158,7 @@ pub fn write(path: impl AsRef<Path>, contents: impl AsRef<[u8]>) -> Result<()> {
     let (mut tmp_file, tmp_path) = tmpfile(dir)?;
     let result = (|| {
         // Write to the tmpfile.
-        let _ = tmp_file.set_len(contents.len() as u64);
+        _ = tmp_file.set_len(contents.len() as u64);
         tmp_file
             .write_all(contents)
             .with_context(|| format!("could not write to file: {}", tmp_path.display()))?;
@@ -173,7 +173,7 @@ pub fn write(path: impl AsRef<Path>, contents: impl AsRef<[u8]>) -> Result<()> {
 
             let uid = Uid::from_raw(metadata.uid());
             let gid = Gid::from_raw(metadata.gid());
-            let _ = unistd::fchown(tmp_file.as_raw_fd(), Some(uid), Some(gid));
+            _ = unistd::fchown(tmp_file.as_raw_fd(), Some(uid), Some(gid));
         }
 
         // Close and rename the tmpfile.
@@ -182,7 +182,7 @@ pub fn write(path: impl AsRef<Path>, contents: impl AsRef<[u8]>) -> Result<()> {
     })();
     // In case of an error, delete the tmpfile.
     if result.is_err() {
-        let _ = fs::remove_file(&tmp_path);
+        _ = fs::remove_file(&tmp_path);
     }
     result
 }
@@ -373,5 +373,9 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
 /// Convert a string to lowercase, with a fast path for ASCII strings.
 pub fn to_lowercase(s: impl AsRef<str>) -> String {
     let s = s.as_ref();
-    if s.is_ascii() { s.to_ascii_lowercase() } else { s.to_lowercase() }
+    if s.is_ascii() {
+        s.to_ascii_lowercase()
+    } else {
+        s.to_lowercase()
+    }
 }

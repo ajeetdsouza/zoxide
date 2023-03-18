@@ -7,7 +7,7 @@ on:
 env:
   CARGO_INCREMENTAL: 0
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   release:

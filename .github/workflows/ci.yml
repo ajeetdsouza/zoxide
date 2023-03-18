@@ -8,6 +8,9 @@ env:
   CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
   CARGO_INCREMENTAL: 0
   CARGO_TERM_COLOR: always
+permissions:
+  contents: read
+
 jobs:
   ci:
     name: ${{ matrix.os }}
@@ -16,29 +19,29 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@dc323e67f16fb5f7663d20ff7941f27f5809e9b6 # v2.6.0
         with:
           fetch-depth: 0
 
-      - uses: actions-rs/toolchain@v1
+      - uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
         if: ${{ matrix.os == 'windows-latest' }}
         with:
           toolchain: stable
           components: rustfmt, clippy
           profile: minimal
           override: true
-      - uses: cachix/install-nix-action@v16
+      - uses: cachix/install-nix-action@d56f3ce9be45c562799280e8a561fbbe8f36de44 # v16
         if: ${{ matrix.os != 'windows-latest' }}
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - uses: cachix/cachix-action@v10
+      - uses: cachix/cachix-action@73e75d1a0cd4330597a571e8f9dedb41faa2fc4e # v10
         if: ${{ matrix.os != 'windows-latest' && env.CACHIX_AUTH_TOKEN != '' }}
         with:
           authToken: ${{ env.CACHIX_AUTH_TOKEN }}
           name: zoxide
 
       - name: Setup cache
-        uses: Swatinem/rust-cache@v1
+        uses: Swatinem/rust-cache@81d053bdb0871dcd3f10763c8cc60d0adc41762b # v1
         with:
           key: ${{ matrix.target }}
 

@@ -6,6 +6,9 @@ on:
   workflow_dispatch:
 env:
   CARGO_INCREMENTAL: 0
+permissions:
+  contents: read
+
 jobs:
   release:
     name: ${{ matrix.target }}
@@ -38,19 +41,19 @@ jobs:
             target: aarch64-pc-windows-msvc
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@dc323e67f16fb5f7663d20ff7941f27f5809e9b6 # v2.6.0
         with:
           fetch-depth: 0
 
       - name: Get version
         id: get_version
-        uses: SebRollen/toml-action@v1.0.2
+        uses: SebRollen/toml-action@2bd04b06a3ebc3e6a3eb6060de115710cad16cd6 # v1.0.2
         with:
           file: Cargo.toml
           field: package.version
 
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
         with:
           toolchain: stable
           profile: minimal
@@ -58,12 +61,12 @@ jobs:
           target: ${{ matrix.target }}
 
       - name: Setup cache
-        uses: Swatinem/rust-cache@v1
+        uses: Swatinem/rust-cache@81d053bdb0871dcd3f10763c8cc60d0adc41762b # v1
         with:
           key: ${{ matrix.target }}
 
       - name: Build binary
-        uses: actions-rs/cargo@v1
+        uses: actions-rs/cargo@844f36862e911db73fe0815f00a4a2602c279505 # v1.0.3
         with:
           command: build
           args: --release --locked --target=${{ matrix.target }} --color=always --verbose
@@ -71,13 +74,13 @@ jobs:
 
       - name: Install cargo-deb
         if: ${{ matrix.deb == true }}
-        uses: actions-rs/install@v0.1
+        uses: actions-rs/install@9da1d2adcfe5e7c16992e8242ca33a56b6d9b101 # v0.1.2
         with:
           crate: cargo-deb
 
       - name: Build deb
         if: ${{ matrix.deb == true }}
-        uses: actions-rs/cargo@v1
+        uses: actions-rs/cargo@844f36862e911db73fe0815f00a4a2602c279505 # v1.0.3
         with:
           command: deb
           args: --no-build --no-strip --output=. --target=${{ matrix.target }}
@@ -102,7 +105,7 @@ jobs:
           ./target/${{ matrix.target }}/release/zoxide.exe
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@82c141cc518b40d92cc801eee768e7aafc9c2fa2 # v2.3.1
         with:
           name: ${{ matrix.target }}
           path: |
@@ -112,7 +115,7 @@ jobs:
 
       - name: Create release
         if: ${{ github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'chore(release)') }}
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
         with:
           draft: true
           files: |

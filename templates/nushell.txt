@@ -18,7 +18,7 @@ if (not ($env | default false __zoxide_hooked | get __zoxide_hooked)) {
   let-env config = ($env | default {} config).config
   let-env config = ($env.config | default {} hooks)
   let-env config = ($env.config | update hooks ($env.config.hooks | default [] pre_prompt))
-  let-env config = ($env.config | update hooks.pre_prompt ($env.config.hooks.pre_prompt | append {
+  let-env config = ($env.config | update hooks.pre_prompt ($env.config.hooks.pre_prompt | append { ||
     zoxide add -- $env.PWD
   }))
 {%- else if hook == InitHook::Pwd %}

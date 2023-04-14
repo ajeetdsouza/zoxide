@@ -1,5 +1,5 @@
 _zoxide() {
-    local i cur prev opts cmds
+    local i cur prev opts cmd
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"

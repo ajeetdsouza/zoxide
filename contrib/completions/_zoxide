@@ -15,10 +15,10 @@ _zoxide() {
 
     local context curcontext="$curcontext" state line
     _arguments "${_arguments_options[@]}" \
-'-h[Print help information]' \
-'--help[Print help information]' \
-'-V[Print version information]' \
-'--version[Print version information]' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
 ":: :_zoxide_commands" \
 "*::: :->zoxide" \
 && ret=0
@@ -30,19 +30,19 @@ _zoxide() {
         case $line[1] in
             (add)
 _arguments "${_arguments_options[@]}" \
-'-h[Print help information]' \
-'--help[Print help information]' \
-'-V[Print version information]' \
-'--version[Print version information]' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
 '*::paths:_files -/' \
 && ret=0
 ;;
 (edit)
 _arguments "${_arguments_options[@]}" \
-'-h[Print help information]' \
-'--help[Print help information]' \
-'-V[Print version information]' \
-'--version[Print version information]' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
 ":: :_zoxide__edit_commands" \
 "*::: :->edit" \
 && ret=0
@@ -55,37 +55,37 @@ _arguments "${_arguments_options[@]}" \
         case $line[1] in
             (decrement)
 _arguments "${_arguments_options[@]}" \
-'-h[Print help information]' \
-'--help[Print help information]' \
-'-V[Print version information]' \
-'--version[Print version information]' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
 ':path:' \
 && ret=0
 ;;
 (delete)
 _arguments "${_arguments_options[@]}" \
-'-h[Print help information]' \
-'--help[Print help information]' \
-'-V[Print version information]' \
-'--version[Print version information]' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
 ':path:' \
 && ret=0
 ;;
 (increment)
 _arguments "${_arguments_options[@]}" \
-'-h[Print help information]' \
-'--help[Print help information]' \
-'-V[Print version information]' \
-'--version[Print version information]' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
 ':path:' \
 && ret=0
 ;;
 (reload)
 _arguments "${_arguments_options[@]}" \
-'-h[Print help information]' \
-'--help[Print help information]' \
-'-V[Print version information]' \
-'--version[Print version information]' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
 && ret=0
 ;;
         esac
@@ -96,10 +96,10 @@ esac
 _arguments "${_arguments_options[@]}" \
 '--from=[Application to import from]:FROM:(autojump z)' \
 '--merge[Merge into existing database]' \
-'-h[Print help information]' \
-'--help[Print help information]' \
-'-V[Print version information]' \
-'--version[Print version information]' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
 ':path:_files' \
 && ret=0
 ;;
@@ -108,10 +108,10 @@ _arguments "${_arguments_options[@]}" \
 '--cmd=[Changes the prefix of the `z` and `zi` commands]:CMD: ' \
 '--hook=[Changes how often zoxide increments a directory'\''s score]:HOOK:(none prompt pwd)' \
 '--no-cmd[Prevents zoxide from defining the `z` and `zi` commands]' \
-'-h[Print help information]' \
-'--help[Print help information]' \
-'-V[Print version information]' \
-'--version[Print version information]' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
 ':shell:(bash elvish fish nushell posix powershell xonsh zsh)' \
 && ret=0
 ;;
@@ -125,19 +125,19 @@ _arguments "${_arguments_options[@]}" \
 '(-i --interactive)--list[List all matching directories]' \
 '-s[Print score with results]' \
 '--score[Print score with results]' \
-'-h[Print help information]' \
-'--help[Print help information]' \
-'-V[Print version information]' \
-'--version[Print version information]' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
 '*::keywords:' \
 && ret=0
 ;;
 (remove)
 _arguments "${_arguments_options[@]}" \
-'-h[Print help information]' \
-'--help[Print help information]' \
-'-V[Print version information]' \
-'--version[Print version information]' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
 '*::paths:_files -/' \
 && ret=0
 ;;
@@ -214,4 +214,8 @@ _zoxide__remove_commands() {
     _describe -t commands 'zoxide remove commands' commands "$@"
 }
 
-_zoxide "$@"
+if [ "$funcstack[1]" = "_zoxide" ]; then
+    _zoxide "$@"
+else
+    compdef _zoxide zoxide
+fi

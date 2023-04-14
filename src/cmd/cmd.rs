@@ -4,20 +4,28 @@ use std::path::PathBuf;
 
 use clap::{Parser, Subcommand, ValueEnum, ValueHint};
 
-const ENV_HELP: &str = "Environment variables:
-  _ZO_DATA_DIR          Path for zoxide data files
-  _ZO_ECHO              Print the matched directory before navigating to it when set to 1
-  _ZO_EXCLUDE_DIRS      List of directory globs to be excluded
-  _ZO_FZF_OPTS          Custom flags to pass to fzf
-  _ZO_MAXAGE            Maximum total age after which entries start getting deleted
-  _ZO_RESOLVE_SYMLINKS  Resolve symlinks when storing paths";
+const HELP_TEMPLATE: &str = color_print::cstr!(
+    "\
+<bold><underline>{before-help}{name} {version}</underline></bold>
+{author-with-newline}{about-with-newline}
+{usage-heading} {usage}
+
+{all-args}{after-help}
+
+<bold><underline>Environment variables:</underline></bold>
+  <bold>_ZO_DATA_DIR</bold>          Path for zoxide data files
+  <bold>_ZO_ECHO</bold>              Print the matched directory before navigating to it when set to 1
+  <bold>_ZO_EXCLUDE_DIRS</bold>      List of directory globs to be excluded
+  <bold>_ZO_FZF_OPTS</bold>          Custom flags to pass to fzf
+  <bold>_ZO_MAXAGE</bold>            Maximum total age after which entries start getting deleted
+  <bold>_ZO_RESOLVE_SYMLINKS</bold>  Resolve symlinks when storing paths"
+);
 
 #[derive(Debug, Parser)]
 #[clap(
-    bin_name = env!("CARGO_PKG_NAME"),
     about,
     author,
-    after_help = ENV_HELP,
+    help_template = HELP_TEMPLATE,
     disable_help_subcommand = true,
     propagate_version = true,
     version = option_env!("ZOXIDE_VERSION").unwrap_or_default()
@@ -33,6 +41,10 @@ pub enum Cmd {
 
 /// Add a new directory or increment its rank
 #[derive(Debug, Parser)]
+#[clap(
+    author,
+    help_template = HELP_TEMPLATE,
+)]
 pub struct Add {
     #[clap(num_args = 1.., required = true, value_hint = ValueHint::DirPath)]
     pub paths: Vec<PathBuf>,
@@ -40,6 +52,10 @@ pub struct Add {
 
 /// Edit the database
 #[derive(Debug, Parser)]
+#[clap(
+    author,
+    help_template = HELP_TEMPLATE,
+)]
 pub struct Edit {
     #[clap(subcommand)]
     pub cmd: Option<EditCommand>,
@@ -59,6 +75,10 @@ pub enum EditCommand {
 
 /// Import entries from another application
 #[derive(Debug, Parser)]
+#[clap(
+    author,
+    help_template = HELP_TEMPLATE,
+)]
 pub struct Import {
     #[clap(value_hint = ValueHint::FilePath)]
     pub path: PathBuf,
@@ -81,6 +101,10 @@ pub enum ImportFrom {
 
 /// Generate shell configuration
 #[derive(Debug, Parser)]
+#[clap(
+    author,
+    help_template = HELP_TEMPLATE,
+)]
 pub struct Init {
     #[clap(value_enum)]
     pub shell: InitShell,
@@ -119,6 +143,10 @@ pub enum InitShell {
 
 /// Search for a directory in the database
 #[derive(Debug, Parser)]
+#[clap(
+    author,
+    help_template = HELP_TEMPLATE,
+)]
 pub struct Query {
     pub keywords: Vec<String>,
 
@@ -145,6 +173,10 @@ pub struct Query {
 
 /// Remove a directory from the database
 #[derive(Debug, Parser)]
+#[clap(
+    author,
+    help_template = HELP_TEMPLATE,
+)]
 pub struct Remove {
     #[clap(value_hint = ValueHint::DirPath)]
     pub paths: Vec<String>,

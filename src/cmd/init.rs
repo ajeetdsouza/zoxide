@@ -6,7 +6,7 @@ use askama::Template;
 use crate::cmd::{Init, InitShell, Run};
 use crate::config;
 use crate::error::BrokenPipeHandler;
-use crate::shell::{self, Opts};
+use crate::shell::{Bash, Elvish, Fish, Nushell, Opts, Posix, Powershell, Xonsh, Zsh};
 
 impl Run for Init {
     fn run(&self) -> Result<()> {
@@ -16,14 +16,14 @@ impl Run for Init {
         let opts = &Opts { cmd, hook: self.hook, echo, resolve_symlinks };
 
         let source = match self.shell {
-            InitShell::Bash => shell::Bash(opts).render(),
-            InitShell::Elvish => shell::Elvish(opts).render(),
-            InitShell::Fish => shell::Fish(opts).render(),
-            InitShell::Nushell => shell::Nushell(opts).render(),
-            InitShell::Posix => shell::Posix(opts).render(),
-            InitShell::Powershell => shell::Powershell(opts).render(),
-            InitShell::Xonsh => shell::Xonsh(opts).render(),
-            InitShell::Zsh => shell::Zsh(opts).render(),
+            InitShell::Bash => Bash(opts).render(),
+            InitShell::Elvish => Elvish(opts).render(),
+            InitShell::Fish => Fish(opts).render(),
+            InitShell::Nushell => Nushell(opts).render(),
+            InitShell::Posix => Posix(opts).render(),
+            InitShell::Powershell => Powershell(opts).render(),
+            InitShell::Xonsh => Xonsh(opts).render(),
+            InitShell::Zsh => Zsh(opts).render(),
         }
         .context("could not render template")?;
         writeln!(io::stdout(), "{source}").pipe_exit("stdout")

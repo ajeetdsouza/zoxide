@@ -11,7 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Fish/Zsh: Aliases on `__zoxide_z` will now use completions.
+- Fish/Zsh: aliases on `__zoxide_z` will now use completions.
+- Nushell: add support for v0.78.0.
+- Fish: plugin now works on older versions.
 
 ## [0.9.0] - 2023-01-08
 

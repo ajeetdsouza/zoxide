@@ -196,9 +196,6 @@ zoxide can be installed in 4 easy steps:
    > ```fish
    > zoxide init fish | source
    > ```
-   >
-   > **Note**
-   > zoxide only supports fish v3.4.0 and above.
 
    </details>
 

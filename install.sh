@@ -55,6 +55,7 @@ main() {
     esac
     ensure mkdir -p "$_bin_dir"
     ensure cp "$_bin_name" "$_bin_dir"
+    ensure chmod +x "$_bin_dir/$_bin_name"
     echo "Installed zoxide to $_bin_dir"
 
     # Install manpages.

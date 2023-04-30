@@ -131,6 +131,12 @@ zoxide can be installed in 4 easy steps:
    > | [Chocolatey]    | `choco install zoxide`                |
    > | [conda-forge]   | `conda install -c conda-forge zoxide` |
    > | [Scoop]         | `scoop install zoxide`                |
+   >
+   > If you're using Cygwin, Git Bash, or MSYS2, use the install script instead:
+   >
+   > ```sh
+   > curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+   > ```
 
    </details>
 

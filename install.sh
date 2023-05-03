@@ -47,11 +47,10 @@ main() {
     esac
 
     # Install binary.
-    local _bin_dir="${HOME}/.local/bin"
-    local _bin_name
+    local _bin_dir="${BINDIR:-${HOME}/.local/bin}"
+    local _bin_name="${BINNAME:-zoxide}"
     case "${_arch}" in
-    *windows*) _bin_name="zoxide.exe" ;;
-    *) _bin_name="zoxide" ;;
+    *windows*) _bin_name="$_bin_name.exe" ;;
     esac
     ensure mkdir -p "${_bin_dir}"
     ensure cp "${_bin_name}" "${_bin_dir}"
@@ -59,7 +58,7 @@ main() {
     echo "Installed zoxide to ${_bin_dir}"
 
     # Install manpages.
-    local _man_dir="${HOME}/.local/share/man"
+    local _man_dir="${MANDIR:-${HOME}/.local/share/man}"
     ensure mkdir -p "${_man_dir}/man1"
     ensure cp "man/man1/"* "${_man_dir}/man1/"
     echo "Installed manpages to ${_man_dir}"

@@ -35,6 +35,8 @@ impl Fzf {
         #[cfg(not(windows))]
         let program = "fzf";
 
+        // TODO: check version of fzf here.
+
         let mut cmd = Command::new(program);
         cmd.args([
             // Search mode

@@ -5,9 +5,18 @@ let
     "https://github.com/NixOS/nixpkgs/archive/5f902ae769594aaeaf326e8623a48482eeacfe89.tar.gz") {
       overlays = [ rust ];
     };
+
+  rust-nightly =
+    pkgs.rust-bin.selectLatestNightlyWith (toolchain: toolchain.minimal);
+  cargo-udeps = pkgs.writeShellScriptBin "cargo-udeps" ''
+    export RUSTC="${rust-nightly}/bin/rustc";
+    export CARGO="${rust-nightly}/bin/cargo";
+    exec "${pkgs.cargo-udeps}/bin/cargo-udeps" "$@"
+  '';
 in pkgs.mkShell {
   buildInputs = [
     # Rust
+    (pkgs.rust-bin.selectLatestNightlyWith (toolchain: toolchain.rustfmt))
     pkgs.rust-bin.stable.latest.default
 
     # Shells
@@ -21,8 +30,11 @@ in pkgs.mkShell {
     pkgs.zsh
 
     # Tools
+    cargo-udeps
     pkgs.cargo-msrv
     pkgs.cargo-nextest
+    pkgs.cargo-udeps
+    pkgs.just
     pkgs.mandoc
     pkgs.nixfmt
     pkgs.nodePackages.markdownlint-cli
@@ -39,6 +51,5 @@ in pkgs.mkShell {
     pkgs.libiconv
   ];
 
-  CARGO_INCREMENTAL = builtins.getEnv "CI" != "";
   CARGO_TARGET_DIR = "target_nix";
 }

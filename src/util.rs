@@ -375,9 +375,5 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
 /// Convert a string to lowercase, with a fast path for ASCII strings.
 pub fn to_lowercase(s: impl AsRef<str>) -> String {
     let s = s.as_ref();
-    if s.is_ascii() {
-        s.to_ascii_lowercase()
-    } else {
-        s.to_lowercase()
-    }
+    if s.is_ascii() { s.to_ascii_lowercase() } else { s.to_lowercase() }
 }

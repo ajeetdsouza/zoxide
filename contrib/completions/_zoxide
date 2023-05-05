@@ -105,9 +105,9 @@ _arguments "${_arguments_options[@]}" \
 ;;
 (init)
 _arguments "${_arguments_options[@]}" \
-'--cmd=[Changes the prefix of the `z` and `zi` commands]:CMD: ' \
+'--cmd=[Changes the prefix of the \`z\` and \`zi\` commands]:CMD: ' \
 '--hook=[Changes how often zoxide increments a directory'\''s score]:HOOK:(none prompt pwd)' \
-'--no-cmd[Prevents zoxide from defining the `z` and `zi` commands]' \
+'--no-cmd[Prevents zoxide from defining the \`z\` and \`zi\` commands]' \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \

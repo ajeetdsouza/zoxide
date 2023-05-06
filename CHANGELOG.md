@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nushell: add support for v0.78.0.
 - Fish: plugin now works on older versions.
 
+### Fixed
+
+- Fish: not providing `cd` completions when there is a space in the path.
+- Fish: providing `z` completions when the preceding argument starts with `z!`.
+
 ## [0.9.0] - 2023-01-08
 
 ### Added

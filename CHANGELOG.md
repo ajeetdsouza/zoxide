@@ -18,8 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fish: not providing `cd` completions when there is a space in the path.
-- Bash/Fish: providing `z` completions when the last argument starts with `z!`.
-- Bash/Fish: attempting to `cd` when the last argument is `z!`.
+- Bash/Fish/Zsh: providing `z` completions when the last argument starts with `z!`.
+- Bash/Fish/Zsh: attempting to `cd` when the last argument is `z!`.
 
 ## [0.9.0] - 2023-01-08
 

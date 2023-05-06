@@ -85,7 +85,7 @@ mod tests {
         source.push('\n');
 
         Command::new("shfmt")
-            .args(["-d", "-s", "-ln", "bash", "-i", "4", "-ci", "-"])
+            .args(["--diff", "--indent=4", "--language-dialect=bash", "--simplify", "-"])
             .write_stdin(source)
             .assert()
             .success()
@@ -218,7 +218,7 @@ mod tests {
         source.push('\n');
 
         Command::new("shfmt")
-            .args(["-d", "-s", "-ln", "posix", "-i", "4", "-ci", "-"])
+            .args(["--diff", "--indent=4", "--language-dialect=posix", "--simplify", "-"])
             .write_stdin(source)
             .assert()
             .success()

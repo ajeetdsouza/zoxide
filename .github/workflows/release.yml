@@ -8,7 +8,6 @@ env:
   CARGO_INCREMENTAL: 0
 permissions:
   contents: write
-
 jobs:
   release:
     name: ${{ matrix.target }}
@@ -27,12 +26,10 @@ jobs:
           - os: ubuntu-latest
             target: aarch64-unknown-linux-musl
             deb: true
-
           - os: macos-11
             target: x86_64-apple-darwin
           - os: macos-11
             target: aarch64-apple-darwin
-
           - os: windows-latest
             target: x86_64-pc-windows-msvc
           - os: windows-latest
@@ -42,14 +39,12 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-
       - name: Get version
         id: get_version
         uses: SebRollen/toml-action@v1.0.2
         with:
           file: Cargo.toml
           field: package.version
-
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -57,51 +52,41 @@ jobs:
           profile: minimal
           override: true
           target: ${{ matrix.target }}
-
       - name: Setup cache
         uses: Swatinem/rust-cache@v1.0.2
         with:
           key: ${{ matrix.target }}
-
       - name: Build binary
         uses: actions-rs/cargo@v1
         with:
           command: build
           args: --release --locked --target=${{ matrix.target }} --color=always --verbose
           use-cross: ${{ runner.os == 'Linux' }}
-
       - name: Install cargo-deb
         if: ${{ matrix.deb == true }}
         uses: actions-rs/install@v0.1
         with:
           crate: cargo-deb
-
       - name: Build deb
         if: ${{ matrix.deb == true }}
         uses: actions-rs/cargo@v1
         with:
           command: deb
           args: --no-build --no-strip --output=. --target=${{ matrix.target }}
-
       - name: Package (*nix)
         if: runner.os != 'Windows'
-        run: >
-          tar -cv
-          CHANGELOG.md LICENSE README.md
-          man/
-          -C contrib/ completions/ -C ../
-          -C target/${{ matrix.target }}/release/ zoxide
-          | gzip --best
-          > 'zoxide-${{ steps.get_version.outputs.value }}-${{ matrix.target }}.tar.gz'
+        run: |
+          tar -cv CHANGELOG.md LICENSE README.md man/ \
+            -C contrib/ completions/ -C ../ \
+            -C target/${{ matrix.target }}/release/ zoxide |
+            gzip --best > \
+            zoxide-${{ steps.get_version.outputs.value }}-${{ matrix.target }}.tar.gz
       - name: Package (Windows)
         if: runner.os == 'Windows'
-        run: >
-          7z a 'zoxide-${{ steps.get_version.outputs.value }}-${{ matrix.target }}.zip'
-          CHANGELOG.md LICENSE README.md
-          ./man/
-          ./contrib/completions/
-          ./target/${{ matrix.target }}/release/zoxide.exe
-
+        run: |
+          7z a zoxide-${{ steps.get_version.outputs.value }}-${{ matrix.target }}.zip `
+            CHANGELOG.md LICENSE README.md ./man/ ./contrib/completions/ `
+            ./target/${{ matrix.target }}/release/zoxide.exe
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
@@ -110,9 +95,9 @@ jobs:
             *.deb
             *.tar.gz
             *.zip
-
       - name: Create release
-        if: ${{ github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'chore(release)') }}
+        if: |
+          ${{ github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'chore(release)') }}
         uses: softprops/action-gh-release@v1
         with:
           draft: true

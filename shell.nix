@@ -1,10 +1,10 @@
 let
-  rust = import (builtins.fetchTarball
-    "https://github.com/oxalica/rust-overlay/archive/9096306d4a1c3adcc8d20f2c9dcaee3dee30d1ad.tar.gz");
   pkgs = import (builtins.fetchTarball
-    "https://github.com/NixOS/nixpkgs/archive/5f902ae769594aaeaf326e8623a48482eeacfe89.tar.gz") {
+    "https://github.com/NixOS/nixpkgs/archive/22a6958f46fd8e14830d02856ff63b1d0e5cc3e4.tar.gz") {
       overlays = [ rust ];
     };
+  rust = import (builtins.fetchTarball
+    "https://github.com/oxalica/rust-overlay/archive/a61fcd9910229d097ffef92b5a2440065e3b64d5.tar.gz");
 
   rust-nightly =
     pkgs.rust-bin.selectLatestNightlyWith (toolchain: toolchain.minimal);
@@ -43,6 +43,7 @@ in pkgs.mkShell {
     pkgs.python3Packages.pylint
     pkgs.shellcheck
     pkgs.shfmt
+    pkgs.yamlfmt
 
     # Dependencies
     pkgs.cacert

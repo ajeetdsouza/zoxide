@@ -89,11 +89,11 @@ function __zoxide_z {
     if ($args.Length -eq 0) {
         __zoxide_cd ~ $true
     }
-    elseif (
-        $args.Length -eq 1 -and
-        (($args[0] -eq '-' -or $args[0] -eq '+') -or (Test-Path $args[0] -PathType Container))
-    ) {
+    elseif ($args.Length -eq 1 -and ($args[0] -eq '-' -or $args[0] -eq '+')) {
         __zoxide_cd $args[0] $false
+    }
+    elseif ($args.Length -eq 1 -and (Test-Path $args[0] -PathType Container)) {
+        __zoxide_cd $args[0] $true
     }
     else {
         $result = __zoxide_pwd

@@ -58,8 +58,5 @@ jobs:
         with:
           tool: just
 
-      - name: Run lints
-        run: just lint
-
-      - name: Run tests
-        run: just test
+      - name: Run lints + tests
+        run: just lint test

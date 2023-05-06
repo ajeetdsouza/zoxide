@@ -68,7 +68,7 @@ edit:add-var __zoxide_z~ $__zoxide_z~
 fn __zoxide_zi {|@rest|
     var path
     try {
-        set path = (zoxide query -i -- $@rest)
+        set path = (zoxide query --interactive -- $@rest)
     } catch {
     } else {
         __zoxide_cd $path

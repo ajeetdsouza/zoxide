@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fish/Zsh: aliases on `__zoxide_z` will now use completions.
 - Nushell: add support for v0.78.0.
 - Fish: plugin now works on older versions.
+- PowerShell: warn when PowerShell version is too old for `z -` and `z +`.
+- PowerShell: support for PWD hooks on all versions.
 
 ### Fixed
 
@@ -36,7 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nushell: upgrade minimum supported version to v0.73.0.
 - Zsh: fix extra space in interactive completions when no match is found.
 - Fzf: various improvements, upgrade minimum supported version to v0.33.0.
-- Nushell: Accidental redefinition of hooks when initialized twice.
+- Nushell: accidental redefinition of hooks when initialized twice.
 
 ### Removed
 
@@ -140,7 +142,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- PowerShell: Hook not initializing correctly.
+- PowerShell: hook not initializing correctly.
 
 ## [0.7.6] - 2021-10-13
 

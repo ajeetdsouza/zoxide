@@ -50,10 +50,7 @@ Add this to your configuration (find it by running \fBecho $profile\fR in
 PowerShell):
 .sp
 .nf
-    \fBInvoke-Expression (& {
-        $hook = if ($PSVersionTable.PSVersion.Major -lt 6) { 'prompt' } else { 'pwd' }
-        (zoxide init --hook $hook powershell | Out-String)
-    })\fR
+    \fBInvoke-Expression (& { (zoxide init powershell | Out-String) })\fR
 .fi
 .TP
 .B xonsh

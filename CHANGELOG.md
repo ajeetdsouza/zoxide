@@ -7,11 +7,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [0.9.1] - 2023-05-07
 
 ### Added
 
-- Fish/Zsh: Aliases on `__zoxide_z` will now use completions.
+- Fish/Zsh: aliases on `__zoxide_z` will now use completions.
+- Nushell: add support for v0.78.0.
+- Fish: plugin now works on older versions.
+- PowerShell: warn when PowerShell version is too old for `z -` and `z +`.
+- PowerShell: support for PWD hooks on all versions.
+
+### Fixed
+
+- Fish: not providing `cd` completions when there is a space in the path.
+- Bash/Fish/Zsh: providing `z` completions when the last argument starts with `z!`.
+- Bash/Fish/Zsh: attempting to `cd` when the last argument is `z!`.
 
 ## [0.9.0] - 2023-01-08
 
@@ -28,7 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nushell: upgrade minimum supported version to v0.73.0.
 - Zsh: fix extra space in interactive completions when no match is found.
 - Fzf: various improvements, upgrade minimum supported version to v0.33.0.
-- Nushell: Accidental redefinition of hooks when initialized twice.
+- Nushell: accidental redefinition of hooks when initialized twice.
 
 ### Removed
 
@@ -132,7 +142,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- PowerShell: Hook not initializing correctly.
+- PowerShell: hook not initializing correctly.
 
 ## [0.7.6] - 2021-10-13
 
@@ -430,6 +440,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions pipeline to build and upload releases.
 - Support for zsh.
 
+[0.9.1]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/ajeetdsouza/zoxide/compare/v0.8.3...v0.9.0
 [0.8.3]: https://github.com/ajeetdsouza/zoxide/compare/v0.8.2...v0.8.3
 [0.8.2]: https://github.com/ajeetdsouza/zoxide/compare/v0.8.1...v0.8.2

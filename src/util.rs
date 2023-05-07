@@ -35,6 +35,8 @@ impl Fzf {
         #[cfg(not(windows))]
         let program = "fzf";
 
+        // TODO: check version of fzf here.
+
         let mut cmd = Command::new(program);
         cmd.args([
             // Search mode
@@ -133,7 +135,7 @@ impl FzfChild {
         mem::drop(self.0.stdin.take());
 
         let mut stdout = self.0.stdout.take().unwrap();
-        let mut output = String::new();
+        let mut output = String::default();
         stdout.read_to_string(&mut output).context("failed to read from fzf")?;
 
         let status = self.0.wait().context("wait failed on fzf")?;
@@ -158,7 +160,7 @@ pub fn write(path: impl AsRef<Path>, contents: impl AsRef<[u8]>) -> Result<()> {
     let (mut tmp_file, tmp_path) = tmpfile(dir)?;
     let result = (|| {
         // Write to the tmpfile.
-        let _ = tmp_file.set_len(contents.len() as u64);
+        _ = tmp_file.set_len(contents.len() as u64);
         tmp_file
             .write_all(contents)
             .with_context(|| format!("could not write to file: {}", tmp_path.display()))?;
@@ -173,7 +175,7 @@ pub fn write(path: impl AsRef<Path>, contents: impl AsRef<[u8]>) -> Result<()> {
 
             let uid = Uid::from_raw(metadata.uid());
             let gid = Gid::from_raw(metadata.gid());
-            let _ = unistd::fchown(tmp_file.as_raw_fd(), Some(uid), Some(gid));
+            _ = unistd::fchown(tmp_file.as_raw_fd(), Some(uid), Some(gid));
         }
 
         // Close and rename the tmpfile.
@@ -182,7 +184,7 @@ pub fn write(path: impl AsRef<Path>, contents: impl AsRef<[u8]>) -> Result<()> {
     })();
     // In case of an error, delete the tmpfile.
     if result.is_err() {
-        let _ = fs::remove_file(&tmp_path);
+        _ = fs::remove_file(&tmp_path);
     }
     result
 }

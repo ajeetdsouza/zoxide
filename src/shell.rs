@@ -85,7 +85,7 @@ mod tests {
         source.push('\n');
 
         Command::new("shfmt")
-            .args(["-d", "-s", "-ln", "bash", "-i", "4", "-ci", "-"])
+            .args(["--diff", "--indent=4", "--language-dialect=bash", "--simplify", "-"])
             .write_stdin(source)
             .assert()
             .success()
@@ -96,13 +96,11 @@ mod tests {
     #[apply(opts)]
     fn elvish_elvish(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
-        let mut source = String::new();
+        let mut source = String::default();
 
         // Filter out lines using edit:*, since those functions are only available in
         // the interactive editor.
-        for line in
-            Elvish(&opts).render().unwrap().split('\n').filter(|line| !line.contains("edit:"))
-        {
+        for line in Elvish(&opts).render().unwrap().lines().filter(|line| !line.contains("edit:")) {
             source.push_str(line);
             source.push('\n');
         }
@@ -218,7 +216,7 @@ mod tests {
         source.push('\n');
 
         Command::new("shfmt")
-            .args(["-d", "-s", "-ln", "posix", "-i", "4", "-ci", "-"])
+            .args(["--diff", "--indent=4", "--language-dialect=posix", "--simplify", "-"])
             .write_stdin(source)
             .assert()
             .success()

@@ -28,8 +28,6 @@ Add this to your configuration (usually \fB~/.config/fish/config.fish\fR):
 .nf
     \fBzoxide init fish | source\fR
 .fi
-.sp
-Note: zoxide only supports fish v3.4.0 and above.
 .TP
 .B nushell
 Add this to your env file (find it by running \fB$nu.env-path\fR in Nushell):
@@ -52,10 +50,7 @@ Add this to your configuration (find it by running \fBecho $profile\fR in
 PowerShell):
 .sp
 .nf
-    \fBInvoke-Expression (& {
-        $hook = if ($PSVersionTable.PSVersion.Major -lt 6) { 'prompt' } else { 'pwd' }
-        (zoxide init --hook $hook powershell | Out-String)
-    })\fR
+    \fBInvoke-Expression (& { (zoxide init powershell | Out-String) })\fR
 .fi
 .TP
 .B xonsh

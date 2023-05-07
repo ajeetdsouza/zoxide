@@ -30,7 +30,15 @@ function __zoxide_cd($dir, $literal) {
     $dir = if ($literal) {
         Set-Location -LiteralPath $dir -Passthru -ErrorAction Stop
     } else {
-        Set-Location -Path $dir -Passthru -ErrorAction Stop
+        if ($dir -eq '-' -and ($PSVersionTable.PSVersion -lt 6.1)) {
+            Write-Error "cd - is not supported below PowerShell 6.1. Please upgrade your version of PowerShell."
+        }
+        elseif ($dir -eq '+' -and ($PSVersionTable.PSVersion -lt 6.2)) {
+            Write-Error "cd + is not supported below PowerShell 6.2. Please upgrade your version of PowerShell."
+        }
+        else {
+            Set-Location -Path $dir -Passthru -ErrorAction Stop
+        }
     }
 {%- if echo %}
     Write-Output $dir.Path
@@ -41,6 +49,15 @@ function __zoxide_cd($dir, $literal) {
 # Hook configuration for zoxide.
 #
 
+{% if hook == InitHook::None -%}
+{{ not_configured }}
+
+{%- else -%}
+{#-
+  Initialize $__zoxide_hooked if it does not exist. Removing this will cause an
+  unset variable error in StrictMode.
+-#}
+{%- if hook == InitHook::Prompt -%}
 # Hook to add new entries to the database.
 function __zoxide_hook {
     $result = __zoxide_pwd
@@ -48,37 +65,34 @@ function __zoxide_hook {
         zoxide add -- $result
     }
 }
+{%- else if hook == InitHook::Pwd -%}
+# Hook to add new entries to the database.
+$global:__zoxide_oldpwd = __zoxide_pwd
+function __zoxide_hook {
+    $result = __zoxide_pwd
+    if ($result -ne $global:__zoxide_oldpwd) {
+        if ($null -ne $result) {
+            zoxide add -- $result
+        }
+        $global:__zoxide_oldpwd = $result
+    }
+}
+{%- endif %}
 
 # Initialize hook.
-{#-
-  Initialize $__zoxide_hooked if it does not exist. Removing this will cause an
-  unset variable error in StrictMode.
-#}
-$__zoxide_hooked = (Get-Variable __zoxide_hooked -ValueOnly -ErrorAction SilentlyContinue)
+$__zoxide_hooked = (Get-Variable __zoxide_hooked -ErrorAction SilentlyContinue -ValueOnly)
 if ($__zoxide_hooked -ne 1) {
     $__zoxide_hooked = 1
-{%- match hook %}
-{%- when InitHook::None %}
-    {{ not_configured }}
-{%- when InitHook::Prompt %}
-    $prompt_old = $function:prompt
+    $__zoxide_prompt_old = $function:prompt
+
     function prompt {
-        $null = __zoxide_hook
-        & $prompt_old
-    }
-{%- when InitHook::Pwd %}
-    if ($PSVersionTable.PSVersion.Major -ge 6) {
-        $ExecutionContext.InvokeCommand.LocationChangedAction = {
-            $null = __zoxide_hook
+        if ($null -ne $__zoxide_prompt_old) {
+            & $__zoxide_prompt_old
         }
+        $null = __zoxide_hook
     }
-    else {
-        Write-Error ("`n" +
-            "zoxide: PWD hooks are not supported below powershell 6.`n" +
-            "        Use 'zoxide init powershell --hook prompt' instead.")
-    }
-{%- endmatch %}
 }
+{%- endif %}
 
 {{ section }}
 # When using zoxide with --no-cmd, alias these internal functions as desired.
@@ -89,11 +103,11 @@ function __zoxide_z {
     if ($args.Length -eq 0) {
         __zoxide_cd ~ $true
     }
-    elseif (
-        $args.Length -eq 1 -and
-        (($args[0] -eq '-' -or $args[0] -eq '+') -or (Test-Path $args[0] -PathType Container))
-    ) {
+    elseif ($args.Length -eq 1 -and ($args[0] -eq '-' -or $args[0] -eq '+')) {
         __zoxide_cd $args[0] $false
+    }
+    elseif ($args.Length -eq 1 -and (Test-Path $args[0] -PathType Container)) {
+        __zoxide_cd $args[0] $true
     }
     else {
         $result = __zoxide_pwd
@@ -137,4 +151,4 @@ Set-Alias -Name {{cmd}}i -Value __zoxide_zi -Option AllScope -Scope Global -Forc
 # To initialize zoxide, add this to your configuration (find it by running
 # `echo $profile` in PowerShell):
 #
-# Invoke-Expression (& { $hook = if ($PSVersionTable.PSVersion.Major -ge 6) { 'pwd' } else { 'prompt' } (zoxide init powershell --hook $hook | Out-String) })
+# Invoke-Expression (& { (zoxide init powershell | Out-String) })

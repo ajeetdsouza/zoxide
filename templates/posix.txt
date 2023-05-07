@@ -74,7 +74,7 @@ __zoxide_z() {
 
 # Jump to a directory using interactive search.
 __zoxide_zi() {
-    __zoxide_result="$(\command zoxide query -i -- "$@")" && __zoxide_cd "${__zoxide_result}"
+    __zoxide_result="$(\command zoxide query --interactive -- "$@")" && __zoxide_cd "${__zoxide_result}"
 }
 
 {{ section }}

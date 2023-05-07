@@ -135,7 +135,7 @@ impl FzfChild {
         mem::drop(self.0.stdin.take());
 
         let mut stdout = self.0.stdout.take().unwrap();
-        let mut output = String::new();
+        let mut output = String::default();
         stdout.read_to_string(&mut output).context("failed to read from fzf")?;
 
         let status = self.0.wait().context("wait failed on fzf")?;

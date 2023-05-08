@@ -341,6 +341,17 @@ zoxide can be installed in 4 easy steps:
    > ```
 
    </details>
+   
+   <details>
+   <summary>Nushell</summary>
+  
+   > In case you have enabled `.sqlite` history storage ([help](https://github.com/nushell/nushell/blob/a2dd948e71c3cbdecfa1a2dbf35282707e151b02/crates/nu-utils/src/sample_config/default_config.nu#L268)) in Nushell, you can import all visited directories with the command:
+   > 
+   > ```sh
+   > history | get cwd | uniq | each {|i| zoxide add $i}
+   > ```
+  
+   </details>
 
 ## Configuration
 

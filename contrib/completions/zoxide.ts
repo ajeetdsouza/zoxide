@@ -205,8 +205,8 @@ const completion: Fig.Spec = {
           },
         },
         {
-          name: "--all",
-          description: "Show deleted directories",
+          name: ["-a", "--all"],
+          description: "Show unavailable directories",
         },
         {
           name: ["-i", "--interactive"],

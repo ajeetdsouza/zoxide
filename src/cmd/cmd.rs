@@ -132,6 +132,7 @@ pub enum InitHook {
 #[derive(ValueEnum, Clone, Debug)]
 pub enum InitShell {
     Bash,
+    Cmd,
     Elvish,
     Fish,
     Nushell,

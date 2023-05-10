@@ -1,0 +1,156 @@
+{%- let section = "@rem ==========================================================================\n@rem" -%}
+{%- let not_configured = "@rem -- not configured --" -%}
+@setlocal EnableDelayedExpansion EnableExtensions & set "CMD=!CMDCMDLINE!" 2>nul
+@if /i not "!CMD!"=="!CMD:/=!" (goto :EOF) else @if not defined DEBUG (echo off)
+@reg query "HKCU\Software\Microsoft\Command Processor" /v "AutoRun" /z >nul 2>&1
+@if !ERRORLEVEL! equ 0 (endlocal & set "CMD_ENV=%~0") else (echo(cmd& goto :EOF)
+
+{{ section }}
+@rem Utility functions for zoxide.
+@rem
+
+@rem Full credits to jeb for this - https://stackoverflow.com/a/76213522/6724141
+set i_AS_$*=%%^^^^ in ("") do @for /f "delims=" %%i in (^^""$*%%~^^"^")
+
+set __ZOXIDE_CD=chdir /d
+set __ZOXIDE_PWD=chdir
+
+@rem cd + custom logic based on the value of _ZO_ECHO.
+doskey cd = ( ^
+{#- Full credits to jeb (see https://stackoverflow.com/a/76213522/6724141) #}
+    for %%^^^^ in ("") do @for /f "delims=" %%i in (^^""$*%%~^^"^") do @( ^
+        if "%%~i"=="" ( ^
+            if defined USERPROFILE ( ^
+                if /i not "%%CD%%"=="%%USERPROFILE%%" ( ^
+                    %__ZOXIDE_CD% "%%USERPROFILE%%" ^&^& ^
+}
+{%- if echo %}
+                    %__ZOXIDE_PWD% ^&^& ^
+{%- endif %}
+{% if hook != InitHook::None -%}
+                    if defined __ZOXIDE_HOOK (%%__ZOXIDE_HOOK%%) ^&^& ^
+{%- endif %}
+                    set "OLDCD=%%CD%%" ^
+                ) ^
+            ) ^
+        ) else if "%%~i"=="-" ( ^
+            if defined OLDCD ( ^
+                if /i not "%%CD%%"=="%%OLDCD%%" ( ^
+                    %__ZOXIDE_CD% "%%OLDCD%%" ^&^& ^
+{%- if echo %}
+                    %__ZOXIDE_PWD% ^&^& ^
+{%- endif %}
+{% if hook != InitHook::None -%}
+                    if defined __ZOXIDE_HOOK (%%__ZOXIDE_HOOK%%) ^&^& ^
+{%- endif %}
+                    set "OLDCD=%%CD%%" ^
+                ) ^
+            ) ^
+        ) else ( ^
+            ( ^
+                if /i not "%%CD%%"=="%%~fi" ( ^
+                    %__ZOXIDE_CD% %%~fi ^&^& ^
+{%- if echo %}
+                    %__ZOXIDE_PWD% ^&^& ^
+{%- endif %}
+{% if hook != InitHook::None -%}
+                    if defined __ZOXIDE_HOOK (%%__ZOXIDE_HOOK%%) ^&^& ^
+{%- endif %}
+                    set "OLDCD=%%CD%%" ^
+                ) ^
+            ) ^
+        ) ^
+    ) ^
+)
+
+doskey pwd = (%__ZOXIDE_PWD%)
+
+{{ section }}
+@rem Hook configuration for zoxide.
+@rem
+
+if not defined __ZOXIDE_HOOKED (
+    set __ZOXIDE_HOOKED=1
+{% if hook == InitHook::None -%}
+    @rem {{ not_configured }}
+    set __ZOXIDE_HOOK=
+{%- else -%}
+    @rem Initialize hook to add new entries to the database.
+    set __ZOXIDE_HOOK=for /f "delims=" %%z in ('%__ZOXIDE_PWD%') do (zoxide add -- "%%~fz ")
+{%- endif %}
+)
+
+{{ section }}
+@rem Commands for zoxide. Disable these using --no-cmd.
+@rem
+
+{%- match cmd %}
+{%- when Some with (cmd) %}
+
+@rem Jump to a directory using only keywords.
+doskey {{cmd}} = ( ^
+    for %%^^^^ in ("") do @for /f "delims=" %%i in (^^""$*%%~^^"^") do @( ^
+        if "%%~i"=="" ( ^
+            if defined HOME ( ^
+                if /i not "%%CD%%"=="%%HOME%%" ( ^
+                    %__CD% "%%HOME%%" ^&^& ^
+{%- if echo %}
+                    %__ZOXIDE_PWD% ^&^& ^
+{%- endif %}
+                    set "OLDCD=%%CD%%" ^&^& ^
+                    %__ZOXIDE_HOOK% ^
+                ) ^
+            ) ^
+        ) else if "%%~i"=="-" ( ^
+            if defined OLDCD ( ^
+                if /i not "%%CD%%"=="%%OLDCD%%" ( ^
+                    %__CD% "%%OLDCD%%" ^&^& ^
+{%- if echo %}
+                    %__ZOXIDE_PWD% ^&^& ^
+{%- endif %}
+                    set "OLDCD=%%CD%%" ^&^& ^
+                    %__ZOXIDE_HOOK% ^
+                ) ^
+            ) ^
+        ) else ( ^
+            for /f "delims=" %%p in ('zoxide query --exclude "%%CD%%" -- "%%~i"') do @( ^
+                if /i not "%%CD%%"=="%%~fp" ( ^
+                    %__CD% %%~fp ^&^& ^
+{%- if echo %}
+                    %__ZOXIDE_PWD% ^&^& ^
+{%- endif %}
+                    set "OLDCD=%%CD%%" ^&^& ^
+                    %__ZOXIDE_HOOK% ^
+                ) ^
+            ) ^
+        ) ^
+    ) ^
+)
+
+@rem Jump to a directory using interactive search.
+doskey {{cmd}}i = ( ^
+    for %%^^^^ in ("") do @for /f "delims=" %%i in (^^""$*%%~^^"^") do @( ^
+        for /f "delims=" %%q in ('zoxide query --interactive -- "%%~i"') do @( ^
+            %__CD% %%~fq ^&^& ^
+{%- if echo %}
+            %__ZOXIDE_PWD% ^&^& ^
+{%- endif %}
+            set "OLDCD=%%CD%%" ^&^& ^
+            %__ZOXIDE_HOOK% ^
+        ) ^
+    ) ^
+)
+
+{%- when None %}
+
+{{ not_configured }}
+
+{%- endmatch %}
+
+{{ section }}
+@rem To initialize zoxide, add the contents of the following command to your
+@rem configuration:
+@rem
+@rem   zoxide init cmd
+@rem
+@rem If you don't have one: <TODO: explain how to run `AutoRun` scripts>

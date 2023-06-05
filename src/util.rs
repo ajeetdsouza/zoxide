@@ -444,5 +444,4 @@ mod tests_win {
         let resolved_path = super::resolve_path(path).unwrap();
         assert_eq!(resolved_path.to_str().unwrap(), normalized_form);
     }
-
 }

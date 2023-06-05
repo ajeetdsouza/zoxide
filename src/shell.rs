@@ -101,7 +101,7 @@ mod tests {
     #[cfg(windows)]
     fn cmd_cmd(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
-        let mut source = Cmd(&opts).render().unwrap();
+        let source = Cmd(&opts).render().unwrap();
 
         Command::new("cmd.exe")
             .args(["/a", "/d", "/e:on", "/q", "/v:off", "/k", "@doskey", "/macros:cmd.exe"])

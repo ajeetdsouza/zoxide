@@ -151,8 +151,8 @@ pub enum InitShell {
 pub struct Query {
     pub keywords: Vec<String>,
 
-    /// Show deleted directories
-    #[clap(long)]
+    /// Show unavailable directories
+    #[clap(long, short)]
     pub all: bool,
 
     /// Use interactive selection

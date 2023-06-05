@@ -7,7 +7,7 @@
 # extension. Note: Most shells limit `local` to 1 var per line, contra bash.
 
 main() {
-    if [ "$KSH_VERSION" = 'Version JM 93t+ 2010-03-05' ]; then
+    if [ "${KSH_VERSION-}" = 'Version JM 93t+ 2010-03-05' ]; then
         # The version of ksh93 that ships with many illumos systems does not
         # support the "local" extension.  Print a message rather than fail in
         # subtle ways later on:
@@ -18,57 +18,57 @@ main() {
 
     # Detect and print host target triple.
     ensure get_architecture
-    local _arch="$RETVAL"
-    assert_nz "$_arch" "arch"
-    echo "Detected architecture: $_arch"
+    local _arch="${RETVAL}"
+    assert_nz "${_arch}" "arch"
+    echo "Detected architecture: ${_arch}"
 
     # Create and enter a temporary directory.
     local _tmp_dir
     _tmp_dir="$(mktemp -d)" || err "mktemp: could not create temporary directory"
-    cd "$_tmp_dir" || err "cd: failed to enter directory: $_tmp_dir"
+    cd "${_tmp_dir}" || err "cd: failed to enter directory: ${_tmp_dir}"
 
     # Download and extract zoxide.
-    ensure download_zoxide "$_arch"
-    local _package="$RETVAL"
-    assert_nz "$_package" "package"
-    echo "Downloaded package: $_package"
-    case "$_package" in
+    ensure download_zoxide "${_arch}"
+    local _package="${RETVAL}"
+    assert_nz "${_package}" "package"
+    echo "Downloaded package: ${_package}"
+    case "${_package}" in
     *.tar.gz)
         need_cmd tar
-        ensure tar -xf "$_package"
+        ensure tar -xf "${_package}"
         ;;
     *.zip)
         need_cmd unzip
-        ensure unzip -oq "$_package"
+        ensure unzip -oq "${_package}"
         ;;
     *)
-        err "unsupported package format: $_package"
+        err "unsupported package format: ${_package}"
         ;;
     esac
 
     # Install binary.
-    local _bin_dir="$HOME/.local/bin"
+    local _bin_dir="${HOME}/.local/bin"
     local _bin_name
-    case "$_arch" in
+    case "${_arch}" in
     *windows*) _bin_name="zoxide.exe" ;;
     *) _bin_name="zoxide" ;;
     esac
-    ensure mkdir -p "$_bin_dir"
-    ensure cp "$_bin_name" "$_bin_dir"
-    ensure chmod +x "$_bin_dir/$_bin_name"
-    echo "Installed zoxide to $_bin_dir"
+    ensure mkdir -p "${_bin_dir}"
+    ensure cp "${_bin_name}" "${_bin_dir}"
+    ensure chmod +x "${_bin_dir}/${_bin_name}"
+    echo "Installed zoxide to ${_bin_dir}"
 
     # Install manpages.
-    local _man_dir="$HOME/.local/share/man"
-    ensure mkdir -p "$_man_dir/man1"
-    ensure cp "man/man1/"* "$_man_dir/man1/"
-    echo "Installed manpages to $_man_dir"
+    local _man_dir="${HOME}/.local/share/man"
+    ensure mkdir -p "${_man_dir}/man1"
+    ensure cp "man/man1/"* "${_man_dir}/man1/"
+    echo "Installed manpages to ${_man_dir}"
 
     # Print success message and check $PATH.
     echo ""
     echo "zoxide is installed!"
-    if ! echo ":$PATH:" | grep -Fq ":$_bin_dir:"; then
-        echo "NOTE: $_bin_dir is not on your \$PATH. zoxide will not work unless it is added to \$PATH."
+    if ! echo ":${PATH}:" | grep -Fq ":${_bin_dir}:"; then
+        echo "NOTE: ${_bin_dir} is not on your \$PATH. zoxide will not work unless it is added to \$PATH."
     fi
 }
 
@@ -86,33 +86,35 @@ download_zoxide() {
 
     local _releases_url="https://api.github.com/repos/ajeetdsouza/zoxide/releases/latest"
     local _releases
-    case "$_dld" in
-    curl) _releases="$(curl -sL "$_releases_url")" ||
-        err "curl: failed to download $_releases_url" ;;
-    wget) _releases="$(wget -qO- "$_releases_url")" ||
-        err "wget: failed to download $_releases_url" ;;
+    case "${_dld}" in
+    curl) _releases="$(curl -sL "${_releases_url}")" ||
+        err "curl: failed to download ${_releases_url}" ;;
+    wget) _releases="$(wget -qO- "${_releases_url}")" ||
+        err "wget: failed to download ${_releases_url}" ;;
+    *) err "unsupported downloader: ${_dld}" ;;
     esac
-    (echo "$_releases" | grep -q 'API rate limit exceeded') &&
+    (echo "${_releases}" | grep -q 'API rate limit exceeded') &&
         err "you have exceeded GitHub's API rate limit. Please try again later, or use a different installation method: https://github.com/ajeetdsouza/zoxide/#installation"
 
     local _package_url
-    _package_url="$(echo "$_releases" | grep "browser_download_url" | cut -d '"' -f 4 | grep "$_arch")" ||
-        err "zoxide has not yet been packaged for your architecture ($_arch), please file an issue: https://github.com/ajeetdsouza/zoxide/issues"
+    _package_url="$(echo "${_releases}" | grep "browser_download_url" | cut -d '"' -f 4 | grep "${_arch}")" ||
+        err "zoxide has not yet been packaged for your architecture (${_arch}), please file an issue: https://github.com/ajeetdsouza/zoxide/issues"
 
     local _ext
-    case "$_package_url" in
+    case "${_package_url}" in
     *.tar.gz) _ext="tar.gz" ;;
     *.zip) _ext="zip" ;;
-    *) err "unsupported package format: $_package_url" ;;
+    *) err "unsupported package format: ${_package_url}" ;;
     esac
 
-    local _package="zoxide.$_ext"
-    case "$_dld" in
-    curl) _releases="$(curl -sLo "$_package" "$_package_url")" || err "curl: failed to download $_package_url" ;;
-    wget) _releases="$(wget -qO "$_package" "$_package_url")" || err "wget: failed to download $_package_url" ;;
+    local _package="zoxide.${_ext}"
+    case "${_dld}" in
+    curl) _releases="$(curl -sLo "${_package}" "${_package_url}")" || err "curl: failed to download ${_package_url}" ;;
+    wget) _releases="$(wget -qO "${_package}" "${_package_url}")" || err "wget: failed to download ${_package_url}" ;;
+    *) err "unsupported downloader: ${_dld}" ;;
     esac
 
-    RETVAL="$_package"
+    RETVAL="${_package}"
 }
 
 # The below functions have been extracted with minor modifications from the
@@ -126,25 +128,25 @@ get_architecture() {
     _cputype="$(uname -m)"
     _clibtype="musl"
 
-    if [ "$_ostype" = Linux ]; then
-        if [ "$(uname -o)" = Android ]; then
+    if [ "${_ostype}" = Linux ]; then
+        if [ "$(uname -o || true)" = Android ]; then
             _ostype=Android
         fi
     fi
 
-    if [ "$_ostype" = Darwin ] && [ "$_cputype" = i386 ]; then
+    if [ "${_ostype}" = Darwin ] && [ "${_cputype}" = i386 ]; then
         # Darwin `uname -m` lies
         if sysctl hw.optional.x86_64 | grep -q ': 1'; then
             _cputype=x86_64
         fi
     fi
 
-    if [ "$_ostype" = SunOS ]; then
+    if [ "${_ostype}" = SunOS ]; then
         # Both Solaris and illumos presently announce as "SunOS" in "uname -s"
         # so use "uname -o" to disambiguate.  We use the full path to the
         # system uname in case the user has coreutils uname first in PATH,
         # which has historically sometimes printed the wrong value here.
-        if [ "$(/usr/bin/uname -o)" = illumos ]; then
+        if [ "$(/usr/bin/uname -o || true)" = illumos ]; then
             _ostype=illumos
         fi
 
@@ -152,18 +154,18 @@ get_architecture() {
         # machine hardware name; e.g., "i86pc" on both 32- and 64-bit x86
         # systems.  Check for the native (widest) instruction set on the
         # running kernel:
-        if [ "$_cputype" = i86pc ]; then
+        if [ "${_cputype}" = i86pc ]; then
             _cputype="$(isainfo -n)"
         fi
     fi
 
-    case "$_ostype" in
+    case "${_ostype}" in
     Android)
         _ostype=linux-android
         ;;
     Linux)
         check_proc
-        _ostype=unknown-linux-$_clibtype
+        _ostype=unknown-linux-${_clibtype}
         _bitness=$(get_bitness)
         ;;
     FreeBSD)
@@ -185,23 +187,23 @@ get_architecture() {
         _ostype=pc-windows-msvc
         ;;
     *)
-        err "unrecognized OS type: $_ostype"
+        err "unrecognized OS type: ${_ostype}"
         ;;
     esac
 
-    case "$_cputype" in
+    case "${_cputype}" in
     i386 | i486 | i686 | i786 | x86)
         _cputype=i686
         ;;
     xscale | arm)
         _cputype=arm
-        if [ "$_ostype" = "linux-android" ]; then
+        if [ "${_ostype}" = "linux-android" ]; then
             _ostype=linux-androideabi
         fi
         ;;
     armv6l)
         _cputype=arm
-        if [ "$_ostype" = "linux-android" ]; then
+        if [ "${_ostype}" = "linux-android" ]; then
             _ostype=linux-androideabi
         else
             _ostype="${_ostype}eabihf"
@@ -209,7 +211,7 @@ get_architecture() {
         ;;
     armv7l | armv8l)
         _cputype=armv7
-        if [ "$_ostype" = "linux-android" ]; then
+        if [ "${_ostype}" = "linux-android" ]; then
             _ostype=linux-androideabi
         else
             _ostype="${_ostype}eabihf"
@@ -225,7 +227,7 @@ get_architecture() {
         _cputype=$(get_endianness mips '' el)
         ;;
     mips64)
-        if [ "$_bitness" -eq 64 ]; then
+        if [ "${_bitness}" -eq 64 ]; then
             # only n64 ABI is supported for now
             _ostype="${_ostype}abi64"
             _cputype=$(get_endianness mips64 '' el)
@@ -247,13 +249,13 @@ get_architecture() {
         _cputype=riscv64gc
         ;;
     *)
-        err "unknown CPU type: $_cputype"
+        err "unknown CPU type: ${_cputype}"
         ;;
     esac
 
     # Detect 64-bit linux with 32-bit userland
     if [ "${_ostype}" = unknown-linux-musl ] && [ "${_bitness}" -eq 32 ]; then
-        case $_cputype in
+        case ${_cputype} in
         x86_64)
             # 32-bit executable for amd64 = x32
             if is_host_amd64_elf; then {
@@ -271,7 +273,7 @@ get_architecture() {
             ;;
         aarch64)
             _cputype=armv7
-            if [ "$_ostype" = "linux-android" ]; then
+            if [ "${_ostype}" = "linux-android" ]; then
                 _ostype=linux-androideabi
             else
                 _ostype="${_ostype}eabihf"
@@ -280,13 +282,14 @@ get_architecture() {
         riscv64gc)
             err "riscv64 with 32-bit userland unsupported"
             ;;
+        *) ;;
         esac
     fi
 
     # Detect armv7 but without the CPU features Rust needs in that build,
     # and fall back to arm.
     # See https://github.com/rust-lang/rustup.rs/issues/587.
-    if [ "$_ostype" = "unknown-linux-musleabihf" ] && [ "$_cputype" = armv7 ]; then
+    if [ "${_ostype}" = "unknown-linux-musleabihf" ] && [ "${_cputype}" = armv7 ]; then
         if ensure grep '^Features' /proc/cpuinfo | grep -q -v neon; then
             # At least one processor does not have NEON.
             _cputype=arm
@@ -294,7 +297,7 @@ get_architecture() {
     fi
 
     _arch="${_cputype}-${_ostype}"
-    RETVAL="$_arch"
+    RETVAL="${_arch}"
 }
 
 get_bitness() {
@@ -307,9 +310,9 @@ get_bitness() {
     # escape sequences, so we use those.
     local _current_exe_head
     _current_exe_head=$(head -c 5 /proc/self/exe)
-    if [ "$_current_exe_head" = "$(printf '\177ELF\001')" ]; then
+    if [ "${_current_exe_head}" = "$(printf '\177ELF\001')" ]; then
         echo 32
-    elif [ "$_current_exe_head" = "$(printf '\177ELF\002')" ]; then
+    elif [ "${_current_exe_head}" = "$(printf '\177ELF\002')" ]; then
         echo 64
     else
         err "unknown platform bitness"
@@ -327,9 +330,9 @@ get_endianness() {
 
     local _current_exe_endianness
     _current_exe_endianness="$(head -c 6 /proc/self/exe | tail -c 1)"
-    if [ "$_current_exe_endianness" = "$(printf '\001')" ]; then
+    if [ "${_current_exe_endianness}" = "$(printf '\001')" ]; then
         echo "${cputype}${suffix_el}"
-    elif [ "$_current_exe_endianness" = "$(printf '\002')" ]; then
+    elif [ "${_current_exe_endianness}" = "$(printf '\002')" ]; then
         echo "${cputype}${suffix_eb}"
     else
         err "unknown platform endianness"
@@ -344,7 +347,7 @@ is_host_amd64_elf() {
     # but we're interested in it being 0x3E to indicate amd64, or not that.
     local _current_exe_machine
     _current_exe_machine=$(head -c 19 /proc/self/exe | tail -c 1)
-    [ "$_current_exe_machine" = "$(printf '\076')" ]
+    [ "${_current_exe_machine}" = "$(printf '\076')" ]
 }
 
 check_proc() {

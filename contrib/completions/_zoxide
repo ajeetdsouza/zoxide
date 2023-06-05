@@ -105,9 +105,9 @@ _arguments "${_arguments_options[@]}" \
 ;;
 (init)
 _arguments "${_arguments_options[@]}" \
-'--cmd=[Changes the prefix of the `z` and `zi` commands]:CMD: ' \
+'--cmd=[Changes the prefix of the \`z\` and \`zi\` commands]:CMD: ' \
 '--hook=[Changes how often zoxide increments a directory'\''s score]:HOOK:(none prompt pwd)' \
-'--no-cmd[Prevents zoxide from defining the `z` and `zi` commands]' \
+'--no-cmd[Prevents zoxide from defining the \`z\` and \`zi\` commands]' \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \
@@ -118,7 +118,8 @@ _arguments "${_arguments_options[@]}" \
 (query)
 _arguments "${_arguments_options[@]}" \
 '--exclude=[Exclude the current directory]:path:_files -/' \
-'--all[Show deleted directories]' \
+'-a[Show unavailable directories]' \
+'--all[Show unavailable directories]' \
 '(-l --list)-i[Use interactive selection]' \
 '(-l --list)--interactive[Use interactive selection]' \
 '(-i --interactive)-l[List all matching directories]' \

@@ -71,10 +71,10 @@ zoxide can be installed in 4 easy steps:
    >
    > | Distribution        | Repository              | Instructions                                                                                          |
    > | ------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------- |
-   > | ***Any***           | **[crates.io]**         | `cargo install zoxide --locked`                                                                       |
-   > | *Any*               | [asdf]                  | `asdf plugin add zoxide https://github.com/nyrst/asdf-zoxide.git` <br /> `asdf install zoxide latest` |
-   > | *Any*               | [conda-forge]           | `conda install -c conda-forge zoxide`                                                                 |
-   > | *Any*               | [Linuxbrew]             | `brew install zoxide`                                                                                 |
+   > | **_Any_**           | **[crates.io]**         | `cargo install zoxide --locked`                                                                       |
+   > | _Any_               | [asdf]                  | `asdf plugin add zoxide https://github.com/nyrst/asdf-zoxide.git` <br /> `asdf install zoxide latest` |
+   > | _Any_               | [conda-forge]           | `conda install -c conda-forge zoxide`                                                                 |
+   > | _Any_               | [Linuxbrew]             | `brew install zoxide`                                                                                 |
    > | Alpine Linux 3.13+  | [Alpine Linux Packages] | `apk add zoxide`                                                                                      |
    > | Arch Linux          | [Arch Linux Community]  | `pacman -S zoxide`                                                                                    |
    > | CentOS 7+           | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide`                                             |
@@ -147,7 +147,7 @@ zoxide can be installed in 4 easy steps:
    >
    > | Distribution  | Repository      | Instructions                    |
    > | ------------- | --------------- | ------------------------------- |
-   > | ***Any***     | **[crates.io]** | `cargo install zoxide --locked` |
+   > | **_Any_**     | **[crates.io]** | `cargo install zoxide --locked` |
    > | DragonFly BSD | [DPorts]        | `pkg install zoxide`            |
    > | FreeBSD       | [FreshPorts]    | `pkg install zoxide`            |
    > | NetBSD        | [pkgsrc]        | `pkgin install zoxide`          |
@@ -172,7 +172,7 @@ zoxide can be installed in 4 easy steps:
    <details>
    <summary>Bash</summary>
 
-   > Add this to your configuration (usually `~/.bashrc`):
+   > Add this to the **end** of your config file (usually `~/.bashrc`):
    >
    > ```sh
    > eval "$(zoxide init bash)"
@@ -183,7 +183,7 @@ zoxide can be installed in 4 easy steps:
    <details>
    <summary>Elvish</summary>
 
-   > Add this to your configuration (usually `~/.elvish/rc.elv`):
+   > Add this to the **end** of your config file (usually `~/.elvish/rc.elv`):
    >
    > ```sh
    > eval (zoxide init elvish | slurp)
@@ -197,7 +197,8 @@ zoxide can be installed in 4 easy steps:
    <details>
    <summary>Fish</summary>
 
-   > Add this to your configuration (usually `~/.config/fish/config.fish`):
+   > Add this to the **end** of your config file (usually
+   > `~/.config/fish/config.fish`):
    >
    > ```fish
    > zoxide init fish | source
@@ -208,13 +209,14 @@ zoxide can be installed in 4 easy steps:
    <details>
    <summary>Nushell</summary>
 
-   > Add this to your env file (find it by running `$nu.env-path` in Nushell):
+   > Add this to the **end** of your env file (find it by running `$nu.env-path`
+   > in Nushell):
    >
    > ```sh
    > zoxide init nushell | save -f ~/.zoxide.nu
    > ```
    >
-   > Now, add this to the end of your config file (find it by running
+   > Now, add this to the **end** of your config file (find it by running
    > `$nu.config-path` in Nushell):
    >
    > ```sh
@@ -229,33 +231,19 @@ zoxide can be installed in 4 easy steps:
    <details>
    <summary>PowerShell</summary>
 
-   > Add this to your configuration (find it by running `echo $profile` in
-   > PowerShell):
+   > Add this to the **end** of your config file (find it by running
+   > `echo $profile` in PowerShell):
    >
-   > - For zoxide v0.8.0+:
-   >
-   >   ```powershell
-   >   Invoke-Expression (& {
-   >       $hook = if ($PSVersionTable.PSVersion.Major -lt 6) { 'prompt' } else { 'pwd' }
-   >       (zoxide init --hook $hook powershell | Out-String)
-   >   })
-   >   ```
-   >
-   > - For older versions of zoxide:
-   >
-   >   ```powershell
-   >   Invoke-Expression (& {
-   >       $hook = if ($PSVersionTable.PSVersion.Major -lt 6) { 'prompt' } else { 'pwd' }
-   >       (zoxide init --hook $hook powershell) -join "`n"
-   >   })
-   >   ```
+   > ```powershell
+   > Invoke-Expression (& { (zoxide init powershell | Out-String) })
+   > ```
 
    </details>
 
    <details>
    <summary>Xonsh</summary>
 
-   > Add this to your configuration (usually `~/.xonshrc`):
+   > Add this to the **end** of your config file (usually `~/.xonshrc`):
    >
    > ```python
    > execx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')
@@ -266,13 +254,13 @@ zoxide can be installed in 4 easy steps:
    <details>
    <summary>Zsh</summary>
 
-   > Add this to your configuration (usually `~/.zshrc`):
+   > Add this to the **end** of your config file (usually `~/.zshrc`):
    >
    > ```sh
    > eval "$(zoxide init zsh)"
    > ```
    >
-   > For completions to work, the above line must be added *after* `compinit` is
+   > For completions to work, the above line must be added _after_ `compinit` is
    > called. You may have to rebuild your completions cache by running
    > `rm ~/.zcompdump*; compinit`.
 
@@ -281,7 +269,7 @@ zoxide can be installed in 4 easy steps:
    <details>
    <summary>Any POSIX shell</summary>
 
-   > Add this to your configuration:
+   > Add this to the **end** of your config file:
    >
    > ```sh
    > eval "$(zoxide init posix --hook prompt)"
@@ -434,10 +422,13 @@ Environment variables[^2] can be used for configuration. They must be set before
 | [zabb]                | Finds the shortest possible query for a path | Natively supported         |
 | [zsh-autocomplete]    | Realtime completions for zsh                 | Natively supported         |
 
-[^1]: Debian / Ubuntu derivatives update their packages very slowly. If you're
-using one of these distributions, consider using the install script instead.
-[^2]: If you're not sure how to set an environment variable on your shell, check
-out the [wiki][wiki-env].
+[^1]:
+    Debian / Ubuntu derivatives update their packages very slowly. If you're
+    using one of these distributions, consider using the install script instead.
+
+[^2]:
+    If you're not sure how to set an environment variable on your shell, check
+    out the [wiki][wiki-env].
 
 [algorithm-aging]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#aging
 [algorithm-matching]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#matching

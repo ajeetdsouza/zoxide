@@ -75,7 +75,7 @@ function __zoxide_z() {
         __zoxide_cd "${OLDPWD}"
     elif [[ $# -eq 1 && -d $1 ]]; then
         __zoxide_cd "$1"
-    elif [[ ${@: -1} == "${__zoxide_z_prefix}"* ]]; then
+    elif [[ ${@: -1} == "${__zoxide_z_prefix}"?* ]]; then
         # shellcheck disable=SC2124
         \builtin local result="${@: -1}"
         __zoxide_cd "{{ "${result:${#__zoxide_z_prefix}}" }}"
@@ -90,7 +90,7 @@ function __zoxide_z() {
 # Jump to a directory using interactive search.
 function __zoxide_zi() {
     \builtin local result
-    result="$(\command zoxide query -i -- "$@")" && __zoxide_cd "${result}"
+    result="$(\command zoxide query --interactive -- "$@")" && __zoxide_cd "${result}"
 }
 
 {{ section }}
@@ -130,10 +130,10 @@ if [[ ${BASH_VERSINFO[0]:-0} -eq 4 && ${BASH_VERSINFO[1]:-0} -ge 4 || ${BASH_VER
                 \builtin compgen -A directory -- "${COMP_WORDS[-1]}" || \builtin true
             )
         # If there is a space after the last word, use interactive selection.
-        elif [[ -z ${COMP_WORDS[-1]} ]]; then
+        elif [[ -z ${COMP_WORDS[-1]} ]] && [[ ${COMP_WORDS[-2]} != "${__zoxide_z_prefix}"?* ]]; then
             \builtin local result
             # shellcheck disable=SC2312
-            result="$(\command zoxide query --exclude "$(__zoxide_pwd)" -i -- "{{ "${COMP_WORDS[@]:1:${#COMP_WORDS[@]}-2}" }}")" &&
+            result="$(\command zoxide query --exclude "$(__zoxide_pwd)" --interactive -- "{{ "${COMP_WORDS[@]:1:${#COMP_WORDS[@]}-2}" }}")" &&
                 COMPREPLY=("${__zoxide_z_prefix}${result}/")
             \builtin printf '\e[5n'
         fi

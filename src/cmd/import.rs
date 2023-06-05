@@ -31,16 +31,14 @@ fn import_autojump(db: &mut Database, buffer: &str) -> Result<()> {
         if line.is_empty() {
             continue;
         }
-        let mut split = line.splitn(2, '\t');
+        let (rank, path) =
+            line.split_once('\t').with_context(|| format!("invalid entry: {line}"))?;
 
-        let rank = split.next().with_context(|| format!("invalid entry: {line}"))?;
         let mut rank = rank.parse::<f64>().with_context(|| format!("invalid rank: {rank}"))?;
         // Normalize the rank using a sigmoid function. Don't import actual ranks from
         // autojump, since its scoring algorithm is very different and might
         // take a while to get normalized.
         rank = sigmoid(rank);
-
-        let path = split.next().with_context(|| format!("invalid entry: {line}"))?;
 
         db.add_unchecked(path, rank, 0);
     }

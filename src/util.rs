@@ -35,6 +35,8 @@ impl Fzf {
         #[cfg(not(windows))]
         let program = "fzf";
 
+        // TODO: check version of fzf here.
+
         let mut cmd = Command::new(program);
         cmd.args([
             // Search mode
@@ -133,7 +135,7 @@ impl FzfChild {
         mem::drop(self.0.stdin.take());
 
         let mut stdout = self.0.stdout.take().unwrap();
-        let mut output = String::new();
+        let mut output = String::default();
         stdout.read_to_string(&mut output).context("failed to read from fzf")?;
 
         let status = self.0.wait().context("wait failed on fzf")?;
@@ -406,11 +408,7 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
 /// Convert a string to lowercase, with a fast path for ASCII strings.
 pub fn to_lowercase(s: impl AsRef<str>) -> String {
     let s = s.as_ref();
-    if s.is_ascii() {
-        s.to_ascii_lowercase()
-    } else {
-        s.to_lowercase()
-    }
+    if s.is_ascii() { s.to_ascii_lowercase() } else { s.to_lowercase() }
 }
 
 #[cfg(test)]

@@ -32,7 +32,7 @@ complete -c zoxide -n "__fish_seen_subcommand_from init" -l no-cmd -d 'Prevents 
 complete -c zoxide -n "__fish_seen_subcommand_from init" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_seen_subcommand_from init" -s V -l version -d 'Print version'
 complete -c zoxide -n "__fish_seen_subcommand_from query" -l exclude -d 'Exclude the current directory' -r -f -a "(__fish_complete_directories)"
-complete -c zoxide -n "__fish_seen_subcommand_from query" -l all -d 'Show deleted directories'
+complete -c zoxide -n "__fish_seen_subcommand_from query" -s a -l all -d 'Show unavailable directories'
 complete -c zoxide -n "__fish_seen_subcommand_from query" -s i -l interactive -d 'Use interactive selection'
 complete -c zoxide -n "__fish_seen_subcommand_from query" -s l -l list -d 'List all matching directories'
 complete -c zoxide -n "__fish_seen_subcommand_from query" -s s -l score -d 'Print score with results'

@@ -410,3 +410,39 @@ pub fn to_lowercase(s: impl AsRef<str>) -> String {
     let s = s.as_ref();
     if s.is_ascii() { s.to_ascii_lowercase() } else { s.to_lowercase() }
 }
+
+#[cfg(test)]
+#[cfg(windows)]
+mod tests_win {
+    use std::path::PathBuf;
+
+    use rstest::rstest;
+
+    #[rstest]
+    #[case(r"c:\", r"C:\")]
+    #[case(r"C:\", r"C:\")]
+    #[case(r"c:\\.", r"C:\")]
+    #[case(r"c:\..", r"C:\")]
+    #[case(r"C:\.\.", r"C:\")]
+    #[case(r"\\?\C:\", r"C:\")]
+    #[case(r"\\?\c:\", r"C:\")]
+    #[case(r"\\?\C:\\\", r"C:\")]
+    #[case(r"\\?\c:\\.\", r"C:\")]
+    #[case(r"c:\Windows", r"C:\Windows")]
+    #[case(r"C:\WINDOWS", r"C:\WINDOWS")]
+    #[case(r"c:\\\Windows\.", r"C:\Windows")]
+    #[case(r"C:\$WinREAgent", r"C:\$WinREAgent")]
+    #[case(r"\\?\c:\\Windows\\.", r"C:\Windows")]
+    #[case(r"\\?\c:\..\.\windows", r"C:\windows")]
+    #[case(r"c:\Windows\System32\.", r"C:\Windows\System32")]
+    #[case(r"c:\WINDOWS\..\..\Windows", r"C:\Windows")]
+    #[case(r"c:\Windows\..\.\.\..\Temp\..\tmp", r"C:\tmp")]
+    #[case(r"c:\.\Windows\..\..\Program Files", r"C:\Program Files")]
+    #[case(r"\\?\C:\\$WinREAgent\\..\Program Files\.", r"C:\Program Files")]
+    fn resolve_path(#[case] absolute_path: &str, #[case] normalized_form: &str) {
+        let path = PathBuf::from(absolute_path);
+        let resolved_path = super::resolve_path(path).unwrap();
+        assert_eq!(resolved_path.to_str().unwrap(), normalized_form);
+    }
+
+}

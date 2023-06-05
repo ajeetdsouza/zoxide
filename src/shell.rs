@@ -103,11 +103,9 @@ mod tests {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let mut source = Cmd(&opts).render().unwrap();
 
-        // @TODO test this sometime, somehow
-        let tempfile = tempfile::tempfile();
-
-        Command::new("cmd")
-            .args(["/c", &source])
+        Command::new("cmd.exe")
+            .args(["/a", "/d", "/e:on", "/q", "/v:off", "/k", "@doskey", "/macros:cmd.exe"])
+            .write_stdin(source)
             .assert()
             .success()
             .stdout("")

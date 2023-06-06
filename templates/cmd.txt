@@ -4,7 +4,7 @@
 {%- call batch::indent(tabs) %}    %__builtin_cd% {{ directory|safe }}^
 {%- call batch::indent(tabs) %}    ^&^& set "OLDPWD=%$p%CD%$p%"^
 {%- if echo -%}
-{%- call batch::indent(tabs) %}    ^&^& {%~ call pwd(tabs + 1) ~%}^
+{%- call batch::indent(tabs) %}    ^&^& {%~ call pwd(tabs + 1) -%}^
 {%- endif -%}
 {%- if hook != InitHook::None -%}
 {%- call batch::indent(tabs) %}    ^&^& (for /f "delims=" %$p%a in ('"%__builtin_pwd%"') do @(zoxide add -- "%$p%~fa\."))^
@@ -60,25 +60,25 @@ set __zoxide_pwd=pwd
     {% call batch::for_caret("%$p%", "i") ~%} @(^
         if "%$p%~i"=="" (^
             if defined USERPROFILE (^
-                {% call cd("%$p%USERPROFILE%$p%", 4) %}^
+                {% call cd("%$p%USERPROFILE%$p%", 4) -%}^
             ) else (^
                 (echo(%__zoxide_cd%: USERPROFILE is not defined) ^>^&2 ^& %$false%^
             )^
         ) else if "%$p%~i"=="~" (^
             if defined USERPROFILE (^
-                {% call cd("%$p%USERPROFILE%$p%", 4) %}^
+                {% call cd("%$p%USERPROFILE%$p%", 4) -%}^
             ) else (^
                 (echo(%__zoxide_cd%: USERPROFILE is not defined) ^>^&2 ^& %$false%^
             )^
         ) else if "%$p%~i"=="-" (^
             if defined OLDPWD (^
-                {% call cd("%$p%OLDPWD%$p%", 4) %}^
+                {% call cd("%$p%OLDPWD%$p%", 4) -%}^
             ) else (^
                 (echo(%__zoxide_cd%: OLDPWD is not defined) ^>^&2 ^& %$false%^
             )^
         ) else (^
             (^
-                {% call cd("%$p%~fi", 4) %}^
+                {% call cd("%$p%~fi", 4) -%}^
             )^
         )^
     )^
@@ -101,25 +101,25 @@ set __zoxide_z_prefix={{cmd}}
     {% call batch::for_caret("%$p%", "i") ~%} @(^
         if "%$p%~i"=="" (^
             if defined USERPROFILE (^
-                {% call cd("%$p%USERPROFILE%$p%", 4) %}^
+                {% call cd("%$p%USERPROFILE%$p%", 4) -%}^
             ) else (^
                 (echo(%__zoxide_z_prefix%: USERPROFILE is not defined) ^>^&2 ^& %$false%^
             )^
         ) else if "%$p%~i"=="~" (^
             if defined USERPROFILE (^
-                {% call cd("%$p%USERPROFILE%$p%", 4) %}^
+                {% call cd("%$p%USERPROFILE%$p%", 4) -%}^
             ) else (^
                 (echo(%__zoxide_z_prefix%: USERPROFILE is not defined) ^>^&2 ^& %$false%^
             )^
         ) else if "%$p%~i"=="-" (^
             if defined OLDPWD (^
-                {% call cd("%$p%OLDPWD%$p%", 4) %}^
+                {% call cd("%$p%OLDPWD%$p%", 4) -%}^
             ) else (^
                 (echo(%__zoxide_z_prefix%: OLDPWD is not defined) ^>^&2 ^& %$false%^
             )^
         ) else (^
             for /f "delims=" %$p%p in ('"zoxide query --exclude "%$p%CD%$p%\." -- %$p%~i"') do @(^
-                {% call cd("%$p%~fp", 4) %}^
+                {% call cd("%$p%~fp", 4) -%}^
             )^
         )^
     )^
@@ -129,7 +129,7 @@ set __zoxide_z_prefix={{cmd}}
 "%$doskey%" %__zoxide_z_prefix%i = (^
     {% call batch::for_caret("%$p%", "i") ~%} @(^
         for /f "delims=" %$p%p in ('"zoxide query --interactive -- %$p%~i"') do @(^
-            {% call cd("%$p%~fp", 3) %}^
+            {% call cd("%$p%~fp", 3) -%}^
         )^
     )^
 ) ^&^& %$true%

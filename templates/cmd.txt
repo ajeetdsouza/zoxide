@@ -28,7 +28,7 @@
 {%- let section = "@rem ==========================================================================\n@rem" -%}
 {%- let not_configured = "@rem -- not configured --" -%}
 
-@echo off & setlocal EnableDelayedExpansion EnableExtensions
+@echo off & setlocal DisableDelayedExpansion EnableExtensions
 
 @if "%~f0"=="%~dpnx0" (
     set ^"$p=%%<nul"

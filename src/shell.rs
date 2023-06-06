@@ -104,11 +104,10 @@ mod tests {
         let source = Cmd(&opts).render().unwrap();
 
         Command::new("cmd.exe")
-            .args(["/a", "/d", "/e:on", "/q", "/v:off", "/k", "@doskey", "/macros:cmd.exe"])
+            .args(["/a", "/d", "/e:on", "/q", "/v:off", "/k", "@doskey", "/macros:all"])
             .write_stdin(source)
             .assert()
             .success()
-            .stdout("")
             .stderr("");
     }
 

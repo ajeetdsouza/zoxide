@@ -1,84 +1,91 @@
+{%- import "utils/batch.txt" as batch -%}
+
+{%- macro    cd(directory, tabs) -%} if /i not "%$p%CD%$p%"=="{{ directory }}" (^
+{%- call batch::indent(tabs) %}    %__builtin_cd% {{ directory|safe }}^
+{%- call batch::indent(tabs) %}    ^&^& set "OLDPWD=%$p%CD%$p%"^
+{%- if echo -%}
+{%- call batch::indent(tabs) %}    ^&^& {%~ call pwd(tabs + 1) ~%}^
+{%- endif -%}
+{%- if hook != InitHook::None -%}
+{%- call batch::indent(tabs) %}    ^&^& (for /f "delims=" %$p%a in ('"%__builtin_pwd%"') do @(zoxide add -- "%$p%~fa\."))^
+{%- endif -%}
+{%- call batch::indent(tabs) %})
+{%- endmacro cd -%}
+
+{%- macro    pwd(tabs) -%} (^
+{%- if resolve_symlinks -%}
+{%- call batch::indent(tabs) %}    (^
+{%- call batch::indent(tabs) %}        for /f "skip=9 tokens=1,2,*" %$p%j in ('""%$fsutil%" reparsepoint query ."') do @(^
+{%- call batch::indent(tabs) %}            if "%$p%~j"=="Print" if "%$p%~k"=="Name:" if not "%$p%~l"=="" (echo(%$p%~l)^
+{%- call batch::indent(tabs) %}        )^
+{%- call batch::indent(tabs) %}    ) ^|^| %__builtin_pwd%^
+{%- else -%}
+{%- call batch::indent(tabs) %}    %__builtin_pwd%^
+{%- endif -%}
+{%- call batch::indent(tabs) %})
+{%- endmacro pwd -%}
+
 {%- let section = "@rem ==========================================================================\n@rem" -%}
 {%- let not_configured = "@rem -- not configured --" -%}
-@setlocal EnableDelayedExpansion EnableExtensions & set "CMD=!CMDCMDLINE!" 2>nul
-@if /i not "!CMD!"=="!CMD:/=!" (goto :EOF) else @if not defined DEBUG (echo off)
-@reg query "HKCU\Software\Microsoft\Command Processor" /v "AutoRun" /z >nul 2>&1
-@if !ERRORLEVEL! equ 0 (endlocal & set "CMD_ENV=%~0") else (echo(cmd& goto :EOF)
+
+@echo off & setlocal EnableDelayedExpansion EnableExtensions
+
+@if "%~f0"=="%~dpnx0" (
+    set ^"$p=%%<nul"
+) else (
+    set ^"$p=^%<nul"
+)
+
+set ^"$true=(call )"
+set ^"$false=(call)"
+
+set root=%SystemRoot%\System32
+set ^"$doskey=%root%\doskey.exe"
+{%- if resolve_symlinks %}
+set ^"$fsutil=%root%\fsutil.exe"
+{%- endif %}
 
 {{ section }}
 @rem Utility functions for zoxide.
 @rem
 
-@rem Full credits to jeb for this - https://stackoverflow.com/a/76213522/6724141
-set i_AS_$*=%%^^^^ in ("") do @for /f "delims=" %%i in (^^""$*%%~^^"^")
+set __builtin_cd=chdir /d
+set __builtin_pwd=chdir
 
-set __ZOXIDE_CD=chdir /d
-set __ZOXIDE_PWD=chdir
+set __zoxide_cd=cd
+set __zoxide_pwd=pwd
 
 @rem cd + custom logic based on the value of _ZO_ECHO.
-doskey cd = ( ^
-{#- Full credits to jeb (see https://stackoverflow.com/a/76213522/6724141) #}
-    for %%^^^^ in ("") do @for /f "delims=" %%i in (^^""$*%%~^^"^") do @( ^
-        if "%%~i"=="" ( ^
-            if defined USERPROFILE ( ^
-                if /i not "%%CD%%"=="%%USERPROFILE%%" ( ^
-                    %__ZOXIDE_CD% "%%USERPROFILE%%" ^&^& ^
-}
-{%- if echo %}
-                    %__ZOXIDE_PWD% ^&^& ^
-{%- endif %}
-{% if hook != InitHook::None -%}
-                    if defined __ZOXIDE_HOOK (%%__ZOXIDE_HOOK%%) ^&^& ^
-{%- endif %}
-                    set "OLDCD=%%CD%%" ^
-                ) ^
-            ) ^
-        ) else if "%%~i"=="-" ( ^
-            if defined OLDCD ( ^
-                if /i not "%%CD%%"=="%%OLDCD%%" ( ^
-                    %__ZOXIDE_CD% "%%OLDCD%%" ^&^& ^
-{%- if echo %}
-                    %__ZOXIDE_PWD% ^&^& ^
-{%- endif %}
-{% if hook != InitHook::None -%}
-                    if defined __ZOXIDE_HOOK (%%__ZOXIDE_HOOK%%) ^&^& ^
-{%- endif %}
-                    set "OLDCD=%%CD%%" ^
-                ) ^
-            ) ^
-        ) else ( ^
-            ( ^
-                if /i not "%%CD%%"=="%%~fi" ( ^
-                    %__ZOXIDE_CD% %%~fi ^&^& ^
-{%- if echo %}
-                    %__ZOXIDE_PWD% ^&^& ^
-{%- endif %}
-{% if hook != InitHook::None -%}
-                    if defined __ZOXIDE_HOOK (%%__ZOXIDE_HOOK%%) ^&^& ^
-{%- endif %}
-                    set "OLDCD=%%CD%%" ^
-                ) ^
-            ) ^
-        ) ^
-    ) ^
-)
+"%$doskey%" %__zoxide_cd% = (^
+    {% call batch::for_caret("%$p%", "i") ~%} @(^
+        if "%$p%~i"=="" (^
+            if defined USERPROFILE (^
+                {% call cd("%$p%USERPROFILE%$p%", 4) %}^
+            ) else (^
+                (echo(%__zoxide_cd%: USERPROFILE is not defined) ^>^&2 ^& %$false%^
+            )^
+        ) else if "%$p%~i"=="~" (^
+            if defined USERPROFILE (^
+                {% call cd("%$p%USERPROFILE%$p%", 4) %}^
+            ) else (^
+                (echo(%__zoxide_cd%: USERPROFILE is not defined) ^>^&2 ^& %$false%^
+            )^
+        ) else if "%$p%~i"=="-" (^
+            if defined OLDPWD (^
+                {% call cd("%$p%OLDPWD%$p%", 4) %}^
+            ) else (^
+                (echo(%__zoxide_cd%: OLDPWD is not defined) ^>^&2 ^& %$false%^
+            )^
+        ) else (^
+            (^
+                {% call cd("%$p%~fi", 4) %}^
+            )^
+        )^
+    )^
+) ^&^& %$true%
 
-doskey pwd = (%__ZOXIDE_PWD%)
-
-{{ section }}
-@rem Hook configuration for zoxide.
-@rem
-
-if not defined __ZOXIDE_HOOKED (
-    set __ZOXIDE_HOOKED=1
-{% if hook == InitHook::None -%}
-    @rem {{ not_configured }}
-    set __ZOXIDE_HOOK=
-{%- else -%}
-    @rem Initialize hook to add new entries to the database.
-    set __ZOXIDE_HOOK=for /f "delims=" %%z in ('%__ZOXIDE_PWD%') do (zoxide add -- "%%~fz ")
-{%- endif %}
-)
+@rem pwd based on the value of _ZO_RESOLVE_SYMLINKS.
+"%$doskey%" %__zoxide_pwd% = {%~ call pwd(0) %}
 
 {{ section }}
 @rem Commands for zoxide. Disable these using --no-cmd.
@@ -87,59 +94,45 @@ if not defined __ZOXIDE_HOOKED (
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
+set __zoxide_z_prefix={{cmd}}
+
 @rem Jump to a directory using only keywords.
-doskey {{cmd}} = ( ^
-    for %%^^^^ in ("") do @for /f "delims=" %%i in (^^""$*%%~^^"^") do @( ^
-        if "%%~i"=="" ( ^
-            if defined HOME ( ^
-                if /i not "%%CD%%"=="%%HOME%%" ( ^
-                    %__CD% "%%HOME%%" ^&^& ^
-{%- if echo %}
-                    %__ZOXIDE_PWD% ^&^& ^
-{%- endif %}
-                    set "OLDCD=%%CD%%" ^&^& ^
-                    %__ZOXIDE_HOOK% ^
-                ) ^
-            ) ^
-        ) else if "%%~i"=="-" ( ^
-            if defined OLDCD ( ^
-                if /i not "%%CD%%"=="%%OLDCD%%" ( ^
-                    %__CD% "%%OLDCD%%" ^&^& ^
-{%- if echo %}
-                    %__ZOXIDE_PWD% ^&^& ^
-{%- endif %}
-                    set "OLDCD=%%CD%%" ^&^& ^
-                    %__ZOXIDE_HOOK% ^
-                ) ^
-            ) ^
-        ) else ( ^
-            for /f "delims=" %%p in ('zoxide query --exclude "%%CD%%" -- "%%~i"') do @( ^
-                if /i not "%%CD%%"=="%%~fp" ( ^
-                    %__CD% %%~fp ^&^& ^
-{%- if echo %}
-                    %__ZOXIDE_PWD% ^&^& ^
-{%- endif %}
-                    set "OLDCD=%%CD%%" ^&^& ^
-                    %__ZOXIDE_HOOK% ^
-                ) ^
-            ) ^
-        ) ^
-    ) ^
-)
+"%$doskey%" %__zoxide_z_prefix% = (^
+    {% call batch::for_caret("%$p%", "i") ~%} @(^
+        if "%$p%~i"=="" (^
+            if defined USERPROFILE (^
+                {% call cd("%$p%USERPROFILE%$p%", 4) %}^
+            ) else (^
+                (echo(%__zoxide_z_prefix%: USERPROFILE is not defined) ^>^&2 ^& %$false%^
+            )^
+        ) else if "%$p%~i"=="~" (^
+            if defined USERPROFILE (^
+                {% call cd("%$p%USERPROFILE%$p%", 4) %}^
+            ) else (^
+                (echo(%__zoxide_z_prefix%: USERPROFILE is not defined) ^>^&2 ^& %$false%^
+            )^
+        ) else if "%$p%~i"=="-" (^
+            if defined OLDPWD (^
+                {% call cd("%$p%OLDPWD%$p%", 4) %}^
+            ) else (^
+                (echo(%__zoxide_z_prefix%: OLDPWD is not defined) ^>^&2 ^& %$false%^
+            )^
+        ) else (^
+            for /f "delims=" %$p%p in ('"zoxide query --exclude "%$p%CD%$p%\." -- %$p%~i"') do @(^
+                {% call cd("%$p%~fp", 4) %}^
+            )^
+        )^
+    )^
+) ^&^& %$true%
 
 @rem Jump to a directory using interactive search.
-doskey {{cmd}}i = ( ^
-    for %%^^^^ in ("") do @for /f "delims=" %%i in (^^""$*%%~^^"^") do @( ^
-        for /f "delims=" %%q in ('zoxide query --interactive -- "%%~i"') do @( ^
-            %__CD% %%~fq ^&^& ^
-{%- if echo %}
-            %__ZOXIDE_PWD% ^&^& ^
-{%- endif %}
-            set "OLDCD=%%CD%%" ^&^& ^
-            %__ZOXIDE_HOOK% ^
-        ) ^
-    ) ^
-)
+"%$doskey%" %__zoxide_z_prefix%i = (^
+    {% call batch::for_caret("%$p%", "i") ~%} @(^
+        for /f "delims=" %$p%p in ('"zoxide query --interactive -- %$p%~i"') do @(^
+            {% call cd("%$p%~fp", 3) %}^
+        )^
+    )^
+) ^&^& %$true%
 
 {%- when None %}
 
@@ -147,10 +140,9 @@ doskey {{cmd}}i = ( ^
 
 {%- endmatch %}
 
+@endlocal
+
 {{ section }}
-@rem To initialize zoxide, add the contents of the following command to your
-@rem configuration:
+@rem To initialize zoxide, add this to your configuration or AutoRun command:
 @rem
-@rem   zoxide init cmd
-@rem
-@rem If you don't have one: <TODO: explain how to run `AutoRun` scripts>
+@rem   zoxide init cmd | cmd /d >nul

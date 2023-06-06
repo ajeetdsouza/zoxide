@@ -218,6 +218,17 @@ zoxide can be installed in 4 easy steps:
    </details>
 
    <details>
+   <summary>`cmd.exe`</summary>
+
+   > Add this to the **end** of your config file or AutoRun command:
+   >
+   > ```batchfile
+   > zoxide init cmd | cmd /d >nul
+   > ```
+
+   </details>
+
+   <details>
    <summary>Elvish</summary>
 
    > Add this to the <ins>**end**</ins> of your config file (usually `~/.elvish/rc.elv`):

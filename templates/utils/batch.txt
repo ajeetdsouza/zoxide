@@ -1,0 +1,9 @@
+{%- macro    indent(tabs) %}
+{% for tab in 0..tabs %}    {% endfor -%}
+{%- endmacro indent -%}
+
+{%- macro    for_caret(percent, for_parameter) -%}
+{#- `for /f` statement with disappearing carets suitable for use in aliases. -#}
+{#- Credits for this go to jeb: https://stackoverflow.com/a/76213522/6724141 -#}
+for {{ percent }}^^^^ in ("") do @for /f "delims=" {{ percent }}{{ for_parameter }} in (^^""$*{{ percent }}~^^"^") do
+{%- endmacro for_caret -%}

@@ -140,7 +140,7 @@ set __zoxide_z_prefix={{cmd}}
 
 {%- endmatch %}
 
-@endlocal
+@endlocal & set OLDPWD=
 
 {{ section }}
 @rem To initialize zoxide, add this to your configuration or AutoRun command:

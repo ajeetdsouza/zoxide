@@ -1,8 +1,6 @@
 name: release
 on:
   push:
-    branches: [main]
-  pull_request:
   workflow_dispatch:
 env:
   CARGO_INCREMENTAL: 0

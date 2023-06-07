@@ -28,9 +28,10 @@
 {%- let section = "@rem ==========================================================================\n@rem" -%}
 {%- let not_configured = "@rem -- not configured --" -%}
 
-@echo off & setlocal DisableDelayedExpansion EnableExtensions
+@echo off & (set ComSpec) >nul 2>nul || exit /b 0 2>nul
+setlocal DisableDelayedExpansion EnableExtensions
 
-@if "%~f0"=="%~dpnx0" (
+if /i "%~f0"=="%~dpnx0" (
     set ^"$p=%%<nul"
 ) else (
     set ^"$p=^%<nul"
@@ -140,7 +141,7 @@ set __zoxide_z_prefix={{cmd}}
 
 {%- endmatch %}
 
-@endlocal & set OLDPWD=
+endlocal & set OLDPWD=
 
 {{ section }}
 @rem To initialize zoxide, add this to your configuration or AutoRun command:

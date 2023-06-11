@@ -117,9 +117,11 @@ set __zoxide_command={{cmd}}
             ) else (^
                 (echo(%__zoxide_command%: OLDPWD is not defined) ^>^&2 ^& %$false%^
             )^
-        ) else (^
-            for /f "delims=" %$p%p in ('"zoxide query --exclude "%$p%CD%$p%\." -- %$p%~i"') do @(^
-                {% call cd("%$p%~fp", 4) -%}^
+        ) else for /f "tokens=1,* delims=d" %$p%a in ("-%$p%~ai") do @(^
+            if not "%$p%b"=="" (^
+                {% call cd("%$p%~fi", 4) -%}^
+            ) else for /f "delims=" %$p%q in ('"zoxide query --exclude "%$p%CD%$p%" -- %$p%~i"') do @(^
+                {% call cd("%$p%~fq", 4) -%}^
             )^
         )^
     )^

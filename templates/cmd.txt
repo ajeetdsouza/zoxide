@@ -28,8 +28,7 @@
 {%- let section = "@rem ==========================================================================\n@rem" -%}
 {%- let not_configured = "@rem -- not configured --" -%}
 
-@echo off & (set ComSpec) >nul 2>nul || exit /b 0 2>nul
-setlocal DisableDelayedExpansion EnableExtensions
+@echo off & setlocal DisableDelayedExpansion EnableExtensions
 
 if /i "%~f0"=="%~dpnx0" (
     set ^"$p=%%<nul"
@@ -147,3 +146,5 @@ endlocal & set OLDPWD=
 @rem To initialize zoxide, add this to your configuration or AutoRun command:
 @rem
 @rem   zoxide init cmd | cmd /d >nul
+@rem
+@rem Note: zoxide only supports `cmd.exe` with Command Extensions v2 and above.

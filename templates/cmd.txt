@@ -7,7 +7,11 @@
 {%- call batch::indent(tabs) %}    ^&^& {%~ call pwd(tabs + 1) -%}^
 {%- endif -%}
 {%- if hook != InitHook::None -%}
-{%- call batch::indent(tabs) %}    ^&^& (for /f "delims=" %$p%a in ('"%__builtin_pwd%"') do @(zoxide add -- "%$p%~fa\."))^
+{%- call batch::indent(tabs) %}    ^&^& for /f "delims=" %$p%a in ('"%__builtin_pwd%"') do @if /i not "%$p%~dpa"=="%$p%~fa" (^
+{%- call batch::indent(tabs) %}        zoxide add -- "%$p%~fa"^
+{%- call batch::indent(tabs) %}    ) else (^
+{%- call batch::indent(tabs) %}        zoxide add -- "%$p%~fa\"^
+{%- call batch::indent(tabs) %}    )^
 {%- endif -%}
 {%- call batch::indent(tabs) %})
 {%- endmacro cd -%}
@@ -119,8 +123,14 @@ set __zoxide_command={{cmd}}
         ) else for /f "tokens=1,* delims=d" %$p%a in ("-%$p%~ai") do @(^
             if not "%$p%b"=="" (^
                 {% call cd("%$p%~fi", 4) -%}^
-            ) else for /f "delims=" %$p%q in ('"zoxide query --exclude "%$p%CD%$p%" -- %$p%~i"') do @(^
-                {% call cd("%$p%~fq", 4) -%}^
+            ) else if /i not "%$p%CD%$p%"=="%$p%__CD__%$p%" (^
+                for /f "delims=" %$p%q in ('"zoxide query --exclude "%$p%CD%$p%" -- %$p%~i"') do @(^
+                    {% call cd("%$p%~fq", 5) -%}^
+                )^
+            ) else (^
+                for /f "delims=" %$p%q in ('"zoxide query --exclude "%$p%CD%$p%\" -- %$p%~i"') do @(^
+                    {% call cd("%$p%~fq", 5) -%}^
+                )^
             )^
         )^
     )^

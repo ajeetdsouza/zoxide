@@ -94,28 +94,28 @@ set __zoxide_pwd=pwd
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-set __zoxide_z_prefix={{cmd}}
+set __zoxide_command={{cmd}}
 
 @rem Jump to a directory using only keywords.
-"%$doskey%" %__zoxide_z_prefix% = (^
+"%$doskey%" %__zoxide_command% = (^
     {% call batch::for_caret("%$p%", "i") ~%} @(^
         if "%$p%~i"=="" (^
             if defined USERPROFILE (^
                 {% call cd("%$p%USERPROFILE%$p%", 4) -%}^
             ) else (^
-                (echo(%__zoxide_z_prefix%: USERPROFILE is not defined) ^>^&2 ^& %$false%^
+                (echo(%__zoxide_command%: USERPROFILE is not defined) ^>^&2 ^& %$false%^
             )^
         ) else if "%$p%~i"=="~" (^
             if defined USERPROFILE (^
                 {% call cd("%$p%USERPROFILE%$p%", 4) -%}^
             ) else (^
-                (echo(%__zoxide_z_prefix%: USERPROFILE is not defined) ^>^&2 ^& %$false%^
+                (echo(%__zoxide_command%: USERPROFILE is not defined) ^>^&2 ^& %$false%^
             )^
         ) else if "%$p%~i"=="-" (^
             if defined OLDPWD (^
                 {% call cd("%$p%OLDPWD%$p%", 4) -%}^
             ) else (^
-                (echo(%__zoxide_z_prefix%: OLDPWD is not defined) ^>^&2 ^& %$false%^
+                (echo(%__zoxide_command%: OLDPWD is not defined) ^>^&2 ^& %$false%^
             )^
         ) else (^
             for /f "delims=" %$p%p in ('"zoxide query --exclude "%$p%CD%$p%\." -- %$p%~i"') do @(^
@@ -126,7 +126,7 @@ set __zoxide_z_prefix={{cmd}}
 ) ^&^& %$true%
 
 @rem Jump to a directory using interactive search.
-"%$doskey%" %__zoxide_z_prefix%i = (^
+"%$doskey%" %__zoxide_command%i = (^
     {% call batch::for_caret("%$p%", "i") ~%} @(^
         for /f "delims=" %$p%p in ('"zoxide query --interactive -- %$p%~i"') do @(^
             {% call cd("%$p%~fp", 3) -%}^

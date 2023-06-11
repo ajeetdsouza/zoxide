@@ -219,11 +219,8 @@ zoxide can be installed in 4 easy steps:
    > Add this to the **end** of your config file or AutoRun command:
    >
    > ```batchfile
-   > zoxide init cmd | cmd /d >nul
+   > zoxide init cmd | cmd /d /k >nul
    > ```
-   >
-   > **Note**
-   > zoxide only supports `cmd.exe` with Command Extensions v2 and above.
 
    </details>
 

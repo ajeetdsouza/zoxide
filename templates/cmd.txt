@@ -32,7 +32,11 @@
 {%- let section = "@rem ==========================================================================\n@rem" -%}
 {%- let not_configured = "@rem -- not configured --" -%}
 
-@echo off & setlocal DisableDelayedExpansion EnableExtensions
+@(set ^"^") >nul 2>nul && (echo off) || (
+    echo zoxide: unable to init with Command Extensions disabled ^(see `help cmd` for details^)
+) >&2 && exit /b 1 "Command Extensions are disabled" 2>nul
+
+setlocal DisableDelayedExpansion EnableExtensions
 
 if /i "%~f0"=="%~dpnx0" (
     set ^"$p=%%<nul"
@@ -156,6 +160,4 @@ endlocal & set OLDPWD=
 {{ section }}
 @rem To initialize zoxide, add this to your configuration or AutoRun command:
 @rem
-@rem   zoxide init cmd | cmd /d >nul
-@rem
-@rem Note: zoxide only supports `cmd.exe` with Command Extensions v2 and above.
+@rem   zoxide init cmd | cmd /d /k >nul

@@ -225,6 +225,9 @@ zoxide can be installed in 4 easy steps:
    > ```batchfile
    > zoxide init cmd | cmd /d >nul
    > ```
+   >
+   > **Note**
+   > zoxide only supports `cmd.exe` with Command Extensions v2 and above.
 
    </details>
 

@@ -104,11 +104,25 @@ mod tests {
         let source = Cmd(&opts).render().unwrap();
 
         Command::new("cmd.exe")
-            .args(["/a", "/d", "/e:on", "/q", "/v:off", "/k", "@doskey", "/macros:all"])
+            .args(["/a", "/d", "/e:on", "/q", "/v:off", "/k", "@doskey /macros:cmd.exe"])
             .write_stdin(source)
             .assert()
             .success()
             .stderr("");
+    }
+
+    #[apply(opts)]
+    #[cfg(windows)]
+    fn cmd_dos(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+        let source = Cmd(&opts).render().unwrap();
+
+        Command::new("cmd.exe")
+            .args(["/a", "/d", "/e:off", "/q", "/v:off", "/k", "@doskey /macros:cmd.exe"])
+            .write_stdin(source)
+            .assert()
+            .failure()
+            .stderr("zoxide: unable to init with Command Extensions disabled (see `help cmd` for details)");
     }
 
     #[apply(opts)]

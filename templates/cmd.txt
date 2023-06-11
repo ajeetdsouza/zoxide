@@ -15,7 +15,7 @@
 {%- macro    pwd(tabs) -%} (^
 {%- if resolve_symlinks -%}
 {%- call batch::indent(tabs) %}    (^
-{%- call batch::indent(tabs) %}        for /f "skip=9 tokens=1,2,*" %$p%j in ('""%$fsutil%" reparsepoint query ."') do @(^
+{%- call batch::indent(tabs) %}        for /f "skip=9 tokens=1,2,*" %$p%j in ('"%$fsutil% reparsepoint query ."') do @(^
 {%- call batch::indent(tabs) %}            if "%$p%~j"=="Print" if "%$p%~k"=="Name:" if not "%$p%~l"=="" (echo(%$p%~l)^
 {%- call batch::indent(tabs) %}        )^
 {%- call batch::indent(tabs) %}    ) ^|^| %__builtin_pwd%^
@@ -39,10 +39,9 @@ if /i "%~f0"=="%~dpnx0" (
 set ^"$true=(call )"
 set ^"$false=(call)"
 
-set root=%SystemRoot%\System32
-set ^"$doskey=%root%\doskey.exe"
+set ^"$doskey="%SystemRoot%\System32\doskey.exe""
 {%- if resolve_symlinks %}
-set ^"$fsutil=%root%\fsutil.exe"
+set ^"$fsutil="%SystemRoot%\System32\fsutil.exe""
 {%- endif %}
 
 {{ section }}
@@ -56,7 +55,7 @@ set __zoxide_cd=cd
 set __zoxide_pwd=pwd
 
 @rem cd + custom logic based on the value of _ZO_ECHO.
-"%$doskey%" %__zoxide_cd% = (^
+%$doskey% %__zoxide_cd% = (^
     {% call batch::for_caret("%$p%", "i") ~%} @(^
         if "%$p%~i"=="" (^
             if defined USERPROFILE (^
@@ -85,7 +84,7 @@ set __zoxide_pwd=pwd
 ) ^&^& %$true%
 
 @rem pwd based on the value of _ZO_RESOLVE_SYMLINKS.
-"%$doskey%" %__zoxide_pwd% = {%~ call pwd(0) %}
+%$doskey% %__zoxide_pwd% = {%~ call pwd(0) %}
 
 {{ section }}
 @rem Commands for zoxide. Disable these using --no-cmd.
@@ -97,7 +96,7 @@ set __zoxide_pwd=pwd
 set __zoxide_command={{cmd}}
 
 @rem Jump to a directory using only keywords.
-"%$doskey%" %__zoxide_command% = (^
+%$doskey% %__zoxide_command% = (^
     {% call batch::for_caret("%$p%", "i") ~%} @(^
         if "%$p%~i"=="" (^
             if defined USERPROFILE (^
@@ -128,7 +127,7 @@ set __zoxide_command={{cmd}}
 ) ^&^& %$true%
 
 @rem Jump to a directory using interactive search.
-"%$doskey%" %__zoxide_command%i = (^
+%$doskey% %__zoxide_command%i = (^
     {% call batch::for_caret("%$p%", "i") ~%} @(^
         for /f "delims=" %$p%p in ('"zoxide query --interactive -- %$p%~i"') do @(^
             {% call cd("%$p%~fp", 3) -%}^

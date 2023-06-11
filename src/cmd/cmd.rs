@@ -4,22 +4,25 @@ use std::path::PathBuf;
 
 use clap::{Parser, Subcommand, ValueEnum, ValueHint};
 
-const HELP_TEMPLATE: &str = color_print::cstr!(
-    "\
-<bold><underline>{before-help}{name} {version}</underline></bold>
-{author-with-newline}{about-with-newline}
-{usage-heading} {usage}
+const HELP_TEMPLATE: &str = color_print::cstr!("\
+{before-help}<bold><underline>{name} {version}</underline></bold>
+{author}
+https://github.com/ajeetdsouza/zoxide
+
+{about}
+
+{usage-heading}
+{tab}{usage}
 
 {all-args}{after-help}
 
 <bold><underline>Environment variables:</underline></bold>
-  <bold>_ZO_DATA_DIR</bold>          Path for zoxide data files
-  <bold>_ZO_ECHO</bold>              Print the matched directory before navigating to it when set to 1
-  <bold>_ZO_EXCLUDE_DIRS</bold>      List of directory globs to be excluded
-  <bold>_ZO_FZF_OPTS</bold>          Custom flags to pass to fzf
-  <bold>_ZO_MAXAGE</bold>            Maximum total age after which entries start getting deleted
-  <bold>_ZO_RESOLVE_SYMLINKS</bold>  Resolve symlinks when storing paths"
-);
+{tab}<bold>_ZO_DATA_DIR</bold>        {tab}Path for zoxide data files
+{tab}<bold>_ZO_ECHO</bold>            {tab}Print the matched directory before navigating to it when set to 1
+{tab}<bold>_ZO_EXCLUDE_DIRS</bold>    {tab}List of directory globs to be excluded
+{tab}<bold>_ZO_FZF_OPTS</bold>        {tab}Custom flags to pass to fzf
+{tab}<bold>_ZO_MAXAGE</bold>          {tab}Maximum total age after which entries start getting deleted
+{tab}<bold>_ZO_RESOLVE_SYMLINKS</bold>{tab}Resolve symlinks when storing paths");
 
 #[derive(Debug, Parser)]
 #[clap(
@@ -28,7 +31,7 @@ const HELP_TEMPLATE: &str = color_print::cstr!(
     help_template = HELP_TEMPLATE,
     disable_help_subcommand = true,
     propagate_version = true,
-    version = option_env!("ZOXIDE_VERSION").unwrap_or_default()
+    version,
 )]
 pub enum Cmd {
     Add(Add),

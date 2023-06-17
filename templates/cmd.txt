@@ -91,6 +91,30 @@ set __zoxide_pwd=pwd
     )^
 ) ^&^& %$true%
 
+%$doskey% %__zoxide_cd%~ = (^
+    if defined USERPROFILE (^
+        {% call cd("%$p%USERPROFILE%$p%", 2) -%}^
+    ) else (^
+        (echo(%__zoxide_cd%: USERPROFILE is not defined) ^>^&2 ^& %$false%^
+    )^
+)
+
+%$doskey% %__zoxide_cd%- = (^
+    if defined OLDPWD (^
+        {% call cd("%$p%OLDPWD%$p%", 2) -%}^
+    ) else (^
+        (echo(%__zoxide_cd%: OLDPWD is not defined) ^>^&2 ^& %$false%^
+    )^
+)
+
+%$doskey% %__zoxide_cd%\ = {%~ call cd("\\", 0) %}
+
+%$doskey% %__zoxide_cd%/ = {%~ call cd("/", 0) %}
+
+%$doskey% %__zoxide_cd%. = (%__builtin_cd%.)
+
+%$doskey% %__zoxide_cd%.. = {%~ call cd("..", 0) %}
+
 @rem pwd based on the value of _ZO_RESOLVE_SYMLINKS.
 %$doskey% %__zoxide_pwd% = {%~ call pwd(0) %}
 
@@ -139,6 +163,30 @@ set __zoxide_command={{cmd}}
         )^
     )^
 ) ^&^& %$true%
+
+%$doskey% %__zoxide_command%~ = (^
+    if defined USERPROFILE (^
+        {% call cd("%$p%USERPROFILE%$p%", 2) -%}^
+    ) else (^
+        (echo(%__zoxide_command%: USERPROFILE is not defined) ^>^&2 ^& %$false%^
+    )^
+)
+
+%$doskey% %__zoxide_command%- = (^
+    if defined OLDPWD (^
+        {% call cd("%$p%OLDPWD%$p%", 2) -%}^
+    ) else (^
+        (echo(%__zoxide_command%: OLDPWD is not defined) ^>^&2 ^& %$false%^
+    )^
+)
+
+%$doskey% %__zoxide_command%\ = {%~ call cd("\\", 0) %}
+
+%$doskey% %__zoxide_command%/ = {%~ call cd("/", 0) %}
+
+%$doskey% %__zoxide_command%. = (%__builtin_cd%.)
+
+%$doskey% %__zoxide_command%.. = {%~ call cd("..", 0) %}
 
 @rem Jump to a directory using interactive search.
 %$doskey% %__zoxide_command%i = (^

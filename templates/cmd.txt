@@ -38,7 +38,7 @@
 
 setlocal DisableDelayedExpansion EnableExtensions
 
-if /i "%~f0"=="%~dpnx0" (
+if "%=^%="=="%=%=" (
     set ^"$p=%%<nul"
 ) else (
     set ^"$p=^%<nul"

@@ -433,7 +433,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 [algorithm-aging]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#aging
 [algorithm-matching]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#matching
 [alpine linux packages]: https://pkgs.alpinelinux.org/packages?name=zoxide
-[arch linux community]: https://archlinux.org/packages/extra/x86_64/zoxide/
+[arch linux extra]: https://archlinux.org/packages/extra/x86_64/zoxide/
 [asdf]: https://github.com/asdf-vm/asdf
 [builtwithnix-badge]: https://img.shields.io/badge/builtwith-nix-7d81f7?logo=nixos&logoColor=white&style=flat-square
 [builtwithnix]: https://builtwithnix.org/

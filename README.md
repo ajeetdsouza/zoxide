@@ -76,7 +76,7 @@ zoxide can be installed in 4 easy steps:
    > | _Any_               | [conda-forge]           | `conda install -c conda-forge zoxide`                                                                 |
    > | _Any_               | [Linuxbrew]             | `brew install zoxide`                                                                                 |
    > | Alpine Linux 3.13+  | [Alpine Linux Packages] | `apk add zoxide`                                                                                      |
-   > | Arch Linux          | [Arch Linux Community]  | `pacman -S zoxide`                                                                                    |
+   > | Arch Linux          | [Arch Linux Extra]  | `pacman -S zoxide`                                                                                    |
    > | CentOS 7+           | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide`                                             |
    > | Debian 11+[^1]      | [Debian Packages]       | `apt install zoxide`                                                                                  |
    > | Devuan 4.0+[^1]     | [Devuan Packages]       | `apt install zoxide`                                                                                  |
@@ -433,7 +433,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 [algorithm-aging]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#aging
 [algorithm-matching]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#matching
 [alpine linux packages]: https://pkgs.alpinelinux.org/packages?name=zoxide
-[arch linux community]: https://archlinux.org/packages/community/x86_64/zoxide/
+[arch linux extra]: https://archlinux.org/packages/extra/x86_64/zoxide/
 [asdf]: https://github.com/asdf-vm/asdf
 [builtwithnix-badge]: https://img.shields.io/badge/builtwith-nix-7d81f7?logo=nixos&logoColor=white&style=flat-square
 [builtwithnix]: https://builtwithnix.org/

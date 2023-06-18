@@ -76,7 +76,7 @@ zoxide can be installed in 4 easy steps:
    > | _Any_               | [conda-forge]           | `conda install -c conda-forge zoxide`                                                                 |
    > | _Any_               | [Linuxbrew]             | `brew install zoxide`                                                                                 |
    > | Alpine Linux 3.13+  | [Alpine Linux Packages] | `apk add zoxide`                                                                                      |
-   > | Arch Linux          | [Arch Linux Community]  | `pacman -S zoxide`                                                                                    |
+   > | Arch Linux          | [Arch Linux Extra]  | `pacman -S zoxide`                                                                                    |
    > | CentOS 7+           | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide`                                             |
    > | Debian 11+[^1]      | [Debian Packages]       | `apt install zoxide`                                                                                  |
    > | Devuan 4.0+[^1]     | [Devuan Packages]       | `apt install zoxide`                                                                                  |

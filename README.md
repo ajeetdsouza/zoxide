@@ -406,6 +406,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 
 | Application           | Description                                  | Plugin                     |
 | --------------------- | -------------------------------------------- | -------------------------- |
+| [aerc]                | Email client                                 | Natively supported         |
 | [clink]               | Improved cmd.exe for Windows                 | [clink-zoxide]             |
 | [emacs]               | Text editor                                  | [zoxide.el]                |
 | [felix]               | File manager                                 | Natively supported         |
@@ -430,6 +431,7 @@ Environment variables[^2] can be used for configuration. They must be set before
     If you're not sure how to set an environment variable on your shell, check
     out the [wiki][wiki-env].
 
+[aerc]: https://github.com/rjarry/aerc
 [algorithm-aging]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#aging
 [algorithm-matching]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#matching
 [alpine linux packages]: https://pkgs.alpinelinux.org/packages?name=zoxide

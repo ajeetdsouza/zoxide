@@ -48,9 +48,10 @@ main() {
 
     # Install binary.
     local _bin_dir="${BINDIR:-${HOME}/.local/bin}"
-    local _bin_name="${BINNAME:-zoxide}"
+    local _bin_name
     case "${_arch}" in
     *windows*) _bin_name="$_bin_name.exe" ;;
+    *) _bin_name="zoxide" ;;
     esac
     ensure mkdir -p "${_bin_dir}"
     ensure cp "${_bin_name}" "${_bin_dir}"

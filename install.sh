@@ -149,7 +149,12 @@ main() {
 
     # Install manpages.
     # shellcheck disable=SC2086 # The lack of quoting is intentional.
-    ensure ${_sudo} cp "man/man1/"* "${_man_dir}/man1/"
+    {
+        if ! [ -d "${_man_dir}/man1/" ]; then
+            ensure ${_sudo} mkdir -p "${_man_dir}/man1/"
+        fi
+        ensure ${_sudo} cp "man/man1/"* "${_man_dir}/man1/"
+    }
     log "Installed manpages to ${_man_dir}"
 
     # Print success message and check $PATH.

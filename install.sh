@@ -148,6 +148,18 @@ main() {
     }
     log "Installed zoxide to ${_bin_dir}"
 
+    # After this point, $sudo is used for _bin_dir instead of _bin_dir
+
+    if test_writeable "${_man_dir}"; then
+        log "Installing zoxide man pages, please wait…"
+        _sudo=""
+    else
+        log "Escalated permissions are required to install man pages to ${_man_dir}"
+        elevate_priv "${_sudo:-$SUDO}" # use previously found command OR user defined
+        _sudo=${RETVAL}
+        log "Installing zoxide man pages as root using $_sudo, please wait…"
+    fi
+
     # Install manpages.
     # shellcheck disable=SC2086 # The lack of quoting is intentional.
     {

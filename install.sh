@@ -143,8 +143,8 @@ main() {
     # Install binary.
     # shellcheck disable=SC2086 # The lack of quoting is intentional. This may not be the best way to do it, but it's hard to properly do in POSIX
     {
-        ensure ${_sudo} cp "${_bin_name}" "${_bin_dir}"
-        ensure ${_sudo} chmod +x "${_bin_dir}/${_bin_name}"
+        ensure ${_sudo} cp -- "${_bin_name}" "${_bin_dir}"
+        ensure ${_sudo} chmod +x -- "${_bin_dir}/${_bin_name}"
     }
     log "Installed zoxide to ${_bin_dir}"
 
@@ -165,9 +165,9 @@ main() {
     # shellcheck disable=SC2086 # The lack of quoting is intentional.
     {
         if ! [ -d "${_man_dir}/man1/" ]; then
-            ensure ${_sudo} mkdir -p "${_man_dir}/man1/"
+            ensure ${_sudo} mkdir -p -- "${_man_dir}/man1/"
         fi
-        ensure ${_sudo} cp "man/man1/"* "${_man_dir}/man1/"
+        ensure ${_sudo} cp -- "man/man1/"* "${_man_dir}/man1/"
     }
     log "Installed manpages to ${_man_dir}"
 
@@ -200,11 +200,11 @@ download_zoxide() {
     local _releases_url="https://api.github.com/repos/ajeetdsouza/zoxide/releases/latest"
     local _releases
     case "${_dld}" in
-    curl) _releases="$(curl -sL "${_releases_url}")" ||
+    curl) _releases="$(curl -sSfL -- "${_releases_url}")" ||
         abort "curl: failed to download ${_releases_url}" ;;
-    wget) _releases="$(wget -qO- "${_releases_url}")" ||
+    wget) _releases="$(wget -qO- -- "${_releases_url}")" ||
         abort "wget: failed to download ${_releases_url}" ;;
-    fetch) _releases="$(fetch --quiet "${_releases_url}")" ||
+    fetch) _releases="$(fetch --quiet -- "${_releases_url}")" ||
         abort "fetch: failed to download ${_releases_url}" ;;
     *) abort "unsupported downloader: ${_dld}" ;;
     esac
@@ -212,7 +212,7 @@ download_zoxide() {
         abort "you have exceeded GitHub's API rate limit. Please try again later, or use a different installation method: https://github.com/ajeetdsouza/zoxide/#installation"
 
     local _package_url
-    _package_url="$(printf "%s" "${_releases}" | grep "browser_download_url" | cut -d '"' -f 4 | grep "${_arch}")" ||
+    _package_url="$(printf "%s" "${_releases}" | grep "browser_download_url" | cut -d '"' -f 4 | grep -F -- "${_arch}")" ||
         abort "zoxide has not yet been packaged for your architecture (${_arch}), please file an issue: https://github.com/ajeetdsouza/zoxide/issues"
 
     local _ext
@@ -224,9 +224,9 @@ download_zoxide() {
 
     local _package="zoxide.${_ext}"
     case "${_dld}" in
-    curl) _releases="$(curl -sLo "${_package}" "${_package_url}")" || abort "curl: failed to download ${_package_url}" ;;
-    wget) _releases="$(wget -qO "${_package}" "${_package_url}")" || abort "wget: failed to download ${_package_url}" ;;
-    fetch) _releases="$(fetch --quiet --output="${_package}" "${_package_url}")" || abort "fetch: failed to download ${_package_url}" ;;
+    curl) _releases="$(curl -sLo "${_package}" -- "${_package_url}")" || abort "curl: failed to download ${_package_url}" ;;
+    wget) _releases="$(wget -qO "${_package}" -- "${_package_url}")" || abort "wget: failed to download ${_package_url}" ;;
+    fetch) _releases="$(fetch --quiet --output="${_package}" -- "${_package_url}")" || abort "fetch: failed to download ${_package_url}" ;;
     *) abort "unsupported downloader: ${_dld}" ;;
     esac
 
@@ -473,8 +473,8 @@ test_writeable() {
         abort "BUG: test_writeable requires a path to test."
     fi
     path="$1/test.txt"
-    if touch "${path}" 2>/dev/null; then
-        rm "${path}"
+    if touch -- "${path}" 2>/dev/null; then
+        rm -- "${path}"
         return 0
     else
         return 1
@@ -495,7 +495,7 @@ need_cmd() {
     fi
 }
 
-has_cmd() { command -v "$1" >/dev/null 2>&1; }
+has_cmd() { command -v -- "$1" >/dev/null 2>&1; }
 
 # parse the arguments passed and set the environment variables accordingly
 parse_args() {

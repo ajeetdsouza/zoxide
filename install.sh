@@ -68,8 +68,6 @@ main() {
     ensure get_architecture
     local _arch="${RETVAL}"
   fi
-  assert_nz "${_arch}" "arch"
-  log "Detected architecture: ${_arch}"
 
   local _bin_dir="${HOME}/.local/bin"
   local _bin_name
@@ -81,6 +79,8 @@ main() {
   _man_dir=${MAN_DIR:-$_man_dir}
   _arch=${ARCH:-$_arch}
 
+  assert_nz "${_arch}" "arch"
+  log "Detected architecture: ${_arch}"
   case "${_arch}" in
   *windows*) _bin_name="zoxide.exe" ;;
   *) _bin_name="zoxide" ;;

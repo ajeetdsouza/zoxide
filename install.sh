@@ -26,7 +26,7 @@ usage() {
 # sets RETVAL to sudo command to use, exits script if no command can be found
 # optional user command is passed as an argument, if it fails, attempts to use sudo/doas.
 elevate_priv() {
-    if [ -n "${1:-}" ]; then # user input
+    if [ -n "${1-}" ]; then # user input
         if "$1" true; then
             RETVAL="$1"
             return 0
@@ -72,7 +72,7 @@ main() {
     set -u
 
     # Detect and print host target triple.
-    if [ -n "${ARCH:-}" ]; then
+    if [ -n "${ARCH-}" ]; then
         # if the user specifed, trust them - don't error on unrecognized hardware.
         local _arch="${ARCH}"
     else
@@ -90,7 +90,7 @@ main() {
     _bin_dir=${BIN_DIR:-${_bin_dir}}
     _man_dir=${MAN_DIR:-${_man_dir}}
     _arch=${ARCH:-${_arch}}
-    _sudo=${SUDO:-}
+    _sudo=${SUDO-}
 
     assert_nz "${_arch}" "arch"
     log "Detected architecture: ${_arch}"
@@ -156,7 +156,7 @@ main() {
         _sudo=""
     else
         log "Escalated permissions are required to install man pages to ${_man_dir}"
-        elevate_priv "${_sudo:-${SUDO:-}}" # use previously found command OR user defined
+        elevate_priv "${_sudo:-${SUDO-}}" # use previously found command OR user defined
         _sudo=${RETVAL}
         log "Installing zoxide man pages as root using ${_sudo}, please wait…"
     fi

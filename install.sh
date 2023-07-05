@@ -19,11 +19,22 @@ usage() {
     "-b, --bin-dir" "Override the bin installation directory [default: ${_bin_dir}]" \
     "-m, --man-dir" "Override the man installation directory [default: ${_man_dir}]" \
     "-a, --arch" "Override the architecture identified by the installer [default: ${_arch}]" \
+    "-s, --sudo" "Override the command used to elevate to root privaliges [default: sudo/doas]" \
     "-h, --help" "Display this help message"
 }
 
 # outputs sudo command to use to stdout, exits script if no command can be found
+# optional user command is passed as an argument, if it fails, attempts to use sudo/doas.
 elevate_priv() {
+  if [ -n "${1:-}" ]; then # user input
+    if "$1" true; then
+      printf '%s' "$1"
+      return 0
+    else
+      err "$1 failed. Checking sudo support."
+    fi
+  fi
+
   if has sudo; then
     if sudo true; then
       printf 'sudo'
@@ -72,12 +83,14 @@ main() {
   local _bin_dir="${HOME}/.local/bin"
   local _bin_name
   local _man_dir="${HOME}/.local/share/man"
+  local _sudo
 
-  parse_args "$@" # sets global variables (BIN_DIR, MAN_DIR, ARCH)
+  parse_args "$@" # sets global variables (BIN_DIR, MAN_DIR, ARCH, SUDO)
 
   _bin_dir=${BIN_DIR:-$_bin_dir}
   _man_dir=${MAN_DIR:-$_man_dir}
   _arch=${ARCH:-$_arch}
+  _sudo=${SUDO:-}
 
   assert_nz "${_arch}" "arch"
   log "Detected architecture: ${_arch}"
@@ -93,12 +106,12 @@ main() {
     abort "Please ensure the manual destination exists! (${_man_dir})"
   fi
 
-  local sudo=""
   if test_writeable "${_bin_dir}"; then
     log "Installing zoxide, please wait…"
+    _sudo=""
   else
     log "Escalated permissions are required to install to ${_bin_dir}"
-    sudo=$(elevate_priv)
+    _sudo=$(elevate_priv "$_sudo")
     log "Installing zoxide as root, please wait…"
   fi
 
@@ -129,14 +142,14 @@ main() {
   # Install binary.
   # shellcheck disable=SC2086 # The lack of quoting is intentional. This may not be the best way to do it, but it's hard to properly do in POSIX
   {
-    ensure ${sudo} cp "${_bin_name}" "${_bin_dir}"
-    ensure ${sudo} chmod +x "${_bin_dir}/${_bin_name}"
+    ensure ${_sudo} cp "${_bin_name}" "${_bin_dir}"
+    ensure ${_sudo} chmod +x "${_bin_dir}/${_bin_name}"
   }
   log "Installed zoxide to ${_bin_dir}"
 
   # Install manpages.
   # shellcheck disable=SC2086 # The lack of quoting is intentional.
-  ensure ${sudo} cp "man/man1/"* "${_man_dir}/man1/"
+  ensure ${_sudo} cp "man/man1/"* "${_man_dir}/man1/"
   log "Installed manpages to ${_man_dir}"
 
   # Print success message and check $PATH.
@@ -477,6 +490,10 @@ parse_args() {
       ARCH="$2"
       shift 2
       ;;
+    -s | --sudo)
+      SUDO="$2"
+      shift 2
+      ;;
     -h | --help)
       usage
       exit 0
@@ -492,6 +509,10 @@ parse_args() {
       ;;
     -a=* | --arch=*)
       ARCH="${1#*=}"
+      shift 1
+      ;;
+    -s=* | --sudo=*)
+      SUDO="${1#*=}"
       shift 1
       ;;
     *)

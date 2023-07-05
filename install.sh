@@ -35,7 +35,7 @@ elevate_priv() {
         fi
     fi
 
-    if has sudo; then
+    if has_cmd sudo; then
         if sudo true; then
             printf 'sudo'
             return 0
@@ -44,7 +44,7 @@ elevate_priv() {
         fi
     fi
 
-    if has doas; then
+    if has_cmd doas; then
         if doas true; then
             printf "doas"
             return 0
@@ -112,7 +112,7 @@ main() {
     else
         log "Escalated permissions are required to install to ${_bin_dir}"
         _sudo=$(elevate_priv "$_sudo")
-        log "Installing zoxide as root, please wait…"
+        log "Installing zoxide as root using $_sudo, please wait…"
     fi
 
     # Create and enter a temporary directory.

@@ -150,7 +150,8 @@ main() {
 
     # After this point, $sudo is used for _bin_dir instead of _bin_dir
 
-    if test_writeable "${_man_dir}"; then
+    if { [ -d "${_man_dir}/man1" ] && test_writeable "${_man_dir}/man1}"; } ||
+        { ! [ -d "${_man_dir}/man1" ] && test_writeable "${_man_dir}"; }; then
         log "Installing zoxide man pages, please wait…"
         _sudo=""
     else

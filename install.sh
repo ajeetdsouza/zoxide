@@ -175,7 +175,9 @@ main() {
     log ""
     log "zoxide is installed!"
     case ":${PATH}:" in
-    *":${_bin_dir}:"*) true ;; # noop
+    *":${_bin_dir}:"*) true ;;   # noop
+    *":${_bin_dir%/}:"*) true ;; # noop
+    *":${_bin_dir}/:"*) true ;;  # noop
     *) log "NOTE: ${_bin_dir} is not on your \$PATH. zoxide will not work unless it is added to \$PATH." ;;
     esac
 }

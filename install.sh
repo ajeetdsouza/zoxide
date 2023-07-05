@@ -541,3 +541,4 @@ abort() {
 {
     main "$@" || exit 1
 }
+# vim: shiftwidth=4:tabstop=4:ft=sh:

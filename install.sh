@@ -156,7 +156,7 @@ main() {
         _sudo=""
     else
         log "Escalated permissions are required to install man pages to ${_man_dir}"
-        elevate_priv "${_sudo:-$SUDO}" # use previously found command OR user defined
+        elevate_priv "${_sudo:-${SUDO:-}}" # use previously found command OR user defined
         _sudo=${RETVAL}
         log "Installing zoxide man pages as root using $_sudo, please wait…"
     fi

@@ -1,6 +1,6 @@
 #!/bin/sh
 # shellcheck shell=dash
-# shellcheck disable=SC3043
+# shellcheck disable=SC3043 # Disable warning about 'local'. see note below.
 
 # The official zoxide installer.
 #

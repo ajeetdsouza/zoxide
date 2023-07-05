@@ -23,12 +23,12 @@ usage() {
         "-h, --help" "Display this help message"
 }
 
-# outputs sudo command to use to stdout, exits script if no command can be found
+# sets RETVAL to sudo command to use, exits script if no command can be found
 # optional user command is passed as an argument, if it fails, attempts to use sudo/doas.
 elevate_priv() {
     if [ -n "${1:-}" ]; then # user input
         if "$1" true; then
-            printf '%s' "$1"
+            RETVAL="$1"
             return 0
         else
             err "$1 failed. Checking sudo support."
@@ -37,7 +37,7 @@ elevate_priv() {
 
     if has_cmd sudo; then
         if sudo true; then
-            printf 'sudo'
+            RETVAL="sudo"
             return 0
         else
             err "Sudo failed. Checking doas support."
@@ -46,7 +46,7 @@ elevate_priv() {
 
     if has_cmd doas; then
         if doas true; then
-            printf "doas"
+            RETVAL="doas"
             return 0
         else
             err "doas failed."
@@ -111,7 +111,8 @@ main() {
         _sudo=""
     else
         log "Escalated permissions are required to install to ${_bin_dir}"
-        _sudo=$(elevate_priv "$_sudo")
+        elevate_priv "$_sudo"
+        _sudo=${RETVAL}
         log "Installing zoxide as root using $_sudo, please wait…"
     fi
 

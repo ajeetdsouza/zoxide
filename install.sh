@@ -87,9 +87,9 @@ main() {
 
     parse_args "$@" # sets global variables (BIN_DIR, MAN_DIR, ARCH, SUDO)
 
-    _bin_dir=${BIN_DIR:-$_bin_dir}
-    _man_dir=${MAN_DIR:-$_man_dir}
-    _arch=${ARCH:-$_arch}
+    _bin_dir=${BIN_DIR:-${_bin_dir}}
+    _man_dir=${MAN_DIR:-${_man_dir}}
+    _arch=${ARCH:-${_arch}}
     _sudo=${SUDO:-}
 
     assert_nz "${_arch}" "arch"
@@ -111,9 +111,9 @@ main() {
         _sudo=""
     else
         log "Escalated permissions are required to install to ${_bin_dir}"
-        elevate_priv "$_sudo"
+        elevate_priv "${_sudo}"
         _sudo=${RETVAL}
-        log "Installing zoxide as root using $_sudo, please wait…"
+        log "Installing zoxide as root using ${_sudo}, please wait…"
     fi
 
     # Create and enter a temporary directory.
@@ -158,7 +158,7 @@ main() {
         log "Escalated permissions are required to install man pages to ${_man_dir}"
         elevate_priv "${_sudo:-${SUDO:-}}" # use previously found command OR user defined
         _sudo=${RETVAL}
-        log "Installing zoxide man pages as root using $_sudo, please wait…"
+        log "Installing zoxide man pages as root using ${_sudo}, please wait…"
     fi
 
     # Install manpages.
@@ -191,7 +191,6 @@ download_zoxide() {
         _dld=wget
     elif has_cmd fetch; then
         _dld="fetch"
-        # cmd="fetch --quiet --output=$file $url"
     else
         abort 'curl or wget are required to download zoxide'
     fi

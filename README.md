@@ -75,6 +75,7 @@ zoxide can be installed in 4 easy steps:
    > | _Any_               | [asdf]                  | `asdf plugin add zoxide https://github.com/nyrst/asdf-zoxide.git` <br /> `asdf install zoxide latest` |
    > | _Any_               | [conda-forge]           | `conda install -c conda-forge zoxide`                                                                 |
    > | _Any_               | [Linuxbrew]             | `brew install zoxide`                                                                                 |
+   > | _Any_               | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                                                                          |
    > | Alpine Linux 3.13+  | [Alpine Linux Packages] | `apk add zoxide`                                                                                      |
    > | Arch Linux          | [Arch Linux Extra]  | `pacman -S zoxide`                                                                                    |
    > | CentOS 7+           | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide`                                             |
@@ -83,7 +84,6 @@ zoxide can be installed in 4 easy steps:
    > | Fedora 32+          | [Fedora Packages]       | `dnf install zoxide`                                                                                  |
    > | Gentoo              | [GURU Overlay]          | `eselect repository enable guru` <br /> `emerge --sync guru` <br /> `emerge app-shells/zoxide`        |
    > | Manjaro             |                         | `pacman -S zoxide`                                                                                    |
-   > | NixOS 21.05+        | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                                                                          |
    > | openSUSE Tumbleweed | [openSUSE Factory]      | `zypper install zoxide`                                                                               |
    > | Parrot OS[^1]       |                         | `apt install zoxide`                                                                                  |
    > | Raspbian 11+[^1]    | [Raspbian Packages]     | `apt install zoxide`                                                                                  |
@@ -105,7 +105,8 @@ zoxide can be installed in 4 easy steps:
    > | [asdf]          | `asdf plugin add zoxide https://github.com/nyrst/asdf-zoxide.git` <br /> `asdf install zoxide latest` |
    > | [conda-forge]   | `conda install -c conda-forge zoxide`                                                                 |
    > | [MacPorts]      | `port install zoxide`                                                                                 |
-   >
+   > | [nixpkgs]       | `nix-env -iA nixpkgs.zoxide`                                                                          |
+   > 
    > Or, run this command in your terminal:
    >
    > ```sh

@@ -106,7 +106,7 @@ zoxide can be installed in 4 easy steps:
    > | [conda-forge]   | `conda install -c conda-forge zoxide`                                                                 |
    > | [MacPorts]      | `port install zoxide`                                                                                 |
    > | [nixpkgs]       | `nix-env -iA nixpkgs.zoxide`                                                                          |
-   > 
+   >
    > Or, run this command in your terminal:
    >
    > ```sh

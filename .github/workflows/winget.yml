@@ -4,7 +4,7 @@ on:
     types: [released]
 jobs:
   publish:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: vedantmgoyal2009/winget-releaser@v2
         with:

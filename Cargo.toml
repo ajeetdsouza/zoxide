@@ -4,16 +4,7 @@ categories = ["command-line-utilities", "filesystem"]
 description = "A smarter cd command for your terminal"
 edition = "2021"
 homepage = "https://github.com/ajeetdsouza/zoxide"
-keywords = [
-    "cli",
-    "command",
-    "command-line",
-    "filesystem",
-    "search",
-    "shell",
-    "tool",
-    "utility",
-]
+keywords = ["cli", "filesystem", "shell", "tool", "utility"]
 license = "MIT"
 name = "zoxide"
 readme = "README.md"

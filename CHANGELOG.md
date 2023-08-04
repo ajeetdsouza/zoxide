@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Short option `-a` for `zoxide query --all`.
 
+### Fixed
+
+- PowerShell: use `global` scope for variables / functions.
+
 ## [0.9.1] - 2023-05-07
 
 ### Added

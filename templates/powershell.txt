@@ -6,7 +6,7 @@
 #
 
 # Call zoxide binary, returning the output as UTF-8.
-function __zoxide_bin {
+function global:__zoxide_bin {
     $encoding = [Console]::OutputEncoding
     try {
         [Console]::OutputEncoding = [System.Text.Utf8Encoding]::new()
@@ -18,7 +18,7 @@ function __zoxide_bin {
 }
 
 # pwd based on zoxide's format.
-function __zoxide_pwd {
+function global:__zoxide_pwd {
     $cwd = Get-Location
     if ($cwd.Provider.Name -eq "FileSystem") {
         $cwd.ProviderPath
@@ -26,7 +26,7 @@ function __zoxide_pwd {
 }
 
 # cd + custom logic based on the value of _ZO_ECHO.
-function __zoxide_cd($dir, $literal) {
+function global:__zoxide_cd($dir, $literal) {
     $dir = if ($literal) {
         Set-Location -LiteralPath $dir -Passthru -ErrorAction Stop
     } else {
@@ -59,7 +59,7 @@ function __zoxide_cd($dir, $literal) {
 -#}
 {%- if hook == InitHook::Prompt -%}
 # Hook to add new entries to the database.
-function __zoxide_hook {
+function global:__zoxide_hook {
     $result = __zoxide_pwd
     if ($null -ne $result) {
         zoxide add -- $result
@@ -68,7 +68,7 @@ function __zoxide_hook {
 {%- else if hook == InitHook::Pwd -%}
 # Hook to add new entries to the database.
 $global:__zoxide_oldpwd = __zoxide_pwd
-function __zoxide_hook {
+function global:__zoxide_hook {
     $result = __zoxide_pwd
     if ($result -ne $global:__zoxide_oldpwd) {
         if ($null -ne $result) {
@@ -80,12 +80,12 @@ function __zoxide_hook {
 {%- endif %}
 
 # Initialize hook.
-$__zoxide_hooked = (Get-Variable __zoxide_hooked -ErrorAction SilentlyContinue -ValueOnly)
-if ($__zoxide_hooked -ne 1) {
-    $__zoxide_hooked = 1
-    $__zoxide_prompt_old = $function:prompt
+$global:__zoxide_hooked = (Get-Variable __zoxide_hooked -ErrorAction SilentlyContinue -ValueOnly)
+if ($global:__zoxide_hooked -ne 1) {
+    $global:__zoxide_hooked = 1
+    $global:__zoxide_prompt_old = $function:prompt
 
-    function prompt {
+    function global:prompt {
         if ($null -ne $__zoxide_prompt_old) {
             & $__zoxide_prompt_old
         }
@@ -99,7 +99,7 @@ if ($__zoxide_hooked -ne 1) {
 #
 
 # Jump to a directory using only keywords.
-function __zoxide_z {
+function global:__zoxide_z {
     if ($args.Length -eq 0) {
         __zoxide_cd ~ $true
     }
@@ -124,7 +124,7 @@ function __zoxide_z {
 }
 
 # Jump to a directory using interactive search.
-function __zoxide_zi {
+function global:__zoxide_zi {
     $result = __zoxide_bin query -i -- @args
     if ($LASTEXITCODE -eq 0) {
         __zoxide_cd $result $true

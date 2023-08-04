@@ -19,7 +19,7 @@ name = "zoxide"
 readme = "README.md"
 repository = "https://github.com/ajeetdsouza/zoxide"
 rust-version = "1.65"
-version = "0.9.1"
+version = "0.9.2"
 
 [badges]
 maintenance = { status = "actively-developed" }
@@ -34,7 +34,7 @@ dirs = "5.0.0"
 dunce = "1.0.1"
 fastrand = "2.0.0"
 glob = "0.3.0"
-ouroboros = "0.15.5"
+ouroboros = "0.17.2"
 serde = { version = "1.0.116", features = ["derive"] }
 
 [target.'cfg(unix)'.dependencies]
@@ -54,8 +54,8 @@ color-print = "0.3.4"
 
 [dev-dependencies]
 assert_cmd = "2.0.0"
-rstest = { version = "0.17.0", default-features = false }
-rstest_reuse = "0.5.0"
+rstest = { version = "0.18.0", default-features = false }
+rstest_reuse = "0.6.0"
 tempfile = "3.1.0"
 
 [features]

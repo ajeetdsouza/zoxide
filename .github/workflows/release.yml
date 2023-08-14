@@ -51,7 +51,7 @@ jobs:
           override: true
           target: ${{ matrix.target }}
       - name: Setup cache
-        uses: Swatinem/rust-cache@v2.6.0
+        uses: Swatinem/rust-cache@v2.6.1
         with:
           key: ${{ matrix.target }}
       - name: Build binary

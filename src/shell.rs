@@ -196,7 +196,7 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn posix_shellcheck_(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
+    fn posix_shellcheck(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Posix(&opts).render().unwrap();
 

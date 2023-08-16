@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Nushell: support for v0.86.0.
 
+### Fixed
+
+- Normalize drive letters when resolving paths on Windows.
+
 ## [0.9.2] - 2023-08-04
 
 ### Added

@@ -1,7 +1,7 @@
 use std::ffi::OsStr;
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, Read, Write};
-use std::path::{Component, Path, PathBuf};
+use std::path::{Component, Path, PathBuf, Prefix};
 use std::process::{Child, Command, Stdio};
 use std::time::SystemTime;
 use std::{env, mem};
@@ -263,6 +263,37 @@ pub fn path_to_str(path: &impl AsRef<Path>) -> Result<&str> {
     path.to_str().with_context(|| format!("invalid unicode in path: {}", path.display()))
 }
 
+pub fn patch_path(path: PathBuf) -> PathBuf {
+    if cfg!(windows) {
+        fn patch_drive(drive_letter: u8) -> char {
+            drive_letter.to_ascii_uppercase() as char
+        }
+
+        let mut components = path.components();
+        match components.next() {
+            Some(Component::Prefix(prefix)) => {
+                let prefix = match prefix.kind() {
+                    Prefix::Disk(drive_letter) => {
+                        format!(r"{}:", patch_drive(drive_letter))
+                    }
+                    Prefix::VerbatimDisk(drive_letter) => {
+                        format!(r"\\?\{}:", patch_drive(drive_letter))
+                    }
+                    _ => return path,
+                };
+
+                let mut path = PathBuf::default();
+                path.push(prefix);
+                path.extend(components);
+                path
+            }
+            _ => path,
+        }
+    } else {
+        path
+    }
+}
+
 /// Returns the absolute version of a path. Like
 /// [`std::path::Path::canonicalize`], but doesn't resolve symlinks.
 pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
@@ -274,8 +305,6 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
 
     // initialize root
     if cfg!(windows) {
-        use std::path::Prefix;
-
         fn get_drive_letter(path: impl AsRef<Path>) -> Option<u8> {
             let path = path.as_ref();
             let mut components = path.components();
@@ -292,7 +321,7 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
         }
 
         fn get_drive_path(drive_letter: u8) -> PathBuf {
-            format!(r"{}:\", drive_letter as char).into()
+            format!(r"{}:\", drive_letter.to_ascii_uppercase() as char).into()
         }
 
         fn get_drive_relative(drive_letter: u8) -> Result<PathBuf> {
@@ -312,23 +341,25 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
         match components.peek() {
             Some(Component::Prefix(prefix)) => match prefix.kind() {
                 Prefix::Disk(drive_letter) => {
-                    let disk = components.next().unwrap();
+                    components.next();
                     if components.peek() == Some(&Component::RootDir) {
-                        let root = components.next().unwrap();
-                        stack.push(disk);
-                        stack.push(root);
+                        components.next();
+                        base_path = get_drive_path(drive_letter);
                     } else {
                         base_path = get_drive_relative(drive_letter)?;
-                        stack.extend(base_path.components());
                     }
+
+                    stack.extend(base_path.components());
                 }
                 Prefix::VerbatimDisk(drive_letter) => {
                     components.next();
                     if components.peek() == Some(&Component::RootDir) {
                         components.next();
+                        base_path = get_drive_path(drive_letter);
+                    } else {
+                        bail!("illegal path: {}", path.display());
                     }
 
-                    base_path = get_drive_path(drive_letter);
                     stack.extend(base_path.components());
                 }
                 _ => bail!("invalid path: {}", path.display()),

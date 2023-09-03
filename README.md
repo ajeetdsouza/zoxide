@@ -77,7 +77,7 @@ zoxide can be installed in 4 easy steps:
    > | _Any_               | [Linuxbrew]             | `brew install zoxide`                                                                                 |
    > | _Any_               | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                                                                          |
    > | Alpine Linux 3.13+  | [Alpine Linux Packages] | `apk add zoxide`                                                                                      |
-   > | Arch Linux          | [Arch Linux Extra]  | `pacman -S zoxide`                                                                                    |
+   > | Arch Linux          | [Arch Linux Extra]      | `pacman -S zoxide`                                                                                    |
    > | CentOS 7+           | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide`                                             |
    > | Debian 11+[^1]      | [Debian Packages]       | `apt install zoxide`                                                                                  |
    > | Devuan 4.0+[^1]     | [Devuan Packages]       | `apt install zoxide`                                                                                  |
@@ -87,6 +87,7 @@ zoxide can be installed in 4 easy steps:
    > | openSUSE Tumbleweed | [openSUSE Factory]      | `zypper install zoxide`                                                                               |
    > | Parrot OS[^1]       |                         | `apt install zoxide`                                                                                  |
    > | Raspbian 11+[^1]    | [Raspbian Packages]     | `apt install zoxide`                                                                                  |
+   > | Rhino Linux         | [Pacstall Packages]     | `pacstall -I zoxide-deb`                                                                              |
    > | Slackware 15.0+     | [SlackBuilds]           | [Instructions][slackbuilds-howto]                                                                     |
    > | Ubuntu 21.04+[^1]   | [Ubuntu Packages]       | `apt install zoxide`                                                                                  |
    > | Void Linux          | [Void Linux Packages]   | `xbps-install -S zoxide`                                                                              |
@@ -472,6 +473,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 [nnn-autojump]: https://github.com/jarun/nnn/blob/master/plugins/autojump
 [nnn]: https://github.com/jarun/nnn
 [opensuse factory]: https://build.opensuse.org/package/show/openSUSE:Factory/zoxide
+[pacstall packages]: https://pacstall.dev/packages/zoxide-deb
 [pkgsrc]: https://pkgsrc.se/sysutils/zoxide
 [ranger-zoxide]: https://github.com/jchook/ranger-zoxide
 [ranger]: https://github.com/ranger/ranger

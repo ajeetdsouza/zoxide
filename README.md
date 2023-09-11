@@ -122,7 +122,7 @@ zoxide can be installed in 4 easy steps:
    > The recommended way to install zoxide is via `winget`:
    >
    > ```sh
-   > winget install zoxide
+   > winget install ajeetdsouza.zoxide
    > ```
    >
    > Or, you can use an alternative package manager:

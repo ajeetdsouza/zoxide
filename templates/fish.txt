@@ -65,7 +65,7 @@ end
 if test -z $__zoxide_z_prefix
     set __zoxide_z_prefix 'z!'
 end
-set __zoxide_z_prefix_regex ^(string escape --style=regex $__zoxide_z_prefix)
+set __zoxide_z_prefix_regex (string escape --style=regex $__zoxide_z_prefix)
 
 # Jump to a directory using only keywords.
 function __zoxide_z

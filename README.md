@@ -15,7 +15,10 @@
   <div>
     <img src="contrib/warp.png" width="230" alt="Warp" />
   </div>
-  <b>Warp is a modern, Rust-based terminal with AI built in so you and your team can build great software, faster.</b>
+  <b>
+    Warp is a modern, Rust-based terminal with AI built in so you and your team
+    can build great software, faster.
+  </b>
   <div>
     <sup>Visit <u>warp.dev</u> to learn more.</sup>
   </div>

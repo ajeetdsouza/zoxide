@@ -23,7 +23,7 @@ pub const MONTH: Epoch = 30 * DAY;
 pub struct Fzf(Command);
 
 impl Fzf {
-    const ERR_FZF_NOT_FOUND: &str = "could not find fzf, is it installed?";
+    const ERR_FZF_NOT_FOUND: &'static str = "could not find fzf, is it installed?";
 
     pub fn new() -> Result<Self> {
         // On Windows, CreateProcess implicitly searches the current working

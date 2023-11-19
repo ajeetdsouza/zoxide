@@ -17,6 +17,5 @@ jobs:
           daysUntilClose: 30
           responseRequiredLabel: waiting-for-response
           closeComment: >
-            This issue has been automatically closed due to inactivity. If you feel
-            this is still relevant, please comment here or create a fresh issue.
+            This issue has been automatically closed due to inactivity. If you feel this is still relevant, please comment here or create a fresh issue.
 

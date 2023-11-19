@@ -38,7 +38,7 @@ def __zoxide_pwd() -> str:
 {%- else %}
     pwd = __zoxide_env().get("PWD")
     if pwd is None:
-        raise Exception("$PWD not found")
+        raise RuntimeError("$PWD not found")
 {%- endif %}
     return pwd
 
@@ -53,7 +53,7 @@ def __zoxide_cd(path: typing.Optional[typing.AnyStr] = None) -> None:
         args = [path]
     _, exc, _ = xonsh.dirstack.cd(args)
     if exc is not None:
-        raise Exception(exc)
+        raise RuntimeError(exc)
 {%- if echo %}
     print(__zoxide_pwd())
 {%- endif %}

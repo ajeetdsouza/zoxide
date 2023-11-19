@@ -243,7 +243,7 @@ zoxide can be installed in 4 easy steps:
    > ```
    >
    > **Note**
-   > zoxide only supports Nushell v0.73.0 and above.
+   > zoxide only supports Nushell v0.86.0+.
 
    </details>
 

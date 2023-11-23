@@ -93,6 +93,7 @@ zoxide can be installed in 4 easy steps:
    > | _Any_               | [conda-forge]           | `conda install -c conda-forge zoxide`                                                                 |
    > | _Any_               | [Linuxbrew]             | `brew install zoxide`                                                                                 |
    > | _Any_               | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                                                                          |
+   > | _Any_               | [Webi]                  | `curl https://webi.sh/zoxide@stable | sh`                                                             |
    > | Alpine Linux 3.13+  | [Alpine Linux Packages] | `apk add zoxide`                                                                                      |
    > | Arch Linux          | [Arch Linux Extra]      | `pacman -S zoxide`                                                                                    |
    > | CentOS 7+           | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide`                                             |
@@ -124,6 +125,7 @@ zoxide can be installed in 4 easy steps:
    > | [conda-forge]   | `conda install -c conda-forge zoxide`                                                                 |
    > | [MacPorts]      | `port install zoxide`                                                                                 |
    > | [nixpkgs]       | `nix-env -iA nixpkgs.zoxide`                                                                          |
+   > | [Webi]          | `curl https://webi.sh/zoxide@stable | sh`                                                             |
    >
    > Or, run this command in your terminal:
    >
@@ -144,12 +146,13 @@ zoxide can be installed in 4 easy steps:
    >
    > Or, you can use an alternative package manager:
    >
-   > | Repository      | Instructions                          |
-   > | --------------- | ------------------------------------- |
-   > | **[crates.io]** | `cargo install zoxide --locked`       |
-   > | [Chocolatey]    | `choco install zoxide`                |
-   > | [conda-forge]   | `conda install -c conda-forge zoxide` |
-   > | [Scoop]         | `scoop install zoxide`                |
+   > | Repository      | Instructions                        |  |
+   > | --------------- | -------------------------------------- |
+   > | **[crates.io]** | `cargo install zoxide --locked`        |
+   > | [Chocolatey]    | `choco install zoxide`                 |
+   > | [conda-forge]   | `conda install -c conda-forge zoxide`  |
+   > | [Scoop]         | `scoop install zoxide`                 |
+   > | [Webi]          | `curl.exe https://webi.ms/zoxide | sh` |
    >
    > If you're using Cygwin, Git Bash, or MSYS2, use the install script instead:
    >
@@ -507,6 +510,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 [ubuntu packages]: https://packages.ubuntu.com/jammy/zoxide
 [vim]: https://github.com/vim/vim
 [void linux packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide
+[Webi]: https://webinstall.dev/zoxide
 [wiki-env]: https://github.com/ajeetdsouza/zoxide/wiki/HOWTO:-set-environment-variables "HOWTO: set environment variables"
 [xplr]: https://github.com/sayanarijit/xplr
 [xxh-plugin-prerun-zoxide]: https://github.com/xxh/xxh-plugin-prerun-zoxide

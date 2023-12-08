@@ -195,6 +195,15 @@ const completion: Fig.Spec = {
       description: "Search for a directory in the database",
       options: [
         {
+          name: ["-n", "--limit"],
+          description: "Limit number of results in List mode",
+          isRepeatable: true,
+          args: {
+            name: "limit",
+            isOptional: true,
+          },
+        },
+        {
           name: "--exclude",
           description: "Exclude the current directory",
           isRepeatable: true,

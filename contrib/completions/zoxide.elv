@@ -87,6 +87,8 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand --version 'Print version'
         }
         &'zoxide;query'= {
+            cand -n 'Limit number of results in List mode'
+            cand --limit 'Limit number of results in List mode'
             cand --exclude 'Exclude the current directory'
             cand -a 'Show unavailable directories'
             cand --all 'Show unavailable directories'

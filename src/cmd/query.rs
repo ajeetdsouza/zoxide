@@ -41,9 +41,14 @@ impl Query {
             }
         } else if self.list {
             let handle = &mut io::stdout().lock();
+            let mut limit = self.limit.unwrap_or(usize::MAX);
             while let Some(dir) = stream.next() {
+                if limit == 0 {
+                    break;
+                }
                 let dir = if self.score { dir.display().with_score(now) } else { dir.display() };
                 writeln!(handle, "{dir}").pipe_exit("stdout")?;
+                limit -= 1;
             }
         } else {
             let handle = &mut io::stdout();

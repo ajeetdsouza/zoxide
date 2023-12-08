@@ -99,6 +99,8 @@ Register-ArgumentCompleter -Native -CommandName 'zoxide' -ScriptBlock {
             break
         }
         'zoxide;query' {
+            [CompletionResult]::new('-n', 'n', [CompletionResultType]::ParameterName, 'Limit number of results in List mode')
+            [CompletionResult]::new('--limit', 'limit', [CompletionResultType]::ParameterName, 'Limit number of results in List mode')
             [CompletionResult]::new('--exclude', 'exclude', [CompletionResultType]::ParameterName, 'Exclude the current directory')
             [CompletionResult]::new('-a', 'a', [CompletionResultType]::ParameterName, 'Show unavailable directories')
             [CompletionResult]::new('--all', 'all', [CompletionResultType]::ParameterName, 'Show unavailable directories')

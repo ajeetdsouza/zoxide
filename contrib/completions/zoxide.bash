@@ -187,12 +187,20 @@ _zoxide() {
             return 0
             ;;
         zoxide__query)
-            opts="-a -i -l -s -h -V --all --interactive --list --score --exclude --help --version [KEYWORDS]..."
+            opts="-a -i -l -n -s -h -V --all --interactive --list --limit --score --exclude --help --version [KEYWORDS]..."
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
             fi
             case "${prev}" in
+                --limit)
+                    COMPREPLY=($(compgen -f "${cur}"))
+                    return 0
+                    ;;
+                -n)
+                    COMPREPLY=($(compgen -f "${cur}"))
+                    return 0
+                    ;;
                 --exclude)
                     COMPREPLY=($(compgen -f "${cur}"))
                     return 0

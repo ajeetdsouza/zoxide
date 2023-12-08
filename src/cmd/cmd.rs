@@ -165,6 +165,10 @@ pub struct Query {
     #[clap(long, short, conflicts_with = "interactive")]
     pub list: bool,
 
+    /// Limit number of results in List mode
+    #[clap(long, short('n'))]
+    pub limit: Option<usize>,
+
     /// Print score with results
     #[clap(long, short)]
     pub score: bool,

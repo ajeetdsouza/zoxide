@@ -13,10 +13,11 @@ if &shortmess =~ 'A'
 else
   set shortmess=aoO
 endif
-badd +57 templates/nushell.txt
+badd +47 templates/nushell.txt
+badd +0 oil:///home/felix/coding/OpenSource/zoxide/
 argglobal
 %argdel
-$argadd .
+$argadd oil:///home/felix/coding/OpenSource/zoxide/
 edit templates/nushell.txt
 wincmd t
 let s:save_winminheight = &winminheight
@@ -34,12 +35,12 @@ setlocal fdl=99
 setlocal fml=1
 setlocal fdn=99
 setlocal fen
-let s:l = 57 - ((19 * winheight(0) + 11) / 23)
+let s:l = 47 - ((36 * winheight(0) + 27) / 55)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 57
-normal! 041|
+keepjumps 47
+normal! 043|
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

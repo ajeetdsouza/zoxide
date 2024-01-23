@@ -12,17 +12,17 @@
 usage() {
     # Note: here-docs aren't defined in posix
     printf '%s\n' \
-"Usage: install.sh [option]" \
-"Fetch and install the latest version of zoxide, if zoxide is already" \
-"installed it will be updated to the latest version." \
-"" \
-"Options:" \
-"  -b, --bin-dir   Override the bin installation directory [default: ${_bin_dir}]" \
-"  -m, --man-dir   Override the man installation directory [default: ${_man_dir}]" \
-"  -a, --arch      Override the architecture identified by the installer" \
-"  -s, --sudo      Override the command used to elevate to root privaliges [default: sudo]" \
-"  -h, --help      Display this help message" \
-    || true
+        "Usage: install.sh [option]" \
+        "Fetch and install the latest version of zoxide, if zoxide is already" \
+        "installed it will be updated to the latest version." \
+        "" \
+        "Options:" \
+        "  -b, --bin-dir   Override the bin installation directory [default: ${_bin_dir}]" \
+        "  -m, --man-dir   Override the man installation directory [default: ${_man_dir}]" \
+        "  -a, --arch      Override the architecture identified by the installer" \
+        "  -s, --sudo      Override the command used to elevate to root privaliges [default: sudo]" \
+        "  -h, --help      Display this help message" ||
+        true
 }
 
 main() {
@@ -64,8 +64,8 @@ main() {
 
     local _bin_name
     case "${_arch}" in
-        *windows*) _bin_name="zoxide.exe" ;;
-        *) _bin_name="zoxide" ;;
+    *windows*) _bin_name="zoxide.exe" ;;
+    *) _bin_name="zoxide" ;;
     esac
 
     local _sudo
@@ -80,8 +80,6 @@ main() {
         fi
         echo "Installing zoxide as root, please wait…"
     fi
-
-
 
     # Create and enter a temporary directory.
     local _tmp_dir
@@ -128,7 +126,6 @@ main() {
         echo "Installing zoxide man pages as root, please wait…"
     fi
 
-
     # Install manpages.
     # shellcheck disable=SC2086 # The lack of quoting is intentional.
     {
@@ -136,7 +133,6 @@ main() {
         ensure ${_sudo} cp -- "man/man1/"* "${_man_dir}/man1/"
     }
     echo "Installed manpages to ${_man_dir}"
-
 
     # Print success message and check $PATH.
     echo ""
@@ -460,17 +456,16 @@ err() {
 
 elevate_priv() {
     if ! check_cmd sudo; then
-        echo  'Could not find the command "sudo", needed to get permissions for install.' >&2
-        echo  "If you are on Windows, please run your shell as an administrator, then" >&2
-        echo  "rerun this script. Otherwise, please run this script as root, or install" >&2
-        echo  "sudo." >&2
+        echo 'Could not find the command "sudo", needed to get permissions for install.' >&2
+        echo "If you are on Windows, please run your shell as an administrator, then" >&2
+        echo "rerun this script. Otherwise, please run this script as root, or install" >&2
+        echo "sudo." >&2
         exit 1
     fi
     if ! sudo -v; then
         err "Superuser not granted, aborting installation"
     fi
 }
-
 
 # Test if a location is writeable by trying to write to it. Windows does not let
 # you test writeability other than by writing: https://stackoverflow.com/q/1999988
@@ -487,56 +482,24 @@ test_writeable() {
     fi
 }
 
-
 # parse the arguments passed and set the environment variables accordingly
 parse_args() {
     # parse argv variables
     while [ "$#" -gt 0 ]; do
         case "$1" in
-            -b | --bin-dir)
-                BIN_DIR="$2"
-                shift 2
-                ;;
-            -m | --man-dir)
-                MAN_DIR="$2"
-                shift 2
-                ;;
-            -a | --arch)
-                ARCH="$2"
-                shift 2
-                ;;
-            -s | --sudo)
-                SUDO="$2"
-                shift 2
-                ;;
-            -h | --help)
-                usage
-                exit 0
-                ;;
-
-            -b=* | --bin-dir=*)
-                BIN_DIR="${1#*=}"
-                shift 1
-                ;;
-            -m=* | --man-dir=*)
-                MAN_DIR="${1#*=}"
-                shift 1
-                ;;
-            -a=* | --arch=*)
-                ARCH="${1#*=}"
-                shift 1
-                ;;
-            -s=* | --sudo=*)
-                SUDO="${1#*=}"
-                shift 1
-                ;;
-            *)
-                err "Unknown option: $1"
-                ;;
+        -b | --bin-dir) BIN_DIR="$2" && shift 2 ;;
+        -m | --man-dir) MAN_DIR="$2" && shift 2 ;;
+        -a | --arch) ARCH="$2" && shift 2 ;;
+        -s | --sudo) SUDO="$2" && shift 2 ;;
+        -h | --help) usage && exit 0 ;;
+        -b=* | --bin-dir=*) BIN_DIR="${1#*=}" && shift 1 ;;
+        -m=* | --man-dir=*) MAN_DIR="${1#*=}" && shift 1 ;;
+        -a=* | --arch=*) ARCH="${1#*=}" && shift 1 ;;
+        -s=* | --sudo=*) SUDO="${1#*=}" && shift 1 ;;
+        *) err "Unknown option: $1" ;;
         esac
     done
 }
-
 
 # This is put in braces to ensure that the script does not run until it is
 # downloaded completely.

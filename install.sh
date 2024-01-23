@@ -108,9 +108,9 @@ main() {
     # Install binary.
     # shellcheck disable=SC2086 # The lack of quoting is intentional. This may not be the best way to do it, but it's hard to properly do in POSIX
     {
-        ensure ${_sudo} mkdir -p "${_bin_dir}"
-        ensure ${_sudo} cp "${_bin_name}" "${_bin_dir}"
-        ensure ${_sudo} chmod +x "${_bin_dir}/${_bin_name}"
+        ensure ${_sudo} mkdir -p -- "${_bin_dir}"
+        ensure ${_sudo} cp -- "${_bin_name}" "${_bin_dir}"
+        ensure ${_sudo} chmod +x -- "${_bin_dir}/${_bin_name}"
     }
     echo "Installed zoxide to ${_bin_dir}"
 
@@ -130,8 +130,8 @@ main() {
     # Install manpages.
     # shellcheck disable=SC2086 # The lack of quoting is intentional.
     {
-        ensure ${_sudo} mkdir -p "${_man_dir}/man1"
-        ensure ${_sudo} cp "man/man1/"* "${_man_dir}/man1/"
+        ensure ${_sudo} mkdir -p -- "${_man_dir}/man1"
+        ensure ${_sudo} cp -- "man/man1/"* "${_man_dir}/man1/"
     }
     echo "Installed manpages to ${_man_dir}"
 
@@ -169,7 +169,7 @@ download_zoxide() {
         err "you have exceeded GitHub's API rate limit. Please try again later, or use a different installation method: https://github.com/ajeetdsouza/zoxide/#installation"
 
     local _package_url
-    _package_url="$(echo "${_releases}" | grep "browser_download_url" | cut -d '"' -f 4 | grep "${_arch}")" ||
+    _package_url="$(echo "${_releases}" | grep "browser_download_url" | cut -d '"' -f 4 | grep -- "${_arch}")" ||
         err "zoxide has not yet been packaged for your architecture (${_arch}), please file an issue: https://github.com/ajeetdsouza/zoxide/issues"
 
     local _ext
@@ -437,7 +437,7 @@ need_cmd() {
 }
 
 check_cmd() {
-    command -v "$1" >/dev/null 2>&1
+    command -v -- "$1" >/dev/null 2>&1
 }
 
 # Run a command that should never fail. If the command fails execution
@@ -477,8 +477,8 @@ test_writeable() {
         return 1 # an empty path should never be writeable
     fi
     path="$1/test.txt"
-    if touch "${path}" 2>/dev/null; then
-        rm "${path}"
+    if touch -- "${path}" 2>/dev/null; then
+        rm -- "${path}"
         return 0
     else
         return 1

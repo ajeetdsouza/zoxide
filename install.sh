@@ -1,5 +1,6 @@
 #!/bin/sh
 # shellcheck shell=dash
+# shellcheck enable=all # Show warnings in IDE - these are checked in CI
 # shellcheck disable=SC3043 # Assume `local` extension
 # vim:set ts=4 sw=4 et:
 
@@ -33,7 +34,7 @@ main() {
     fi
     # from posix `command -v` definition (https://pubs.opengroup.org/onlinepubs/9699919799/utilities/command.html):
     # "Shell functions, special built-in utilities, regular built-in utilities not associated with a PATH search, and shell reserved words shall be written as just their names."
-    if [ "$(command -v -- local)" != "local" ]; then
+    if [ "$(command -v -- local 2>/dev/null || true)" != "local" ]; then
         # Local is not a posix defined builtin, so it may not be available.
         # Print a message rather than fail in subtle ways later on:
         err "the installer does not work with this shell; please try bash"
@@ -47,8 +48,8 @@ main() {
 
     parse_args "$@" # sets global variables (BIN_DIR, MAN_DIR, ARCH, SUDO)
 
-    _bin_dir=${BIN_DIR:-$_bin_dir}
-    _man_dir=${MAN_DIR:-$_man_dir}
+    _bin_dir=${BIN_DIR:-${_bin_dir}}
+    _man_dir=${MAN_DIR:-${_man_dir}}
 
     if [ -n "${ARCH:-}" ]; then
         # if the user specifed, trust them - don't error on unrecognized hardware.
@@ -393,9 +394,9 @@ get_bitness() {
 }
 
 get_endianness() {
-    local cputype=$1
-    local suffix_eb=$2
-    local suffix_el=$3
+    local cputype="$1"
+    local suffix_eb="$2"
+    local suffix_el="$3"
 
     # detect endianness without od/hexdump, like get_bitness() does.
     need_cmd head

@@ -18,7 +18,7 @@ usage() {
 "Options:" \
 "  -b, --bin-dir   Override the bin installation directory [default: ${_bin_dir}]" \
 "  -m, --man-dir   Override the man installation directory [default: ${_man_dir}]" \
-"  -a, --arch      Override the architecture identified by the installer [default: ${_arch}]" \
+"  -a, --arch      Override the architecture identified by the installer" \
 "  -s, --sudo      Override the command used to elevate to root privaliges [default: sudo]" \
 "  -h, --help      Display this help message" \
     || true
@@ -41,10 +41,9 @@ main() {
 
     set -u
 
+    # Note: these variables are used in the usage message!
     local _bin_dir="${HOME}/.local/bin"
-    local _bin_name
     local _man_dir="${HOME}/.local/share/man"
-    local _sudo
 
     parse_args "$@" # sets global variables (BIN_DIR, MAN_DIR, ARCH, SUDO)
 
@@ -62,11 +61,13 @@ main() {
     assert_nz "${_arch}" "arch"
     echo "Detected architecture: ${_arch}"
 
+    local _bin_name
     case "${_arch}" in
         *windows*) _bin_name="zoxide.exe" ;;
         *) _bin_name="zoxide" ;;
     esac
 
+    local _sudo
     if test_writeable "${_bin_dir}"; then
         echo "Installing zoxide, please wait…"
         _sudo=''

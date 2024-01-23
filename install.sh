@@ -1,10 +1,27 @@
 #!/bin/sh
 # shellcheck shell=dash
+# shellcheck disable=SC3043 # Assume `local` extension
+# vim:set ts=4 sw=4 et:
 
 # The official zoxide installer.
 #
 # It runs on Unix shells like {a,ba,da,k,z}sh. It uses the common `local`
 # extension. Note: Most shells limit `local` to 1 var per line, contra bash.
+
+usage() {
+    # Note: here-docs aren't defined in posix
+    printf '%s\n' \
+"Usage: install.sh [option]" \
+"Fetch and install the latest version of zoxide, if zoxide is already" \
+"installed it will be updated to the latest version." \
+"" \
+"Options:" \
+"  -b, --bin-dir   Override the bin installation directory [default: ${_bin_dir}]" \
+"  -m, --man-dir   Override the man installation directory [default: ${_man_dir}]" \
+"  -a, --arch      Override the architecture identified by the installer [default: ${_arch}]" \
+"  -h, --help      Display this help message" \
+    || true
+}
 
 main() {
     if [ "${KSH_VERSION-}" = 'Version JM 93t+ 2010-03-05' ]; then
@@ -16,11 +33,42 @@ main() {
 
     set -u
 
-    # Detect and print host target triple.
-    ensure get_architecture
-    local _arch="${RETVAL}"
+    local _bin_dir="${HOME}/.local/bin"
+    local _bin_name
+    local _man_dir="${HOME}/.local/share/man"
+
+    parse_args "$@" # sets global variables (BIN_DIR, MAN_DIR, ARCH)
+
+    _bin_dir=${BIN_DIR:-$_bin_dir}
+    _man_dir=${MAN_DIR:-$_man_dir}
+
+    if [ -n "${ARCH:-}" ]; then
+        # if the user specifed, trust them - don't error on unrecognized hardware.
+        local _arch="${ARCH}"
+    else
+        # Detect and print host target triple.
+        ensure get_architecture
+        local _arch="${RETVAL}"
+    fi
     assert_nz "${_arch}" "arch"
     echo "Detected architecture: ${_arch}"
+
+    case "${_arch}" in
+        *windows*) _bin_name="zoxide.exe" ;;
+        *) _bin_name="zoxide" ;;
+    esac
+
+    local _sudo=''
+    if test_writeable "${_bin_dir}"; then
+        echo "Installing zoxide, please wait…"
+    else
+        echo "Escalated permissions are required to install to ${_bin_dir}"
+        elevate_priv
+        _sudo='sudo'
+        echo "Installing zoxide as root, please wait…"
+    fi
+
+
 
     # Create and enter a temporary directory.
     local _tmp_dir
@@ -47,22 +95,22 @@ main() {
     esac
 
     # Install binary.
-    local _bin_dir="${HOME}/.local/bin"
-    local _bin_name
-    case "${_arch}" in
-    *windows*) _bin_name="zoxide.exe" ;;
-    *) _bin_name="zoxide" ;;
-    esac
-    ensure mkdir -p "${_bin_dir}"
-    ensure cp "${_bin_name}" "${_bin_dir}"
-    ensure chmod +x "${_bin_dir}/${_bin_name}"
+    # shellcheck disable=SC2086 # The lack of quoting is intentional. This may not be the best way to do it, but it's hard to properly do in POSIX
+    {
+        ensure ${_sudo} mkdir -p "${_bin_dir}"
+        ensure ${_sudo} cp "${_bin_name}" "${_bin_dir}"
+        ensure ${_sudo} chmod +x "${_bin_dir}/${_bin_name}"
+    }
     echo "Installed zoxide to ${_bin_dir}"
 
     # Install manpages.
-    local _man_dir="${HOME}/.local/share/man"
-    ensure mkdir -p "${_man_dir}/man1"
-    ensure cp "man/man1/"* "${_man_dir}/man1/"
+    # shellcheck disable=SC2086 # The lack of quoting is intentional.
+    {
+        ensure ${_sudo} mkdir -p "${_man_dir}/man1"
+        ensure ${_sudo} cp "man/man1/"* "${_man_dir}/man1/"
+    }
     echo "Installed manpages to ${_man_dir}"
+
 
     # Print success message and check $PATH.
     echo ""
@@ -383,6 +431,75 @@ err() {
     echo "Error: $1" >&2
     exit 1
 }
+
+elevate_priv() {
+    if ! check_cmd sudo; then
+        echo  'Could not find the command "sudo", needed to get permissions for install.' >&2
+        echo  "If you are on Windows, please run your shell as an administrator, then" >&2
+        echo  "rerun this script. Otherwise, please run this script as root, or install" >&2
+        echo  "sudo." >&2
+        exit 1
+    fi
+    if ! sudo -v; then
+        err "Superuser not granted, aborting installation"
+    fi
+}
+
+
+# Test if a location is writeable by trying to write to it. Windows does not let
+# you test writeability other than by writing: https://stackoverflow.com/q/1999988
+test_writeable() {
+    path="${1:-}/test.txt"
+    if touch "${path}" 2>/dev/null; then
+        rm "${path}"
+        return 0
+    else
+        return 1
+    fi
+}
+
+
+# parse the arguments passed and set the environment variables accordingly
+parse_args() {
+    # parse argv variables
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            -b | --bin-dir)
+                BIN_DIR="$2"
+                shift 2
+                ;;
+            -m | --man-dir)
+                MAN_DIR="$2"
+                shift 2
+                ;;
+            -a | --arch)
+                ARCH="$2"
+                shift 2
+                ;;
+            -h | --help)
+                usage
+                exit 0
+                ;;
+
+            -b=* | --bin-dir=*)
+                BIN_DIR="${1#*=}"
+                shift 1
+                ;;
+            -m=* | --man-dir=*)
+                MAN_DIR="${1#*=}"
+                shift 1
+                ;;
+            -a=* | --arch=*)
+                ARCH="${1#*=}"
+                shift 1
+                ;;
+            *)
+                err "Unknown option: $1"
+                ;;
+        esac
+    done
+}
+
 
 # This is put in braces to ensure that the script does not run until it is
 # downloaded completely.

@@ -466,7 +466,10 @@ elevate_priv() {
 # Test if a location is writeable by trying to write to it. Windows does not let
 # you test writeability other than by writing: https://stackoverflow.com/q/1999988
 test_writeable() {
-    path="${1:-}/test.txt"
+    if [ -z "${1-}" ]; then
+        return 1 # an empty path should never be writeable
+    fi
+    path="$1/test.txt"
     if touch "${path}" 2>/dev/null; then
         rm "${path}"
         return 0

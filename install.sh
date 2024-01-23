@@ -37,13 +37,12 @@ main() {
     local _bin_dir="${HOME}/.local/bin"
     local _bin_name
     local _man_dir="${HOME}/.local/share/man"
-    local _sudo="sudo"
+    local _sudo
 
     parse_args "$@" # sets global variables (BIN_DIR, MAN_DIR, ARCH, SUDO)
 
     _bin_dir=${BIN_DIR:-$_bin_dir}
     _man_dir=${MAN_DIR:-$_man_dir}
-    _sudo=${SUDO:-$_sudo}
 
     if [ -n "${ARCH:-}" ]; then
         # if the user specifed, trust them - don't error on unrecognized hardware.
@@ -66,6 +65,7 @@ main() {
         _sudo=''
     else
         echo "Escalated permissions are required to install to ${_bin_dir}"
+        _sudo=${SUDO:-"sudo"}
         if [ "${_sudo}" = 'sudo' ]; then
             elevate_priv # only check if the user didn't provide it, blindly trust user provided values
         fi
@@ -106,6 +106,19 @@ main() {
         ensure ${_sudo} chmod +x "${_bin_dir}/${_bin_name}"
     }
     echo "Installed zoxide to ${_bin_dir}"
+
+    if test_writeable "${_man_dir}"; then
+        echo "Installing zoxide man pages, please wait…"
+        _sudo=""
+    else
+        echo "Escalated permissions are required to install man pages to ${_man_dir}"
+        _sudo=${SUDO:-"sudo"}
+        if [ "${_sudo}" = 'sudo' ]; then
+            elevate_priv # only check if the user didn't provide it, blindly trust user provided values
+        fi
+        echo "Installing zoxide man pages as root, please wait…"
+    fi
+
 
     # Install manpages.
     # shellcheck disable=SC2086 # The lack of quoting is intentional.

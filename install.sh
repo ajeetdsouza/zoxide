@@ -19,6 +19,7 @@ usage() {
 "  -b, --bin-dir   Override the bin installation directory [default: ${_bin_dir}]" \
 "  -m, --man-dir   Override the man installation directory [default: ${_man_dir}]" \
 "  -a, --arch      Override the architecture identified by the installer [default: ${_arch}]" \
+"  -s, --sudo      Override the command used to elevate to root privaliges [default: sudo]" \
 "  -h, --help      Display this help message" \
     || true
 }
@@ -36,11 +37,13 @@ main() {
     local _bin_dir="${HOME}/.local/bin"
     local _bin_name
     local _man_dir="${HOME}/.local/share/man"
+    local _sudo="sudo"
 
-    parse_args "$@" # sets global variables (BIN_DIR, MAN_DIR, ARCH)
+    parse_args "$@" # sets global variables (BIN_DIR, MAN_DIR, ARCH, SUDO)
 
     _bin_dir=${BIN_DIR:-$_bin_dir}
     _man_dir=${MAN_DIR:-$_man_dir}
+    _sudo=${SUDO:-$_sudo}
 
     if [ -n "${ARCH:-}" ]; then
         # if the user specifed, trust them - don't error on unrecognized hardware.
@@ -58,13 +61,14 @@ main() {
         *) _bin_name="zoxide" ;;
     esac
 
-    local _sudo=''
     if test_writeable "${_bin_dir}"; then
         echo "Installing zoxide, please wait…"
+        _sudo=''
     else
         echo "Escalated permissions are required to install to ${_bin_dir}"
-        elevate_priv
-        _sudo='sudo'
+        if [ "${_sudo}" = 'sudo' ]; then
+            elevate_priv # only check if the user didn't provide it, blindly trust user provided values
+        fi
         echo "Installing zoxide as root, please wait…"
     fi
 
@@ -476,6 +480,10 @@ parse_args() {
                 ARCH="$2"
                 shift 2
                 ;;
+            -s | --sudo)
+                SUDO="$2"
+                shift 2
+                ;;
             -h | --help)
                 usage
                 exit 0
@@ -491,6 +499,10 @@ parse_args() {
                 ;;
             -a=* | --arch=*)
                 ARCH="${1#*=}"
+                shift 1
+                ;;
+            -s=* | --sudo=*)
+                SUDO="${1#*=}"
                 shift 1
                 ;;
             *)

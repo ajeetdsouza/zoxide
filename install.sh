@@ -31,6 +31,13 @@ main() {
         # subtle ways later on:
         err 'the installer does not work with this ksh93 version; please try bash'
     fi
+    # from posix `command -v` definition (https://pubs.opengroup.org/onlinepubs/9699919799/utilities/command.html):
+    # "Shell functions, special built-in utilities, regular built-in utilities not associated with a PATH search, and shell reserved words shall be written as just their names."
+    if [ "$(command -v -- local)" != "local" ]; then
+        # Local is not a posix defined builtin, so it may not be available.
+        # Print a message rather than fail in subtle ways later on:
+        err "the installer does not work with this shell; please try bash"
+    fi
 
     set -u
 

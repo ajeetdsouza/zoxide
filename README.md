@@ -91,6 +91,7 @@ zoxide can be installed in 4 easy steps:
    > | **_Any_**           | **[crates.io]**         | `cargo install zoxide --locked`                                                                       |
    > | _Any_               | [asdf]                  | `asdf plugin add zoxide https://github.com/nyrst/asdf-zoxide.git` <br /> `asdf install zoxide latest` |
    > | _Any_               | [conda-forge]           | `conda install -c conda-forge zoxide`                                                                 |
+   > | _Any_               | [guix]                  | `guix install zoxide`                                                                                 |
    > | _Any_               | [Linuxbrew]             | `brew install zoxide`                                                                                 |
    > | _Any_               | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                                                                          |
    > | Alpine Linux 3.13+  | [Alpine Linux Packages] | `apk add zoxide`                                                                                      |
@@ -477,6 +478,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 [fzf-man]: https://manpages.ubuntu.com/manpages/en/man1/fzf.1.html
 [fzf]: https://github.com/junegunn/fzf
 [glob]: https://man7.org/linux/man-pages/man7/glob.7.html
+[guix]: https://packages.guix.gnu.org/packages/zoxide/
 [guru overlay]: https://github.com/gentoo-mirror/guru
 [homebrew]: https://formulae.brew.sh/formula/zoxide
 [issues]: https://github.com/ajeetdsouza/zoxide/issues/new

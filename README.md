@@ -254,7 +254,7 @@ zoxide can be installed in 4 easy steps:
    > `echo $profile` in PowerShell):
    >
    > ```powershell
-   > Invoke-Expression (& { (zoxide init powershell | Out-String) })
+   > Invoke-Expression (& { (zoxide init powershell --hook prompt | Out-String) })
    > ```
 
    </details>

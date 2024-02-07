@@ -86,4 +86,4 @@ alias {{cmd}}i = __zoxide_zi
 #
 #   source ~/.zoxide.nu
 #
-# Note: zoxide only supports Nushell v0.86.0+.
+# Note: zoxide only supports Nushell v0.89.0+.

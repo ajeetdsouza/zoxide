@@ -39,7 +39,7 @@ jobs:
           fetch-depth: 0
       - name: Get version
         id: get_version
-        uses: SebRollen/toml-action@v1.0.2
+        uses: SebRollen/toml-action@v1.2.0
         with:
           file: Cargo.toml
           field: package.version

@@ -226,7 +226,10 @@ impl Database {
                 deserializer.deserialize(bytes_dirs).context("could not deserialize database")?
             }
             version => {
-                bail!("unsupported version (got {version}, supports {})", Self::VERSION)
+                bail!(
+                    "unsupported database version (got {version}, supports {}), re-create the database",
+                    Self::VERSION
+                )
             }
         };
 

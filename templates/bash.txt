@@ -102,7 +102,13 @@ function __zoxide_zi() {
 
 \builtin unalias {{cmd}} &>/dev/null || \builtin true
 function {{cmd}}() {
-    __zoxide_z "$@"
+    if [[ $# -eq 2 && "$1" == "--" && -d $2 ]]; then
+        # This is how cd is called when bash's autocd option is set. To get the
+        # directory-changing behavior first argument must be skipped.
+        __zoxide_z "${@:2}"
+    else
+        __zoxide_z "$@"
+    fi
 }
 
 \builtin unalias {{cmd}}i &>/dev/null || \builtin true

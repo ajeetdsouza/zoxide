@@ -75,6 +75,8 @@ function __zoxide_z() {
         __zoxide_cd "${OLDPWD}"
     elif [[ $# -eq 1 && -d $1 ]]; then
         __zoxide_cd "$1"
+    elif [[ $# -eq 2 && $1 == '--' ]]; then
+        __zoxide_cd "$2"
     elif [[ ${@: -1} == "${__zoxide_z_prefix}"?* ]]; then
         # shellcheck disable=SC2124
         \builtin local result="${@: -1}"
@@ -102,13 +104,7 @@ function __zoxide_zi() {
 
 \builtin unalias {{cmd}} &>/dev/null || \builtin true
 function {{cmd}}() {
-    if [[ $# -eq 2 && "$1" == "--" ]]; then
-        # This is how cd is called when bash's autocd option is set. To get the
-        # directory-changing behavior first argument must be skipped.
-        __zoxide_z "${@:2}"
-    else
-        __zoxide_z "$@"
-    fi
+    __zoxide_z "$@"
 }
 
 \builtin unalias {{cmd}}i &>/dev/null || \builtin true

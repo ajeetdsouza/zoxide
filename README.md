@@ -372,7 +372,7 @@ When calling `zoxide init`, the following flags are available:
 - `--cmd`
   - Changes the prefix of the `z` and `zi` commands.
   - `--cmd j` would change the commands to (`j`, `ji`).
-  - `--cmd cd` would replace the `cd` command (doesn't work on Nushell / POSIX shells).
+  - `--cmd cd` would replace the `cd` command.
 - `--hook <HOOK>`
   - Changes how often zoxide increments a directory's score:
     | Hook     | Description                       |

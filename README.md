@@ -107,6 +107,7 @@ zoxide can be installed in 4 easy steps:
    > | ~Raspbian 11+~[^1]  | ~[Raspbian Packages]~   | ~`apt install zoxide`~                                                                                |
    > | Rhino Linux         | [Pacstall Packages]     | `pacstall -I zoxide-deb`                                                                              |
    > | Slackware 15.0+     | [SlackBuilds]           | [Instructions][slackbuilds-howto]                                                                     |
+   > | Solus               | [Solus Packages]        | `eopkg install zoxide`                                                                                |
    > | ~Ubuntu 21.04+~[^1] | ~[Ubuntu Packages]~     | ~`apt install zoxide`~                                                                                |
    > | Void Linux          | [Void Linux Packages]   | `xbps-install -S zoxide`                                                                              |
 
@@ -501,6 +502,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 [scoop]: https://github.com/ScoopInstaller/Main/tree/master/bucket/zoxide.json
 [slackbuilds]: https://slackbuilds.org/repository/15.0/system/zoxide/
 [slackbuilds-howto]: https://slackbuilds.org/howto/
+[solus packages]: https://github.com/getsolus/packages/tree/main/packages/z/zoxide/
 [t]: https://github.com/joshmedeski/t-smart-tmux-session-manager
 [telescope-zoxide]: https://github.com/jvgrootveld/telescope-zoxide
 [telescope.nvim]: https://github.com/nvim-telescope/telescope.nvim

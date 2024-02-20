@@ -103,7 +103,10 @@ if [[ -o zle ]]; then
             # Show completions for Space-Tab.
             # shellcheck disable=SC2086
             __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd || \builtin true)" --interactive -- ${words[2,-1]})" || __zoxide_result=''
-            # Sends '\e[0n' to console input.
+
+            # Bind '\e[0n' to helper function.
+            \builtin bindkey '\e[0n' '__zoxide_z_complete_helper'
+            # Send '\e[0n' to console input.
             \builtin printf '\e[5n'
         fi
 
@@ -124,7 +127,6 @@ if [[ -o zle ]]; then
     }
     \builtin zle -N __zoxide_z_complete_helper
 
-    \builtin bindkey '\e[0n' '__zoxide_z_complete_helper'
     [[ "${+functions[compdef]}" -ne 0 ]] && \compdef __zoxide_z_complete {{ cmd }}
 fi
 

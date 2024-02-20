@@ -101,7 +101,8 @@ if [[ -o zle ]]; then
             _files -/
         elif [[ "${words[-1]}" == '' ]]; then
             # Show completions for Space-Tab.
-            __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd)" --interactive -- ${words[2,-1]})" || __zoxide_result=''
+            # shellcheck disable=SC2086
+            __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd || \builtin true)" --interactive -- ${words[2,-1]})" || __zoxide_result=''
             # Sends '\e[0n' to console input.
             \builtin printf '\e[5n'
         fi
@@ -113,6 +114,7 @@ if [[ -o zle ]]; then
 
     function __zoxide_z_complete_helper() {
         if [[ -n "${__zoxide_result}" ]]; then
+            # shellcheck disable=SC2034,SC2296
             BUFFER="{{ cmd }} ${(q-)__zoxide_result}"
             \builtin zle reset-prompt
             \builtin zle accept-line

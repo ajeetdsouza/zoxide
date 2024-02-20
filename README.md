@@ -76,7 +76,7 @@ zoxide can be installed in 4 easy steps:
    please [open an issue][issues].
 
    <details>
-   <summary>Linux</summary>
+   <summary>Linux / WSL</summary>
 
    > The recommended way to install zoxide is via the install script:
    >
@@ -138,6 +138,9 @@ zoxide can be installed in 4 easy steps:
    <details>
    <summary>Windows</summary>
 
+   > zoxide works with PowerShell, as well as shells running in Cygwin, Git
+   > Bash, and MSYS2.
+   >
    > The recommended way to install zoxide is via `winget`:
    >
    > ```sh
@@ -152,12 +155,6 @@ zoxide can be installed in 4 easy steps:
    > | [Chocolatey]    | `choco install zoxide`                |
    > | [conda-forge]   | `conda install -c conda-forge zoxide` |
    > | [Scoop]         | `scoop install zoxide`                |
-   >
-   > If you're using Cygwin, Git Bash, or MSYS2, use the install script instead:
-   >
-   > ```sh
-   > curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
-   > ```
 
    </details>
 

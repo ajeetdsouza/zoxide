@@ -196,7 +196,7 @@ zoxide can be installed in 4 easy steps:
    <details>
    <summary>Bash</summary>
 
-   > Add this to the **end** of your config file (usually `~/.bashrc`):
+   > Add this to the <ins>**end**</ins> of your config file (usually `~/.bashrc`):
    >
    > ```sh
    > eval "$(zoxide init bash)"
@@ -207,7 +207,7 @@ zoxide can be installed in 4 easy steps:
    <details>
    <summary>Elvish</summary>
 
-   > Add this to the **end** of your config file (usually `~/.elvish/rc.elv`):
+   > Add this to the <ins>**end**</ins> of your config file (usually `~/.elvish/rc.elv`):
    >
    > ```sh
    > eval (zoxide init elvish | slurp)
@@ -221,7 +221,7 @@ zoxide can be installed in 4 easy steps:
    <details>
    <summary>Fish</summary>
 
-   > Add this to the **end** of your config file (usually
+   > Add this to the <ins>**end**</ins> of your config file (usually
    > `~/.config/fish/config.fish`):
    >
    > ```fish
@@ -233,14 +233,14 @@ zoxide can be installed in 4 easy steps:
    <details>
    <summary>Nushell</summary>
 
-   > Add this to the **end** of your env file (find it by running `$nu.env-path`
+   > Add this to the <ins>**end**</ins> of your env file (find it by running `$nu.env-path`
    > in Nushell):
    >
    > ```sh
    > zoxide init nushell | save -f ~/.zoxide.nu
    > ```
    >
-   > Now, add this to the **end** of your config file (find it by running
+   > Now, add this to the <ins>**end**</ins> of your config file (find it by running
    > `$nu.config-path` in Nushell):
    >
    > ```sh
@@ -255,7 +255,7 @@ zoxide can be installed in 4 easy steps:
    <details>
    <summary>PowerShell</summary>
 
-   > Add this to the **end** of your config file (find it by running
+   > Add this to the <ins>**end**</ins> of your config file (find it by running
    > `echo $profile` in PowerShell):
    >
    > ```powershell
@@ -267,7 +267,7 @@ zoxide can be installed in 4 easy steps:
    <details>
    <summary>Xonsh</summary>
 
-   > Add this to the **end** of your config file (usually `~/.xonshrc`):
+   > Add this to the <ins>**end**</ins> of your config file (usually `~/.xonshrc`):
    >
    > ```python
    > execx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')
@@ -278,7 +278,7 @@ zoxide can be installed in 4 easy steps:
    <details>
    <summary>Zsh</summary>
 
-   > Add this to the **end** of your config file (usually `~/.zshrc`):
+   > Add this to the <ins>**end**</ins> of your config file (usually `~/.zshrc`):
    >
    > ```sh
    > eval "$(zoxide init zsh)"
@@ -293,7 +293,7 @@ zoxide can be installed in 4 easy steps:
    <details>
    <summary>Any POSIX shell</summary>
 
-   > Add this to the **end** of your config file:
+   > Add this to the <ins>**end**</ins> of your config file:
    >
    > ```sh
    > eval "$(zoxide init posix --hook prompt)"

@@ -6,7 +6,7 @@ use askama::Template;
 use crate::cmd::{Init, InitShell, Run};
 use crate::config;
 use crate::error::BrokenPipeHandler;
-use crate::shell::{Bash, Elvish, Fish, Nushell, Opts, Posix, Powershell, Xonsh, Zsh};
+use crate::shell::{Bash, Cmd, Elvish, Fish, Nushell, Opts, Posix, Powershell, Xonsh, Zsh};
 
 impl Run for Init {
     fn run(&self) -> Result<()> {
@@ -17,6 +17,7 @@ impl Run for Init {
 
         let source = match self.shell {
             InitShell::Bash => Bash(opts).render(),
+            InitShell::Cmd => Cmd(opts).render(),
             InitShell::Elvish => Elvish(opts).render(),
             InitShell::Fish => Fish(opts).render(),
             InitShell::Nushell => Nushell(opts).render(),

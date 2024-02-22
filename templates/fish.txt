@@ -28,10 +28,16 @@ end
 
 # cd + custom logic based on the value of _ZO_ECHO.
 function __zoxide_cd
+    if set -q __zoxide_loop
+        builtin echo "zoxide: infinite loop detected"
+        builtin echo "Avoid aliasing `cd` to `z` directly, use `zoxide init --cmd=cd fish` instead"
+        return 1
+    end
+
 {%- if cfg!(windows) %}
-    __zoxide_cd_internal (cygpath -u $argv)
+    __zoxide_loop=1 __zoxide_cd_internal (cygpath -u $argv)
 {%- else %}
-    __zoxide_cd_internal $argv
+    __zoxide_loop=1 __zoxide_cd_internal $argv
 {%- endif %}
 {%- if echo %}
     and __zoxide_pwd

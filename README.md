@@ -100,7 +100,7 @@ zoxide can be installed in 4 easy steps:
    > | ~Debian 11+~[^1]    | ~[Debian Packages]~     | ~`apt install zoxide`~                                                                                |
    > | Devuan 4.0+         | [Devuan Packages]       | `apt install zoxide`                                                                                  |
    > | Fedora 32+          | [Fedora Packages]       | `dnf install zoxide`                                                                                  |
-   > | Gentoo              | [GURU Overlay]          | `eselect repository enable guru` <br /> `emerge --sync guru` <br /> `emerge app-shells/zoxide`        |
+   > | Gentoo              | [Gentoo Packages]       | `emerge app-shells/zoxide`                                                                            |
    > | Manjaro             |                         | `pacman -S zoxide`                                                                                    |
    > | openSUSE Tumbleweed | [openSUSE Factory]      | `zypper install zoxide`                                                                               |
    > | ~Parrot OS~[^1]     |                         | ~`apt install zoxide`~                                                                                |
@@ -481,9 +481,9 @@ Environment variables[^2] can be used for configuration. They must be set before
 [fzf-installation]: https://github.com/junegunn/fzf#installation
 [fzf-man]: https://manpages.ubuntu.com/manpages/en/man1/fzf.1.html
 [fzf]: https://github.com/junegunn/fzf
+[gentoo packages]: https://packages.gentoo.org/packages/app-shells/zoxide
 [glob]: https://man7.org/linux/man-pages/man7/glob.7.html
 [guix]: https://packages.guix.gnu.org/packages/zoxide/
-[guru overlay]: https://github.com/gentoo-mirror/guru
 [homebrew]: https://formulae.brew.sh/formula/zoxide
 [issues]: https://github.com/ajeetdsouza/zoxide/issues/new
 [joshuto]: https://github.com/kamiyaa/joshuto

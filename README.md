@@ -240,11 +240,12 @@ zoxide can be installed in 4 easy steps:
    > zoxide init nushell | save -f ~/.zoxide.nu
    > ```
    >
-   > Now, add this to the <ins>**end**</ins> of your config file (find it by running
+   > Now, add this to the <ins>**end**</ins> of your config file (you can find it by running
    > `$nu.config-path` in Nushell):
    >
    > ```sh
-   > source ~/.zoxide.nu
+   > # addes "source ~/.zoxide.nu" to your config.nu file
+   > "source ~/.zoxide.nu" | save --append $nu.config-path
    > ```
    >
    > **Note**

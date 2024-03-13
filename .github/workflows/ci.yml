@@ -33,7 +33,7 @@ jobs:
           components: rustfmt
           profile: minimal
           toolchain: nightly
-      - uses: cachix/install-nix-action@v25
+      - uses: cachix/install-nix-action@v26
         if: ${{ matrix.os != 'windows-latest' }}
         with:
           nix_path: nixpkgs=channel:nixos-unstable

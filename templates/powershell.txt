@@ -62,7 +62,7 @@ function global:__zoxide_cd($dir, $literal) {
 function global:__zoxide_hook {
     $result = __zoxide_pwd
     if ($null -ne $result) {
-        zoxide add -- $result
+        zoxide add "--" $result
     }
 }
 {%- else if hook == InitHook::Pwd -%}
@@ -72,7 +72,7 @@ function global:__zoxide_hook {
     $result = __zoxide_pwd
     if ($result -ne $global:__zoxide_oldpwd) {
         if ($null -ne $result) {
-            zoxide add -- $result
+            zoxide add "--" $result
         }
         $global:__zoxide_oldpwd = $result
     }
@@ -112,10 +112,10 @@ function global:__zoxide_z {
     else {
         $result = __zoxide_pwd
         if ($null -ne $result) {
-            $result = __zoxide_bin query --exclude $result -- @args
+            $result = __zoxide_bin query --exclude $result "--" @args
         }
         else {
-            $result = __zoxide_bin query -- @args
+            $result = __zoxide_bin query "--" @args
         }
         if ($LASTEXITCODE -eq 0) {
             __zoxide_cd $result $true
@@ -125,7 +125,7 @@ function global:__zoxide_z {
 
 # Jump to a directory using interactive search.
 function global:__zoxide_zi {
-    $result = __zoxide_bin query -i -- @args
+    $result = __zoxide_bin query -i "--" @args
     if ($LASTEXITCODE -eq 0) {
         __zoxide_cd $result $true
     }

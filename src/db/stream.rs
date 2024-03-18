@@ -1,5 +1,6 @@
 use std::iter::Rev;
 use std::ops::Range;
+use std::path::Path;
 use std::{fs, path};
 
 use crate::db::{Database, Dir, Epoch};
@@ -71,7 +72,13 @@ impl<'a> Stream<'a> {
                 continue;
             }
 
-            if Some(dir.path.as_ref()) == self.exclude_path.as_deref() {
+            if self
+                .exclude_path
+                .as_deref()
+                .map(|a| dir.path.to_str().map(|x| x == a))
+                .flatten()
+                .unwrap_or_default()
+            {
                 self.did_exclude = true;
                 continue;
             }
@@ -87,7 +94,7 @@ impl<'a> Stream<'a> {
         self.did_exclude
     }
 
-    fn matches_exists(&self, path: &str) -> bool {
+    fn matches_exists(&self, path: &Path) -> bool {
         if !self.check_exists {
             return true;
         }
@@ -95,12 +102,14 @@ impl<'a> Stream<'a> {
         resolver(path).map(|m| m.is_dir()).unwrap_or_default()
     }
 
-    fn matches_keywords(&self, path: &str) -> bool {
+    fn matches_keywords(&self, path: &Path) -> bool {
         let (keywords_last, keywords) = match self.keywords.split_last() {
             Some(split) => split,
             None => return true,
         };
-
+        let Some(path) = path.to_str() else {
+            return false;
+        };
         let path = util::to_lowercase(path);
         let mut path = path.as_str();
         match path.rfind(keywords_last) {
@@ -155,6 +164,6 @@ mod tests {
     fn query(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
         let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
         let stream = Stream::new(db, 0).with_keywords(keywords);
-        assert_eq!(is_match, stream.matches_keywords(path));
+        assert_eq!(is_match, stream.matches_keywords(Path::new(path)));
     }
 }

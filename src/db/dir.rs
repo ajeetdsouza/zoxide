@@ -1,5 +1,6 @@
 use std::borrow::Cow;
 use std::fmt::{self, Display, Formatter};
+use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
@@ -8,7 +9,7 @@ use crate::util::{DAY, HOUR, WEEK};
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Dir<'a> {
     #[serde(borrow)]
-    pub path: Cow<'a, str>,
+    pub path: Cow<'a, Path>,
     pub rank: Rank,
     pub last_accessed: Epoch,
 }
@@ -61,7 +62,7 @@ impl Display for DirDisplay<'_> {
             let score = self.dir.score(now).clamp(0.0, 9999.0);
             write!(f, "{score:>6.1}{}", self.separator)?;
         }
-        write!(f, "{}", self.dir.path)
+        write!(f, "{}", self.dir.path.display())
     }
 }
 

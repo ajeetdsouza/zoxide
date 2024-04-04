@@ -225,7 +225,9 @@ zoxide can be installed in 4 easy steps:
    > `~/.config/fish/config.fish`):
    >
    > ```fish
-   > zoxide init fish | source
+   > if command -q zoxide
+   >     zoxide init fish | source
+   > end
    > ```
 
    </details>

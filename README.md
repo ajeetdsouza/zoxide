@@ -99,6 +99,7 @@ zoxide can be installed in 4 easy steps:
    > | CentOS 7+           | [Copr]                  | `dnf copr enable atim/zoxide` <br /> `dnf install zoxide`                                             |
    > | ~Debian 11+~[^1]    | ~[Debian Packages]~     | ~`apt install zoxide`~                                                                                |
    > | Devuan 4.0+         | [Devuan Packages]       | `apt install zoxide`                                                                                  |
+   > | Exherbo Linux       | [Exherbo packages]      | `cave resolve -x repository/rust` <br /> `cave resolve -x zoxide`                                     |
    > | Fedora 32+          | [Fedora Packages]       | `dnf install zoxide`                                                                                  |
    > | Gentoo              | [Gentoo Packages]       | `emerge app-shells/zoxide`                                                                            |
    > | Manjaro             |                         | `pacman -S zoxide`                                                                                    |
@@ -472,6 +473,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 [crates.io-badge]: https://img.shields.io/crates/v/zoxide?logo=rust&logoColor=white&style=flat-square
 [crates.io]: https://crates.io/crates/zoxide
 [debian packages]: https://packages.debian.org/stable/admin/zoxide
+[exherbo packages]: https://gitlab.exherbo.org/exherbo/rust/-/tree/master/packages/sys-apps/zoxide
 [devuan packages]: https://pkginfo.devuan.org/cgi-bin/package-query.html?c=package&q=zoxide
 [downloads-badge]: https://img.shields.io/github/downloads/ajeetdsouza/zoxide/total?logo=github&logoColor=white&style=flat-square
 [dports]: https://github.com/DragonFlyBSD/DPorts/tree/master/sysutils/zoxide

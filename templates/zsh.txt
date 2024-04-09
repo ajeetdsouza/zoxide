@@ -119,6 +119,7 @@ if [[ -o zle ]]; then
         if [[ -n "${__zoxide_result}" ]]; then
             # shellcheck disable=SC2034,SC2296
             BUFFER="{{ cmd }} ${(q-)__zoxide_result}"
+            __zoxide_result=''
             \builtin zle reset-prompt
             \builtin zle accept-line
         else

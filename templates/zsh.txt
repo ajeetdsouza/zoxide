@@ -98,7 +98,9 @@ if [[ -o zle ]]; then
 
         if [[ "{{ "${#words[@]}" }}" -eq 2 ]]; then
             # Show completions for local directories.
-            _files -/
+            _cd -/
+
+	    # Don't return 0 so we can fall back to another comleter if unsuccessful.
         elif [[ "${words[-1]}" == '' ]]; then
             # Show completions for Space-Tab.
             # shellcheck disable=SC2086
@@ -108,11 +110,11 @@ if [[ -o zle ]]; then
             \builtin bindkey '\e[0n' '__zoxide_z_complete_helper'
             # Send '\e[0n' to console input.
             \builtin printf '\e[5n'
-        fi
 
-        # Report that the completion was successful, so that we don't fall back
-        # to another completion function.
-        return 0
+	    # Report that the completion was successful, so that we don't fall back
+	    # to another completion function.
+	    return 0
+        fi
     }
 
     function __zoxide_z_complete_helper() {

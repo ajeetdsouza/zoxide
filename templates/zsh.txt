@@ -104,9 +104,12 @@ if [[ -o zle ]]; then
             # shellcheck disable=SC2086
             __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd || \builtin true)" --interactive -- ${words[2,-1]})" || __zoxide_result=''
 
+            # Set a result to ensure completion doesn't re-run
+            compadd -Q ""
+
             # Bind '\e[0n' to helper function.
             \builtin bindkey '\e[0n' '__zoxide_z_complete_helper'
-            # Send '\e[0n' to console input.
+            # Sends query device status code, which results in a '\e[0n' being sent to console input.
             \builtin printf '\e[5n'
         fi
 
@@ -119,6 +122,7 @@ if [[ -o zle ]]; then
         if [[ -n "${__zoxide_result}" ]]; then
             # shellcheck disable=SC2034,SC2296
             BUFFER="{{ cmd }} ${(q-)__zoxide_result}"
+            __zoxide_result=''
             \builtin zle reset-prompt
             \builtin zle accept-line
         else

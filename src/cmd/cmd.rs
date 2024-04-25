@@ -67,11 +67,11 @@ pub struct Edit {
 #[derive(Clone, Debug, Subcommand)]
 pub enum EditCommand {
     #[clap(hide = true)]
-    Decrement { path: String },
+    Decrement { paths: Vec<String> },
     #[clap(hide = true)]
-    Delete { path: String },
+    Delete { paths: Vec<String> },
     #[clap(hide = true)]
-    Increment { path: String },
+    Increment { paths: Vec<String> },
     #[clap(hide = true)]
     Reload,
 }

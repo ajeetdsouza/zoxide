@@ -15,11 +15,15 @@ impl Run for Edit {
         match &self.cmd {
             Some(cmd) => {
                 match cmd {
-                    EditCommand::Decrement { path } => db.add(path, -1.0, now),
-                    EditCommand::Delete { path } => {
+                    EditCommand::Decrement { paths } => paths.iter().for_each(|path| {
+                        db.add(path, -1.0, now);
+                    }),
+                    EditCommand::Delete { paths } => paths.iter().for_each(|path| {
                         db.remove(path);
+                    }),
+                    EditCommand::Increment { paths } => {
+                        paths.iter().for_each(|path| db.add(path, 1.0, now))
                     }
-                    EditCommand::Increment { path } => db.add(path, 1.0, now),
                     EditCommand::Reload => {}
                 }
                 db.save()?;
@@ -50,17 +54,16 @@ impl Edit {
                 // Search result
                 "--no-sort",
                 // Interface
+                "--multi",
                 "--bind=\
-btab:up,\
 ctrl-r:reload(zoxide edit reload),\
-ctrl-d:reload(zoxide edit delete {2..}),\
-ctrl-w:reload(zoxide edit increment {2..}),\
-ctrl-s:reload(zoxide edit decrement {2..}),\
+ctrl-d:reload(zoxide edit delete {+2..}),\
+ctrl-w:reload(zoxide edit increment {+2..}),\
+ctrl-s:reload(zoxide edit decrement {+2..}),\
 ctrl-z:ignore,\
 double-click:ignore,\
 enter:abort,\
-start:reload(zoxide edit reload),\
-tab:down",
+start:reload(zoxide edit reload)",
                 "--cycle",
                 "--keep-right",
                 // Layout

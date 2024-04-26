@@ -64,11 +64,11 @@ impl Database {
     }
 
     /// Increments the rank of a directory, or creates it if it does not exist.
-    pub fn add(&mut self, path: impl AsRef<str> + Into<String>, by: Rank, now: Epoch) {
+    pub fn add(&mut self, path: impl AsRef<Path>, by: Rank, now: Epoch) {
         self.with_dirs_mut(|dirs| match dirs.iter_mut().find(|dir| dir.path == path.as_ref()) {
             Some(dir) => dir.rank = (dir.rank + by).max(0.0),
             None => {
-                dirs.push(Dir { path: path.into().into(), rank: by.max(0.0), last_accessed: now })
+                dirs.push(Dir { path: path.as_ref().to_owned().into(), rank: by.max(0.0), last_accessed: now })
             }
         });
         self.with_dirty_mut(|dirty| *dirty = true);
@@ -77,23 +77,23 @@ impl Database {
     /// Creates a new directory. This will create a duplicate entry if this
     /// directory is always in the database, it is expected that the user either
     /// does a check before calling this, or calls `dedup()` afterward.
-    pub fn add_unchecked(&mut self, path: impl AsRef<str> + Into<String>, rank: Rank, now: Epoch) {
+    pub fn add_unchecked(&mut self, path: impl AsRef<Path>, rank: Rank, now: Epoch) {
         self.with_dirs_mut(|dirs| {
-            dirs.push(Dir { path: path.into().into(), rank, last_accessed: now })
+            dirs.push(Dir { path: path.as_ref().to_owned().into(), rank, last_accessed: now })
         });
         self.with_dirty_mut(|dirty| *dirty = true);
     }
 
     /// Increments the rank and updates the last_accessed of a directory, or
     /// creates it if it does not exist.
-    pub fn add_update(&mut self, path: impl AsRef<str> + Into<String>, by: Rank, now: Epoch) {
+    pub fn add_update(&mut self, path: impl AsRef<Path>, by: Rank, now: Epoch) {
         self.with_dirs_mut(|dirs| match dirs.iter_mut().find(|dir| dir.path == path.as_ref()) {
             Some(dir) => {
                 dir.rank = (dir.rank + by).max(0.0);
                 dir.last_accessed = now;
             }
             None => {
-                dirs.push(Dir { path: path.into().into(), rank: by.max(0.0), last_accessed: now })
+                dirs.push(Dir { path: path.as_ref().to_owned().into(), rank: by.max(0.0), last_accessed: now })
             }
         });
         self.with_dirty_mut(|dirty| *dirty = true);
@@ -101,7 +101,7 @@ impl Database {
 
     /// Removes the directory with `path` from the store. This does not preserve
     /// ordering, but is O(1).
-    pub fn remove(&mut self, path: impl AsRef<str>) -> bool {
+    pub fn remove(&mut self, path: impl AsRef<Path>) -> bool {
         match self.dirs().iter().position(|dir| dir.path == path.as_ref()) {
             Some(idx) => {
                 self.swap_remove(idx);
@@ -256,7 +256,7 @@ mod tests {
             assert_eq!(db.dirs().len(), 1);
 
             let dir = &db.dirs()[0];
-            assert_eq!(dir.path, path);
+            assert_eq!(dir.path, Path::new(path));
             assert!((dir.rank - 2.0).abs() < 0.01);
             assert_eq!(dir.last_accessed, now);
         }

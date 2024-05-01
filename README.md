@@ -41,6 +41,7 @@ zoxide works on all major shells.
 [Getting started](#getting-started) •
 [Installation](#installation) •
 [Configuration](#configuration) •
+[Usage](#usage) •
 [Integrations](#third-party-integrations)
 
 </div>
@@ -426,6 +427,18 @@ Environment variables[^2] can be used for configuration. They must be set before
 - `_ZO_RESOLVE_SYMLINKS`
   - When set to 1, `z` will resolve symlinks before adding directories to the
     database.
+
+## Usage
+
+Zoxide uses [man pages](https://en.wikipedia.org/wiki/Man_page) for its documentation. To see them:
+
+```shell
+man zoxide
+# For the subcommands
+man zoxide-query
+```
+
+You can find [these man pages online](https://www.mankier.com/1/zoxide) too.
 
 ## Third-party integrations
 

@@ -430,7 +430,8 @@ Environment variables[^2] can be used for configuration. They must be set before
 
 ## Usage
 
-Zoxide uses [man pages](https://en.wikipedia.org/wiki/Man_page) for its documentation. To see them:
+Zoxide uses [man pages](https://en.wikipedia.org/wiki/Man_page) for its
+documentation. To see them:
 
 ```shell
 man zoxide

@@ -9,7 +9,7 @@ use bincode::Options;
 use ouroboros::self_referencing;
 
 pub use crate::db::dir::{Dir, Epoch, Rank};
-pub use crate::db::stream::Stream;
+pub use crate::db::stream::{Stream, StreamOptions};
 use crate::{config, util};
 
 #[self_referencing]
@@ -133,10 +133,6 @@ impl Database {
             }
         });
         self.with_dirty_mut(|dirty_prev| *dirty_prev |= dirty);
-    }
-
-    pub fn stream(&mut self, now: Epoch) -> Stream {
-        Stream::new(self, now)
     }
 
     pub fn dedup(&mut self) {

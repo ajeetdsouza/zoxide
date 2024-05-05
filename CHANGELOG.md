@@ -9,9 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+
+- zsh: Space-Tab completion repeating output multiple times when matching single
+  directory
+- fish: detect infinite loop when using `alias cd=z`.
+- fish / Nushell / PowerShell: handle queries that look like args (e.g. `z -x`).
+- zsh: better cd completions.
+- Lazily delete excluded directories from the database.
+
+## [0.9.4] - 2024-02-21
+
+### Changed
+
+- zsh: improved Space-Tab completions.
+
+## [0.9.3] - 2024-02-13
+
 ### Added
 
-- Nushell: support for v0.86.0.
+- Nushell: support for v0.89.0.
 
 ## [0.9.2] - 2023-08-04
 
@@ -456,6 +473,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions pipeline to build and upload releases.
 - Support for zsh.
 
+[0.9.4]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.3...v0.9.4
+[0.9.3]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/ajeetdsouza/zoxide/compare/v0.8.3...v0.9.0

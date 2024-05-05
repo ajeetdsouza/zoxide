@@ -194,7 +194,10 @@ _zoxide() {
             fi
             case "${prev}" in
                 --exclude)
-                    COMPREPLY=($(compgen -f "${cur}"))
+                    COMPREPLY=()
+                    if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
+                        compopt -o plusdirs
+                    fi
                     return 0
                     ;;
                 *)
@@ -221,4 +224,8 @@ _zoxide() {
     esac
 }
 
-complete -F _zoxide -o bashdefault -o default zoxide
+if [[ "${BASH_VERSINFO[0]}" -eq 4 && "${BASH_VERSINFO[1]}" -ge 4 || "${BASH_VERSINFO[0]}" -gt 4 ]]; then
+    complete -F _zoxide -o nosort -o bashdefault -o default zoxide
+else
+    complete -F _zoxide -o bashdefault -o default zoxide
+fi

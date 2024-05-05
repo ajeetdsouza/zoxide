@@ -39,7 +39,7 @@ jobs:
           fetch-depth: 0
       - name: Get version
         id: get_version
-        uses: SebRollen/toml-action@v1.0.2
+        uses: SebRollen/toml-action@v1.2.0
         with:
           file: Cargo.toml
           field: package.version
@@ -51,7 +51,7 @@ jobs:
           override: true
           target: ${{ matrix.target }}
       - name: Setup cache
-        uses: Swatinem/rust-cache@v2.7.1
+        uses: Swatinem/rust-cache@v2.7.3
         with:
           key: ${{ matrix.target }}
       - name: Build binary
@@ -86,7 +86,7 @@ jobs:
             CHANGELOG.md LICENSE README.md ./man/ ./contrib/completions/ `
             ./target/${{ matrix.target }}/release/zoxide.exe
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.target }}
           path: |
@@ -96,7 +96,7 @@ jobs:
       - name: Create release
         if: |
           github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'chore(release)')
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           draft: true
           files: |

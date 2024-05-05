@@ -1,5 +1,6 @@
 #!/bin/sh
 # shellcheck shell=dash
+# shellcheck disable=SC3043 # Assume `local` extension
 
 # The official zoxide installer.
 #
@@ -7,20 +8,26 @@
 # extension. Note: Most shells limit `local` to 1 var per line, contra bash.
 
 main() {
+    # The version of ksh93 that ships with many illumos systems does not support the "local"
+    # extension. Print a message rather than fail in subtle ways later on:
     if [ "${KSH_VERSION-}" = 'Version JM 93t+ 2010-03-05' ]; then
-        # The version of ksh93 that ships with many illumos systems does not
-        # support the "local" extension.  Print a message rather than fail in
-        # subtle ways later on:
         err 'the installer does not work with this ksh93 version; please try bash'
     fi
 
     set -u
 
-    # Detect and print host target triple.
-    ensure get_architecture
-    local _arch="${RETVAL}"
+    parse_args "$@"
+
+    local _arch
+    _arch="${ARCH:-$(ensure get_architecture)}"
     assert_nz "${_arch}" "arch"
     echo "Detected architecture: ${_arch}"
+
+    local _bin_name
+    case "${_arch}" in
+    *windows*) _bin_name="zoxide.exe" ;;
+    *) _bin_name="zoxide" ;;
+    esac
 
     # Create and enter a temporary directory.
     local _tmp_dir
@@ -28,8 +35,8 @@ main() {
     cd "${_tmp_dir}" || err "cd: failed to enter directory: ${_tmp_dir}"
 
     # Download and extract zoxide.
-    ensure download_zoxide "${_arch}"
-    local _package="${RETVAL}"
+    local _package
+    _package="$(ensure download_zoxide "${_arch}")"
     assert_nz "${_package}" "package"
     echo "Downloaded package: ${_package}"
     case "${_package}" in
@@ -47,29 +54,75 @@ main() {
     esac
 
     # Install binary.
-    local _bin_dir="${HOME}/.local/bin"
-    local _bin_name
-    case "${_arch}" in
-    *windows*) _bin_name="zoxide.exe" ;;
-    *) _bin_name="zoxide" ;;
-    esac
-    ensure mkdir -p "${_bin_dir}"
-    ensure cp "${_bin_name}" "${_bin_dir}"
-    ensure chmod +x "${_bin_dir}/${_bin_name}"
-    echo "Installed zoxide to ${_bin_dir}"
+    ensure try_sudo mkdir -p -- "${BIN_DIR}"
+    ensure try_sudo cp -- "${_bin_name}" "${BIN_DIR}/${_bin_name}"
+    ensure try_sudo chmod +x -- "${BIN_DIR}/${_bin_name}"
+    echo "Installed zoxide to ${BIN_DIR}"
 
     # Install manpages.
-    local _man_dir="${HOME}/.local/share/man"
-    ensure mkdir -p "${_man_dir}/man1"
-    ensure cp "man/man1/"* "${_man_dir}/man1/"
-    echo "Installed manpages to ${_man_dir}"
+    ensure try_sudo mkdir -p -- "${MAN_DIR}/man1"
+    ensure try_sudo cp -- "man/man1/"* "${MAN_DIR}/man1/"
+    echo "Installed manpages to ${MAN_DIR}"
 
     # Print success message and check $PATH.
     echo ""
     echo "zoxide is installed!"
-    if ! echo ":${PATH}:" | grep -Fq ":${_bin_dir}:"; then
-        echo "NOTE: ${_bin_dir} is not on your \$PATH. zoxide will not work unless it is added to \$PATH."
+    if ! echo ":${PATH}:" | grep -Fq ":${BIN_DIR}:"; then
+        echo "Note: ${BIN_DIR} is not on your \$PATH. zoxide will not work unless it is added to \$PATH."
     fi
+}
+
+# Parse the arguments passed and set variables accordingly.
+parse_args() {
+    BIN_DIR_DEFAULT="${HOME}/.local/bin"
+    MAN_DIR_DEFAULT="${HOME}/.local/share/man"
+    SUDO_DEFAULT="sudo"
+
+    BIN_DIR="${BIN_DIR_DEFAULT}"
+    MAN_DIR="${MAN_DIR_DEFAULT}"
+    SUDO="${SUDO_DEFAULT}"
+
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+        --arch) ARCH="$2" && shift 2 ;;
+        --arch=*) ARCH="${1#*=}" && shift 1 ;;
+        --bin-dir) BIN_DIR="$2" && shift 2 ;;
+        --bin-dir=*) BIN_DIR="${1#*=}" && shift 1 ;;
+        --man-dir) MAN_DIR="$2" && shift 2 ;;
+        --man-dir=*) MAN_DIR="${1#*=}" && shift 1 ;;
+        --sudo) SUDO="$2" && shift 2 ;;
+        --sudo=*) SUDO="${1#*=}" && shift 1 ;;
+        -h | --help) usage && exit 0 ;;
+        *) err "Unknown option: $1" ;;
+        esac
+    done
+}
+
+usage() {
+    # heredocs are not defined in POSIX.
+    local _text_heading _text_reset
+    _text_heading="$(tput bold || true 2>/dev/null)$(tput smul || true 2>/dev/null)"
+    _text_reset="$(tput sgr0 || true 2>/dev/null)"
+
+    local _arch
+    _arch="$(get_architecture || true)"
+
+    echo "\
+${_text_heading}zoxide installer${_text_reset}
+Ajeet D'Souza <98ajeet@gmail.com>
+https://github.com/ajeetdsouza/zoxide
+
+Fetches and installs zoxide. If zoxide is already installed, it will be updated to the latest version.
+
+${_text_heading}Usage:${_text_reset}
+  install.sh [OPTIONS]
+
+${_text_heading}Options:${_text_reset}
+      --arch     Override the architecture identified by the installer [current: ${_arch}]
+      --bin-dir  Override the installation directory [default: ${BIN_DIR_DEFAULT}]
+      --man-dir  Override the manpage installation directory [default: ${MAN_DIR_DEFAULT}]
+      --sudo     Override the command used to elevate to root privileges [default: ${SUDO_DEFAULT}]
+  -h, --help     Print help"
 }
 
 download_zoxide() {
@@ -97,7 +150,7 @@ download_zoxide() {
         err "you have exceeded GitHub's API rate limit. Please try again later, or use a different installation method: https://github.com/ajeetdsouza/zoxide/#installation"
 
     local _package_url
-    _package_url="$(echo "${_releases}" | grep "browser_download_url" | cut -d '"' -f 4 | grep "${_arch}")" ||
+    _package_url="$(echo "${_releases}" | grep "browser_download_url" | cut -d '"' -f 4 | grep -- "${_arch}")" ||
         err "zoxide has not yet been packaged for your architecture (${_arch}), please file an issue: https://github.com/ajeetdsouza/zoxide/issues"
 
     local _ext
@@ -114,7 +167,30 @@ download_zoxide() {
     *) err "unsupported downloader: ${_dld}" ;;
     esac
 
-    RETVAL="${_package}"
+    echo "${_package}"
+}
+
+try_sudo() {
+    if "$@" >/dev/null 2>&1; then
+        return 0
+    fi
+
+    need_sudo
+    "${SUDO}" "$@"
+}
+
+need_sudo() {
+    if ! check_cmd "${SUDO}"; then
+        err "\
+could not find the command \`${SUDO}\` needed to get permissions for install.
+
+If you are on Windows, please run your shell as an administrator, then rerun this script.
+Otherwise, please run this script as root, or install \`sudo\`."
+    fi
+
+    if ! "${SUDO}" -v; then
+        err "sudo permissions not granted, aborting installation"
+    fi
 }
 
 # The below functions have been extracted with minor modifications from the
@@ -259,8 +335,7 @@ get_architecture() {
         x86_64)
             # 32-bit executable for amd64 = x32
             if is_host_amd64_elf; then {
-                echo "x32 userland is unsupported" 1>&2
-                exit 1
+                err "x32 userland is unsupported"
             }; else
                 _cputype=i686
             fi
@@ -297,7 +372,7 @@ get_architecture() {
     fi
 
     _arch="${_cputype}-${_ostype}"
-    RETVAL="${_arch}"
+    echo "${_arch}"
 }
 
 get_bitness() {
@@ -320,9 +395,9 @@ get_bitness() {
 }
 
 get_endianness() {
-    local cputype=$1
-    local suffix_eb=$2
-    local suffix_el=$3
+    local cputype="$1"
+    local suffix_eb="$2"
+    local suffix_el="$3"
 
     # detect endianness without od/hexdump, like get_bitness() does.
     need_cmd head
@@ -365,7 +440,7 @@ need_cmd() {
 }
 
 check_cmd() {
-    command -v "$1" >/dev/null 2>&1
+    command -v -- "$1" >/dev/null 2>&1
 }
 
 # Run a command that should never fail. If the command fails execution

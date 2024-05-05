@@ -81,7 +81,7 @@ zoxide can be installed in 4 easy steps:
    > The recommended way to install zoxide is via the install script:
    >
    > ```sh
-   > curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+   > curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
    > ```
    >
    > Or, you can use a package manager:
@@ -131,7 +131,7 @@ zoxide can be installed in 4 easy steps:
    > Or, run this command in your terminal:
    >
    > ```sh
-   > curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+   > curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
    > ```
 
    </details>
@@ -156,6 +156,12 @@ zoxide can be installed in 4 easy steps:
    > | [Chocolatey]    | `choco install zoxide`                |
    > | [conda-forge]   | `conda install -c conda-forge zoxide` |
    > | [Scoop]         | `scoop install zoxide`                |
+   >
+   > If you're using Cygwin, Git Bash, or MSYS2, you can also use the install script:
+   >
+   > ```sh
+   > curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+   > ```
 
    </details>
 
@@ -186,7 +192,13 @@ zoxide can be installed in 4 easy steps:
    >
    > | Repository | Instructions         |
    > | ---------- | -------------------- |
-   > | [Termux]   | `pkg install zoxide` |
+   > | [Termux]   | `pkg install zoxide` |  
+   >
+   > Or, run this command in your terminal:
+   >
+   > ```sh
+   > curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+   > ```
 
    </details>
 

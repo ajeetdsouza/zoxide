@@ -122,7 +122,11 @@ impl StreamOptions {
         }
     }
 
-    pub fn with_keywords<I: Iterator<Item = S>, S: AsRef<str>>(mut self, keywords: I) -> Self {
+    pub fn with_keywords<I>(mut self, keywords: I) -> Self
+    where
+        I: IntoIterator,
+        I::Item: AsRef<str>,
+    {
         self.keywords = keywords.into_iter().map(util::to_lowercase).collect();
         self
     }

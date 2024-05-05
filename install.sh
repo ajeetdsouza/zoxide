@@ -1,8 +1,6 @@
 #!/bin/sh
 # shellcheck shell=dash
-# shellcheck enable=all # Show warnings in IDE - these are checked in CI
 # shellcheck disable=SC3043 # Assume `local` extension
-# vim:set ts=4 sw=4 et:
 
 # The official zoxide installer.
 #
@@ -10,34 +8,39 @@
 # extension. Note: Most shells limit `local` to 1 var per line, contra bash.
 
 usage() {
-    # Note: here-docs aren't defined in posix
-    printf '%s\n' \
-        "Usage: install.sh [option]" \
-        "Fetch and install the latest version of zoxide, if zoxide is already" \
-        "installed it will be updated to the latest version." \
-        "" \
-        "Options:" \
-        "  -b, --bin-dir   Override the bin installation directory [default: ${_bin_dir}]" \
-        "  -m, --man-dir   Override the man installation directory [default: ${_man_dir}]" \
-        "  -a, --arch      Override the architecture identified by the installer" \
-        "  -s, --sudo      Override the command used to elevate to root privaliges [default: sudo]" \
-        "  -h, --help      Display this help message" ||
-        true
+    # heredocs are not defined in POSIX.
+    local _text_heading _text_reset
+    _text_heading="$(tput bold || true 2>/dev/null)$(tput smul || true 2>/dev/null)"
+    _text_reset="$(tput sgr0 || true 2>/dev/null)"
+
+    echo "\
+${_text_heading}zoxide installer${_text_reset}
+Ajeet D'Souza <98ajeet@gmail.com>
+https://github.com/ajeetdsouza/zoxide
+
+Fetches and installs zoxide. If zoxide is already installed, it will be updated to the latest version.
+
+${_text_heading}Usage:${_text_reset}
+  install.sh [OPTIONS]
+
+${_text_heading}Options:${_text_reset}
+      --arch     Override the architecture identified by the installer
+      --bin-dir  Override the installation directory [default: ${_bin_dir}]
+      --man-dir  Override the manpage installation directory [default: ${_man_dir}]
+      --sudo     Override the command used to elevate to root privileges [default: sudo]
+  -h, --help     Print help"
 }
 
 main() {
+    # The version of ksh93 that ships with many illumos systems does not support the "local"
+    # extension. Print a message rather than fail in subtle ways later on:
     if [ "${KSH_VERSION-}" = 'Version JM 93t+ 2010-03-05' ]; then
-        # The version of ksh93 that ships with many illumos systems does not
-        # support the "local" extension.  Print a message rather than fail in
-        # subtle ways later on:
         err 'the installer does not work with this ksh93 version; please try bash'
     fi
-    # from posix `command -v` definition (https://pubs.opengroup.org/onlinepubs/9699919799/utilities/command.html):
-    # "Shell functions, special built-in utilities, regular built-in utilities not associated with a PATH search, and shell reserved words shall be written as just their names."
+
+    # local is not a POSIX builtin, so it may not be available.
     if [ "$(command -v -- local 2>/dev/null || true)" != "local" ]; then
-        # Local is not a posix defined builtin, so it may not be available.
-        # Print a message rather than fail in subtle ways later on:
-        err "the installer does not work with this shell; please try bash"
+        err 'the installer does not work with this shell; please try bash'
     fi
 
     set -u
@@ -329,8 +332,7 @@ get_architecture() {
         x86_64)
             # 32-bit executable for amd64 = x32
             if is_host_amd64_elf; then {
-                echo "x32 userland is unsupported" 1>&2
-                exit 1
+                err "x32 userland is unsupported"
             }; else
                 _cputype=i686
             fi
@@ -487,15 +489,15 @@ parse_args() {
     # parse argv variables
     while [ "$#" -gt 0 ]; do
         case "$1" in
-        -b | --bin-dir) BIN_DIR="$2" && shift 2 ;;
-        -m | --man-dir) MAN_DIR="$2" && shift 2 ;;
-        -a | --arch) ARCH="$2" && shift 2 ;;
-        -s | --sudo) SUDO="$2" && shift 2 ;;
+        --arch) ARCH="$2" && shift 2 ;;
+        --arch=*) ARCH="${1#*=}" && shift 1 ;;
+        --bin-dir) BIN_DIR="$2" && shift 2 ;;
+        --bin-dir=*) BIN_DIR="${1#*=}" && shift 1 ;;
+        --man-dir) MAN_DIR="$2" && shift 2 ;;
+        --man-dir=*) MAN_DIR="${1#*=}" && shift 1 ;;
+        --sudo) SUDO="$2" && shift 2 ;;
+        --sudo=*) SUDO="${1#*=}" && shift 1 ;;
         -h | --help) usage && exit 0 ;;
-        -b=* | --bin-dir=*) BIN_DIR="${1#*=}" && shift 1 ;;
-        -m=* | --man-dir=*) MAN_DIR="${1#*=}" && shift 1 ;;
-        -a=* | --arch=*) ARCH="${1#*=}" && shift 1 ;;
-        -s=* | --sudo=*) SUDO="${1#*=}" && shift 1 ;;
         *) err "Unknown option: $1" ;;
         esac
     done

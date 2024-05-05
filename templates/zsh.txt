@@ -110,11 +110,11 @@ if [[ -o zle ]]; then
             \builtin bindkey '\e[0n' '__zoxide_z_complete_helper'
             # Send '\e[0n' to console input.
             \builtin printf '\e[5n'
+        fi
 
 	    # Report that the completion was successful, so that we don't fall back
 	    # to another completion function.
 	    return 0
-        fi
     }
 
     function __zoxide_z_complete_helper() {

@@ -122,8 +122,8 @@ impl StreamOptions {
         }
     }
 
-    pub fn with_keywords(mut self, keywords: Vec<String>) -> Self {
-        self.keywords = keywords;
+    pub fn with_keywords<I: Iterator<Item = S>, S: AsRef<str>>(mut self, keywords: I) -> Self {
+        self.keywords = keywords.into_iter().map(util::to_lowercase).collect();
         self
     }
 
@@ -173,8 +173,7 @@ mod tests {
     #[case(&["/foo/", "/bar"], "/foo/baz/bar", true)]
     fn query(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
         let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
-        let options =
-            StreamOptions::new(0).with_keywords(keywords.iter().map(|s| s.to_string()).collect());
+        let options = StreamOptions::new(0).with_keywords(keywords.iter());
         let stream = Stream::new(db, options);
         assert_eq!(is_match, stream.filter_by_keywords(path));
     }

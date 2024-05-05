@@ -98,7 +98,8 @@ if [[ -o zle ]]; then
 
         if [[ "{{ "${#words[@]}" }}" -eq 2 ]]; then
             # Show completions for local directories.
-            _files -/
+            _cd -/
+
         elif [[ "${words[-1]}" == '' ]]; then
             # Show completions for Space-Tab.
             # shellcheck disable=SC2086

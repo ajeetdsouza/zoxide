@@ -16,11 +16,6 @@ main() {
 
     set -u
 
-    # local is not a POSIX builtin, so it may not be available.
-    if [ "$(command -v -- local 2>/dev/null || true)" != "local" ]; then
-        err 'the installer does not work with this shell; please try bash'
-    fi
-
     parse_args "$@"
 
     local _arch

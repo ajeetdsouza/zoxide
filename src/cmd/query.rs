@@ -33,6 +33,7 @@ impl Query {
         let mut fzf = Self::get_fzf()?;
         let selection = loop {
             match stream.next() {
+                Some(dir) if Some(dir.path.as_ref()) == self.exclude.as_deref() => continue,
                 Some(dir) => {
                     if let Some(selection) = fzf.write(dir, now)? {
                         break selection;
@@ -54,6 +55,9 @@ impl Query {
     fn query_list(&self, stream: &mut Stream, now: Epoch) -> Result<()> {
         let handle = &mut io::stdout().lock();
         while let Some(dir) = stream.next() {
+            if Some(dir.path.as_ref()) == self.exclude.as_deref() {
+                continue;
+            }
             let dir = if self.score { dir.display().with_score(now) } else { dir.display() };
             writeln!(handle, "{dir}").pipe_exit("stdout")?;
         }
@@ -73,14 +77,13 @@ impl Query {
     }
 
     fn get_stream<'a>(&self, db: &'a mut Database, now: Epoch) -> Result<Stream<'a>> {
-        let mut options = StreamOptions::new(now).with_keywords(self.keywords.to_owned());
+        let mut options = StreamOptions::new(now)
+            .with_keywords(self.keywords.to_owned())
+            .with_exclude(config::exclude_dirs()?);
         if !self.all {
             let resolve_symlinks = config::resolve_symlinks();
             options = options.with_exists(true).with_resolve_symlinks(resolve_symlinks);
         }
-
-        let exclude = config::exclude_dirs()?;
-        options = options.with_exclude(exclude);
 
         let stream = Stream::new(db, options);
         Ok(stream)

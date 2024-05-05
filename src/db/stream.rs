@@ -83,10 +83,8 @@ impl<'a> Stream<'a> {
         if !self.options.exists {
             return true;
         }
-        let resolver = match self.options.resolve_symlinks {
-            true => fs::metadata,
-            false => fs::symlink_metadata,
-        };
+        let resolver =
+            if self.options.resolve_symlinks { fs::metadata } else { fs::symlink_metadata };
         resolver(path).map(|metadata| metadata.is_dir()).unwrap_or_default()
     }
 }

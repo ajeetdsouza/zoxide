@@ -7,30 +7,6 @@
 # It runs on Unix shells like {a,ba,da,k,z}sh. It uses the common `local`
 # extension. Note: Most shells limit `local` to 1 var per line, contra bash.
 
-usage() {
-    # heredocs are not defined in POSIX.
-    local _text_heading _text_reset
-    _text_heading="$(tput bold || true 2>/dev/null)$(tput smul || true 2>/dev/null)"
-    _text_reset="$(tput sgr0 || true 2>/dev/null)"
-
-    echo "\
-${_text_heading}zoxide installer${_text_reset}
-Ajeet D'Souza <98ajeet@gmail.com>
-https://github.com/ajeetdsouza/zoxide
-
-Fetches and installs zoxide. If zoxide is already installed, it will be updated to the latest version.
-
-${_text_heading}Usage:${_text_reset}
-  install.sh [OPTIONS]
-
-${_text_heading}Options:${_text_reset}
-      --arch     Override the architecture identified by the installer
-      --bin-dir  Override the installation directory [default: ${_bin_dir}]
-      --man-dir  Override the manpage installation directory [default: ${_man_dir}]
-      --sudo     Override the command used to elevate to root privileges [default: sudo]
-  -h, --help     Print help"
-}
-
 main() {
     # The version of ksh93 that ships with many illumos systems does not support the "local"
     # extension. Print a message rather than fail in subtle ways later on:
@@ -38,30 +14,17 @@ main() {
         err 'the installer does not work with this ksh93 version; please try bash'
     fi
 
+    set -u
+
     # local is not a POSIX builtin, so it may not be available.
     if [ "$(command -v -- local 2>/dev/null || true)" != "local" ]; then
         err 'the installer does not work with this shell; please try bash'
     fi
 
-    set -u
+    parse_args "$@"
 
-    # Note: these variables are used in the usage message!
-    local _bin_dir="${HOME}/.local/bin"
-    local _man_dir="${HOME}/.local/share/man"
-
-    parse_args "$@" # sets global variables (BIN_DIR, MAN_DIR, ARCH, SUDO)
-
-    _bin_dir=${BIN_DIR:-${_bin_dir}}
-    _man_dir=${MAN_DIR:-${_man_dir}}
-
-    if [ -n "${ARCH:-}" ]; then
-        # if the user specifed, trust them - don't error on unrecognized hardware.
-        local _arch="${ARCH}"
-    else
-        # Detect and print host target triple.
-        ensure get_architecture
-        local _arch="${RETVAL}"
-    fi
+    local _arch
+    _arch="${ARCH:-$(ensure get_architecture)}"
     assert_nz "${_arch}" "arch"
     echo "Detected architecture: ${_arch}"
 
@@ -71,27 +34,14 @@ main() {
     *) _bin_name="zoxide" ;;
     esac
 
-    local _sudo
-    if test_writeable "${_bin_dir}"; then
-        echo "Installing zoxide, please wait…"
-        _sudo=''
-    else
-        echo "Escalated permissions are required to install to ${_bin_dir}"
-        _sudo=${SUDO:-"sudo"}
-        if [ "${_sudo}" = 'sudo' ]; then
-            elevate_priv # only check if the user didn't provide it, blindly trust user provided values
-        fi
-        echo "Installing zoxide as root, please wait…"
-    fi
-
     # Create and enter a temporary directory.
     local _tmp_dir
     _tmp_dir="$(mktemp -d)" || err "mktemp: could not create temporary directory"
     cd "${_tmp_dir}" || err "cd: failed to enter directory: ${_tmp_dir}"
 
     # Download and extract zoxide.
-    ensure download_zoxide "${_arch}"
-    local _package="${RETVAL}"
+    local _package
+    _package="$(ensure download_zoxide "${_arch}")"
     assert_nz "${_package}" "package"
     echo "Downloaded package: ${_package}"
     case "${_package}" in
@@ -109,40 +59,75 @@ main() {
     esac
 
     # Install binary.
-    # shellcheck disable=SC2086 # The lack of quoting is intentional. This may not be the best way to do it, but it's hard to properly do in POSIX
-    {
-        ensure ${_sudo} mkdir -p -- "${_bin_dir}"
-        ensure ${_sudo} cp -- "${_bin_name}" "${_bin_dir}"
-        ensure ${_sudo} chmod +x -- "${_bin_dir}/${_bin_name}"
-    }
-    echo "Installed zoxide to ${_bin_dir}"
-
-    if test_writeable "${_man_dir}"; then
-        echo "Installing zoxide man pages, please wait…"
-        _sudo=""
-    else
-        echo "Escalated permissions are required to install man pages to ${_man_dir}"
-        _sudo=${SUDO:-"sudo"}
-        if [ "${_sudo}" = 'sudo' ]; then
-            elevate_priv # only check if the user didn't provide it, blindly trust user provided values
-        fi
-        echo "Installing zoxide man pages as root, please wait…"
-    fi
+    ensure try_sudo mkdir -p -- "${BIN_DIR}"
+    ensure try_sudo cp -- "${_bin_name}" "${BIN_DIR}/${_bin_name}"
+    ensure try_sudo chmod +x -- "${BIN_DIR}/${_bin_name}"
+    echo "Installed zoxide to ${BIN_DIR}"
 
     # Install manpages.
-    # shellcheck disable=SC2086 # The lack of quoting is intentional.
-    {
-        ensure ${_sudo} mkdir -p -- "${_man_dir}/man1"
-        ensure ${_sudo} cp -- "man/man1/"* "${_man_dir}/man1/"
-    }
-    echo "Installed manpages to ${_man_dir}"
+    ensure try_sudo mkdir -p -- "${MAN_DIR}/man1"
+    ensure try_sudo cp -- "man/man1/"* "${MAN_DIR}/man1/"
+    echo "Installed manpages to ${MAN_DIR}"
 
     # Print success message and check $PATH.
     echo ""
     echo "zoxide is installed!"
-    if ! echo ":${PATH}:" | grep -Fq ":${_bin_dir}:"; then
-        echo "NOTE: ${_bin_dir} is not on your \$PATH. zoxide will not work unless it is added to \$PATH."
+    if ! echo ":${PATH}:" | grep -Fq ":${BIN_DIR}:"; then
+        echo "Note: ${BIN_DIR} is not on your \$PATH. zoxide will not work unless it is added to \$PATH."
     fi
+}
+
+# Parse the arguments passed and set variables accordingly.
+parse_args() {
+    BIN_DIR_DEFAULT="${HOME}/.local/bin"
+    MAN_DIR_DEFAULT="${HOME}/.local/share/man"
+    SUDO_DEFAULT="sudo"
+
+    BIN_DIR="${BIN_DIR_DEFAULT}"
+    MAN_DIR="${MAN_DIR_DEFAULT}"
+    SUDO="${SUDO_DEFAULT}"
+
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+        --arch) ARCH="$2" && shift 2 ;;
+        --arch=*) ARCH="${1#*=}" && shift 1 ;;
+        --bin-dir) BIN_DIR="$2" && shift 2 ;;
+        --bin-dir=*) BIN_DIR="${1#*=}" && shift 1 ;;
+        --man-dir) MAN_DIR="$2" && shift 2 ;;
+        --man-dir=*) MAN_DIR="${1#*=}" && shift 1 ;;
+        --sudo) SUDO="$2" && shift 2 ;;
+        --sudo=*) SUDO="${1#*=}" && shift 1 ;;
+        -h | --help) usage && exit 0 ;;
+        *) err "Unknown option: $1" ;;
+        esac
+    done
+}
+
+usage() {
+    # heredocs are not defined in POSIX.
+    local _text_heading _text_reset
+    _text_heading="$(tput bold || true 2>/dev/null)$(tput smul || true 2>/dev/null)"
+    _text_reset="$(tput sgr0 || true 2>/dev/null)"
+
+    local _arch
+    _arch="$(get_architecture || true)"
+
+    echo "\
+${_text_heading}zoxide installer${_text_reset}
+Ajeet D'Souza <98ajeet@gmail.com>
+https://github.com/ajeetdsouza/zoxide
+
+Fetches and installs zoxide. If zoxide is already installed, it will be updated to the latest version.
+
+${_text_heading}Usage:${_text_reset}
+  install.sh [OPTIONS]
+
+${_text_heading}Options:${_text_reset}
+      --arch     Override the architecture identified by the installer [current: ${_arch}]
+      --bin-dir  Override the installation directory [default: ${BIN_DIR_DEFAULT}]
+      --man-dir  Override the manpage installation directory [default: ${MAN_DIR_DEFAULT}]
+      --sudo     Override the command used to elevate to root privileges [default: ${SUDO_DEFAULT}]
+  -h, --help     Print help"
 }
 
 download_zoxide() {
@@ -187,7 +172,30 @@ download_zoxide() {
     *) err "unsupported downloader: ${_dld}" ;;
     esac
 
-    RETVAL="${_package}"
+    echo "${_package}"
+}
+
+try_sudo() {
+    if "$@" >/dev/null 2>&1; then
+        return 0
+    fi
+
+    need_sudo
+    "${SUDO}" "$@"
+}
+
+need_sudo() {
+    if ! check_cmd "${SUDO}"; then
+        err "\
+could not find the command \`${SUDO}\` needed to get permissions for install.
+
+If you are on Windows, please run your shell as an administrator, then rerun this script.
+Otherwise, please run this script as root, or install \`sudo\`."
+    fi
+
+    if ! "${SUDO}" -v; then
+        err "sudo permissions not granted, aborting installation"
+    fi
 }
 
 # The below functions have been extracted with minor modifications from the
@@ -369,7 +377,7 @@ get_architecture() {
     fi
 
     _arch="${_cputype}-${_ostype}"
-    RETVAL="${_arch}"
+    echo "${_arch}"
 }
 
 get_bitness() {
@@ -454,53 +462,6 @@ assert_nz() {
 err() {
     echo "Error: $1" >&2
     exit 1
-}
-
-elevate_priv() {
-    if ! check_cmd sudo; then
-        echo 'Could not find the command "sudo", needed to get permissions for install.' >&2
-        echo "If you are on Windows, please run your shell as an administrator, then" >&2
-        echo "rerun this script. Otherwise, please run this script as root, or install" >&2
-        echo "sudo." >&2
-        exit 1
-    fi
-    if ! sudo -v; then
-        err "Superuser not granted, aborting installation"
-    fi
-}
-
-# Test if a location is writeable by trying to write to it. Windows does not let
-# you test writeability other than by writing: https://stackoverflow.com/q/1999988
-test_writeable() {
-    if [ -z "${1-}" ]; then
-        return 1 # an empty path should never be writeable
-    fi
-    path="$1/test.txt"
-    if touch -- "${path}" 2>/dev/null; then
-        rm -- "${path}"
-        return 0
-    else
-        return 1
-    fi
-}
-
-# parse the arguments passed and set the environment variables accordingly
-parse_args() {
-    # parse argv variables
-    while [ "$#" -gt 0 ]; do
-        case "$1" in
-        --arch) ARCH="$2" && shift 2 ;;
-        --arch=*) ARCH="${1#*=}" && shift 1 ;;
-        --bin-dir) BIN_DIR="$2" && shift 2 ;;
-        --bin-dir=*) BIN_DIR="${1#*=}" && shift 1 ;;
-        --man-dir) MAN_DIR="$2" && shift 2 ;;
-        --man-dir=*) MAN_DIR="${1#*=}" && shift 1 ;;
-        --sudo) SUDO="$2" && shift 2 ;;
-        --sudo=*) SUDO="${1#*=}" && shift 1 ;;
-        -h | --help) usage && exit 0 ;;
-        *) err "Unknown option: $1" ;;
-        esac
-    done
 }
 
 # This is put in braces to ensure that the script does not run until it is

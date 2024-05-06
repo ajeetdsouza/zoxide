@@ -112,11 +112,11 @@ if [[ -o zle ]]; then
             \builtin bindkey '\e[0n' '__zoxide_z_complete_helper'
             # Sends query device status code, which results in a '\e[0n' being sent to console input.
             \builtin printf '\e[5n'
-        fi
 
-        # Report that the completion was successful, so that we don't fall back
-        # to another completion function.
-        return 0
+            # Report that the completion was successful, so that we don't fall back
+            # to another completion function.
+            return 0
+        fi
     }
 
     function __zoxide_z_complete_helper() {

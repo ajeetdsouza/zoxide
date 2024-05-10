@@ -56,7 +56,7 @@ main() {
     # Install binary.
     ensure try_sudo mkdir -p -- "${BIN_DIR}"
     ensure try_sudo cp -- "${_bin_name}" "${BIN_DIR}/${_bin_name}"
-    ensure try_sudo chmod +x -- "${BIN_DIR}/${_bin_name}"
+    ensure try_sudo chmod +x "${BIN_DIR}/${_bin_name}"
     echo "Installed zoxide to ${BIN_DIR}"
 
     # Install manpages.

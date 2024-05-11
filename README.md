@@ -444,6 +444,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 | Application           | Description                                  | Plugin                     |
 | --------------------- | -------------------------------------------- | -------------------------- |
 | [aerc]                | Email client                                 | Natively supported         |
+| [alfred]              | macOS launcher                               | [alfred-zoxide]            |
 | [clink]               | Improved cmd.exe for Windows                 | [clink-zoxide]             |
 | [emacs]               | Text editor                                  | [zoxide.el]                |
 | [felix]               | File manager                                 | Natively supported         |
@@ -470,6 +471,8 @@ Environment variables[^2] can be used for configuration. They must be set before
     out the [wiki][wiki-env].
 
 [aerc]: https://github.com/rjarry/aerc
+[alfred]: https://www.alfredapp.com/
+[alfred-zoxide]: https://github.com/yihou/alfred-zoxide
 [algorithm-aging]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#aging
 [algorithm-matching]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#matching
 [alpine linux packages]: https://pkgs.alpinelinux.org/packages?name=zoxide

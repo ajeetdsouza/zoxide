@@ -56,6 +56,13 @@ jobs:
         uses: Swatinem/rust-cache@v2.7.3
         with:
           key: ${{ matrix.target }}
+      - name: Install cross
+        if: ${{ runner.os == 'Linux' }}
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: --git https://github.com/cross-rs/cross.git --release --rev 02bf930e0cb0c6f1beffece0788f3932ecb2c7eb --locked --color=always --verbose
+          use-cross: ${{ runner.os == 'Linux' }}
       - name: Build binary
         uses: actions-rs/cargo@v1
         with:

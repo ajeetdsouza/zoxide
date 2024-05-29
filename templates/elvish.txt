@@ -22,7 +22,7 @@ fn __zoxide_cd {|path|
 
 # Initialize hook to track previous directory.
 var oldpwd = $builtin:pwd
-set builtin:before-chdir = [$@builtin:before-chdir {|_| edit:add-var oldpwd $builtin:pwd }]
+set builtin:before-chdir = [$@builtin:before-chdir {|_| set oldpwd = $builtin:pwd }]
 
 # Initialize hook to add directories to zoxide.
 {%- if hook == InitHook::None %}

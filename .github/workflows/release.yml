@@ -21,8 +21,12 @@ jobs:
             target: arm-unknown-linux-musleabihf
           - os: ubuntu-latest
             target: armv7-unknown-linux-musleabihf
+            deb: true
           - os: ubuntu-latest
             target: aarch64-unknown-linux-musl
+            deb: true
+          - os: ubuntu-latest
+            target: i686-unknown-linux-musl
             deb: true
           - os: ubuntu-latest
             target: aarch64-linux-android

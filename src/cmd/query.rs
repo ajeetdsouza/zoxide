@@ -112,7 +112,6 @@ impl Query {
                 "--tabstop=1",
                 // Scripting
                 "--exit-0",
-                "--select-1",
             ])
             .enable_preview()
         }

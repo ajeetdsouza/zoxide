@@ -8,7 +8,7 @@ indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[*.(md,txt}]
+[*.(md,rst,txt}]
 indent_size = unset
 trim_trailing_whitespace = false
 

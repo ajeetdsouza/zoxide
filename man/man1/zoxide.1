@@ -70,7 +70,7 @@ T}
 .TE
 .TP
 .B _ZO_ECHO
-When set to 1, \fBz\fR will print the matched directory before navigating to it.
+When set to 1, \fBz\fR will print the matched directory after navigating to it.
 .TP
 .B _ZO_EXCLUDE_DIRS
 Prevents the specified directories from being added to the database. This is
@@ -82,7 +82,7 @@ l l.
     \fBLinux/macOS/BSD\fR|T{
 \fB:\fR, eg. \fB$HOME:$HOME/private/*\fR
 T}
-    \fBWindows\fR|\fB;\fR, eg. \fB$HOME;$HOME/private/*\fR
+    \fBWindows\fR|\fB;\fR, eg. \fB%HOME%;%HOME%/private/*\fR
 .TE
 .sp
 By default, this is set to \fB$HOME\fR. After setting this up, you might need

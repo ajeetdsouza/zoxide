@@ -13,6 +13,13 @@ Add this to the \fBend\fR of your config file (usually \fB~/.bashrc\fR):
     \fBeval "$(zoxide init bash)"\fR
 .fi
 .TP
+.B cmd
+Add this to the \fBend\fR of your config file or AutoRun command:
+.sp
+.nf
+    \fBzoxide init cmd --hook none | cmd /d/q/k >nul\fR
+.fi
+.TP
 .B elvish
 Add this to the \fBend\fR of your config file (usually \fB~/.elvish/rc.elv\fR):
 .sp

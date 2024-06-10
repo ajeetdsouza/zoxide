@@ -12,5 +12,5 @@ trim_trailing_whitespace = true
 indent_size = unset
 trim_trailing_whitespace = false
 
-[*.{nix,ts,yml,zsh}]
+[*.{nix,ts,yml}]
 indent_size = 2

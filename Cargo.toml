@@ -45,8 +45,8 @@ color-print = "0.3.4"
 
 [dev-dependencies]
 assert_cmd = "2.0.0"
-rstest = { version = "0.18.0", default-features = false }
-rstest_reuse = "0.6.0"
+rstest = { version = "0.21.0", default-features = false }
+rstest_reuse = "0.7.0"
 tempfile = "3.1.0"
 
 [features]

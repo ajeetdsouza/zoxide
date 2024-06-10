@@ -223,7 +223,7 @@ zoxide can be installed in 4 easy steps:
    > Add this to the **end** of your config file or AutoRun command:
    >
    > ```batchfile
-   > zoxide init cmd | cmd /d /k >nul
+   > zoxide init cmd --hook none | cmd /d/q/k >nul
    > ```
 
    </details>

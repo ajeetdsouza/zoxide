@@ -11,7 +11,7 @@ pub struct Opts<'a> {
 macro_rules! make_template {
     ($name:ident, $path:expr) => {
         #[derive(::std::fmt::Debug, ::askama::Template)]
-        #[template(path = $path)]
+        #[template(path = $path, escape = "none")]
         pub struct $name<'a>(pub &'a self::Opts<'a>);
 
         impl<'a> ::std::ops::Deref for $name<'a> {
@@ -103,12 +103,17 @@ mod tests {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Cmd(&opts).render().unwrap();
 
-        Command::new("cmd.exe")
-            .args(["/a", "/d", "/e:on", "/q", "/v:off", "/k", "@doskey /macros:cmd.exe"])
+        let assert = Command::new(which::which("cmd.exe").unwrap())
+            .args(["/d", "/x", "/k"])
             .write_stdin(source)
             .assert()
-            .success()
-            .stderr("");
+            .success();
+
+        if opts.hook != InitHook::None {
+            assert.stderr("zoxide: hooks are not supported on cmd shell.\r\n");
+        } else {
+            assert.stderr("");
+        }
     }
 
     #[apply(opts)]
@@ -117,12 +122,17 @@ mod tests {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Cmd(&opts).render().unwrap();
 
-        Command::new("cmd.exe")
-            .args(["/a", "/d", "/e:off", "/q", "/v:off", "/k", "@doskey /macros:cmd.exe"])
+        let assert = Command::new(which::which("cmd.exe").unwrap())
+            .args(["/d", "/y", "/k"])
             .write_stdin(source)
             .assert()
-            .failure()
-            .stderr("zoxide: unable to init with Command Extensions disabled (see `help cmd` for details)");
+            .success();
+
+        if opts.hook != InitHook::None {
+            assert.stderr("zoxide: hooks are not supported on cmd shell.\r\n");
+        } else {
+            assert.stderr("");
+        }
     }
 
     #[apply(opts)]

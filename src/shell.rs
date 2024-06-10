@@ -110,7 +110,7 @@ mod tests {
             .success();
 
         if opts.hook != InitHook::None {
-            assert.stderr("zoxide: hooks are not supported on cmd shell.\r\n");
+            assert.stderr("zoxide: hooks are not supported on cmd.exe shell.\r\n");
         } else {
             assert.stderr("");
         }
@@ -129,7 +129,7 @@ mod tests {
             .success();
 
         if opts.hook != InitHook::None {
-            assert.stderr("zoxide: hooks are not supported on cmd shell.\r\n");
+            assert.stderr("zoxide: hooks are not supported on cmd.exe shell.\r\n");
         } else {
             assert.stderr("");
         }

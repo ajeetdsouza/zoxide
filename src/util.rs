@@ -291,77 +291,44 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
             }
         }
 
-        fn get_drive_prefix_path(drive_letter: u8) -> PathBuf {
-            format!(r"{}:\", patch_drive_letter(drive_letter)).into()
+        fn get_drive_path(drive_letter: u8) -> PathBuf {
+            format!(r"{}:\", drive_letter as char).into()
         }
 
-        fn get_drive_relative_path(drive_letter: u8) -> Result<PathBuf> {
+        fn get_drive_relative(drive_letter: u8) -> Result<PathBuf> {
             let path = current_dir()?;
             if Some(drive_letter) == get_drive_letter(&path) {
-                return Ok(patch_drive_prefix(path));
+                return Ok(path);
             }
 
-            if let Some(path) = env::var_os(format!("={}:", patch_drive_letter(drive_letter))) {
-                return Ok(patch_drive_prefix(path.into()));
+            if let Some(path) = env::var_os(format!("={}:", drive_letter as char)) {
+                return Ok(path.into());
             }
 
-            let path = get_drive_prefix_path(drive_letter);
+            let path = get_drive_path(drive_letter);
             Ok(path)
-        }
-
-        #[inline(always)]
-        fn patch_drive_letter(drive_letter: u8) -> char {
-            drive_letter.to_ascii_uppercase() as char
-        }
-
-        // https://github.com/rust-lang/rust-analyzer/pull/14689
-        fn patch_drive_prefix(path: PathBuf) -> PathBuf {
-            let mut components = path.components();
-
-            match components.next() {
-                Some(Component::Prefix(prefix)) => {
-                    let prefix = match prefix.kind() {
-                        Prefix::Disk(drive_letter) => {
-                            format!(r"{}:", patch_drive_letter(drive_letter))
-                        }
-                        Prefix::VerbatimDisk(drive_letter) => {
-                            format!(r"\\?\{}:", patch_drive_letter(drive_letter))
-                        }
-                        _ => return path,
-                    };
-
-                    let mut path = PathBuf::default();
-                    path.push(prefix);
-                    path.extend(components);
-                    path
-                }
-                _ => path,
-            }
         }
 
         match components.peek() {
             Some(Component::Prefix(prefix)) => match prefix.kind() {
                 Prefix::Disk(drive_letter) => {
-                    components.next();
+                    let disk = components.next().unwrap();
                     if components.peek() == Some(&Component::RootDir) {
-                        components.next();
-                        base_path = get_drive_prefix_path(drive_letter);
+                        let root = components.next().unwrap();
+                        stack.push(disk);
+                        stack.push(root);
                     } else {
-                        base_path = get_drive_relative_path(drive_letter)?;
+                        base_path = get_drive_relative(drive_letter)?;
+                        stack.extend(base_path.components());
                     }
-
-                    stack.extend(base_path.components());
                 }
                 Prefix::VerbatimDisk(drive_letter) => {
                     components.next();
                     if components.peek() == Some(&Component::RootDir) {
                         components.next();
-                        base_path = get_drive_prefix_path(drive_letter);
-                    } else {
-                        // Verbatim prefix without a root component? Likely not a legal path
-                        bail!("illegal path: {}", path.display());
                     }
 
+                    base_path = get_drive_path(drive_letter);
                     stack.extend(base_path.components());
                 }
                 _ => bail!("invalid path: {}", path.display()),
@@ -373,7 +340,7 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
                 let drive_letter = get_drive_letter(&current_dir).with_context(|| {
                     format!("could not get drive letter: {}", current_dir.display())
                 })?;
-                base_path = get_drive_prefix_path(drive_letter);
+                base_path = get_drive_path(drive_letter);
                 stack.extend(base_path.components());
             }
             _ => {

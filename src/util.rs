@@ -112,7 +112,7 @@ impl Fzf {
     pub fn spawn(&mut self) -> Result<FzfChild> {
         match self.0.spawn() {
             Ok(child) => Ok(FzfChild(child)),
-            Err(e) if e.kind() == io::ErrorKind::NotFound => Err(anyhow!(Self::ERR_FZF_NOT_FOUND)),
+            Err(e) if e.kind() == io::ErrorKind::NotFound => bail!(Self::ERR_FZF_NOT_FOUND),
             Err(e) => Err(e).context("could not launch fzf"),
         }
     }

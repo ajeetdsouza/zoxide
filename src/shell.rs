@@ -104,15 +104,15 @@ mod tests {
         let source = Cmd(&opts).render().unwrap();
 
         let assert = Command::new(which::which("cmd.exe").unwrap())
-            .args(["/d", "/x", "/k"])
+            .args(["/x", "/d", "/q", "/k", "echo off"])
+            .env("PROMPT", "")
             .write_stdin(source)
             .assert()
-            .success();
+            .success()
+            .stderr("");
 
-        if opts.hook != InitHook::None {
-            assert.stderr("zoxide: hooks are not supported on cmd.exe shell.\r\n");
-        } else {
-            assert.stderr("");
+        if opts.hook == InitHook::None {
+            assert.stdout("");
         }
     }
 
@@ -123,15 +123,15 @@ mod tests {
         let source = Cmd(&opts).render().unwrap();
 
         let assert = Command::new(which::which("cmd.exe").unwrap())
-            .args(["/d", "/y", "/k"])
+            .args(["/y", "/d", "/q", "/k", "echo off"])
+            .env("PROMPT", "")
             .write_stdin(source)
             .assert()
-            .success();
+            .success()
+            .stderr("");
 
-        if opts.hook != InitHook::None {
-            assert.stderr("zoxide: hooks are not supported on cmd.exe shell.\r\n");
-        } else {
-            assert.stderr("");
+        if opts.hook == InitHook::None {
+            assert.stdout("");
         }
     }
 

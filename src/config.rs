@@ -2,19 +2,21 @@ use std::env;
 use std::ffi::OsString;
 use std::path::PathBuf;
 
-use anyhow::{Context, Result};
+use anyhow::{ensure, Context, Result};
 use glob::Pattern;
 
 use crate::db::Rank;
 
 pub fn data_dir() -> Result<PathBuf> {
-    let path = match env::var_os("_ZO_DATA_DIR") {
+    let dir = match env::var_os("_ZO_DATA_DIR") {
         Some(path) => PathBuf::from(path),
         None => dirs::data_local_dir()
             .context("could not find data directory, please set _ZO_DATA_DIR manually")?
             .join("zoxide"),
     };
-    Ok(path)
+
+    ensure!(dir.is_absolute(), "_ZO_DATA_DIR must be an absolute path");
+    Ok(dir)
 }
 
 pub fn echo() -> bool {

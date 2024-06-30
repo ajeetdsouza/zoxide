@@ -35,7 +35,7 @@ nix = { version = "0.27.1", default-features = false, features = [
 ] }
 
 [target.'cfg(windows)'.dependencies]
-which = "6.0.0"
+which = "6.0.1"
 
 [build-dependencies]
 clap = { version = "4.3.0", features = ["derive"] }
@@ -45,8 +45,8 @@ color-print = "0.3.4"
 
 [dev-dependencies]
 assert_cmd = "2.0.0"
-rstest = { version = "0.18.0", default-features = false }
-rstest_reuse = "0.6.0"
+rstest = { version = "0.21.0", default-features = false }
+rstest_reuse = "0.7.0"
 tempfile = "3.1.0"
 
 [features]

@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- Support for `cmd.exe` (experimental).
+
 ### Fixed
 
 - zsh: Space-Tab completion repeating output multiple times when matching single

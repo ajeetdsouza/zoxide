@@ -31,7 +31,7 @@ impl Fzf {
         // Instead, we resolve the path to the executable and then pass it to
         // CreateProcess.
         #[cfg(windows)]
-        let program = which::which("fzf.exe").map_err(|_| anyhow!(Self::ERR_FZF_NOT_FOUND))?;
+        let program = which::which("fzf").map_err(|_| anyhow!(Self::ERR_FZF_NOT_FOUND))?;
         #[cfg(not(windows))]
         let program = "fzf";
 

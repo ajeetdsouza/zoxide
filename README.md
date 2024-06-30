@@ -139,9 +139,6 @@ zoxide can be installed in 4 easy steps:
    <details>
    <summary>Windows</summary>
 
-   > zoxide works with PowerShell, as well as shells running in Cygwin, Git
-   > Bash, and MSYS2.
-   >
    > The recommended way to install zoxide is via `winget`:
    >
    > ```sh
@@ -213,6 +210,17 @@ zoxide can be installed in 4 easy steps:
    >
    > ```sh
    > eval "$(zoxide init bash)"
+   > ```
+
+   </details>
+
+   <details>
+   <summary><code>cmd.exe</code></summary>
+
+   > Add this to the <ins>**end**</ins> of your config file or AutoRun command:
+   >
+   > ```batchfile
+   > zoxide init cmd | cmd /d/q/k echo off
    > ```
 
    </details>
@@ -390,7 +398,7 @@ When calling `zoxide init`, the following flags are available:
 - `--cmd`
   - Changes the prefix of the `z` and `zi` commands.
   - `--cmd j` would change the commands to (`j`, `ji`).
-  - `--cmd cd` would replace the `cd` command.
+  - `--cmd cd` would replace the `cd` command (highly recommended on `cmd.exe`).
 - `--hook <HOOK>`
   - Changes how often zoxide increments a directory's score:
     | Hook     | Description                       |
@@ -400,8 +408,8 @@ When calling `zoxide init`, the following flags are available:
     | `pwd`    | Whenever the directory is changed |
 - `--no-cmd`
   - Prevents zoxide from defining the `z` and `zi` commands.
-  - These functions will still be available in your shell as `__zoxide_z` and
-    `__zoxide_zi`, should you choose to redefine them.
+  - These functions will still be available in your shell (not on `cmd.exe`)
+    as `__zoxide_z` and `__zoxide_zi`, should you choose to redefine them.
 
 ### Environment variables
 
@@ -417,16 +425,15 @@ Environment variables[^2] can be used for configuration. They must be set before
     | macOS       | `$HOME/Library/Application Support`      | `/Users/Alice/Library/Application Support` |
     | Windows     | `%LOCALAPPDATA%`                         | `C:\Users\Alice\AppData\Local`             |
 - `_ZO_ECHO`
-  - When set to 1, `z` will print the matched directory before navigating to
-    it.
+  - When set to 1, `z` will print the matched directory after navigating to it.
 - `_ZO_EXCLUDE_DIRS`
   - Excludes the specified directories from the database.
   - This is provided as a list of [globs][glob], separated by OS-specific
     characters:
-    | OS                  | Separator | Example                 |
-    | ------------------- | --------- | ----------------------- |
-    | Linux / macOS / BSD | `:`       | `$HOME:$HOME/private/*` |
-    | Windows             | `;`       | `$HOME;$HOME/private/*` |
+    | OS                  | Separator | Example                   |
+    | ------------------- | --------- | ------------------------- |
+    | Linux / macOS / BSD | `:`       | `$HOME:$HOME/private/*`   |
+    | Windows             | `;`       | `%HOME%;%HOME%/private/*` |
   - By default, this is set to `"$HOME"`.
 - `_ZO_FZF_OPTS`
   - Custom options to pass to [fzf] during interactive selection. See

@@ -37,7 +37,7 @@ impl Query {
                 Some(dir)
                     if self.min_score.is_some() && dir.score(now) < self.min_score.unwrap() =>
                 {
-                    continue
+                    continue;
                 }
                 Some(dir) => {
                     if let Some(selection) = fzf.write(dir, now)? {

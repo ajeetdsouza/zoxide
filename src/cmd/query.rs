@@ -34,6 +34,11 @@ impl Query {
         let selection = loop {
             match stream.next() {
                 Some(dir) if Some(dir.path.as_ref()) == self.exclude.as_deref() => continue,
+                Some(dir)
+                    if self.min_score.is_some() && dir.score(now) < self.min_score.unwrap() =>
+                {
+                    continue
+                }
                 Some(dir) => {
                     if let Some(selection) = fzf.write(dir, now)? {
                         break selection;
@@ -57,6 +62,11 @@ impl Query {
         while let Some(dir) = stream.next() {
             if Some(dir.path.as_ref()) == self.exclude.as_deref() {
                 continue;
+            }
+            if let Some(min_score) = self.min_score {
+                if dir.score(now) < min_score {
+                    continue;
+                }
             }
             let dir = if self.score { dir.display().with_score(now) } else { dir.display() };
             writeln!(handle, "{dir}").pipe_exit("stdout")?;

@@ -117,6 +117,8 @@ _arguments "${_arguments_options[@]}" \
 ;;
 (query)
 _arguments "${_arguments_options[@]}" \
+'-m+[Exclude below a certain score]:MIN_SCORE: ' \
+'--min-score=[Exclude below a certain score]:MIN_SCORE: ' \
 '--exclude=[Exclude the current directory]:path:_files -/' \
 '-a[Show unavailable directories]' \
 '--all[Show unavailable directories]' \

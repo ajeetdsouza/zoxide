@@ -195,6 +195,15 @@ const completion: Fig.Spec = {
       description: "Search for a directory in the database",
       options: [
         {
+          name: ["-m", "--min-score"],
+          description: "Exclude below a certain score",
+          isRepeatable: true,
+          args: {
+            name: "min_score",
+            isOptional: true,
+          },
+        },
+        {
           name: "--exclude",
           description: "Exclude the current directory",
           isRepeatable: true,

@@ -1,6 +1,7 @@
+use std::fs;
 use std::iter::Rev;
 use std::ops::Range;
-use std::{fs, path};
+use std::path::{self, PathBuf};
 
 use glob::Pattern;
 
@@ -25,6 +26,10 @@ impl<'a> Stream<'a> {
             let dir = &self.db.dirs()[idx];
 
             if !self.filter_by_keywords(&dir.path) {
+                continue;
+            }
+
+            if !self.filter_by_search_dir(&dir.path) {
                 continue;
             }
 
@@ -87,6 +92,20 @@ impl<'a> Stream<'a> {
             if self.options.resolve_symlinks { fs::metadata } else { fs::symlink_metadata };
         resolver(path).map(|metadata| metadata.is_dir()).unwrap_or_default()
     }
+
+    fn filter_by_search_dir(&self, path: &str) -> bool {
+        if let Some(d) = &self.options.search_dir {
+            let dir = if self.options.resolve_symlinks {
+                util::canonicalize(d)
+            } else {
+                util::resolve_path(d)
+            }
+            .unwrap_or_default();
+            path.starts_with(dir.to_str().unwrap_or_default())
+        } else {
+            true
+        }
+    }
 }
 
 pub struct StreamOptions {
@@ -101,6 +120,9 @@ pub struct StreamOptions {
 
     /// Directories will only be returned if they exist on the filesystem.
     exists: bool,
+
+    /// Only directories (recursively) within this directory will be returned.
+    search_dir: Option<PathBuf>,
 
     /// Whether to resolve symlinks when checking if a directory exists.
     resolve_symlinks: bool,
@@ -118,6 +140,7 @@ impl StreamOptions {
             exclude: Vec::new(),
             exists: false,
             resolve_symlinks: false,
+            search_dir: None,
             ttl: now.saturating_sub(3 * MONTH),
         }
     }
@@ -138,6 +161,11 @@ impl StreamOptions {
 
     pub fn with_exists(mut self, exists: bool) -> Self {
         self.exists = exists;
+        self
+    }
+
+    pub fn with_search_dir(mut self, search_dir: Option<PathBuf>) -> Self {
+        self.search_dir = search_dir;
         self
     }
 

@@ -43,6 +43,10 @@ pub fn exclude_dirs() -> Result<Vec<Pattern>> {
     }
 }
 
+pub fn search_dir() -> Option<PathBuf> {
+    env::var_os("_ZO_SEARCH_DIR").map(PathBuf::from)
+}
+
 pub fn fzf_opts() -> Option<OsString> {
     env::var_os("_ZO_FZF_OPTS")
 }

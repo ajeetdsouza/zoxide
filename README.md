@@ -438,6 +438,11 @@ Environment variables[^2] can be used for configuration. They must be set before
 - `_ZO_RESOLVE_SYMLINKS`
   - When set to 1, `z` will resolve symlinks before adding directories to the
     database.
+- `_ZO_SEARCH_DIR`
+  - Filters query results to only those within the specified directory. Can be
+    an absolute or relative path.
+  - When `_ZO_RESOLVE_SYMLINKS` is set to 1, symlinks will be resolved in
+    determining the search directory.
 
 ## Third-party integrations
 

@@ -99,6 +99,7 @@ Register-ArgumentCompleter -Native -CommandName 'zoxide' -ScriptBlock {
             break
         }
         'zoxide;query' {
+            [CompletionResult]::new('--sort-by', 'sort-by', [CompletionResultType]::ParameterName, 'Sort result')
             [CompletionResult]::new('--exclude', 'exclude', [CompletionResultType]::ParameterName, 'Exclude the current directory')
             [CompletionResult]::new('-a', 'a', [CompletionResultType]::ParameterName, 'Show unavailable directories')
             [CompletionResult]::new('--all', 'all', [CompletionResultType]::ParameterName, 'Show unavailable directories')

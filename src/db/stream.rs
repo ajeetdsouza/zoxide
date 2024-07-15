@@ -4,6 +4,7 @@ use std::{fs, path};
 
 use glob::Pattern;
 
+use crate::cmd::Ordering;
 use crate::db::{Database, Dir, Epoch};
 use crate::util::{self, MONTH};
 
@@ -15,7 +16,11 @@ pub struct Stream<'a> {
 
 impl<'a> Stream<'a> {
     pub fn new(db: &'a mut Database, options: StreamOptions) -> Self {
-        db.sort_by_score(options.now);
+        match options.sort_by {
+            Ordering::Path => db.sort_by_path(),
+            Ordering::Score => db.sort_by_score(options.now),
+            Ordering::LastAccessed => db.sort_by_last_accessed(),
+        }
         let idxs = (0..db.dirs().len()).rev();
         Stream { db, idxs, options }
     }
@@ -108,6 +113,9 @@ pub struct StreamOptions {
     /// Directories that do not exist and haven't been accessed since TTL will
     /// be lazily removed.
     ttl: Epoch,
+
+    /// Ordering of the stream entries
+    sort_by: Ordering,
 }
 
 impl StreamOptions {
@@ -119,6 +127,7 @@ impl StreamOptions {
             exists: false,
             resolve_symlinks: false,
             ttl: now.saturating_sub(3 * MONTH),
+            sort_by: Ordering::Score,
         }
     }
 
@@ -143,6 +152,13 @@ impl StreamOptions {
 
     pub fn with_resolve_symlinks(mut self, resolve_symlinks: bool) -> Self {
         self.resolve_symlinks = resolve_symlinks;
+        self
+    }
+
+    pub fn sort_by(mut self, ordering: Option<Ordering>) -> Self {
+        if let Some(o) = ordering {
+            self.sort_by = o
+        };
         self
     }
 }

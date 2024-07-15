@@ -2,6 +2,7 @@ use std::io::{self, Write};
 
 use anyhow::{Context, Result};
 
+use super::Ordering;
 use crate::cmd::{Query, Run};
 use crate::config;
 use crate::db::{Database, Epoch, Stream, StreamOptions};
@@ -18,7 +19,8 @@ impl Run for Query {
 impl Query {
     fn query(&self, db: &mut Database) -> Result<()> {
         let now = util::current_time()?;
-        let mut stream = self.get_stream(db, now)?;
+        let ordering = self.sort_by;
+        let mut stream = self.get_stream(db, now, ordering)?;
 
         if self.interactive {
             self.query_interactive(&mut stream, now)
@@ -76,10 +78,16 @@ impl Query {
         writeln!(handle, "{dir}").pipe_exit("stdout")
     }
 
-    fn get_stream<'a>(&self, db: &'a mut Database, now: Epoch) -> Result<Stream<'a>> {
+    fn get_stream<'a>(
+        &self,
+        db: &'a mut Database,
+        now: Epoch,
+        ordering: Option<Ordering>,
+    ) -> Result<Stream<'a>> {
         let mut options = StreamOptions::new(now)
             .with_keywords(self.keywords.iter().map(|s| s.as_str()))
-            .with_exclude(config::exclude_dirs()?);
+            .with_exclude(config::exclude_dirs()?)
+            .sort_by(ordering);
         if !self.all {
             let resolve_symlinks = config::resolve_symlinks();
             options = options.with_exists(true).with_resolve_symlinks(resolve_symlinks);

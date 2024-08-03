@@ -169,6 +169,10 @@ pub struct Query {
     #[clap(long, short)]
     pub score: bool,
 
+    /// Exclude below a certain score
+    #[clap(long, short)]
+    pub min_score: Option<f64>,
+
     /// Exclude the current directory
     #[clap(long, value_hint = ValueHint::DirPath, value_name = "path")]
     pub exclude: Option<String>,

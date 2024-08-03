@@ -99,6 +99,8 @@ Register-ArgumentCompleter -Native -CommandName 'zoxide' -ScriptBlock {
             break
         }
         'zoxide;query' {
+            [CompletionResult]::new('-m', 'm', [CompletionResultType]::ParameterName, 'Exclude below a certain score')
+            [CompletionResult]::new('--min-score', 'min-score', [CompletionResultType]::ParameterName, 'Exclude below a certain score')
             [CompletionResult]::new('--exclude', 'exclude', [CompletionResultType]::ParameterName, 'Exclude the current directory')
             [CompletionResult]::new('-a', 'a', [CompletionResultType]::ParameterName, 'Show unavailable directories')
             [CompletionResult]::new('--all', 'all', [CompletionResultType]::ParameterName, 'Show unavailable directories')

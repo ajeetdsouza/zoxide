@@ -195,6 +195,20 @@ const completion: Fig.Spec = {
       description: "Search for a directory in the database",
       options: [
         {
+          name: "--sort-by",
+          description: "Sort result",
+          isRepeatable: true,
+          args: {
+            name: "sort_by",
+            isOptional: true,
+            suggestions: [
+              "path",
+              "score",
+              "last-accessed",
+            ],
+          },
+        },
+        {
           name: "--exclude",
           description: "Exclude the current directory",
           isRepeatable: true,

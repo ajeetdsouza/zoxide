@@ -178,6 +178,15 @@ impl Database {
         self.with_dirty_mut(|dirty| *dirty = true);
     }
 
+    pub fn sort_by_last_accessed(&mut self) {
+        self.with_dirs_mut(|dirs| {
+            dirs.sort_unstable_by(|dir1: &Dir, dir2: &Dir| {
+                dir1.last_accessed.cmp(&dir2.last_accessed)
+            })
+        });
+        self.with_dirty_mut(|dirty| *dirty = true);
+    }
+
     pub fn dirty(&self) -> bool {
         *self.borrow_dirty()
     }

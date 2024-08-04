@@ -165,6 +165,10 @@ pub struct Query {
     #[clap(long, short, conflicts_with = "interactive")]
     pub list: bool,
 
+    /// Sort result
+    #[clap(long)]
+    pub sort_by: Option<Ordering>,
+
     /// Print score with results
     #[clap(long, short)]
     pub score: bool,
@@ -172,6 +176,13 @@ pub struct Query {
     /// Exclude the current directory
     #[clap(long, value_hint = ValueHint::DirPath, value_name = "path")]
     pub exclude: Option<String>,
+}
+
+#[derive(ValueEnum, Debug, Clone, Copy)]
+pub enum Ordering {
+    Path,
+    Score,
+    LastAccessed,
 }
 
 /// Remove a directory from the database

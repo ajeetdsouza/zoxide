@@ -60,8 +60,7 @@ __zoxide_z() {
         if [ -n "${OLDPWD}" ]; then
             __zoxide_cd "${OLDPWD}"
         else
-            # shellcheck disable=SC2016
-            \command printf 'zoxide: $OLDPWD is not set'
+            \command printf 'zoxide: OLDPWD not set'
             return 1
         fi
     elif [ "$#" -eq 1 ] && [ -d "$1" ]; then

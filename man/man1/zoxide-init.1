@@ -13,6 +13,13 @@ Add this to the \fBend\fR of your config file (usually \fB~/.bashrc\fR):
     \fBeval "$(zoxide init bash)"\fR
 .fi
 .TP
+.B cmd.exe
+Add this to the \fBend\fR of your config file or AutoRun command:
+.sp
+.nf
+    \fBzoxide init cmd | cmd /d/q/k echo off\fR
+.fi
+.TP
 .B elvish
 Add this to the \fBend\fR of your config file (usually \fB~/.elvish/rc.elv\fR):
 .sp
@@ -83,8 +90,8 @@ Changes the prefix of the \fBz\fR and \fBzi\fR commands.
 .br
 \fB--cmd j\fR would change the commands to (\fBj\fR, \fBji\fR).
 .br
-\fB--cmd cd\fR would replace the \fBcd\fR command (doesn't work on Nushell /
-POSIX shells).
+\fB--cmd cd\fR would replace the \fBcd\fR command (highly recommended on
+\fBcmd.exe\fR).
 .TP
 .B -h, --help
 Print help information.
@@ -101,8 +108,8 @@ l l.
 .TP
 .B --no-cmd
 Prevents zoxide from defining the \fBz\fR and \fBzi\fR commands. These functions
-will still be available in your shell as \fB__zoxide_z\fR and \fB__zoxide_zi\fR,
-should you choose to redefine them.
+will still be available in your shell (not on \fBcmd.exe\fR) as \fB__zoxide_z\fR
+and \fB__zoxide_zi\fR, should you choose to redefine them.
 .SH REPORTING BUGS
 For any issues, feature requests, or questions, please visit:
 .sp

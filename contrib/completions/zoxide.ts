@@ -180,6 +180,7 @@ const completion: Fig.Spec = {
         name: "shell",
         suggestions: [
           "bash",
+          "cmd",
           "elvish",
           "fish",
           "nushell",

@@ -1,0 +1,68 @@
+{%- let section = "::: ===========================================================================\n:::" -%}
+{%- let not_configured = "::: -- not configured --" -%}
+
+@if "%=^%=" == "%=%=" (set \p=%%<nul) else (set \p=^%<nul)
+
+set program=zoxide
+
+set builtin_cd=chdir /d
+set builtin_pwd=(chdir)
+
+set builtin_true=call;
+set builtin_false=call
+
+::: Get Windows' system directory, like GetSystemDirectoryW.
+@if "" == "%SystemRoot%" (set sysdir="%__APPDIR__%") else (set sysdir="%SystemRoot%\system32\")
+
+{{ section }}
+::: Hook configuration for zoxide.
+:::
+
+{% if hook != InitHook::None -%}
+echo zoxide: hooks are not supported on cmd.exe shell.
+echo         Use '%program% init cmd --hook none' instead.
+
+{%- else -%}
+{{ not_configured }}
+
+{%- endif %}
+
+{{ section }}
+::: Utility functions for zoxide.
+:::
+
+::: pwd based on the value of _ZO_RESOLVE_SYMLINKS.
+set __zoxide_pwd= {%- if resolve_symlinks -%} (for /f "skip=9 tokens=1,2,*" %\p%j in ('^^^^^^^^"%sysdir%fsutil.exe reparsepoint query .^"') do @if "%\p%~j" equ "Print" if "%\p%~k" equ "Name:" if "%\p%~l" neq "" (echo(%\p%~l)) ^^^^^^^|^^^^^^^| {%~ endif -%} %builtin_pwd%
+
+::: cd + custom logic based on the value of _ZO_ECHO.
+set __zoxide_cd=if /i "%\p%CD%\p%" neq "%\p%~fc" (%builtin_cd% "%\p%~fc" ^^^&^^^& set "OLDPWD=%\p%CD%\p%" ^^^&^^^& (for /f "delims=" %\p%l in ('"%builtin_pwd%"') do @if /i "%\p%~fl" neq "%\p%~dpl" (%program% add -- "%\p%~fl") else (%program% add -- "%\p%~dpl\")) {%- if echo ~%} ^^^&^^^& %__zoxide_pwd% {%- endif ~%} ^^^&^^^& if defined CDCMD (call %\p%CDCMD%\p%))
+
+{{ section }}
+::: Commands for zoxide. Disable these using --no-cmd.
+:::
+
+{%- match cmd %}
+{%- when Some with (cmd) %}
+
+::: @TODO for args %* %1 etc., boundary checking 
+::: Jump to a directory using only keywords.
+%sysdir%doskey.exe {{ cmd }} = @(for %\p%^^^^ in ("") do @for /f "delims=" %\p%i in (^^""$*%\p%~^^"^") do @if "%\p%~i" equ "" (if "%\p%HOMEDRIVE%\p%%\p%HOMEPATH%\p%" equ "" (for /f "delims=" %\p%c in (^^""%\p%USERPROFILE%\p%"^") do @%__zoxide_cd%) else for /f "delims=" %\p%c in (^^""%\p%HOMEDRIVE%\p%%\p%HOMEPATH%\p%"^") do @%__zoxide_cd%) else if "%\p%~i" equ "~" (if "%\p%HOMEDRIVE%\p%%\p%HOMEPATH%\p%" equ "" (for /f "delims=" %\p%c in (^^""%\p%USERPROFILE%\p%"^") do @%__zoxide_cd%) else for /f "delims=" %\p%c in (^^""%\p%HOMEDRIVE%\p%%\p%HOMEPATH%\p%"^") do @%__zoxide_cd%) else if "%\p%~i" equ "-" (if defined OLDPWD (for /f "delims=" %\p%c in (^^""%\p%OLDPWD%\p%"^") do @%__zoxide_cd%) else ^>^&2 (echo(%program%: OLDPWD not set) ^& %builtin_false%) else for /f "delims=" %\p%~ in (^^"%\p%~i^") do @for /f "tokens=1,* delims=d" %\p%a in ("-%\p%~a~") do @if "%\p%b" neq "" (for /f "delims=" %\p%c in (^^""%\p%~f~"^") do @%__zoxide_cd%) else if /i "%\p%CD%\p%" neq "%\p%__CD__%\p%" (for /f "delims=" %\p%q in ('^^"%program% query --exclude "%\p%CD%\p%" -- %\p%~i^"') do @(for /f "delims=" %\p%c in (^^""%\p%~fq"^") do @%__zoxide_cd%)) else (for /f "delims=" %\p%q in ('^^"%program% query --exclude "%\p%__CD__%\p%\" -- %\p%~i^"') do @(for /f "delims=" %\p%c in (^^""%\p%~fq"^") do @%__zoxide_cd%))) ^&^& %builtin_true%
+
+::: Jump to a directory using interactive search.
+%sysdir%doskey.exe {{ cmd }}i = @(for %\p%^^^^ in ("") do @for /f "delims=" %\p%i in (^^""$*%\p%~^^"^") do @for /f "delims=" %\p%p in ('^^"%program% query --interactive -- %\p%~i^"') do @for /f "delims=" %\p%c in (^^""%\p%~fp"^") do @%__zoxide_cd%) ^&^& %builtin_true%
+
+{%- when None %}
+
+{{ not_configured }}
+
+{%- endmatch %}
+
+{{ section }}
+::: To initialize zoxide, add this to your configuration or AutoRun command:
+:::
+:::   zoxide init cmd | cmd /d/q/k echo off
+
+{#~
+  Content piped to `cmd.exe` needs to end with an empty line to indicate end of
+  input. Removing this will cause extra "More? " to be written to stdout.
+#}

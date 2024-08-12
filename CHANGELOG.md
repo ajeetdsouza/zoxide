@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - zsh: better cd completions.
 - elvish: `z -` now work as expected.
 - Lazily delete excluded directories from the database.
+- Normalize drive letters when resolving paths on Windows.
 
 ## [0.9.4] - 2024-02-21
 

@@ -1,7 +1,7 @@
 use std::io::{self, Write};
 
 use anyhow::{Context, Result};
-use askama::Template;
+use rinja::Template;
 
 use crate::cmd::{Init, InitShell, Run};
 use crate::config;

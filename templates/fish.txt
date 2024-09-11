@@ -68,11 +68,6 @@ end
 # When using zoxide with --no-cmd, alias these internal functions as desired.
 #
 
-if test -z $__zoxide_z_prefix
-    set __zoxide_z_prefix 'z!'
-end
-set __zoxide_z_prefix_regex ^(string escape --style=regex -- $__zoxide_z_prefix)
-
 # Jump to a directory using only keywords.
 function __zoxide_z
     set -l argc (builtin count $argv)
@@ -84,8 +79,6 @@ function __zoxide_z
         __zoxide_cd $argv[1]
     else if test $argc -eq 2 -a $argv[1] = --
         __zoxide_cd -- $argv[2]
-    else if set -l result (string replace --regex -- $__zoxide_z_prefix_regex '' $argv[-1]); and test -n $result
-        __zoxide_cd $result
     else
         set -l result (command zoxide query --exclude (__zoxide_pwd) -- $argv)
         and __zoxide_cd $result
@@ -100,13 +93,12 @@ function __zoxide_z_complete
     if test (builtin count $tokens) -le 2 -a (builtin count $curr_tokens) -eq 1
         # If there are < 2 arguments, use `cd` completions.
         complete --do-complete "'' "(builtin commandline --cut-at-cursor --current-token) | string match --regex -- '.*/$'
-    else if test (builtin count $tokens) -eq (builtin count $curr_tokens); and ! string match --quiet --regex -- $__zoxide_z_prefix_regex. $tokens[-1]
-        # If the last argument is empty and the one before doesn't start with
-        # $__zoxide_z_prefix, use interactive selection.
+    else if test (builtin count $tokens) -eq (builtin count $curr_tokens)
+        # If the last argument is empty, use interactive selection.
         set -l query $tokens[2..-1]
         set -l result (command zoxide query --exclude (__zoxide_pwd) --interactive -- $query)
-        and builtin echo $__zoxide_z_prefix$result
-        builtin commandline --function repaint
+        and __zoxide_cd $result
+        and builtin commandline --function cancel-commandline repaint
     end
 end
 complete --command __zoxide_z --no-files --arguments '(__zoxide_z_complete)'

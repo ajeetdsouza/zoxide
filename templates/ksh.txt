@@ -111,6 +111,6 @@ __zoxide_zi() {
 {%- endmatch %}
 
 {{ section }}
-# To initialize zoxide, add this to your configuration:
+# To initialize zoxide, add this to your configuration (usually ~/.kshrc):
 #
 # eval "$(zoxide init ksh)"

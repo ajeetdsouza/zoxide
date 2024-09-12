@@ -24,6 +24,7 @@ in pkgs.mkShell {
     pkgs.dash
     pkgs.elvish
     pkgs.fish
+    pkgs.ksh
     pkgs.nushell
     pkgs.powershell
     pkgs.xonsh

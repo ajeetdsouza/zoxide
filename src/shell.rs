@@ -26,6 +26,7 @@ macro_rules! make_template {
 make_template!(Bash, "bash.txt");
 make_template!(Elvish, "elvish.txt");
 make_template!(Fish, "fish.txt");
+make_template!(Ksh, "ksh.txt");
 make_template!(Nushell, "nushell.txt");
 make_template!(Posix, "posix.txt");
 make_template!(Powershell, "powershell.txt");
@@ -70,7 +71,7 @@ mod tests {
         let source = Bash(&opts).render().unwrap();
 
         Command::new("shellcheck")
-            .args(["--enable", "all", "--shell", "bash", "-"])
+            .args(["--enable=all", "-"])
             .write_stdin(source)
             .assert()
             .success()
@@ -149,6 +150,42 @@ mod tests {
     }
 
     #[apply(opts)]
+    fn ksh_ksh(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+        let source = Ksh(&opts).render().unwrap();
+        Command::new("ksh").args(["-n", "-c", &source]).assert().success().stdout("").stderr("");
+    }
+
+    #[apply(opts)]
+    fn ksh_shellcheck(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+        let source = Ksh(&opts).render().unwrap();
+
+        Command::new("shellcheck")
+            .args(["--enable=all", "-"])
+            .write_stdin(source)
+            .assert()
+            .success()
+            .stdout("")
+            .stderr("");
+    }
+
+    #[apply(opts)]
+    fn ksh_shfmt(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+        let mut source = Ksh(&opts).render().unwrap();
+        source.push('\n');
+
+        Command::new("shfmt")
+            .args(["--diff", "--indent=4", "--language-dialect=mksh", "--simplify", "-"])
+            .write_stdin(source)
+            .assert()
+            .success()
+            .stdout("")
+            .stderr("");
+    }
+
+    #[apply(opts)]
     fn nushell_nushell(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Nushell(&opts).render().unwrap();
@@ -196,12 +233,12 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn posix_shellcheck_(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
+    fn posix_shellcheck(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Posix(&opts).render().unwrap();
 
         Command::new("shellcheck")
-            .args(["--enable", "all", "--shell", "sh", "-"])
+            .args(["--enable=all", "-"])
             .write_stdin(source)
             .assert()
             .success()
@@ -298,7 +335,7 @@ mod tests {
 
         // ShellCheck doesn't support zsh yet: https://github.com/koalaman/shellcheck/issues/809
         Command::new("shellcheck")
-            .args(["--enable", "all", "--shell", "bash", "-"])
+            .args(["--enable=all", "-"])
             .write_stdin(source)
             .assert()
             .success()

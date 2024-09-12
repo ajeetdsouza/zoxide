@@ -9,15 +9,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- zsh: improved `cd` completions.
+- Lazily delete excluded directories from the database.
+- fish: detect infinite loop when using `alias cd=z`.
+- Installer: added flags for `--bin-dir`, `--man-dir`, `--arch`, and `--sudo`.
+- Nushell: support for v0.94.0+.
+- bash/fish/zsh: support for `z -- dir` style queries.
+- fish: improved Space-Tab completions.
+- ksh: added support for the Korn shell.
+
+### Changed
+
+- fzf: removed `--select-1` from default options. The interactive selector will
+  now open up even if there is only one match.
+- Enforce that `$_ZO_DATA_DIR` is an absolute path.
+
 ### Fixed
 
 - zsh: Space-Tab completion repeating output multiple times when matching single
   directory
-- fish: detect infinite loop when using `alias cd=z`.
 - fish / Nushell / PowerShell: handle queries that look like args (e.g. `z -x`).
-- zsh: better cd completions.
-- elvish: `z -` now work as expected.
-- Lazily delete excluded directories from the database.
+- elvish: `z -` now works as expected.
+- fish: generated shell code avoids using aliased builtins.
+- fish: `cd` command is now copied directly from
+  `$__fish_data_dir/functions/cd.fish`. This should minimize the chances of an
+  infinite loop when aliasing `cd=z`.
 
 ## [0.9.4] - 2024-02-21
 

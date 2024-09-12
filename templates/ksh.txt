@@ -39,24 +39,26 @@ __zoxide_hook() {
 }
 
 # Initialize hook.
-if [ "${PS1:=}" = "${PS1#*\$(__zoxide_hook)}" ]; then
+if [[ ${PS1:=} == "${PS1#*\$(__zoxide_hook)}" ]]; then
     PS1="${PS1}\$(__zoxide_hook)"
 fi
 
 {%- when InitHook::Pwd -%}
 # Hook to add new entries to the database.
 __zoxide_hook() {
+    __zoxide_retval="$?"
     __zoxide_newpwd="$(__zoxide_pwd)"
-    if [[ "${__zoxide_oldpwd:-__zoxide_newpwd}" != "${__zoxide_newpwd}" ]]; then
+    if [[ ${__zoxide_oldpwd:-__zoxide_newpwd} != "${__zoxide_newpwd}" ]]; then
         \command zoxide add -- "${__zoxide_newpwd}"
         __zoxide_oldpwd="${__zoxide_newpwd}"
     fi
+    return "${__zoxide_retval}"
 }
 
 # Initialize hook.
 __zoxide_trap="$(\command trap -p DEBUG)"
 if [[ ${__zoxide_trap} != *'__zoxide_hook'* ]]; then
-    \command trap "__zoxide_hook;${__zoxide_trap#;}" DEBUG
+    \command trap "__zoxide_hook;${__zoxide_trap#';'}" DEBUG
 fi
 {%- endmatch %}
 
@@ -67,13 +69,13 @@ fi
 # Jump to a directory using only keywords.
 __zoxide_z() {
     # shellcheck disable=SC2199
-    if [[ $# -eq 0 ]]; then
+    if (($# == 0)); then
         __zoxide_cd ~
-    elif [[ $# -eq 1 && $1 == '-' ]]; then
+    elif [[ ($# == 1) && $1 == '-' ]]; then
         __zoxide_cd "${OLDPWD}"
-    elif [[ $# -eq 1 && -d $1 ]]; then
+    elif [[ ($# == 1) && -d $1 ]]; then
         __zoxide_cd "$1"
-    elif [[ $# -eq 2 && $1 == '--' ]]; then
+    elif [[ ($# == 2) && $1 == '--' ]]; then
         __zoxide_cd "$2"
     else
         # shellcheck disable=SC2312

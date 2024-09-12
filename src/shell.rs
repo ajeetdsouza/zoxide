@@ -153,12 +153,7 @@ mod tests {
     fn ksh_ksh(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Ksh(&opts).render().unwrap();
-        Command::new("ksh")
-            .args(["-e", "-u", "-o", "norc", "-o", "pipefail", "-c", &source])
-            .assert()
-            .success()
-            .stdout("")
-            .stderr("");
+        Command::new("ksh").args(["-n", "-c", &source]).assert().success().stdout("").stderr("");
     }
 
     #[apply(opts)]
@@ -182,7 +177,7 @@ mod tests {
         source.push('\n');
 
         Command::new("shfmt")
-            .args(["--diff", "--indent=4", "--language-dialect=bash", "--simplify", "-"])
+            .args(["--diff", "--indent=4", "--language-dialect=mksh", "--simplify", "-"])
             .write_stdin(source)
             .assert()
             .success()

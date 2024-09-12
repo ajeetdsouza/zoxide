@@ -1,7 +1,7 @@
 {%- let section = "# =============================================================================\n#" -%}
 {%- let not_configured = "# -- not configured --" -%}
 
-# shellcheck shell=sh
+# shellcheck shell=ksh
 
 {{ section }}
 # Utility functions for zoxide.
@@ -44,10 +44,20 @@ if [ "${PS1:=}" = "${PS1#*\$(__zoxide_hook)}" ]; then
 fi
 
 {%- when InitHook::Pwd -%}
-\command printf "%s\n%s\n" \
-    "zoxide: PWD hooks are not supported on POSIX shells." \
-    "        Use 'zoxide init posix --hook prompt' instead."
+# Hook to add new entries to the database.
+__zoxide_hook() {
+    __zoxide_newpwd="$(__zoxide_pwd)"
+    if [[ "${__zoxide_oldpwd:-__zoxide_newpwd}" != "${__zoxide_newpwd}" ]]; then
+        \command zoxide add -- "${__zoxide_newpwd}"
+        __zoxide_oldpwd="${__zoxide_newpwd}"
+    fi
+}
 
+# Initialize hook.
+__zoxide_trap="$(\command trap -p DEBUG)"
+if [[ ${__zoxide_trap} != *'__zoxide_hook'* ]]; then
+    \command trap "__zoxide_hook;${__zoxide_trap#;}" DEBUG
+fi
 {%- endmatch %}
 
 {{ section }}
@@ -56,20 +66,18 @@ fi
 
 # Jump to a directory using only keywords.
 __zoxide_z() {
-    if [ "$#" -eq 0 ]; then
+    # shellcheck disable=SC2199
+    if [[ $# -eq 0 ]]; then
         __zoxide_cd ~
-    elif [ "$#" -eq 1 ] && [ "$1" = '-' ]; then
-        if [ -n "${OLDPWD}" ]; then
-            __zoxide_cd "${OLDPWD}"
-        else
-            # shellcheck disable=SC2016
-            \command printf 'zoxide: $OLDPWD is not set'
-            return 1
-        fi
-    elif [ "$#" -eq 1 ] && [ -d "$1" ]; then
+    elif [[ $# -eq 1 && $1 == '-' ]]; then
+        __zoxide_cd "${OLDPWD}"
+    elif [[ $# -eq 1 && -d $1 ]]; then
         __zoxide_cd "$1"
+    elif [[ $# -eq 2 && $1 == '--' ]]; then
+        __zoxide_cd "$2"
     else
-        __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd || \builtin true)" -- "$@")" &&
+        # shellcheck disable=SC2312
+        __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd)" -- "$@")" &&
             __zoxide_cd "${__zoxide_result}"
     fi
 }
@@ -105,4 +113,4 @@ __zoxide_zi() {
 {{ section }}
 # To initialize zoxide, add this to your configuration:
 #
-# eval "$(zoxide init posix --hook prompt)"
+# eval "$(zoxide init ksh)"

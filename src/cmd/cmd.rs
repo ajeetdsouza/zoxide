@@ -137,6 +137,7 @@ pub enum InitShell {
     Bash,
     Elvish,
     Fish,
+    Ksh,
     Nushell,
     Posix,
     Powershell,

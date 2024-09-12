@@ -112,7 +112,7 @@ _arguments "${_arguments_options[@]}" \
 '--help[Print help]' \
 '-V[Print version]' \
 '--version[Print version]' \
-':shell:(bash elvish fish nushell posix powershell xonsh zsh)' \
+':shell:(bash elvish fish ksh nushell posix powershell xonsh zsh)' \
 && ret=0
 ;;
 (query)

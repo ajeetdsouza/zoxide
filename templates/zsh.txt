@@ -1,6 +1,8 @@
 {%- let section = "# =============================================================================\n#" -%}
 {%- let not_configured = "# -- not configured --" -%}
 
+# shellcheck shell=bash
+
 {{ section }}
 # Utility functions for zoxide.
 #

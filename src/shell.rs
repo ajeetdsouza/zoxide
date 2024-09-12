@@ -152,9 +152,9 @@ mod tests {
     #[apply(opts)]
     fn ksh_ksh(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
-        let source = Bash(&opts).render().unwrap();
-        Command::new("bash")
-            .args(["--noprofile", "--norc", "-e", "-u", "-o", "pipefail", "-c", &source])
+        let source = Ksh(&opts).render().unwrap();
+        Command::new("ksh")
+            .args(["-e", "-u", "-o", "norc", "-o", "pipefail", "-c", &source])
             .assert()
             .success()
             .stdout("")
@@ -164,7 +164,7 @@ mod tests {
     #[apply(opts)]
     fn ksh_shellcheck(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
-        let source = Bash(&opts).render().unwrap();
+        let source = Ksh(&opts).render().unwrap();
 
         Command::new("shellcheck")
             .args(["--enable=all", "-"])
@@ -178,11 +178,11 @@ mod tests {
     #[apply(opts)]
     fn ksh_shfmt(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
-        let mut source = Bash(&opts).render().unwrap();
+        let mut source = Ksh(&opts).render().unwrap();
         source.push('\n');
 
         Command::new("shfmt")
-            .args(["--diff", "--indent=4", "--language-dialect=posix", "--simplify", "-"])
+            .args(["--diff", "--indent=4", "--language-dialect=bash", "--simplify", "-"])
             .write_stdin(source)
             .assert()
             .success()

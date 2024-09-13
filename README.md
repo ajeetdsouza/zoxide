@@ -249,7 +249,11 @@ zoxide can be installed in 4 easy steps:
    > Add this to the <ins>**end**</ins> of your config file (usually `~/.kshrc`):
    >
    > ```sh
+   > # ksh93
    > eval "$(zoxide init ksh)"
+   >
+   > # mksh, oksh, etc.
+   > eval "$(zoxide init ksh --hook=prompt)"
    > ```
 
    </details>

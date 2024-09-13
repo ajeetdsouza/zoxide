@@ -83,8 +83,12 @@ impl<'a> Stream<'a> {
         if !self.options.exists {
             return true;
         }
+
+        // The logic here is reversed - if we resolve symlinks when adding entries to
+        // the database, we should not return symlinks when querying back from
+        // the database.
         let resolver =
-            if self.options.resolve_symlinks { fs::metadata } else { fs::symlink_metadata };
+            if self.options.resolve_symlinks { fs::symlink_metadata } else { fs::metadata };
         resolver(path).map(|metadata| metadata.is_dir()).unwrap_or_default()
     }
 }

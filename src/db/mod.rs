@@ -33,6 +33,7 @@ impl Database {
     pub fn open_dir(data_dir: impl AsRef<Path>) -> Result<Self> {
         let data_dir = data_dir.as_ref();
         let path = data_dir.join("db.zo");
+        let path = fs::canonicalize(&path).unwrap_or(path);
 
         match fs::read(&path) {
             Ok(bytes) => Self::try_new(path, bytes, |bytes| Self::deserialize(bytes), false),

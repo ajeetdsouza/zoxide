@@ -37,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `$__fish_data_dir/functions/cd.fish`. This should minimize the chances of an
   infinite loop when aliasing `cd=z`.
 - Symlinks not getting added to the database when `$_ZO_RESOLVE_SYMLINKS=0`.
+- Handle symlinked database files correctly.
 
 ## [0.9.4] - 2024-02-21
 

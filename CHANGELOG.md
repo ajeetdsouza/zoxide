@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [0.9.5] - 2024-09-13
 
 ### Added
 
@@ -37,7 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `$__fish_data_dir/functions/cd.fish`. This should minimize the chances of an
   infinite loop when aliasing `cd=z`.
 - Symlinks not getting added to the database when `$_ZO_RESOLVE_SYMLINKS=0`.
-- Handle symlinked database files correctly.
+- Symlinked database files getting replaced instead of the actual files.
 
 ## [0.9.4] - 2024-02-21
 
@@ -494,6 +494,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions pipeline to build and upload releases.
 - Support for zsh.
 
+[0.9.5]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.4...v0.9.5
 [0.9.4]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.3...v0.9.4
 [0.9.3]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.1...v0.9.2

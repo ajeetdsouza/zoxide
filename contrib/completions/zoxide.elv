@@ -87,6 +87,7 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand --version 'Print version'
         }
         &'zoxide;query'= {
+            cand --sort-by 'Sort result'
             cand --exclude 'Exclude the current directory'
             cand -a 'Show unavailable directories'
             cand --all 'Show unavailable directories'

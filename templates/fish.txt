@@ -112,10 +112,10 @@ end
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-builtin abbr --erase {{cmd}} &>/dev/null
+abbr --erase {{cmd}} &>/dev/null
 alias {{cmd}}=__zoxide_z
 
-builtin abbr --erase {{cmd}}i &>/dev/null
+abbr --erase {{cmd}}i &>/dev/null
 alias {{cmd}}i=__zoxide_zi
 
 {%- when None %}

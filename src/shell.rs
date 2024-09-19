@@ -115,6 +115,16 @@ mod tests {
     }
 
     #[apply(opts)]
+    fn fish_no_builtin_abbr(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+        let source = Fish(&opts).render().unwrap();
+        assert!(
+            !source.contains("builtin abbr"),
+            "`builtin abbr` does not work on older versions of Fish"
+        );
+    }
+
+    #[apply(opts)]
     fn fish_fish(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Fish(&opts).render().unwrap();

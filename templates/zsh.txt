@@ -91,6 +91,12 @@ function {{ cmd }}i() {
     __zoxide_zi "$@"
 }
 
+{%- when None %}
+
+{{ not_configured }}
+
+{%- endmatch %}
+
 # Completions.
 if [[ -o zle ]]; then
     __zoxide_result=''
@@ -126,7 +132,7 @@ if [[ -o zle ]]; then
     function __zoxide_z_complete_helper() {
         if [[ -n "${__zoxide_result}" ]]; then
             # shellcheck disable=SC2034,SC2296
-            BUFFER="{{ cmd }} ${(q-)__zoxide_result}"
+            BUFFER="{{ cmd.unwrap_or("cd") }} ${(q-)__zoxide_result}"
             __zoxide_result=''
             \builtin zle reset-prompt
             \builtin zle accept-line
@@ -135,15 +141,11 @@ if [[ -o zle ]]; then
         fi
     }
     \builtin zle -N __zoxide_z_complete_helper
+{%- if let Some(cmd) = cmd %}
 
     [[ "${+functions[compdef]}" -ne 0 ]] && \compdef __zoxide_z_complete {{ cmd }}
+{%- endif %}
 fi
-
-{%- when None %}
-
-{{ not_configured }}
-
-{%- endmatch %}
 
 {{ section }}
 # To initialize zoxide, add this to your configuration (usually ~/.zshrc):

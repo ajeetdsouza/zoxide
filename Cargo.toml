@@ -29,7 +29,7 @@ rinja = { version = "0.3.2", default-features = false }
 serde = { version = "1.0.116", features = ["derive"] }
 
 [target.'cfg(unix)'.dependencies]
-nix = { version = "0.27.1", default-features = false, features = [
+nix = { version = "0.29.0", default-features = false, features = [
     "fs",
     "user",
 ] }
@@ -45,8 +45,8 @@ color-print = "0.3.4"
 
 [dev-dependencies]
 assert_cmd = "2.0.0"
-rstest = { version = "0.18.0", default-features = false }
-rstest_reuse = "0.6.0"
+rstest = { version = "0.22.0", default-features = false }
+rstest_reuse = "0.7.0"
 tempfile = "3.1.0"
 
 [features]

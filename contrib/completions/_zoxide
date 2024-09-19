@@ -14,7 +14,7 @@ _zoxide() {
     fi
 
     local context curcontext="$curcontext" state line
-    _arguments "${_arguments_options[@]}" \
+    _arguments "${_arguments_options[@]}" : \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \
@@ -29,7 +29,7 @@ _zoxide() {
         curcontext="${curcontext%:*:*}:zoxide-command-$line[1]:"
         case $line[1] in
             (add)
-_arguments "${_arguments_options[@]}" \
+_arguments "${_arguments_options[@]}" : \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \
@@ -38,7 +38,7 @@ _arguments "${_arguments_options[@]}" \
 && ret=0
 ;;
 (edit)
-_arguments "${_arguments_options[@]}" \
+_arguments "${_arguments_options[@]}" : \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \
@@ -54,7 +54,7 @@ _arguments "${_arguments_options[@]}" \
         curcontext="${curcontext%:*:*}:zoxide-edit-command-$line[1]:"
         case $line[1] in
             (decrement)
-_arguments "${_arguments_options[@]}" \
+_arguments "${_arguments_options[@]}" : \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \
@@ -63,7 +63,7 @@ _arguments "${_arguments_options[@]}" \
 && ret=0
 ;;
 (delete)
-_arguments "${_arguments_options[@]}" \
+_arguments "${_arguments_options[@]}" : \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \
@@ -72,7 +72,7 @@ _arguments "${_arguments_options[@]}" \
 && ret=0
 ;;
 (increment)
-_arguments "${_arguments_options[@]}" \
+_arguments "${_arguments_options[@]}" : \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \
@@ -81,7 +81,7 @@ _arguments "${_arguments_options[@]}" \
 && ret=0
 ;;
 (reload)
-_arguments "${_arguments_options[@]}" \
+_arguments "${_arguments_options[@]}" : \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \
@@ -93,7 +93,7 @@ _arguments "${_arguments_options[@]}" \
 esac
 ;;
 (import)
-_arguments "${_arguments_options[@]}" \
+_arguments "${_arguments_options[@]}" : \
 '--from=[Application to import from]:FROM:(autojump z)' \
 '--merge[Merge into existing database]' \
 '-h[Print help]' \
@@ -104,7 +104,7 @@ _arguments "${_arguments_options[@]}" \
 && ret=0
 ;;
 (init)
-_arguments "${_arguments_options[@]}" \
+_arguments "${_arguments_options[@]}" : \
 '--cmd=[Changes the prefix of the \`z\` and \`zi\` commands]:CMD: ' \
 '--hook=[Changes how often zoxide increments a directory'\''s score]:HOOK:(none prompt pwd)' \
 '--no-cmd[Prevents zoxide from defining the \`z\` and \`zi\` commands]' \
@@ -116,7 +116,7 @@ _arguments "${_arguments_options[@]}" \
 && ret=0
 ;;
 (query)
-_arguments "${_arguments_options[@]}" \
+_arguments "${_arguments_options[@]}" : \
 '--exclude=[Exclude the current directory]:path:_files -/' \
 '-a[Show unavailable directories]' \
 '--all[Show unavailable directories]' \
@@ -134,7 +134,7 @@ _arguments "${_arguments_options[@]}" \
 && ret=0
 ;;
 (remove)
-_arguments "${_arguments_options[@]}" \
+_arguments "${_arguments_options[@]}" : \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \
@@ -164,16 +164,6 @@ _zoxide__add_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide add commands' commands "$@"
 }
-(( $+functions[_zoxide__edit__decrement_commands] )) ||
-_zoxide__edit__decrement_commands() {
-    local commands; commands=()
-    _describe -t commands 'zoxide edit decrement commands' commands "$@"
-}
-(( $+functions[_zoxide__edit__delete_commands] )) ||
-_zoxide__edit__delete_commands() {
-    local commands; commands=()
-    _describe -t commands 'zoxide edit delete commands' commands "$@"
-}
 (( $+functions[_zoxide__edit_commands] )) ||
 _zoxide__edit_commands() {
     local commands; commands=(
@@ -184,15 +174,30 @@ _zoxide__edit_commands() {
     )
     _describe -t commands 'zoxide edit commands' commands "$@"
 }
-(( $+functions[_zoxide__import_commands] )) ||
-_zoxide__import_commands() {
+(( $+functions[_zoxide__edit__decrement_commands] )) ||
+_zoxide__edit__decrement_commands() {
     local commands; commands=()
-    _describe -t commands 'zoxide import commands' commands "$@"
+    _describe -t commands 'zoxide edit decrement commands' commands "$@"
+}
+(( $+functions[_zoxide__edit__delete_commands] )) ||
+_zoxide__edit__delete_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide edit delete commands' commands "$@"
 }
 (( $+functions[_zoxide__edit__increment_commands] )) ||
 _zoxide__edit__increment_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide edit increment commands' commands "$@"
+}
+(( $+functions[_zoxide__edit__reload_commands] )) ||
+_zoxide__edit__reload_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide edit reload commands' commands "$@"
+}
+(( $+functions[_zoxide__import_commands] )) ||
+_zoxide__import_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide import commands' commands "$@"
 }
 (( $+functions[_zoxide__init_commands] )) ||
 _zoxide__init_commands() {
@@ -203,11 +208,6 @@ _zoxide__init_commands() {
 _zoxide__query_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide query commands' commands "$@"
-}
-(( $+functions[_zoxide__edit__reload_commands] )) ||
-_zoxide__edit__reload_commands() {
-    local commands; commands=()
-    _describe -t commands 'zoxide edit reload commands' commands "$@"
 }
 (( $+functions[_zoxide__remove_commands] )) ||
 _zoxide__remove_commands() {

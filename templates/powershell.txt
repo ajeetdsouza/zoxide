@@ -27,6 +27,12 @@ function global:__zoxide_pwd {
 
 # cd + custom logic based on the value of _ZO_ECHO.
 function global:__zoxide_cd($dir, $literal) {
+
+    if ($dir.StartsWith('%') -and $dir.EndsWith('%')) {
+        $envVar = $dir.Trim('%')
+        $dir = $env:$envVar
+    }
+    
     $dir = if ($literal) {
         Set-Location -LiteralPath $dir -Passthru -ErrorAction Stop
     } else {

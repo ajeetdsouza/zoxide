@@ -94,6 +94,7 @@ zoxide can be installed in 4 easy steps:
    > | _Any_               | [guix]                  | `guix install zoxide`                                                                                 |
    > | _Any_               | [Linuxbrew]             | `brew install zoxide`                                                                                 |
    > | _Any_               | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                                                                          |
+   > | AlmaLinux           |                         | `dnf install zoxide`                                                                                      |
    > | Alpine Linux 3.13+  | [Alpine Linux Packages] | `apk add zoxide`                                                                                      |
    > | Arch Linux          | [Arch Linux Extra]      | `pacman -S zoxide`                                                                                    |
    > | CentOS Stream       |                         | `dnf install zoxide`                                                                                  |

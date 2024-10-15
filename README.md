@@ -96,17 +96,19 @@ zoxide can be installed in 4 easy steps:
    > | _Any_               | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                                                                          |
    > | Alpine Linux 3.13+  | [Alpine Linux Packages] | `apk add zoxide`                                                                                      |
    > | Arch Linux          | [Arch Linux Extra]      | `pacman -S zoxide`                                                                                    |
-   > | ~CentOS 7~[^3]      | ~[Copr]~                | ~`dnf copr enable atim/zoxide`~ <br /> ~`dnf install zoxide`~                                         |
+   > | CentOS Stream       |                         | `dnf install zoxide`                                                                                  |
    > | ~Debian 11+~[^1]    | ~[Debian Packages]~     | ~`apt install zoxide`~                                                                                |
    > | Devuan 4.0+         | [Devuan Packages]       | `apt install zoxide`                                                                                  |
    > | Exherbo Linux       | [Exherbo packages]      | `cave resolve -x repository/rust` <br /> `cave resolve -x zoxide`                                     |
-   > | Fedora 32+/RHEL 8+  | [Fedora Packages]       | `dnf install zoxide`                                                                                  |
+   > | Fedora 32+          | [Fedora Packages]       | `dnf install zoxide`                                                                                  |
    > | Gentoo              | [Gentoo Packages]       | `emerge app-shells/zoxide`                                                                            |
    > | Manjaro             |                         | `pacman -S zoxide`                                                                                    |
    > | openSUSE Tumbleweed | [openSUSE Factory]      | `zypper install zoxide`                                                                               |
    > | ~Parrot OS~[^1]     |                         | ~`apt install zoxide`~                                                                                |
    > | ~Raspbian 11+~[^1]  | ~[Raspbian Packages]~   | ~`apt install zoxide`~                                                                                |
+   > | RHEL 8+             |                         | `dnf install zoxide`                                                                                  |
    > | Rhino Linux         | [Pacstall Packages]     | `pacstall -I zoxide-deb`                                                                              |
+   > | Rocky Linux         |                         | `dnf install zoxide`                                                                                  |
    > | Slackware 15.0+     | [SlackBuilds]           | [Instructions][slackbuilds-howto]                                                                     |
    > | Solus               | [Solus Packages]        | `eopkg install zoxide`                                                                                |
    > | ~Ubuntu 21.04+~[^1] | ~[Ubuntu Packages]~     | ~`apt install zoxide`~                                                                                |
@@ -484,11 +486,6 @@ Environment variables[^2] can be used for configuration. They must be set before
 [^2]:
     If you're not sure how to set an environment variable on your shell, check
     out the [wiki][wiki-env].
-
-[^3]:
-    The Copr package has failed to build for recent releases and the latest
-    available version is 0.8.3. On RHEL 8+ and derivatives, Fedora EPEL's package
-    is now updated more regularly.
 
 [aerc]: https://github.com/rjarry/aerc
 [alfred]: https://www.alfredapp.com/

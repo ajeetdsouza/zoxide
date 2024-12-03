@@ -22,6 +22,7 @@ https://github.com/ajeetdsouza/zoxide
 {all-args}{after-help}
 
 <bold><underline>Environment variables:</underline></bold>
+{tab}<bold>_ZO_CASE_SENSITIVITY</bold>{tab}Set case-sensitivity: case-sensitive or case-insensitive (default)
 {tab}<bold>_ZO_DATA_DIR</bold>        {tab}Path for zoxide data files
 {tab}<bold>_ZO_ECHO</bold>            {tab}Print the matched directory before navigating to it when set to 1
 {tab}<bold>_ZO_EXCLUDE_DIRS</bold>    {tab}List of directory globs to be excluded

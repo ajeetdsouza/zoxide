@@ -6,6 +6,33 @@ use anyhow::{Context, Result, ensure};
 use glob::Pattern;
 
 use crate::db::Rank;
+use crate::util;
+
+pub enum CaseSensitivity {
+    CaseInsensitive,
+    CaseSensitive,
+}
+
+impl CaseSensitivity {
+    pub fn convert_case(&self, s: &str) -> String {
+        match self {
+            CaseSensitivity::CaseInsensitive => util::to_lowercase(s),
+            CaseSensitivity::CaseSensitive => s.into(),
+        }
+    }
+}
+
+pub fn case_sensitivity() -> CaseSensitivity {
+    env::var_os("_ZO_CASE_SENSITIVITY")
+        .map_or(CaseSensitivity::CaseInsensitive, map_case_sensitivity)
+}
+
+fn map_case_sensitivity(s: OsString) -> CaseSensitivity {
+    match s.to_str() {
+        Some("case-sensitive") => CaseSensitivity::CaseSensitive,
+        _ => CaseSensitivity::CaseInsensitive,
+    }
+}
 
 pub fn data_dir() -> Result<PathBuf> {
     let dir = match env::var_os("_ZO_DATA_DIR") {

@@ -426,6 +426,9 @@ When calling `zoxide init`, the following flags are available:
 Environment variables[^2] can be used for configuration. They must be set before
 `zoxide init` is called.
 
+- `_ZO_CASE_SENSITIVITY`
+  - Defaults to case-insensitive searches. Set to `case-sensitive` for
+    case-sensitive searching.
 - `_ZO_DATA_DIR`
   - Specifies the directory in which the database is stored.
   - The default value varies across OSes:

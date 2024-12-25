@@ -11,18 +11,14 @@
 
 <sup>Special thanks to:</sup>
 
-<a href="https://www.warp.dev/?utm_source=github&utm_medium=referral&utm_campaign=zoxide_20231001">
-  <div>
-    <img src="contrib/warp.png" width="230" alt="Warp" />
-  </div>
-  <b>
-    Warp is a modern, Rust-based terminal with AI built in so you and your team
-    can build great software, faster.
-  </b>
-  <div>
-    <sup>Visit <u>warp.dev</u> to learn more.</sup>
-  </div>
-</a>
+<div><img src="contrib/warp.png" width="230" alt="Warp" /></div>
+<div><sup><b>Warp, the intelligent terminal</b></sup></div>
+<div><sup>Available for MacOS and Linux</sup></div>
+<div><sup>
+  Visit
+  <a href="https://www.warp.dev/?utm_source=github&utm_medium=referral&utm_campaign=zoxide_20231001"><u>warp.dev</u></a>
+  to learn more.
+</sup></div>
 
 <hr />
 

@@ -12,24 +12,45 @@
 
 {%- else -%}
 # Initialize hook to add new entries to the database.
-if (not ($env | default false __zoxide_hooked | get __zoxide_hooked)) {
-  $env.__zoxide_hooked = true
-{%- if hook == InitHook::Prompt %}
-  $env.config = ($env | default {} config).config
-  $env.config = ($env.config | default {} hooks)
-  $env.config = ($env.config | update hooks ($env.config.hooks | default [] pre_prompt))
-  $env.config = ($env.config | update hooks.pre_prompt ($env.config.hooks.pre_prompt | append { ||
-    zoxide add -- $env.PWD
-  }))
-{%- else if hook == InitHook::Pwd %}
-  $env.config = ($env | default {} config).config
-  $env.config = ($env.config | default {} hooks)
-  $env.config = ($env.config | update hooks ($env.config.hooks | default {} env_change))
-  $env.config = ($env.config | update hooks.env_change ($env.config.hooks.env_change | default [] PWD))
-  $env.config = ($env.config | update hooks.env_change.PWD ($env.config.hooks.env_change.PWD | append {|_, dir|
-    zoxide add -- $dir
-  }))
-{%- endif %}
+export-env {
+  {%- if hook == InitHook::Prompt %}
+  let hooked = (
+    $env.config?.hooks?.pre_prompt?
+    | default []
+    | any { try {get zoxide} catch { false } }
+  )
+  if not $hooked {
+    $env.config = (
+      $env.config? | default {}
+      | upsert hooks { default {} }
+      | upsert hooks.pre_prompt { default [] }
+    )
+
+    $env.config.hooks.pre_prompt = ($env.config.hooks.pre_prompt | append {
+      zoxide: true,
+      code: {|| zoxide add -- $env.PWD}
+    })
+  }
+  {%- else if hook == InitHook::Pwd %}
+  let hooked = (
+    $env.config?.hooks?.env_change?.PWD?
+    | default []
+    | any { try {get zoxide} catch { false } }
+  )
+  if not $hooked {
+    $env.config = (
+      $env.config? | default {}
+      | upsert hooks { default {} }
+      | upsert hooks.env_change { default {} }
+      | upsert hooks.env_change.PWD { default [] }
+    )
+
+    $env.config.hooks.env_change.PWD = ($env.config.hooks.env_change.PWD | append {
+      zoxide: true,
+      code: {|_, dir| zoxide add -- $dir}
+    })
+  }
+  {%- endif %}
 }
 
 {%- endif %}

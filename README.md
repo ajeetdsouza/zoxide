@@ -243,21 +243,6 @@ zoxide can be installed in 4 easy steps:
    </details>
 
    <details>
-   <summary>Ksh</summary>
-
-   > Add this to the <ins>**end**</ins> of your config file (usually `~/.kshrc`):
-   >
-   > ```sh
-   > # ksh93
-   > eval "$(zoxide init ksh)"
-   >
-   > # mksh, oksh, etc.
-   > eval "$(zoxide init ksh --hook=prompt)"
-   > ```
-
-   </details>
-
-   <details>
    <summary>Nushell</summary>
 
    > Add this to the <ins>**end**</ins> of your env file (find it by running `$nu.env-path`

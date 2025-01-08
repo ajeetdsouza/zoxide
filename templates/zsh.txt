@@ -37,7 +37,6 @@ function __zoxide_hook() {
 # Initialize hook.
 \builtin typeset -ga precmd_functions
 \builtin typeset -ga chpwd_functions
-
 # shellcheck disable=SC2034,SC2296
 precmd_functions=("${(@)precmd_functions:#__zoxide_hook}")
 # shellcheck disable=SC2034,SC2296
@@ -69,7 +68,7 @@ function __zoxide_doctor() {
         'Please ensure that zoxide is initialized right at the end of your shell configuration file (usually ~/.zshrc).' \
         '' \
         'If the issue persists, consider filing an issue at:' \
-        'https://github.com/ajeetdsouza/zoxide/issues.' \
+        'https://github.com/ajeetdsouza/zoxide/issues' \
         '' \
         'Disable this message by setting _ZO_DOCTOR=0.' \
         '' >&2

@@ -27,11 +27,8 @@ function __zoxide_cd() {
 {{ section }}
 # Hook configuration for zoxide.
 #
+{%- if hook != InitHook::None %}
 
-{% if hook == InitHook::None -%}
-{{ not_configured }}
-
-{%- else -%}
 # Hook to add new entries to the database.
 {%- if hook == InitHook::Prompt %}
 function __zoxide_hook() {
@@ -40,6 +37,7 @@ function __zoxide_hook() {
     \command zoxide add -- "$(__zoxide_pwd)"
     return "${retval}"
 }
+
 {%- else if hook == InitHook::Pwd %}
 __zoxide_oldpwd="$(__zoxide_pwd)"
 
@@ -60,7 +58,29 @@ if [[ ${PROMPT_COMMAND:=} != *'__zoxide_hook'* ]]; then
     PROMPT_COMMAND="__zoxide_hook;${PROMPT_COMMAND#;}"
 fi
 
-{% endif -%}
+{%- endif %}
+
+# Report common issues.
+function __zoxide_doctor() {
+{%- if hook == InitHook::None %}
+    return 0
+
+{%- else %}
+    [[ ${_ZO_DOCTOR:-1} -ne 0 ]] || return 0
+    [[ ${PROMPT_COMMAND:=} != *'__zoxide_hook'* ]] || return 0
+
+    _ZO_DOCTOR=0
+    \builtin printf '%s\n' \
+        'zoxide: detected a possible configuration issue.' \
+        'Please ensure that zoxide is initialized right at the end of your shell configuration file (usually ~/.bashrc).' \
+        '' \
+        'If the issue persists, consider filing an issue at:' \
+        'https://github.com/ajeetdsouza/zoxide/issues' \
+        '' \
+        'Disable this message by setting _ZO_DOCTOR=0.' \
+        '' >&2
+{%- endif %}
+}
 
 {{ section }}
 # When using zoxide with --no-cmd, alias these internal functions as desired.
@@ -70,6 +90,8 @@ __zoxide_z_prefix='z#'
 
 # Jump to a directory using only keywords.
 function __zoxide_z() {
+    __zoxide_doctor
+
     # shellcheck disable=SC2199
     if [[ $# -eq 0 ]]; then
         __zoxide_cd ~
@@ -93,6 +115,7 @@ function __zoxide_z() {
 
 # Jump to a directory using interactive search.
 function __zoxide_zi() {
+    __zoxide_doctor
     \builtin local result
     result="$(\command zoxide query --interactive -- "$@")" && __zoxide_cd "${result}"
 }
@@ -154,6 +177,6 @@ fi
 {%- endmatch %}
 
 {{ section }}
-# To initialize zoxide, add this to your configuration (usually ~/.bashrc):
+# To initialize zoxide, add this to your shell configuration file (usually ~/.bashrc):
 #
 # eval "$(zoxide init bash)"

@@ -4,8 +4,9 @@ use std::{fs, path};
 
 use glob::Pattern;
 
+use crate::config::CaseSensitivity;
 use crate::db::{Database, Dir, Epoch};
-use crate::util::{self, MONTH};
+use crate::util::MONTH;
 
 pub struct Stream<'a> {
     db: &'a mut Database,
@@ -48,13 +49,18 @@ impl<'a> Stream<'a> {
     }
 
     fn filter_by_keywords(&self, path: &str) -> bool {
-        let (keywords_last, keywords) = match self.options.keywords.split_last() {
+        let keywords: Vec<String> = self
+            .options
+            .keywords
+            .iter()
+            .map(|s| self.options.case_sensitivity.convert_case(s))
+            .collect();
+
+        let (keywords_last, keywords) = match keywords.split_last() {
             Some(split) => split,
             None => return true,
         };
-
-        let path = util::to_lowercase(path);
-        let mut path = path.as_str();
+        let mut path = &self.options.case_sensitivity.convert_case(path)[..];
         match path.rfind(keywords_last) {
             Some(idx) => {
                 if path[idx + keywords_last.len()..].contains(path::is_separator) {
@@ -112,6 +118,9 @@ pub struct StreamOptions {
     /// Directories that do not exist and haven't been accessed since TTL will
     /// be lazily removed.
     ttl: Epoch,
+
+    /// Whether searching should be perform case sensitively.
+    case_sensitivity: CaseSensitivity,
 }
 
 impl StreamOptions {
@@ -123,6 +132,7 @@ impl StreamOptions {
             exists: false,
             resolve_symlinks: false,
             ttl: now.saturating_sub(3 * MONTH),
+            case_sensitivity: CaseSensitivity::CaseInsensitive,
         }
     }
 
@@ -131,7 +141,12 @@ impl StreamOptions {
         I: IntoIterator,
         I::Item: AsRef<str>,
     {
-        self.keywords = keywords.into_iter().map(util::to_lowercase).collect();
+        self.keywords = keywords.into_iter().map(|s| s.as_ref().into()).collect();
+        self
+    }
+
+    pub fn with_case_sensitivity(mut self, case_sensitivity: CaseSensitivity) -> Self {
+        self.case_sensitivity = case_sensitivity;
         self
     }
 
@@ -182,6 +197,18 @@ mod tests {
     fn query(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
         let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
         let options = StreamOptions::new(0).with_keywords(keywords.iter());
+        let stream = Stream::new(db, options);
+        assert_eq!(is_match, stream.filter_by_keywords(path));
+    }
+
+    #[rstest]
+    // Case normalization
+    #[case(&["fOo", "bAr"], "/foo/bar", false)]
+    fn query_case_sensitive(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
+        let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
+        let options = StreamOptions::new(0)
+            .with_keywords(keywords.iter())
+            .with_case_sensitivity(CaseSensitivity::CaseSensitive);
         let stream = Stream::new(db, options);
         assert_eq!(is_match, stream.filter_by_keywords(path));
     }

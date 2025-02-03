@@ -62,6 +62,11 @@ z foo<SPACE><TAB>  # show interactive completions (zoxide v0.8.0+, bash 4.4+/fis
 
 Read more about the matching algorithm [here][algorithm-matching].
 
+### `Warp`
+<a href="https://app.warp.dev/drive/folder/zoxide-EyHNpQumHVWNcYB8GJgDxG?utm_source=github&utm_medium=warp_pack&utm_campaign=zoxide_20231001">
+  <img src="doc/sponsors/warp-packs-green.png" alt="Warp">
+</a>
+
 ## Installation
 
 zoxide can be installed in 4 easy steps:

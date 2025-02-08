@@ -1,5 +1,7 @@
+use std::ffi::OsString;
 use std::iter::Rev;
 use std::ops::Range;
+use std::path::{Component, PathBuf};
 use std::{fs, path};
 
 use glob::Pattern;
@@ -37,6 +39,10 @@ impl<'a> Stream<'a> {
                 if dir.last_accessed < self.options.ttl {
                     self.db.swap_remove(idx);
                 }
+                continue;
+            }
+
+            if !self.filter_by_exact(&dir.path) {
                 continue;
             }
 
@@ -91,6 +97,39 @@ impl<'a> Stream<'a> {
             if self.options.resolve_symlinks { fs::symlink_metadata } else { fs::metadata };
         resolver(path).map(|metadata| metadata.is_dir()).unwrap_or_default()
     }
+
+    fn filter_by_exact(&self, path: &str) -> bool {
+        if !self.options.exact {
+            return true;
+        }
+
+        let path = util::to_lowercase(path);
+        let path = PathBuf::from(path);
+        let mut components: Vec<Component> = path.components().collect();
+
+        for keyword in self.options.keywords.iter().rev().map(OsString::from) {
+            let idx = components.iter().rposition(|component| {
+                if let Component::Normal(sub_path) = component {
+                    sub_path == &keyword
+                } else {
+                    false
+                }
+            });
+
+            if let Some(idx) = idx {
+                components = components
+                    .iter()
+                    .enumerate()
+                    .filter(|&(i, _)| i < idx)
+                    .map(|(_, &component)| component)
+                    .collect();
+            } else {
+                return false;
+            };
+        }
+
+        true
+    }
 }
 
 pub struct StreamOptions {
@@ -109,6 +148,9 @@ pub struct StreamOptions {
     /// Whether to resolve symlinks when checking if a directory exists.
     resolve_symlinks: bool,
 
+    // Whether to only allow exact match of directory names.
+    exact: bool,
+
     /// Directories that do not exist and haven't been accessed since TTL will
     /// be lazily removed.
     ttl: Epoch,
@@ -122,6 +164,7 @@ impl StreamOptions {
             exclude: Vec::new(),
             exists: false,
             resolve_symlinks: false,
+            exact: true,
             ttl: now.saturating_sub(3 * MONTH),
         }
     }

@@ -2,7 +2,7 @@ use std::env;
 use std::ffi::OsString;
 use std::path::PathBuf;
 
-use anyhow::{ensure, Context, Result};
+use anyhow::{Context, Result, ensure};
 use glob::Pattern;
 
 use crate::db::Rank;
@@ -20,7 +20,7 @@ pub fn data_dir() -> Result<PathBuf> {
 }
 
 pub fn echo() -> bool {
-    env::var_os("_ZO_ECHO").map_or(false, |var| var == "1")
+    env::var_os("_ZO_ECHO").is_some_and(|var| var == "1")
 }
 
 pub fn exclude_dirs() -> Result<Vec<Pattern>> {
@@ -58,5 +58,5 @@ pub fn maxage() -> Result<Rank> {
 }
 
 pub fn resolve_symlinks() -> bool {
-    env::var_os("_ZO_RESOLVE_SYMLINKS").map_or(false, |var| var == "1")
+    env::var_os("_ZO_RESOLVE_SYMLINKS").is_some_and(|var| var == "1")
 }

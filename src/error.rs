@@ -1,7 +1,7 @@
 use std::fmt::{self, Display, Formatter};
 use std::io;
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 
 /// Custom error type for early exit.
 #[derive(Debug)]

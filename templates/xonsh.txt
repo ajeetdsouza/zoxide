@@ -43,13 +43,13 @@ def __zoxide_pwd() -> str:
     return pwd
 
 
-def __zoxide_cd(path: typing.Optional[typing.AnyStr] = None) -> None:
+def __zoxide_cd(path: str | bytes | None = None) -> None:
     """cd + custom logic based on the value of _ZO_ECHO."""
     if path is None:
         args = []
     elif isinstance(path, bytes):
         args = [path.decode("utf-8")]
-    elif isinstance(path, str):
+    else:
         args = [path]
     _, exc, _ = xonsh.dirstack.cd(args)
     if exc is not None:

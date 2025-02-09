@@ -4,7 +4,7 @@ mod stream;
 use std::path::{Path, PathBuf};
 use std::{fs, io};
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use bincode::Options;
 use ouroboros::self_referencing;
 

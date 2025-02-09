@@ -13,44 +13,40 @@
 {%- else -%}
 # Initialize hook to add new entries to the database.
 export-env {
-  {%- if hook == InitHook::Prompt %}
-  let hooked = (
-    $env.config?.hooks?.pre_prompt?
-    | default []
-    | any { try {get zoxide} catch { false } }
+{%- if hook == InitHook::Prompt %}
+  $env.config = (
+    $env.config?
+    | default {}
+    | upsert hooks { default {} }
+    | upsert hooks.pre_prompt { default [] }
   )
-  if not $hooked {
-    $env.config = (
-      $env.config? | default {}
-      | upsert hooks { default {} }
-      | upsert hooks.pre_prompt { default [] }
-    )
-
+  let __zoxide_hooked = (
+    $env.config.hooks.pre_prompt | any { try { get __zoxide_hook } catch { false } }
+  )
+  if not $__zoxide_hooked {
     $env.config.hooks.pre_prompt = ($env.config.hooks.pre_prompt | append {
-      zoxide: true,
+      __zoxide_hook: true,
       code: {|| zoxide add -- $env.PWD}
     })
   }
-  {%- else if hook == InitHook::Pwd %}
-  let hooked = (
-    $env.config?.hooks?.env_change?.PWD?
-    | default []
-    | any { try {get zoxide} catch { false } }
+{%- else if hook == InitHook::Pwd %}
+  $env.config = (
+    $env.config?
+    | default {}
+    | upsert hooks { default {} }
+    | upsert hooks.env_change { default {} }
+    | upsert hooks.env_change.PWD { default [] }
   )
-  if not $hooked {
-    $env.config = (
-      $env.config? | default {}
-      | upsert hooks { default {} }
-      | upsert hooks.env_change { default {} }
-      | upsert hooks.env_change.PWD { default [] }
-    )
-
+  let __zoxide_hooked = (
+    $env.config.hooks.env_change.PWD | any { try { get __zoxide_hook } catch { false } }
+  )
+  if not $__zoxide_hooked {
     $env.config.hooks.env_change.PWD = ($env.config.hooks.env_change.PWD | append {
-      zoxide: true,
+      __zoxide_hook: true,
       code: {|_, dir| zoxide add -- $dir}
     })
   }
-  {%- endif %}
+{%- endif %}
 }
 
 {%- endif %}

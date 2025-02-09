@@ -26,7 +26,7 @@ def __zoxide_bin() -> str:
     return zoxide
 
 
-def __zoxide_env() -> typing.Dict[str, str]:
+def __zoxide_env() -> dict[str, str]:
     """Returns the current environment."""
     return builtins.__xonsh__.env.detype()  # type: ignore  # pylint:disable=no-member
 
@@ -64,11 +64,11 @@ class ZoxideSilentException(Exception):
 
 
 def __zoxide_errhandler(
-    func: typing.Callable[[typing.List[str]], None]
-) -> typing.Callable[[typing.List[str]], int]:
+    func: typing.Callable[[list[str]], None]
+) -> typing.Callable[[list[str]], int]:
     """Print exception and exit with error code 1."""
 
-    def wrapper(args: typing.List[str]) -> int:
+    def wrapper(args: list[str]) -> int:
         try:
             func(args)
             return 0
@@ -113,7 +113,7 @@ if "__zoxide_hook" not in globals():
 
 
 @__zoxide_errhandler
-def __zoxide_z(args: typing.List[str]) -> None:
+def __zoxide_z(args: list[str]) -> None:
     """Jump to a directory using only keywords."""
     if args == []:
         __zoxide_cd()
@@ -138,7 +138,7 @@ def __zoxide_z(args: typing.List[str]) -> None:
 
 
 @__zoxide_errhandler
-def __zoxide_zi(args: typing.List[str]) -> None:
+def __zoxide_zi(args: list[str]) -> None:
     """Jump to a directory using interactive search."""
     try:
         zoxide = __zoxide_bin()

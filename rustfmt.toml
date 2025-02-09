@@ -5,4 +5,4 @@ use_field_init_shorthand = true
 use_small_heuristics = "Max"
 use_try_shorthand = true
 wrap_comments = true
-version = "Two"
+style_edition = "2024"

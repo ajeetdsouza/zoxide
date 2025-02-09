@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 
 use crate::cmd::{Add, Run};
 use crate::db::Database;

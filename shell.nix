@@ -1,6 +1,6 @@
 let
   pkgs = import (builtins.fetchTarball
-    "https://github.com/NixOS/nixpkgs/archive/4d513ab5f170d66afa3387bdd718d41aa936ee9f.tar.gz") {
+    "https://github.com/NixOS/nixpkgs/archive/056faf24027e12f0ba6edebe299ed136e030d29a.tar.gz") {
       overlays = [ rust ];
     };
   rust = import (builtins.fetchTarball

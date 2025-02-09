@@ -62,6 +62,10 @@ z foo<SPACE><TAB>  # show interactive completions (zoxide v0.8.0+, bash 4.4+/fis
 
 Read more about the matching algorithm [here][algorithm-matching].
 
+<a href="https://app.warp.dev/drive/folder/zoxide-EyHNpQumHVWNcYB8GJgDxG?utm_source=github&utm_medium=warp_pack&utm_campaign=zoxide_20231001">
+  <img src="contrib/warp-packs-green.png" alt="Follow tutorial in Warp">
+</a>
+
 ## Installation
 
 zoxide can be installed in 4 easy steps:
@@ -90,7 +94,7 @@ zoxide can be installed in 4 easy steps:
    > | _Any_               | [guix]                  | `guix install zoxide`                                                                                 |
    > | _Any_               | [Linuxbrew]             | `brew install zoxide`                                                                                 |
    > | _Any_               | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                                                                          |
-   > | AlmaLinux           |                         | `dnf install zoxide`                                                                                      |
+   > | AlmaLinux           |                         | `dnf install zoxide`                                                                                  |
    > | Alpine Linux 3.13+  | [Alpine Linux Packages] | `apk add zoxide`                                                                                      |
    > | Arch Linux          | [Arch Linux Extra]      | `pacman -S zoxide`                                                                                    |
    > | CentOS Stream       |                         | `dnf install zoxide`                                                                                  |

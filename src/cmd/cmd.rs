@@ -2,9 +2,14 @@
 
 use std::path::PathBuf;
 
+use clap::builder::{IntoResettable, Resettable, StyledStr};
 use clap::{Parser, Subcommand, ValueEnum, ValueHint};
 
-const HELP_TEMPLATE: &str = color_print::cstr!("\
+struct HelpTemplate;
+
+impl IntoResettable<StyledStr> for HelpTemplate {
+    fn into_resettable(self) -> Resettable<StyledStr> {
+        color_print::cstr!("\
 {before-help}<bold><underline>{name} {version}</underline></bold>
 {author}
 https://github.com/ajeetdsouza/zoxide
@@ -22,13 +27,15 @@ https://github.com/ajeetdsouza/zoxide
 {tab}<bold>_ZO_EXCLUDE_DIRS</bold>    {tab}List of directory globs to be excluded
 {tab}<bold>_ZO_FZF_OPTS</bold>        {tab}Custom flags to pass to fzf
 {tab}<bold>_ZO_MAXAGE</bold>          {tab}Maximum total age after which entries start getting deleted
-{tab}<bold>_ZO_RESOLVE_SYMLINKS</bold>{tab}Resolve symlinks when storing paths");
+{tab}<bold>_ZO_RESOLVE_SYMLINKS</bold>{tab}Resolve symlinks when storing paths").into_resettable()
+    }
+}
 
 #[derive(Debug, Parser)]
 #[clap(
     about,
     author,
-    help_template = HELP_TEMPLATE,
+    help_template = HelpTemplate,
     disable_help_subcommand = true,
     propagate_version = true,
     version,
@@ -46,7 +53,7 @@ pub enum Cmd {
 #[derive(Debug, Parser)]
 #[clap(
     author,
-    help_template = HELP_TEMPLATE,
+    help_template = HelpTemplate,
 )]
 pub struct Add {
     #[clap(num_args = 1.., required = true, value_hint = ValueHint::DirPath)]
@@ -57,7 +64,7 @@ pub struct Add {
 #[derive(Debug, Parser)]
 #[clap(
     author,
-    help_template = HELP_TEMPLATE,
+    help_template = HelpTemplate,
 )]
 pub struct Edit {
     #[clap(subcommand)]
@@ -80,7 +87,7 @@ pub enum EditCommand {
 #[derive(Debug, Parser)]
 #[clap(
     author,
-    help_template = HELP_TEMPLATE,
+    help_template = HelpTemplate,
 )]
 pub struct Import {
     #[clap(value_hint = ValueHint::FilePath)]
@@ -106,7 +113,7 @@ pub enum ImportFrom {
 #[derive(Debug, Parser)]
 #[clap(
     author,
-    help_template = HELP_TEMPLATE,
+    help_template = HelpTemplate,
 )]
 pub struct Init {
     #[clap(value_enum)]
@@ -149,7 +156,7 @@ pub enum InitShell {
 #[derive(Debug, Parser)]
 #[clap(
     author,
-    help_template = HELP_TEMPLATE,
+    help_template = HelpTemplate,
 )]
 pub struct Query {
     pub keywords: Vec<String>,
@@ -179,7 +186,7 @@ pub struct Query {
 #[derive(Debug, Parser)]
 #[clap(
     author,
-    help_template = HELP_TEMPLATE,
+    help_template = HelpTemplate,
 )]
 pub struct Remove {
     #[clap(value_hint = ValueHint::DirPath)]

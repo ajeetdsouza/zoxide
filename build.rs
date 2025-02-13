@@ -3,7 +3,7 @@ mod cmd;
 
 use std::{env, io};
 
-use clap::CommandFactory;
+use clap::CommandFactory as _;
 use clap_complete::shells::{Bash, Elvish, Fish, PowerShell, Zsh};
 use clap_complete_fig::Fig;
 use cmd::Cmd;

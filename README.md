@@ -13,7 +13,7 @@
 
 <div><img src="contrib/warp.png" width="230" alt="Warp" /></div>
 <div><sup><b>Warp, the intelligent terminal</b></sup></div>
-<div><sup>Available for MacOS and Linux</sup></div>
+<div><sup>Available for MacOS, Linux, and Windows</sup></div>
 <div><sup>
   Visit
   <a href="https://www.warp.dev/?utm_source=github&utm_medium=referral&utm_campaign=zoxide_20231001"><u>warp.dev</u></a>

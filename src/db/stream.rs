@@ -52,24 +52,22 @@ impl<'a> Stream<'a> {
             Some(name) => name,
             None => return false,
         };
-    
+
         let words: Vec<&str> = basename
             .split(|c| ['-', '_', ' ', '.'].contains(&c))
             .filter(|s| !s.is_empty())
             .collect();
-    
+
         if words.len() < 2 {
             return false;
         }
-    
+
         let acronym: String = words.iter().filter_map(|word| word.chars().next()).collect();
         let acronym_lower = util::to_lowercase(&acronym);
-    
-        let user_input: String = keywords.iter()
-            .map(String::as_str)
-            .chain(std::iter::once(keywords_last))
-            .collect();
-    
+
+        let user_input: String =
+            keywords.iter().map(String::as_str).chain(std::iter::once(keywords_last)).collect();
+
         acronym_lower == util::to_lowercase(&user_input)
     }
 
@@ -78,10 +76,10 @@ impl<'a> Stream<'a> {
             Some(split) => split,
             None => return true,
         };
-    
+
         let path_lower = util::to_lowercase(path);
         let mut path_str = path_lower.as_str();
-        
+
         let mut matched = false;
         if let Some(idx) = path_str.rfind(keywords_last) {
             if path_str[idx + keywords_last.len()..].contains(path::is_separator) {
@@ -90,18 +88,18 @@ impl<'a> Stream<'a> {
             path_str = &path_str[..idx];
             matched = true;
         }
-    
+
         if !matched {
             return self.match_acronym(path, keywords_last, keywords);
         }
-    
+
         for keyword in keywords.iter().rev() {
             match path_str.rfind(keyword) {
                 Some(idx) => path_str = &path_str[..idx],
                 None => return self.match_acronym(path, keywords_last, keywords),
             }
         }
-    
+
         true
     }
 

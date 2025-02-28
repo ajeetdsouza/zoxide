@@ -52,26 +52,24 @@ impl<'a> Stream<'a> {
             Some(name) => name,
             None => return false,
         };
-
+    
         let words: Vec<&str> = basename
-            .split(|c: char| c == '-' || c == '_' || c == ' ' || c == '.')
+            .split(|c| ['-', '_', ' ', '.'].contains(&c))
             .filter(|s| !s.is_empty())
             .collect();
-
+    
         if words.len() < 2 {
             return false;
         }
-
+    
         let acronym: String = words.iter().filter_map(|word| word.chars().next()).collect();
-
         let acronym_lower = util::to_lowercase(&acronym);
-
-        let mut user_input = String::new();
-        for kw in keywords {
-            user_input.push_str(kw);
-        }
-        user_input.push_str(keywords_last);
-
+    
+        let user_input: String = keywords.iter()
+            .map(String::as_str)
+            .chain(std::iter::once(keywords_last))
+            .collect();
+    
         acronym_lower == util::to_lowercase(&user_input)
     }
 
@@ -80,38 +78,31 @@ impl<'a> Stream<'a> {
             Some(split) => split,
             None => return true,
         };
-
+    
         let path_lower = util::to_lowercase(path);
         let mut path_str = path_lower.as_str();
-
-        let regular_match = {
-            let mut matched = false;
-            match path_str.rfind(keywords_last) {
-                Some(idx) => {
-                    if path_str[idx + keywords_last.len()..].contains(path::is_separator) {
-                        return false;
-                    }
-                    path_str = &path_str[..idx];
-                    matched = true;
-                }
-                None => {}
+        
+        let mut matched = false;
+        if let Some(idx) = path_str.rfind(keywords_last) {
+            if path_str[idx + keywords_last.len()..].contains(path::is_separator) {
+                return false;
             }
-
-            if !matched {
-                return self.match_acronym(path, keywords_last, keywords);
+            path_str = &path_str[..idx];
+            matched = true;
+        }
+    
+        if !matched {
+            return self.match_acronym(path, keywords_last, keywords);
+        }
+    
+        for keyword in keywords.iter().rev() {
+            match path_str.rfind(keyword) {
+                Some(idx) => path_str = &path_str[..idx],
+                None => return self.match_acronym(path, keywords_last, keywords),
             }
-
-            for keyword in keywords.iter().rev() {
-                match path_str.rfind(keyword) {
-                    Some(idx) => path_str = &path_str[..idx],
-                    None => return self.match_acronym(path, keywords_last, keywords),
-                }
-            }
-
-            true
-        };
-
-        regular_match
+        }
+    
+        true
     }
 
     fn filter_by_exclude(&self, path: &str) -> bool {

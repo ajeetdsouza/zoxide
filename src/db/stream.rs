@@ -57,23 +57,21 @@ impl<'a> Stream<'a> {
             .split(|c: char| c == '-' || c == '_' || c == ' ' || c == '.')
             .filter(|s| !s.is_empty())
             .collect();
-        
+
         if words.len() < 2 {
             return false;
         }
-        
-        let acronym: String = words.iter()
-            .filter_map(|word| word.chars().next())
-            .collect();
-        
+
+        let acronym: String = words.iter().filter_map(|word| word.chars().next()).collect();
+
         let acronym_lower = util::to_lowercase(&acronym);
-        
+
         let mut user_input = String::new();
         for kw in keywords {
             user_input.push_str(kw);
         }
         user_input.push_str(keywords_last);
-        
+
         acronym_lower == util::to_lowercase(&user_input)
     }
 
@@ -82,10 +80,10 @@ impl<'a> Stream<'a> {
             Some(split) => split,
             None => return true,
         };
-    
+
         let path_lower = util::to_lowercase(path);
         let mut path_str = path_lower.as_str();
-        
+
         let regular_match = {
             let mut matched = false;
             match path_str.rfind(keywords_last) {
@@ -98,21 +96,21 @@ impl<'a> Stream<'a> {
                 }
                 None => {}
             }
-    
+
             if !matched {
                 return self.match_acronym(path, keywords_last, keywords);
             }
-    
+
             for keyword in keywords.iter().rev() {
                 match path_str.rfind(keyword) {
                     Some(idx) => path_str = &path_str[..idx],
                     None => return self.match_acronym(path, keywords_last, keywords),
                 }
             }
-    
+
             true
         };
-    
+
         regular_match
     }
 
@@ -242,16 +240,21 @@ mod tests {
         let options = StreamOptions::new(0).with_keywords(keywords.iter());
         let stream = Stream::new(db, options);
         let last_keyword = keywords.last().unwrap();
-        let other_keywords: Vec<String> = keywords[..keywords.len()-1].iter().map(|&s| s.to_string()).collect();
+        let other_keywords: Vec<String> =
+            keywords[..keywords.len() - 1].iter().map(|&s| s.to_string()).collect();
         assert_eq!(is_match, stream.match_acronym(path, last_keyword, &other_keywords));
     }
-    
+
     // Ensure the filter_by_keywords function correctly handles acronyms
     #[rstest]
     #[case(&["hick"], "/home/bachman/Documents/hooli-interactive-computer-keyboard", true)]
     #[case(&["hooli"], "/home/bachman/Documents/hooli-interactive-computer-keyboard", true)] // Regular match still works
     #[case(&["keyb"], "/home/bachman/Documents/hooli-interactive-computer-keyboard", true)] // Regular match still works
-    fn integrated_acronym_keyword_filter(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
+    fn integrated_acronym_keyword_filter(
+        #[case] keywords: &[&str],
+        #[case] path: &str,
+        #[case] is_match: bool,
+    ) {
         let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
         let options = StreamOptions::new(0).with_keywords(keywords.iter());
         let stream = Stream::new(db, options);

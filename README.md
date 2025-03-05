@@ -437,6 +437,8 @@ Environment variables[^2] can be used for configuration. They must be set before
     | Windows             | `;`       | `$HOME;$HOME/private/*` |
 
   - By default, this is set to `"$HOME"`.
+  - This does not exclude directories that have already been added to the database.
+    You must remove them using `zoxide edit`.
 - `_ZO_FZF_OPTS`
   - Custom options to pass to [fzf] during interactive selection. See
     [`man fzf`][fzf-man] for the list of options.

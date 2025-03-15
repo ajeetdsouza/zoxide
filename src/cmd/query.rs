@@ -67,7 +67,9 @@ impl Query {
     fn query_first(&self, stream: &mut Stream, now: Epoch) -> Result<()> {
         let handle = &mut io::stdout();
 
-        let mut dir = stream.next().context("no match found")?;
+        let error_message = format!("no match found for {}", self.format_keywords());
+
+        let mut dir = stream.next().context(error_message)?;
         while Some(dir.path.as_ref()) == self.exclude.as_deref() {
             dir = stream.next().context("you are already in the only match")?;
         }
@@ -78,7 +80,7 @@ impl Query {
 
     fn get_stream<'a>(&self, db: &'a mut Database, now: Epoch) -> Result<Stream<'a>> {
         let mut options = StreamOptions::new(now)
-            .with_keywords(self.keywords.iter().map(|s| s.as_str()))
+            .with_keywords(self.keywords.iter().map(String::as_str))
             .with_exclude(config::exclude_dirs()?);
         if !self.all {
             let resolve_symlinks = config::resolve_symlinks();
@@ -116,5 +118,26 @@ impl Query {
             .enable_preview()
         }
         .spawn()
+    }
+
+    /// Returns the query keywords in printable form
+    /// Used for 'no match' query errors
+    ///
+    /// ## WARNING
+    /// Clones `self.keywords`
+    fn format_keywords(&self) -> String {
+        if self.keywords.is_empty() {
+            return String::new();
+        }
+
+        let result = self
+            .keywords
+            .iter()
+            .take(self.keywords.len() - 1)
+            .map(|s| s.to_string())
+            .collect::<Vec<String>>()
+            .join("', '");
+
+        format!("'{}', and '{}'", result, self.keywords.last().unwrap())
     }
 }

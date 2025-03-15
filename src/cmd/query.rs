@@ -78,7 +78,7 @@ impl Query {
 
     fn get_stream<'a>(&self, db: &'a mut Database, now: Epoch) -> Result<Stream<'a>> {
         let mut options = StreamOptions::new(now)
-            .with_keywords(self.keywords.iter().map(|s| s.as_str()))
+            .with_keywords(self.transfomed_keywords())
             .with_exclude(config::exclude_dirs()?);
         if !self.all {
             let resolve_symlinks = config::resolve_symlinks();
@@ -116,5 +116,21 @@ impl Query {
             .enable_preview()
         }
         .spawn()
+    }
+
+    /// ## Returns
+    /// `self.keywords` with file paths transformed into their parent directory paths and directory paths unchanged
+    ///
+    /// ## Warning
+    /// Clones self.keywords
+    fn transfomed_keywords(&self) -> impl Iterator<Item = String> + use<'_> {
+        self.keywords.iter().map(|keyword| {
+            if !std::path::Path::new(keyword).is_dir() {
+                let dirs: Vec<&str> = keyword.split("/").collect();
+                dirs.split_last().unwrap().1.join("/").to_string()
+            } else {
+                keyword.to_string()
+            }
+        })
     }
 }

@@ -119,7 +119,8 @@ impl Query {
     }
 
     /// ## Returns
-    /// `self.keywords` with file paths transformed into their parent directory paths and directory paths unchanged
+    /// `self.keywords` with file paths transformed into their parent directory
+    /// paths and directory paths unchanged
     ///
     /// ## Warning
     /// Clones self.keywords

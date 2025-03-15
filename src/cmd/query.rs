@@ -126,18 +126,14 @@ impl Query {
     /// ## WARNING
     /// Clones `self.keywords`
     fn format_keywords(&self) -> String {
-        if self.keywords.is_empty() {
-            return String::new();
+        let mut keywords = self.keywords.clone();
+        match keywords.pop() {
+            None => String::new(),
+            Some(last) => {
+                let head = keywords.join("', '");
+
+                format!("'{}', and '{}'", head, last)
+            }
         }
-
-        let result = self
-            .keywords
-            .iter()
-            .take(self.keywords.len() - 1)
-            .map(|s| s.to_string())
-            .collect::<Vec<String>>()
-            .join("', '");
-
-        format!("'{}', and '{}'", result, self.keywords.last().unwrap())
     }
 }

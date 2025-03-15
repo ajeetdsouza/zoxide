@@ -125,7 +125,7 @@ impl Query {
     /// Clones self.keywords
     fn transfomed_keywords(&self) -> impl Iterator<Item = String> + use<'_> {
         self.keywords.iter().map(|keyword| {
-            if !std::path::Path::new(keyword).is_dir() {
+            if std::path::Path::new(keyword).is_file() {
                 let dirs: Vec<&str> = keyword.split("/").collect();
                 dirs.split_last().unwrap().1.join("/").to_string()
             } else {

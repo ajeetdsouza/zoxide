@@ -1,6 +1,7 @@
 mod dir;
 mod stream;
 
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::{fs, io};
 
@@ -19,6 +20,10 @@ pub struct Database {
     #[borrows(bytes)]
     #[covariant]
     pub dirs: Vec<Dir<'this>>,
+    map_bytes: Vec<u8>,
+    #[borrows(map_bytes)]
+    #[covariant]
+    pub bookmarks: HashMap<String, Dir<'this>>,
     dirty: bool,
 }
 
@@ -27,6 +32,7 @@ impl Database {
 
     pub fn open() -> Result<Self> {
         let data_dir = config::data_dir()?;
+        let bookmarks_dir: PathBuf = config::bookmarks_dir()?;
         Self::open_dir(data_dir)
     }
 
@@ -35,15 +41,23 @@ impl Database {
         let path = data_dir.join("db.zo");
         let path = fs::canonicalize(&path).unwrap_or(path);
 
+        match fs::read(&path)
+
         match fs::read(&path) {
-            Ok(bytes) => Self::try_new(path, bytes, |bytes| Self::deserialize(bytes), false),
+            Ok(bytes) => Self::try_new(
+                path,
+                bytes,
+                |bytes| Self::deserialize(bytes),
+                |_| Self::deserialize_bookmarks(bytes),
+                false,
+            ),
             Err(e) if e.kind() == io::ErrorKind::NotFound => {
                 // Create data directory, but don't create any file yet. The file will be
                 // created later by [`Database::save`] if any data is modified.
                 fs::create_dir_all(data_dir).with_context(|| {
                     format!("unable to create data directory: {}", data_dir.display())
                 })?;
-                Ok(Self::new(path, Vec::new(), |_| Vec::new(), false))
+                Ok(Self::new(path, Vec::new(), |_| Vec::new(), |_| HashMap::new(), false))
             }
             Err(e) => {
                 Err(e).with_context(|| format!("could not read from database: {}", path.display()))

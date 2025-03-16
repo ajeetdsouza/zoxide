@@ -33,35 +33,64 @@ impl Database {
     pub fn open() -> Result<Self> {
         let data_dir = config::data_dir()?;
         let bookmarks_dir: PathBuf = config::bookmarks_dir()?;
-        Self::open_dir(data_dir)
+        Self::open_dir(data_dir, bookmarks_dir)
     }
 
-    pub fn open_dir(data_dir: impl AsRef<Path>) -> Result<Self> {
+    pub fn open_dir(data_dir: impl AsRef<Path>, bookmarks_dir: impl AsRef<Path>) -> Result<Self> {
         let data_dir = data_dir.as_ref();
         let path = data_dir.join("db.zo");
         let path = fs::canonicalize(&path).unwrap_or(path);
 
-        match fs::read(&path)
+        let bookmarks_dir = bookmarks_dir.as_ref();
+        let bookmarks_path = bookmarks_dir.join("db_bm.zo");
+        let bookmarks_path = fs::canonicalize(&bookmarks_path).unwrap_or(bookmarks_path);
 
-        match fs::read(&path) {
-            Ok(bytes) => Self::try_new(
+        match (fs::read(&path), fs::read(&bookmarks_path)) {
+            (Ok(bytes), Ok(bookmarks_bytes)) => Self::try_new(
                 path,
                 bytes,
                 |bytes| Self::deserialize(bytes),
-                |_| Self::deserialize_bookmarks(bytes),
+                bookmarks_bytes,
+                |bookmarks_bytes| Self::deserialize_bookmarks(bookmarks_bytes),
                 false,
             ),
-            Err(e) if e.kind() == io::ErrorKind::NotFound => {
+            (Err(e), _) if e.kind() == io::ErrorKind::NotFound => {
                 // Create data directory, but don't create any file yet. The file will be
                 // created later by [`Database::save`] if any data is modified.
                 fs::create_dir_all(data_dir).with_context(|| {
                     format!("unable to create data directory: {}", data_dir.display())
                 })?;
-                Ok(Self::new(path, Vec::new(), |_| Vec::new(), |_| HashMap::new(), false))
+                Ok(Self::new(
+                    path,
+                    Vec::new(),
+                    |_| Vec::new(),
+                    Vec::new(),
+                    |_| HashMap::new(),
+                    false,
+                ))
             }
-            Err(e) => {
+            (_, Err(e)) if e.kind() == io::ErrorKind::NotFound => {
+                // Create data directory, but don't create any file yet. The file will be
+                // created later by [`Database::save`] if any data is modified.
+                fs::create_dir_all(data_dir).with_context(|| {
+                    format!("unable to create bookmarks directory: {}", data_dir.display())
+                })?;
+                Ok(Self::new(
+                    path,
+                    Vec::new(),
+                    |_| Vec::new(),
+                    Vec::new(),
+                    |_| HashMap::new(),
+                    false,
+                ))
+            }
+
+            (Err(e), _) => {
                 Err(e).with_context(|| format!("could not read from database: {}", path.display()))
             }
+            (_, Err(e)) => Err(e).with_context(|| {
+                format!("could not read from bookmarks database: {}", bookmarks_path.display())
+            }),
         }
     }
 
@@ -243,6 +272,33 @@ impl Database {
 
         Ok(dirs)
     }
+
+    fn deserialize_bookmarks(bytes: &[u8]) -> Result<HashMap<String, Dir>> {
+        // Assume a maximum size for the database. This prevents bincode from throwing
+        // strange errors when it encounters invalid data.
+        const MAX_SIZE: u64 = 32 << 20; // 32 MiB
+        let deserializer = &mut bincode::options().with_fixint_encoding().with_limit(MAX_SIZE);
+
+        // Split bytes into sections.
+        let version_size = deserializer.serialized_size(&Self::VERSION).unwrap() as _;
+        if bytes.len() < version_size {
+            bail!("could not deserialize database: corrupted data");
+        }
+        let (bytes_version, bytes_dirs) = bytes.split_at(version_size);
+
+        // Deserialize sections.
+        let version = deserializer.deserialize(bytes_version)?;
+        let dirs = match version {
+            Self::VERSION => {
+                deserializer.deserialize(bytes_dirs).context("could not deserialize database")?
+            }
+            version => {
+                bail!("unsupported version (got {version}, supports {})", Self::VERSION)
+            }
+        };
+
+        Ok(dirs)
+    }
 }
 
 #[cfg(test)]
@@ -255,15 +311,18 @@ mod tests {
         let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
         let now = 946684800;
 
+        let bookmarks_dir = tempfile::tempdir().unwrap();
+        let bookmarks_path = if cfg!(windows) { r"C:\foo\bar2" } else { "/foo/bar2" };
+
         {
-            let mut db = Database::open_dir(data_dir.path()).unwrap();
-            db.add(path, 1.0, now);
-            db.add(path, 1.0, now);
+            let mut db = Database::open_dir(data_dir.path(), bookmarks_dir.path()).unwrap();
+            db.add(bookmarks_path, 1.0, now);
+            db.add(bookmarks_path, 1.0, now);
             db.save().unwrap();
         }
 
         {
-            let db = Database::open_dir(data_dir.path()).unwrap();
+            let db = Database::open_dir(data_dir.path(), bookmarks_dir.path()).unwrap();
             assert_eq!(db.dirs().len(), 1);
 
             let dir = &db.dirs()[0];
@@ -279,22 +338,26 @@ mod tests {
         let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
         let now = 946684800;
 
+        let bookmarks_dir = tempfile::tempdir().unwrap();
+        let bookmarks_path = if cfg!(windows) { r"C:\foo\bar2" } else { "/foo/bar2" };
+
         {
-            let mut db = Database::open_dir(data_dir.path()).unwrap();
-            db.add(path, 1.0, now);
+            let mut db = Database::open_dir(data_dir.path(), bookmarks_dir.path()).unwrap();
+            db.add(bookmarks_path, 1.0, now);
+            db.add(bookmarks_path, 1.0, now);
             db.save().unwrap();
         }
 
         {
-            let mut db = Database::open_dir(data_dir.path()).unwrap();
-            assert!(db.remove(path));
+            let mut db = Database::open_dir(data_dir.path(), bookmarks_dir.path()).unwrap();
+            assert!(db.remove(bookmarks_path));
             db.save().unwrap();
         }
 
         {
-            let mut db = Database::open_dir(data_dir.path()).unwrap();
+            let mut db = Database::open_dir(data_dir.path(), bookmarks_dir.path()).unwrap();
             assert!(db.dirs().is_empty());
-            assert!(!db.remove(path));
+            assert!(!db.remove(bookmarks_path));
             db.save().unwrap();
         }
     }

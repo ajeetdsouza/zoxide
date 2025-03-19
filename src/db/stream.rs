@@ -153,7 +153,8 @@ impl StreamOptions {
 
 #[cfg(test)]
 mod tests {
-    use std::{collections::HashMap, path::PathBuf};
+    use std::collections::HashMap;
+    use std::path::PathBuf;
 
     use rstest::rstest;
 

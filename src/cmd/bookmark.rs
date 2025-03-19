@@ -1,7 +1,7 @@
-use crate::db::Database;
+use anyhow::Result;
 
 use super::{Bookmark, Run};
-use anyhow::Result;
+use crate::db::Database;
 
 impl Run for Bookmark {
     fn run(&self) -> Result<()> {

@@ -12,6 +12,7 @@ impl Run for Bookmark {
 
 impl Bookmark {
     fn add_bookmark(&self, db: &mut Database) -> Result<()> {
-        Ok(db.add_bookmark(self.bookmark_id.clone(), self.path.clone()))
+        db.add_bookmark(self.bookmark_id.clone(), self.path.clone());
+        Ok(())
     }
 }

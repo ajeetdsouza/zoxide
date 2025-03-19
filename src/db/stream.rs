@@ -153,7 +153,7 @@ impl StreamOptions {
 
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
+    use std::{collections::HashMap, path::PathBuf};
 
     use rstest::rstest;
 
@@ -180,7 +180,8 @@ mod tests {
     #[case(&["/foo/", "/bar"], "/foo/bar", false)]
     #[case(&["/foo/", "/bar"], "/foo/baz/bar", true)]
     fn query(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
-        let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
+        let db =
+            &mut Database::new(PathBuf::new(), Vec::new(), |_| (Vec::new(), HashMap::new()), false);
         let options = StreamOptions::new(0).with_keywords(keywords.iter());
         let stream = Stream::new(db, options);
         assert_eq!(is_match, stream.filter_by_keywords(path));

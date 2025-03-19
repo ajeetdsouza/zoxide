@@ -1,4 +1,5 @@
 mod add;
+mod bookmark;
 mod cmd;
 mod edit;
 mod import;
@@ -23,6 +24,7 @@ impl Run for Cmd {
             Cmd::Init(cmd) => cmd.run(),
             Cmd::Query(cmd) => cmd.run(),
             Cmd::Remove(cmd) => cmd.run(),
+            Cmd::Bookmark(cmd) => cmd.run(),
         }
     }
 }

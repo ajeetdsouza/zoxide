@@ -166,7 +166,7 @@ _zoxide_commands() {
 'init:Generate shell configuration' \
 'query:Search for a directory in the database' \
 'remove:Remove a directory from the database' \
-'bookmark:Bookmarks a directory for quick querying' \
+'bookmark:' \
     )
     _describe -t commands 'zoxide commands' commands "$@"
 }

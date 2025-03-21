@@ -453,7 +453,8 @@ Environment variables[^2] can be used for configuration. They must be set before
     database.
 - `_ZO_ZI_ONLY_RESULT`
   - When set to 1, `zi foo` will automatically select the only result `fzf` returns.
-  - However, if only one result is available during selection in the `fzf` menu, it will not be automatically selected.
+  - However, if only one result is available during selection in the `fzf` menu,
+    it will not be automatically selected.
 
 ## Third-party integrations
 

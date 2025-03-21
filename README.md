@@ -461,14 +461,17 @@ Environment variables[^2] can be used for configuration. They must be set before
 | [lf]                  | File manager                                 | See the [wiki][lf-wiki]    |
 | [nnn]                 | File manager                                 | [nnn-autojump]             |
 | [ranger]              | File manager                                 | [ranger-zoxide]            |
+| [rfm]                 | File manager                                 | Natively supported         |
+| [sesh]                | `tmux` session manager                       | Natively supported         |
 | [telescope.nvim]      | Fuzzy finder for Neovim                      | [telescope-zoxide]         |
-| [t]                   | `tmux` session manager                       | Natively supported         |
 | [tmux-session-wizard] | `tmux` session manager                       | Natively supported         |
+| [tmux-sessionx]       | `tmux` session manager                       | Natively supported         |
 | [vim] / [neovim]      | Text editor                                  | [zoxide.vim]               |
 | [xplr]                | File manager                                 | [zoxide.xplr]              |
 | [xxh]                 | Transports shell configuration over SSH      | [xxh-plugin-prerun-zoxide] |
 | [yazi]                | File manager                                 | Natively supported         |
 | [zabb]                | Finds the shortest possible query for a path | Natively supported         |
+| [zesh]                | `zellij` session manager                     | Natively supported         |
 | [zsh-autocomplete]    | Realtime completions for zsh                 | Natively supported         |
 
 [^1]:
@@ -528,15 +531,17 @@ Environment variables[^2] can be used for configuration. They must be set before
 [ranger]: https://github.com/ranger/ranger
 [raspbian packages]: https://archive.raspbian.org/raspbian/pool/main/r/rust-zoxide/
 [releases]: https://github.com/ajeetdsouza/zoxide/releases
+[rfm]: https://github.com/dsxmachina/rfm
 [scoop]: https://github.com/ScoopInstaller/Main/tree/master/bucket/zoxide.json
+[sesh]: https://github.com/joshmedeski/sesh
 [slackbuilds]: https://slackbuilds.org/repository/15.0/system/zoxide/
 [slackbuilds-howto]: https://slackbuilds.org/howto/
 [solus packages]: https://github.com/getsolus/packages/tree/main/packages/z/zoxide/
-[t]: https://github.com/joshmedeski/t-smart-tmux-session-manager
 [telescope-zoxide]: https://github.com/jvgrootveld/telescope-zoxide
 [telescope.nvim]: https://github.com/nvim-telescope/telescope.nvim
 [termux]: https://github.com/termux/termux-packages/tree/master/packages/zoxide
 [tmux-session-wizard]: https://github.com/27medkamal/tmux-session-wizard
+[tmux-sessionx]: https://github.com/omerxx/tmux-sessionx
 [tutorial]: contrib/tutorial.webp
 [ubuntu packages]: https://packages.ubuntu.com/jammy/zoxide
 [vim]: https://github.com/vim/vim
@@ -547,6 +552,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 [xxh]: https://github.com/xxh/xxh
 [yazi]: https://github.com/sxyazi/yazi
 [zabb]: https://github.com/Mellbourn/zabb
+[zesh]: https://github.com/roberte777/zesh
 [zoxide.el]: https://gitlab.com/Vonfry/zoxide.el
 [zoxide.vim]: https://github.com/nanotee/zoxide.vim
 [zoxide.xplr]: https://github.com/sayanarijit/zoxide.xplr

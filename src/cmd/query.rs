@@ -3,7 +3,7 @@ use std::io::{self, Write};
 use anyhow::{Context, Result};
 
 use crate::cmd::{Query, Run};
-use crate::config;
+use crate::config::{self};
 use crate::db::{Database, Epoch, Stream, StreamOptions};
 use crate::error::BrokenPipeHandler;
 use crate::util::{self, Fzf, FzfChild};
@@ -31,15 +31,29 @@ impl Query {
 
     fn query_interactive(&self, stream: &mut Stream, now: Epoch) -> Result<()> {
         let mut fzf = Self::get_fzf()?;
+        let mut stream_length = 0;
+        let mut last_dir: Option<String> = None;
         let selection = loop {
             match stream.next() {
-                Some(dir) if Some(dir.path.as_ref()) == self.exclude.as_deref() => continue,
+                Some(dir) if Some(dir.path.as_ref()) == self.exclude.as_deref() => {
+                    stream_length += 1;
+                    last_dir = Some(format!("{}\n", dir.display().with_score(now)));
+                    continue;
+                }
                 Some(dir) => {
+                    stream_length += 1;
+                    last_dir = Some(format!("{}\n", dir.display().with_score(now)));
                     if let Some(selection) = fzf.write(dir, now)? {
                         break selection;
                     }
                 }
-                None => break fzf.wait()?,
+                None if stream_length == 1 => {
+                    fzf.close()?;
+                    break last_dir.unwrap();
+                }
+                None => {
+                    break fzf.wait()?;
+                }
             }
         };
 

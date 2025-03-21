@@ -8,7 +8,7 @@ use std::{env, mem};
 
 #[cfg(windows)]
 use anyhow::anyhow;
-use anyhow::{Context, Result, bail};
+use anyhow::{Context, Error, Result, bail};
 
 use crate::db::{Dir, Epoch};
 use crate::error::SilentExit;
@@ -147,6 +147,10 @@ impl FzfChild {
             Some(128..=254) | None => bail!("fzf was terminated"),
             _ => bail!("fzf returned an unknown error"),
         }
+    }
+
+    pub fn close(&mut self) -> Result<()> {
+        self.0.kill().map_err(|err| err.into())
     }
 }
 

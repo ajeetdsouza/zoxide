@@ -8,7 +8,7 @@ use std::{env, mem};
 
 #[cfg(windows)]
 use anyhow::anyhow;
-use anyhow::{Context, Error, Result, bail};
+use anyhow::{Context, Result, bail};
 
 use crate::db::{Dir, Epoch};
 use crate::error::SilentExit;

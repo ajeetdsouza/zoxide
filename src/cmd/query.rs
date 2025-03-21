@@ -20,7 +20,9 @@ impl Query {
         let now = util::current_time()?;
         let mut stream = self.get_stream(db, now)?;
 
-        if self.interactive {
+        if self.interactive && config::zi_only_result() {
+            self.query_interactive_only_result(&mut stream, now)
+        } else if self.interactive {
             self.query_interactive(&mut stream, now)
         } else if self.list {
             self.query_list(&mut stream, now)
@@ -30,6 +32,33 @@ impl Query {
     }
 
     fn query_interactive(&self, stream: &mut Stream, now: Epoch) -> Result<()> {
+        let mut fzf = Self::get_fzf()?;
+        let selection = loop {
+            match stream.next() {
+                Some(dir) if Some(dir.path.as_ref()) == self.exclude.as_deref() => {
+                    continue;
+                }
+                Some(dir) => {
+                    if let Some(selection) = fzf.write(dir, now)? {
+                        break selection;
+                    }
+                }
+                None => {
+                    break fzf.wait()?;
+                }
+            }
+        };
+
+        if self.score {
+            print!("{selection}");
+        } else {
+            let path = selection.get(7..).context("could not read selection from fzf")?;
+            print!("{path}");
+        }
+        Ok(())
+    }
+
+    fn query_interactive_only_result(&self, stream: &mut Stream, now: Epoch) -> Result<()> {
         let mut fzf = Self::get_fzf()?;
         let mut stream_length = 0;
         let mut last_dir: Option<String> = None;

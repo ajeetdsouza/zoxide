@@ -148,6 +148,10 @@ impl FzfChild {
             _ => bail!("fzf returned an unknown error"),
         }
     }
+
+    pub fn close(&mut self) -> Result<()> {
+        self.0.kill().map_err(|err| err.into())
+    }
 }
 
 /// Similar to [`fs::write`], but atomic (best effort on Windows).

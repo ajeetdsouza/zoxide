@@ -128,7 +128,7 @@ impl Query {
     fn format_keywords(&self) -> String {
         let mut keywords = self.keywords.clone();
         match keywords.pop() {
-            None => String::new(),
+            None => "".into(),
             Some(last) => {
                 let head = keywords.join("', '");
 

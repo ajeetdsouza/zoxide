@@ -86,10 +86,13 @@ if ($global:__zoxide_hooked -ne 1) {
     $global:__zoxide_prompt_old = $function:prompt
 
     function global:prompt {
-        if ($null -ne $__zoxide_prompt_old) {
-            & $__zoxide_prompt_old
+        $customPrompt = ""
+        if ($null -ne $global:__zoxide_prompt_old) {
+            $customPrompt = & $global:__zoxide_prompt_old
         }
         $null = __zoxide_hook
+
+        return $customPrompt
     }
 }
 {%- endif %}

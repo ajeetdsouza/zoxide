@@ -18,6 +18,13 @@ impl Run for Query {
 impl Query {
     fn query(&self, db: &mut Database) -> Result<()> {
         let now = util::current_time()?;
+
+        if let Ok(is_mark) = self.try_bookmark(db) {
+            if is_mark {
+                return Ok(());
+            }
+        }
+
         let mut stream = self.get_stream(db, now)?;
 
         if self.interactive {
@@ -28,7 +35,22 @@ impl Query {
             self.query_first(&mut stream, now)
         }
     }
+    fn try_bookmark(&self, db: &Database) -> Result<bool, ()> {
+        // NOTE We only assume bookmarking if they supply one keyword
+        // Could be trivially changed to iterate over keywords
+        if self.keywords.len() == 1 {
+            let keyword = &self.keywords[0];
+            if let Some(path) = db.get_bookmark(keyword) {
+                let handle = &mut io::stdout();
+                return match writeln!(handle, "{}", path.to_str().unwrap()).pipe_exit("stdout") {
+                    Ok(_) => Ok(true),
+                    Err(_) => Err(()),
+                };
+            }
+        }
 
+        Ok(false)
+    }
     fn query_interactive(&self, stream: &mut Stream, now: Epoch) -> Result<()> {
         let mut fzf = Self::get_fzf()?;
         let selection = loop {

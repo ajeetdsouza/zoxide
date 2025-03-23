@@ -51,6 +51,28 @@ pub fn fzf_extra_opts() -> Option<OsString> {
     env::var_os("_ZO_FZF_EXTRA_OPTS")
 }
 
+pub fn fzf_default_args() -> Vec<String> {
+    vec![
+        // Search mode
+        String::from("--exact"),
+        // Search result
+        String::from("--no-sort"),
+        // Interface
+        String::from("--bind=ctrl-z:ignore,btab:up,tab:down"),
+        String::from("--cycle"),
+        String::from("--keep-right"),
+        // Layout
+        String::from("--border=sharp"), // rounded edges don't display correctly on some terminals
+        String::from("--height=45%"),
+        String::from("--info=inline"),
+        String::from("--layout=reverse"),
+        // Display
+        String::from("--tabstop=1"),
+        // Scripting
+        String::from("--exit-0"),
+    ]
+}
+
 pub fn maxage() -> Result<Rank> {
     env::var_os("_ZO_MAXAGE").map_or(Ok(10_000.0), |maxage| {
         let maxage = maxage.to_str().context("invalid unicode in _ZO_MAXAGE")?;

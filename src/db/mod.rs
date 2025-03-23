@@ -250,7 +250,6 @@ impl Database {
                         match serialize(&(&dirs, &bookmarks)) {
                             Ok(_) => {
                                 util::write(path, bytes).context("could not write to database")?;
-                                println!("yellow");
                                 return Ok((dirs, bookmarks));
                             }
                             Err(_) => return Err(err).context("could not deserialize database"),

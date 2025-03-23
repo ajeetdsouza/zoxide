@@ -19,18 +19,6 @@ pub fn data_dir() -> Result<PathBuf> {
     Ok(dir)
 }
 
-pub fn bookmarks_dir() -> Result<PathBuf> {
-    let dir = match env::var_os("_ZO_BOOKMARKS_DIR") {
-        Some(path) => PathBuf::from(path),
-        None => dirs::data_local_dir()
-            .context("could not find bookmarks directory, please set _ZO_BOOKMARKS_DIR manually")?
-            .join("zoxide"),
-    };
-
-    ensure!(dir.is_absolute(), "_ZO_BOOKMARKS_DIR must be an absolute path");
-    Ok(dir)
-}
-
 pub fn echo() -> bool {
     env::var_os("_ZO_ECHO").is_some_and(|var| var == "1")
 }

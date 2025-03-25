@@ -58,6 +58,7 @@ complete -c zoxide -n "__fish_zoxide_using_subcommand init" -l no-cmd -d 'Preven
 complete -c zoxide -n "__fish_zoxide_using_subcommand init" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_zoxide_using_subcommand init" -s V -l version -d 'Print version'
 complete -c zoxide -n "__fish_zoxide_using_subcommand query" -l exclude -d 'Exclude the current directory' -r -f -a "(__fish_complete_directories)"
+complete -c zoxide -n "__fish_zoxide_using_subcommand query" -l basedir -d 'Only search within this directory' -r -f -a "(__fish_complete_directories)"
 complete -c zoxide -n "__fish_zoxide_using_subcommand query" -s a -l all -d 'Show unavailable directories'
 complete -c zoxide -n "__fish_zoxide_using_subcommand query" -s i -l interactive -d 'Use interactive selection'
 complete -c zoxide -n "__fish_zoxide_using_subcommand query" -s l -l list -d 'List all matching directories'

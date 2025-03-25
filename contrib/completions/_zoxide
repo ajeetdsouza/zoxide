@@ -118,6 +118,7 @@ _arguments "${_arguments_options[@]}" : \
 (query)
 _arguments "${_arguments_options[@]}" : \
 '--exclude=[Exclude the current directory]:path:_files -/' \
+'(--exclude)--basedir=[Only search within this directory]:path:_files -/' \
 '-a[Show unavailable directories]' \
 '--all[Show unavailable directories]' \
 '(-l --list)-i[Use interactive selection]' \

@@ -88,6 +88,7 @@ set edit:completion:arg-completer[zoxide] = {|@words|
         }
         &'zoxide;query'= {
             cand --exclude 'Exclude the current directory'
+            cand --basedir 'Only search within this directory'
             cand -a 'Show unavailable directories'
             cand --all 'Show unavailable directories'
             cand -i 'Use interactive selection'

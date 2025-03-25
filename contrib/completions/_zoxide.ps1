@@ -100,6 +100,7 @@ Register-ArgumentCompleter -Native -CommandName 'zoxide' -ScriptBlock {
         }
         'zoxide;query' {
             [CompletionResult]::new('--exclude', '--exclude', [CompletionResultType]::ParameterName, 'Exclude the current directory')
+            [CompletionResult]::new('--basedir', '--basedir', [CompletionResultType]::ParameterName, 'Only search within this directory')
             [CompletionResult]::new('-a', '-a', [CompletionResultType]::ParameterName, 'Show unavailable directories')
             [CompletionResult]::new('--all', '--all', [CompletionResultType]::ParameterName, 'Show unavailable directories')
             [CompletionResult]::new('-i', '-i', [CompletionResultType]::ParameterName, 'Use interactive selection')

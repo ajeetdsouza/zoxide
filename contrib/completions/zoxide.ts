@@ -205,6 +205,19 @@ const completion: Fig.Spec = {
           },
         },
         {
+          name: "--basedir",
+          description: "Only search within this directory",
+          exclusiveOn: [
+            "--exclude",
+          ],
+          isRepeatable: true,
+          args: {
+            name: "basedir",
+            isOptional: true,
+            template: "folders",
+          },
+        },
+        {
           name: ["-a", "--all"],
           description: "Show unavailable directories",
         },

@@ -180,6 +180,10 @@ pub struct Query {
     /// Exclude the current directory
     #[clap(long, value_hint = ValueHint::DirPath, value_name = "path")]
     pub exclude: Option<String>,
+
+    /// Only search within this directory
+    #[clap(long, value_hint = ValueHint::DirPath, value_name = "path", conflicts_with = "exclude")]
+    pub basedir: Option<String>,
 }
 
 /// Remove a directory from the database

@@ -229,6 +229,10 @@ const completion: Fig.Spec = {
           description: "Print score with results",
         },
         {
+          name: ["-e", "--exact"],
+          description: "Only match exact",
+        },
+        {
           name: ["-h", "--help"],
           description: "Print help",
         },

@@ -96,6 +96,8 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand --list 'List all matching directories'
             cand -s 'Print score with results'
             cand --score 'Print score with results'
+            cand -e 'Only match exact'
+            cand --exact 'Only match exact'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'

@@ -1,5 +1,6 @@
 use std::iter::Rev;
 use std::ops::Range;
+use std::path::{Path, PathBuf};
 use std::{fs, path};
 
 use glob::Pattern;
@@ -37,6 +38,10 @@ impl<'a> Stream<'a> {
                 if dir.last_accessed < self.options.ttl {
                     self.db.swap_remove(idx);
                 }
+                continue;
+            }
+
+            if !self.filter_by_basedir(&dir.path) {
                 continue;
             }
 
@@ -91,6 +96,15 @@ impl<'a> Stream<'a> {
             if self.options.resolve_symlinks { fs::symlink_metadata } else { fs::metadata };
         resolver(path).map(|metadata| metadata.is_dir()).unwrap_or_default()
     }
+
+    fn filter_by_basedir(&self, path: &str) -> bool {
+        if let Some(basedir) = &self.options.basedir {
+            let path = Path::new(path);
+            return path.starts_with(basedir);
+        }
+
+        true
+    }
 }
 
 pub struct StreamOptions {
@@ -112,6 +126,10 @@ pub struct StreamOptions {
     /// Directories that do not exist and haven't been accessed since TTL will
     /// be lazily removed.
     ttl: Epoch,
+
+    /// Only return directories within this parent directory
+    /// Does not check if the path exists
+    basedir: Option<String>,
 }
 
 impl StreamOptions {
@@ -123,6 +141,7 @@ impl StreamOptions {
             exists: false,
             resolve_symlinks: false,
             ttl: now.saturating_sub(3 * MONTH),
+            basedir: None,
         }
     }
 
@@ -147,6 +166,11 @@ impl StreamOptions {
 
     pub fn with_resolve_symlinks(mut self, resolve_symlinks: bool) -> Self {
         self.resolve_symlinks = resolve_symlinks;
+        self
+    }
+
+    pub fn with_basedir(mut self, basedir: Option<String>) -> Self {
+        self.basedir = basedir;
         self
     }
 }

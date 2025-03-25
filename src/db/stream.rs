@@ -204,7 +204,7 @@ mod tests {
     #[case(&["/foo/", "/bar"], "/foo/bar", false)]
     #[case(&["/foo/", "/bar"], "/foo/baz/bar", true)]
     fn query(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
-        let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
+        let db = &mut Database::new(PathBuf::default(), Vec::default(), |_| Vec::default(), false);
         let options = StreamOptions::new(0).with_keywords(keywords.iter());
         let stream = Stream::new(db, options);
         assert_eq!(is_match, stream.filter_by_keywords(path));

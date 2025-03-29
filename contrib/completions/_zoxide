@@ -30,6 +30,8 @@ _zoxide() {
         case $line[1] in
             (add)
 _arguments "${_arguments_options[@]}" : \
+'-s+[The rank to increment the entry if it exists or initialize it with if it doesn'\''t]:SCORE: ' \
+'--score=[The rank to increment the entry if it exists or initialize it with if it doesn'\''t]:SCORE: ' \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \

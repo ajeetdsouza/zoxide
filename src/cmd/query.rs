@@ -91,29 +91,29 @@ impl Query {
 
     fn get_fzf() -> Result<FzfChild> {
         let mut fzf = Fzf::new()?;
-        if let Some(fzf_opts) = config::fzf_opts() {
+        if let Some(mut fzf_opts) = config::fzf_opts() {
+            if let Some(fzf_extra_opts) = config::fzf_extra_opts() {
+                fzf_opts.push(" ");
+                fzf_opts.push(fzf_extra_opts);
+            }
+
             fzf.env("FZF_DEFAULT_OPTS", fzf_opts)
         } else {
-            fzf.args([
-                // Search mode
-                "--exact",
-                // Search result
-                "--no-sort",
-                // Interface
-                "--bind=ctrl-z:ignore,btab:up,tab:down",
-                "--cycle",
-                "--keep-right",
-                // Layout
-                "--border=sharp", // rounded edges don't display correctly on some terminals
-                "--height=45%",
-                "--info=inline",
-                "--layout=reverse",
-                // Display
-                "--tabstop=1",
-                // Scripting
-                "--exit-0",
-            ])
-            .enable_preview()
+            let default_args = config::fzf_default_args();
+            let args = if let Some(fzf_extra_opts) = config::fzf_extra_opts() {
+                let extra_fzf_args_list: Vec<String> = fzf_extra_opts
+                    .to_str()
+                    .unwrap_or_default()
+                    .split_whitespace()
+                    .map(|arg| String::from(arg))
+                    .collect();
+
+                vec![default_args, extra_fzf_args_list].concat()
+            } else {
+                default_args
+            };
+
+            fzf.args(args).enable_preview()
         }
         .spawn()
     }

@@ -30,6 +30,8 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand remove 'Remove a directory from the database'
         }
         &'zoxide;add'= {
+            cand -s 'The rank to increment the entry if it exists or initialize it with if it doesn''t'
+            cand --score 'The rank to increment the entry if it exists or initialize it with if it doesn''t'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'

@@ -59,7 +59,8 @@ pub struct Add {
     #[clap(num_args = 1.., required = true, value_hint = ValueHint::DirPath)]
     pub paths: Vec<PathBuf>,
 
-    /// The rank to increment the entry if it exists or initialize it with if it doesn't
+    /// The rank to increment the entry if it exists or initialize it with if it
+    /// doesn't
     #[clap(short, long)]
     pub score: Option<f64>,
 }
@@ -180,6 +181,10 @@ pub struct Query {
     /// Print score with results
     #[clap(long, short)]
     pub score: bool,
+
+    /// Print last_accessed with results
+    #[clap(long, short)]
+    pub time: bool,
 
     /// Exclude the current directory
     #[clap(long, value_hint = ValueHint::DirPath, value_name = "path")]

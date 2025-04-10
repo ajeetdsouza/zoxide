@@ -238,6 +238,10 @@ const completion: Fig.Spec = {
           description: "Print score with results",
         },
         {
+          name: ["-t", "--time"],
+          description: "Print last_accessed with results",
+        },
+        {
           name: ["-h", "--help"],
           description: "Print help",
         },

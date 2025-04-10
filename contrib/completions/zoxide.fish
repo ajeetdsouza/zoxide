@@ -49,12 +49,15 @@ complete -c zoxide -n "__fish_zoxide_using_subcommand edit; and __fish_seen_subc
 complete -c zoxide -n "__fish_zoxide_using_subcommand edit; and __fish_seen_subcommand_from increment" -s V -l version -d 'Print version'
 complete -c zoxide -n "__fish_zoxide_using_subcommand edit; and __fish_seen_subcommand_from reload" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_zoxide_using_subcommand edit; and __fish_seen_subcommand_from reload" -s V -l version -d 'Print version'
-complete -c zoxide -n "__fish_zoxide_using_subcommand import" -l from -d 'Application to import from' -r -f -a "{autojump\t'',z\t''}"
+complete -c zoxide -n "__fish_zoxide_using_subcommand import" -l from -d 'Application to import from' -r -f -a "autojump\t''
+z\t''"
 complete -c zoxide -n "__fish_zoxide_using_subcommand import" -l merge -d 'Merge into existing database'
 complete -c zoxide -n "__fish_zoxide_using_subcommand import" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_zoxide_using_subcommand import" -s V -l version -d 'Print version'
 complete -c zoxide -n "__fish_zoxide_using_subcommand init" -l cmd -d 'Changes the prefix of the `z` and `zi` commands' -r
-complete -c zoxide -n "__fish_zoxide_using_subcommand init" -l hook -d 'Changes how often zoxide increments a directory\'s score' -r -f -a "{none\t'',prompt\t'',pwd\t''}"
+complete -c zoxide -n "__fish_zoxide_using_subcommand init" -l hook -d 'Changes how often zoxide increments a directory\'s score' -r -f -a "none\t''
+prompt\t''
+pwd\t''"
 complete -c zoxide -n "__fish_zoxide_using_subcommand init" -l no-cmd -d 'Prevents zoxide from defining the `z` and `zi` commands'
 complete -c zoxide -n "__fish_zoxide_using_subcommand init" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_zoxide_using_subcommand init" -s V -l version -d 'Print version'
@@ -63,6 +66,7 @@ complete -c zoxide -n "__fish_zoxide_using_subcommand query" -s a -l all -d 'Sho
 complete -c zoxide -n "__fish_zoxide_using_subcommand query" -s i -l interactive -d 'Use interactive selection'
 complete -c zoxide -n "__fish_zoxide_using_subcommand query" -s l -l list -d 'List all matching directories'
 complete -c zoxide -n "__fish_zoxide_using_subcommand query" -s s -l score -d 'Print score with results'
+complete -c zoxide -n "__fish_zoxide_using_subcommand query" -s t -l time -d 'Print `last_accessed` with results, no effect without `--list` option'
 complete -c zoxide -n "__fish_zoxide_using_subcommand query" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_zoxide_using_subcommand query" -s V -l version -d 'Print version'
 complete -c zoxide -n "__fish_zoxide_using_subcommand remove" -s h -l help -d 'Print help'

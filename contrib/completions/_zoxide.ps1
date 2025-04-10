@@ -111,6 +111,8 @@ Register-ArgumentCompleter -Native -CommandName 'zoxide' -ScriptBlock {
             [CompletionResult]::new('--list', '--list', [CompletionResultType]::ParameterName, 'List all matching directories')
             [CompletionResult]::new('-s', '-s', [CompletionResultType]::ParameterName, 'Print score with results')
             [CompletionResult]::new('--score', '--score', [CompletionResultType]::ParameterName, 'Print score with results')
+            [CompletionResult]::new('-t', '-t', [CompletionResultType]::ParameterName, 'Print `last_accessed` with results, no effect without `--list` option')
+            [CompletionResult]::new('--time', '--time', [CompletionResultType]::ParameterName, 'Print `last_accessed` with results, no effect without `--list` option')
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')

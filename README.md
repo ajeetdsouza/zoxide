@@ -54,6 +54,7 @@ z ~/foo            # z also works like a regular cd command
 z foo/             # cd into relative path
 z ..               # cd one level up
 z -                # cd into previous directory
+z +                # undo previous z -
 
 zi foo             # cd with interactive selection (using fzf)
 

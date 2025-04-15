@@ -58,7 +58,10 @@ impl Query {
             if Some(dir.path.as_ref()) == self.exclude.as_deref() {
                 continue;
             }
-            let dir = if self.score { dir.display().with_score(now) } else { dir.display() };
+            let mut dir = if self.score { dir.display().with_score(now) } else { dir.display() };
+            if self.time {
+                dir.show_last_accessed = true;
+            }
             writeln!(handle, "{dir}").pipe_exit("stdout")?;
         }
         Ok(())

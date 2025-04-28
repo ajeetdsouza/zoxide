@@ -19,10 +19,10 @@ end
 # A copy of fish's internal cd function. This makes it possible to use
 # `alias cd=z` without causing an infinite loop.
 if ! builtin functions --query __zoxide_cd_internal
-    if status list-files functions/cd.fish >/dev/null
-        source (string replace --regex -- '^function cd\s' 'function __zoxide_cd_internal ' (status get-file functions/cd.fish) | psub -f)
+    if status list-files functions/cd.fish &>/dev/null
+        status get-file functions/cd.fish | string replace --regex -- '^function cd\s' 'function __zoxide_cd_internal ' | source
     else
-        source (string replace --regex -- '^function cd\s' 'function __zoxide_cd_internal ' (cat $__fish_data_dir/functions/cd.fish) | psub -f)
+        string replace --regex -- '^function cd\s' 'function __zoxide_cd_internal ' <$__fish_data_dir/functions/cd.fish | source
     end
 end
 

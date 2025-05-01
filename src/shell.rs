@@ -24,6 +24,7 @@ macro_rules! make_template {
 }
 
 make_template!(Bash, "bash.txt");
+make_template!(Csh, "csh.txt");
 make_template!(Elvish, "elvish.txt");
 make_template!(Fish, "fish.txt");
 make_template!(Nushell, "nushell.txt");
@@ -86,6 +87,20 @@ mod tests {
 
         Command::new("shfmt")
             .args(["--diff", "--indent=4", "--language-dialect=bash", "--simplify", "-"])
+            .write_stdin(source)
+            .assert()
+            .success()
+            .stdout("")
+            .stderr("");
+    }
+
+    #[apply(opts)]
+    fn csh_tcsh(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+        let source = Csh(&opts).render().unwrap();
+
+        Command::new("tcsh")
+            .args(["-e", "-f", "-s"])
             .write_stdin(source)
             .assert()
             .success()

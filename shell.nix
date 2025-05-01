@@ -27,6 +27,7 @@ in pkgs.mkShell {
     pkgs.ksh
     pkgs.nushell
     pkgs.powershell
+    pkgs.tcsh
     pkgs.xonsh
     pkgs.zsh
 

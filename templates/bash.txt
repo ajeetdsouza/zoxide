@@ -160,6 +160,7 @@ if [[ ${BASH_VERSINFO[0]:-0} -eq 4 && ${BASH_VERSINFO[1]:-0} -ge 4 || ${BASH_VER
                 \builtin bind '"\e[0n": redraw-current-line'
                 \builtin printf '\e[5n'
 
+                # shellcheck disable=SC2016
                 \builtin bind -x '"\e[0n": __zoxide_z_complete_helper "${result}"'
                 \builtin printf '\e[5n'
             }

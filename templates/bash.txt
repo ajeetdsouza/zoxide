@@ -168,8 +168,11 @@ if [[ ${BASH_VERSINFO[0]:-0} -eq 4 && ${BASH_VERSINFO[1]:-0} -ge 4 || ${BASH_VER
                 # the directory in the command line.
                 COMPREPLY=("${__zoxide_z_prefix}${__zoxide_result}/")
 
-                \builtin bind -x '"\e[0n": __zoxide_z_complete_helper'
-                \builtin printf '\e[5n'
+                # Note: We here call "bind" without prefixing "\builtin" to be
+                # compatible with frameworks like ble.sh, which emulates Bash's
+                # builtin "bind".
+                bind -x '"\e[0n": __zoxide_z_complete_helper'
+                \builtin printf '\e[5n' >/dev/tty
             }
         fi
     }

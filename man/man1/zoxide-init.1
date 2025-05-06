@@ -55,6 +55,14 @@ $profile\fR in PowerShell):
     \fBInvoke-Expression (& { (zoxide init powershell | Out-String) })\fR
 .fi
 .TP
+.B tcsh
+Add this to the \fBend\fR of your config file (usually \fB~/.tcshrc\fR):
+.sp
+.nf
+    \fBzoxide init tcsh > ~/.zoxide.tcsh\fR
+    \fBsource ~/.zoxide.tcsh\fR
+.fi
+.TP
 .B xonsh
 Add this to the \fBend\fR of your config file (usually \fB~/.xonshrc\fR):
 .sp

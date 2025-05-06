@@ -189,12 +189,12 @@ const completion: Fig.Spec = {
         name: "shell",
         suggestions: [
           "bash",
-          "csh",
           "elvish",
           "fish",
           "nushell",
           "posix",
           "powershell",
+          "tcsh",
           "xonsh",
           "zsh",
         ],

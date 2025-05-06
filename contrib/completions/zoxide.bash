@@ -173,7 +173,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__init)
-            opts="-h -V --no-cmd --cmd --hook --help --version bash csh elvish fish nushell posix powershell xonsh zsh"
+            opts="-h -V --no-cmd --cmd --hook --help --version bash elvish fish nushell posix powershell tcsh xonsh zsh"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0

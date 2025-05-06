@@ -147,14 +147,13 @@ pub enum InitHook {
 #[derive(ValueEnum, Clone, Debug)]
 pub enum InitShell {
     Bash,
-    #[clap(alias = "tcsh")]
-    Csh,
     Elvish,
     Fish,
     Nushell,
     #[clap(alias = "ksh")]
     Posix,
     Powershell,
+    Tcsh,
     Xonsh,
     Zsh,
 }

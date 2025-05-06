@@ -68,7 +68,7 @@ alias {{cmd}}i __zoxide_zi
 {%- endmatch %}
 
 {{ section }}
-# To initialize zoxide, add this to your shell configuration file (usually ~/.cshrc or ~/.tcshrc):
+# To initialize zoxide, add this to your shell configuration file (usually ~/.tcshrc):
 #
-#     zoxide init csh > ~/.zoxide.csh
-#     source ~/.zoxide.csh
+#     zoxide init tcsh > ~/.zoxide.tcsh
+#     source ~/.zoxide.tcsh

@@ -281,6 +281,18 @@ zoxide can be installed in 4 easy steps:
    </details>
 
    <details>
+   <summary>Tcsh</summary>
+
+   > Add this to the <ins>**end**</ins> of your config file (usually `~/.tcshrc`):
+   >
+   > ```sh
+   > zoxide init tcsh > ~/.zoxide.tcsh
+   > source ~/.zoxide.tcsh
+   > ```
+
+   </details>
+
+   <details>
    <summary>Xonsh</summary>
 
    > Add this to the <ins>**end**</ins> of your config file (usually `~/.xonshrc`):

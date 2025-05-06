@@ -323,7 +323,7 @@ zoxide can be installed in 4 easy steps:
    interactive selection. It can be installed from [here][fzf-installation].
 
    > **Note**
-   > The minimum supported fzf version is v0.33.0 on most platforms and v0.51.0 on Windows.
+   > The minimum supported fzf version is v0.51.0.
 
 4. **Import your data** <sup>(optional)</sup>
 

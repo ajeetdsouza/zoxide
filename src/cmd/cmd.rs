@@ -59,7 +59,8 @@ pub struct Add {
     #[clap(num_args = 1.., required = true, value_hint = ValueHint::DirPath)]
     pub paths: Vec<PathBuf>,
 
-    /// The rank to increment the entry if it exists or initialize it with if it doesn't
+    /// The rank to increment the entry if it exists or initialize it with if it
+    /// doesn't
     #[clap(short, long)]
     pub score: Option<f64>,
 }
@@ -146,6 +147,8 @@ pub enum InitHook {
 #[derive(ValueEnum, Clone, Debug)]
 pub enum InitShell {
     Bash,
+    #[clap(alias = "tcsh")]
+    Csh,
     Elvish,
     Fish,
     Nushell,

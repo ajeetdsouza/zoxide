@@ -9,9 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- Support for Csh.
+- Added `--score` flag to `zoxide add`.
+
 ### Changed
 
 - Bash: zoxide will now rewrite the prompt when using Space-Tab completions.
+
+### Fixed
+
+- Nushell: stop ignoring symlinks when `cd`-ing into a directory.
+- Fzf: updated minimum supported version to v0.51.0.
+- PowerShell: avoid setting `$error` when defining `__zoxide_hooked`.
 
 ## [0.9.7] - 2025-02-10
 

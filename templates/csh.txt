@@ -41,13 +41,15 @@ else\
     else if ("$#__zoxide_args" == 1 && -d "$__zoxide_args[1]") then\
         cd "$__zoxide_args[1]"\
     else\
-        set __zoxide_result = "`zoxide query -- $__zoxide_args`" && cd "$__zoxide_result"\
+        set __zoxide_pwd = `{{ pwd_cmd }}`\
+        set __zoxide_result = "`zoxide query --exclude '"'"'$__zoxide_pwd'"'"' -- $__zoxide_args`" && cd "$__zoxide_result"\
     endif\
 endif'
 
 # Jump to a directory using interactive search.
 alias __zoxide_zi 'set __zoxide_args = (\!*)\
-set __zoxide_result = "`zoxide query --interactive -- $__zoxide_args`" && cd "$__zoxide_result"'
+set __zoxide_pwd = `{{ pwd_cmd }}`\
+set __zoxide_result = "`zoxide query --exclude '"'"'$__zoxide_pwd'"'"' --interactive -- $__zoxide_args`" && cd "$__zoxide_result"'
 
 {{ section }}
 # Commands for zoxide. Disable these using --no-cmd.

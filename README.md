@@ -533,7 +533,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 [linuxbrew]: https://formulae.brew.sh/formula-linux/zoxide
 [macports]: https://ports.macports.org/port/zoxide/summary
 [neovim]: https://github.com/neovim/neovim
-[nixpkgs]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/tools/misc/zoxide/default.nix
+[nixpkgs]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/zo/zoxide/package.nix
 [nnn-autojump]: https://github.com/jarun/nnn/blob/master/plugins/autojump
 [nnn]: https://github.com/jarun/nnn
 [opensuse factory]: https://build.opensuse.org/package/show/openSUSE:Factory/zoxide

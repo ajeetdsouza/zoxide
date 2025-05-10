@@ -86,6 +86,8 @@ function __zoxide_doctor() {
 # When using zoxide with --no-cmd, alias these internal functions as desired.
 #
 
+__zoxide_z_prefix='z#'
+
 # Jump to a directory using only keywords.
 function __zoxide_z() {
     __zoxide_doctor
@@ -99,6 +101,10 @@ function __zoxide_z() {
         __zoxide_cd "$1"
     elif [[ $# -eq 2 && $1 == '--' ]]; then
         __zoxide_cd "$2"
+    elif [[ ${@: -1} == "${__zoxide_z_prefix}"?* ]]; then
+        # shellcheck disable=SC2124
+        \builtin local result="${@: -1}"
+        __zoxide_cd "{{ "${result:${#__zoxide_z_prefix}}" }}"
     else
         \builtin local result
         # shellcheck disable=SC2312
@@ -157,12 +163,16 @@ if [[ ${BASH_VERSINFO[0]:-0} -eq 4 && ${BASH_VERSINFO[1]:-0} -ge 4 || ${BASH_VER
         elif [[ -z ${COMP_WORDS[-1]} ]]; then
             # shellcheck disable=SC2312
             __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd)" --interactive -- "{{ "${COMP_WORDS[@]:1:${#COMP_WORDS[@]}-2}" }}")" && {
-                \builtin bind '"\e[0n": redraw-current-line'
-                \builtin printf '\e[5n'
+                # In case the terminal does not respond to \e[5n or another
+                # mechanism steals the response, it is still worth completing
+                # the directory in the command line.
+                COMPREPLY=("${__zoxide_z_prefix}${__zoxide_result}/")
 
-                # shellcheck disable=SC2016
-                \builtin bind -x '"\e[0n": __zoxide_z_complete_helper "${result}"'
-                \builtin printf '\e[5n'
+                # Note: We here call "bind" without prefixing "\builtin" to be
+                # compatible with frameworks like ble.sh, which emulates Bash's
+                # builtin "bind".
+                bind -x '"\e[0n": __zoxide_z_complete_helper'
+                \builtin printf '\e[5n' >/dev/tty
             }
         fi
     }

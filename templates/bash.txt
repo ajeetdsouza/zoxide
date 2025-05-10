@@ -66,8 +66,9 @@ function __zoxide_doctor() {
     return 0
 
 {%- else %}
-    [[ ${_ZO_DOCTOR:-1} -ne 0 ]] || return 0
-    [[ ${PROMPT_COMMAND:=} != *'__zoxide_hook'* ]] || return 0
+    [[ "${_ZO_DOCTOR:-1}" -eq 0 ]] && return 0
+    [[ "${PROMPT_COMMAND:-}" == *'__zoxide_hook'* ]] && return 0
+    [[ "${__vsc_original_prompt_command[@]:-}" == *'__zoxide_hook'* ]] && return 0
 
     _ZO_DOCTOR=0
     \builtin printf '%s\n' \

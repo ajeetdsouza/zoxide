@@ -20,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Bash: doctor now handles `PROMPT_COMMAND` being an array.
+- Bash: doctor now handles Visual Studio Code's shell integration.
+- Bash: completions now work with `ble.sh`.
 - Nushell: stop ignoring symlinks when `cd`-ing into a directory.
 - Fzf: updated minimum supported version to v0.51.0.
 - PowerShell: avoid setting `$error` when defining `__zoxide_hooked`.

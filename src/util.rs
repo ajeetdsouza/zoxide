@@ -179,6 +179,12 @@ pub fn write(path: impl AsRef<Path>, contents: impl AsRef<[u8]>) -> Result<()> {
         }
 
         // Close and rename the tmpfile.
+        // In some cases, errors from the last write() are reported only on close().
+        // Rust ignores errors from close(), since it occurs inside `Drop`. To
+        // catch these errors, we manually call `File::sync_all()` first.
+        tmp_file
+            .sync_all()
+            .with_context(|| format!("could not sync writes to file: {}", tmp_path.display()))?;
         mem::drop(tmp_file);
         rename(&tmp_path, path)
     })();

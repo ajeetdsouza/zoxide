@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Support for Tcsh.
 - Added `--score` flag to `zoxide add`.
+- POSIX: add doctor to diagnose common issues.
 
 ### Changed
 

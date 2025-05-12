@@ -50,7 +50,8 @@ __zoxide_doctor() {
 {%- else %}
     [ "${_ZO_DOCTOR:-1}" -eq 0 ] && return 0
     case "${PS1:-}" in
-        *__zoxide_hook*) return 0 ;;
+    *__zoxide_hook*) return 0 ;;
+    *) ;;
     esac
 
     _ZO_DOCTOR=0

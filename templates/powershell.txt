@@ -40,11 +40,14 @@ function global:__zoxide_cd($dir, $literal) {
             try {
                 Set-Location -Path $dir -Passthru -ErrorAction Stop
             } catch {
-                if ($dir -eq '+') {
-                    # Get the last 5 commands from history
+                if ($dir -match '^\+{1,2}$') { # '^[-\+]{1,2}$'
+                    # Get the last commands from history
+                    if ($dir -eq '++') { $history = Get-History }
+                    else { $history = Get-History -Count 5 }
+
                     # Check for 'mkdir' command and extract the directory created
-                    foreach ($cmd in Get-History -Count 5) {
-                        if ($cmd.CommandLine -match 'mkdir\s+([^\s]+)') {
+                    for ($i = $history.Count - 1; $i -ge 0; $i--) {
+                        if ($history[$i].CommandLine -match 'mkdir\s+([^\s]+)') {
                             if (Test-Path -Path $matches[1] -PathType Container) {
                                 Set-Location -Path $matches[1]
                             }
@@ -120,11 +123,14 @@ function global:__zoxide_z {
     }
     if ($args.Length -eq 1) {
         $arg = $args[0]
-        if ($arg -eq '-' -or $arg -eq '+' -or (Test-Path -PathType Container -Path $arg)) {
+        if ($arg -match '^[-\+]{1,2}$') {
             return __zoxide_cd $arg $false
         }
         if (Test-Path -PathType Container -LiteralPath $arg) {
             return __zoxide_cd $arg $true
+        }
+        if (Test-Path -PathType Container -Path $arg) {
+            return __zoxide_cd $arg $false
         }
     }
 

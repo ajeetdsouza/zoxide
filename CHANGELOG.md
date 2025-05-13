@@ -7,6 +7,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- Support for Tcsh.
+- Added `--score` flag to `zoxide add`.
+- POSIX: add doctor to diagnose common issues.
+
+### Changed
+
+- Bash: zoxide will now rewrite the prompt when using Space-Tab completions.
+
+### Fixed
+
+- Bash: doctor now handles `PROMPT_COMMAND` being an array.
+- Bash: doctor now handles Visual Studio Code's shell integration.
+- Bash: completions now work with `ble.sh`.
+- Nushell: stop ignoring symlinks when `cd`-ing into a directory.
+- Fzf: updated minimum supported version to v0.51.0.
+- PowerShell: avoid setting `$error` when defining `__zoxide_hooked`.
+
 ## [0.9.7] - 2025-02-10
 
 ### Added

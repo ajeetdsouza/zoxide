@@ -33,7 +33,9 @@ impl Run for Add {
             if !Path::new(path).is_dir() {
                 bail!("not a directory: {path}");
             }
-            db.add_update(path, 1.0, now);
+
+            let by = self.score.unwrap_or(1.0);
+            db.add_update(path, by, now);
         }
 
         if db.dirty() {

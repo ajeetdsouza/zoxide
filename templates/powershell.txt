@@ -80,7 +80,7 @@ function global:__zoxide_hook {
 {%- endif %}
 
 # Initialize hook.
-$global:__zoxide_hooked = (Get-Variable __zoxide_hooked -ErrorAction SilentlyContinue -ValueOnly)
+$global:__zoxide_hooked = (Get-Variable __zoxide_hooked -ErrorAction Ignore -ValueOnly)
 if ($global:__zoxide_hooked -ne 1) {
     $global:__zoxide_hooked = 1
     $global:__zoxide_prompt_old = $function:prompt

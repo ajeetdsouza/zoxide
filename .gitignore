@@ -1,5 +1,6 @@
 ### Custom ###
 .vscode/
+.history/
 
 ### Rust ###
 # Compiled files and executables

@@ -37,7 +37,22 @@ function global:__zoxide_cd($dir, $literal) {
             Write-Error "cd + is not supported below PowerShell 6.2. Please upgrade your version of PowerShell."
         }
         else {
-            Set-Location -Path $dir -Passthru -ErrorAction Stop
+            try {
+                Set-Location -Path $dir -Passthru -ErrorAction Stop
+            } catch {
+                if ($dir -eq '+') {
+                    # Get the last 5 commands from history
+                    # Check for 'mkdir' command and extract the directory created
+                    foreach ($cmd in Get-History -Count 5) {
+                        if ($cmd.CommandLine -match 'mkdir\s+([^\s]+)') {
+                            if (Test-Path -Path $matches[1] -PathType Container) {
+                                Set-Location -Path $matches[1]
+                            }
+                            break
+                        }
+                    }
+                }
+            }
         }
     }
 {%- if echo %}
@@ -101,28 +116,27 @@ if ($global:__zoxide_hooked -ne 1) {
 # Jump to a directory using only keywords.
 function global:__zoxide_z {
     if ($args.Length -eq 0) {
-        __zoxide_cd ~ $true
+        return __zoxide_cd ~ $true
     }
-    elseif ($args.Length -eq 1 -and ($args[0] -eq '-' -or $args[0] -eq '+')) {
-        __zoxide_cd $args[0] $false
+    if ($args.Length -eq 1) {
+        $arg = $args[0]
+        if ($arg -eq '-' -or $arg -eq '+' -or (Test-Path -PathType Container -Path $arg)) {
+            return __zoxide_cd $arg $false
+        }
+        if (Test-Path -PathType Container -LiteralPath $arg) {
+            return __zoxide_cd $arg $true
+        }
     }
-    elseif ($args.Length -eq 1 -and (Test-Path $args[0] -PathType Container -LiteralPath)) {
-        __zoxide_cd $args[0] $true
-    }
-    elseif ($args.Length -eq 1 -and (Test-Path $args[0] -PathType Container -Path)) {
-        __zoxide_cd $args[0] $false
+
+    $current = __zoxide_pwd
+    if ($null -ne $current) {
+        $result = __zoxide_bin query --exclude $current "--" @args
     }
     else {
-        $result = __zoxide_pwd
-        if ($null -ne $result) {
-            $result = __zoxide_bin query --exclude $result "--" @args
-        }
-        else {
-            $result = __zoxide_bin query "--" @args
-        }
-        if ($LASTEXITCODE -eq 0) {
-            __zoxide_cd $result $true
-        }
+        $result = __zoxide_bin query "--" @args
+    }
+    if ($LASTEXITCODE -eq 0) {
+        __zoxide_cd $result $true
     }
 }
 

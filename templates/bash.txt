@@ -151,6 +151,8 @@ if [[ ${BASH_VERSINFO[0]:-0} -eq 4 && ${BASH_VERSINFO[1]:-0} -ge 4 || ${BASH_VER
     function __zoxide_z_complete_helper() {
         READLINE_LINE="{{ cmd }} ${__zoxide_result@Q}"
         READLINE_POINT={{ "${#READLINE_LINE}" }}
+        bind '"\e[0n": accept-line'
+        \builtin printf '\e[5n' >/dev/tty
     }
 
     function __zoxide_z_complete() {

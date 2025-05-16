@@ -56,7 +56,7 @@ export-env {
 #
 
 # Jump to a directory using only keywords.
-def --env --wrapped __zoxide_z [...rest: string] {
+export def --env --wrapped __zoxide_z [...rest: string] {
   let path = match $rest {
     [] => {'~'},
     [ '-' ] => {'-'},
@@ -72,7 +72,7 @@ def --env --wrapped __zoxide_z [...rest: string] {
 }
 
 # Jump to a directory using interactive search.
-def --env --wrapped __zoxide_zi [...rest:string] {
+export def --env --wrapped __zoxide_zi [...rest:string] {
   cd $'(zoxide query --interactive -- ...$rest | str trim -r -c "\n")'
 {%- if echo %}
   echo $env.PWD
@@ -86,8 +86,8 @@ def --env --wrapped __zoxide_zi [...rest:string] {
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-alias {{cmd}} = __zoxide_z
-alias {{cmd}}i = __zoxide_zi
+export alias {{cmd}} = __zoxide_z
+export alias {{cmd}}i = __zoxide_zi
 
 {%- when None %}
 
@@ -103,6 +103,6 @@ alias {{cmd}}i = __zoxide_zi
 # Now, add this to the end of your config file (find it by running
 # `$nu.config-path` in Nushell):
 #
-#   source ~/.zoxide.nu
+#   overlay use ~/.zoxide.nu as zoxide
 #
 # Note: zoxide only supports Nushell v0.89.0+.

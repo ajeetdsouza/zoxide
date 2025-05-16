@@ -1,12 +1,16 @@
 _zoxide() {
     local i cur prev opts cmd
     COMPREPLY=()
-    cur="${COMP_WORDS[COMP_CWORD]}"
-    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
+        cur="$2"
+    else
+        cur="${COMP_WORDS[COMP_CWORD]}"
+    fi
+    prev="$3"
     cmd=""
     opts=""
 
-    for i in ${COMP_WORDS[@]}
+    for i in "${COMP_WORDS[@]:0:COMP_CWORD}"
     do
         case "${cmd},${i}" in
             ",$1")
@@ -195,7 +199,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__query)
-            opts="-a -i -l -s -h -V --all --interactive --list --score --exclude --help --version [KEYWORDS]..."
+            opts="-a -i -l -s -t -h -V --all --interactive --list --score --time --exclude --help --version [KEYWORDS]..."
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0

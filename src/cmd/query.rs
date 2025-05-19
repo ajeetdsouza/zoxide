@@ -3,7 +3,7 @@ use std::io::{self, Write};
 use anyhow::{Context, Result};
 
 use crate::cmd::{Query, Run};
-use crate::config;
+use crate::config::{self};
 use crate::db::{Database, Epoch, Stream, StreamOptions};
 use crate::error::BrokenPipeHandler;
 use crate::util::{self, Fzf, FzfChild};
@@ -91,29 +91,35 @@ impl Query {
 
     fn get_fzf() -> Result<FzfChild> {
         let mut fzf = Fzf::new()?;
-        if let Some(mut fzf_opts) = config::fzf_opts() {
-            if let Some(fzf_extra_opts) = config::fzf_extra_opts() {
-                fzf_opts.push(" ");
-                fzf_opts.push(fzf_extra_opts);
+
+        match config::fzf_opts() {
+            Some(mut fzf_opts) => {
+                if let Some(fzf_extra_opts) = config::fzf_extra_opts() {
+                    fzf_opts.push(" ");
+                    fzf_opts.push(fzf_extra_opts);
+                }
+
+                fzf.env("FZF_DEFAULT_OPTS", fzf_opts)
             }
+            None => {
+                let default_args = config::fzf_default_args();
 
-            fzf.env("FZF_DEFAULT_OPTS", fzf_opts)
-        } else {
-            let default_args = config::fzf_default_args();
-            let args = if let Some(fzf_extra_opts) = config::fzf_extra_opts() {
-                let extra_fzf_args_list: Vec<String> = fzf_extra_opts
-                    .to_str()
-                    .unwrap_or_default()
-                    .split_whitespace()
-                    .map(|arg| String::from(arg))
-                    .collect();
+                let args = match config::fzf_extra_opts() {
+                    Some(fzf_extra_opts) => {
+                        let extra_fzf_args_list: Vec<String> = fzf_extra_opts
+                            .to_str()
+                            .unwrap_or_default()
+                            .split_whitespace()
+                            .map(|arg| String::from(arg))
+                            .collect();
 
-                vec![default_args, extra_fzf_args_list].concat()
-            } else {
-                default_args
-            };
+                        vec![default_args, extra_fzf_args_list].concat()
+                    }
+                    None => default_args,
+                };
 
-            fzf.args(args).enable_preview()
+                fzf.args(args).enable_preview()
+            }
         }
         .spawn()
     }

@@ -3,7 +3,7 @@ use std::io::{self, Write};
 use anyhow::{Context, Result};
 
 use crate::cmd::{Query, Run};
-use crate::config::{self};
+use crate::config;
 use crate::db::{Database, Epoch, Stream, StreamOptions};
 use crate::error::BrokenPipeHandler;
 use crate::util::{self, Fzf, FzfChild};

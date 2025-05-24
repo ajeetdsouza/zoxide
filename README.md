@@ -396,6 +396,21 @@ zoxide can be installed in 4 easy steps:
 
    </details>
 
+   <details>
+   <summary>txt file</summary>
+
+   > In case you want to backup from txt
+   >
+   > ```sh
+   > # create a back up
+   > zoxide list > x.txt
+   > # import the backup later
+   > zoxide import --from=txt x.txt
+   > ```
+   >
+   </details>
+
+
 ## Configuration
 
 ### Flags

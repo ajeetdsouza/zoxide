@@ -5,6 +5,8 @@ mod import;
 mod init;
 mod query;
 mod remove;
+mod clear;
+mod list;
 
 use anyhow::Result;
 
@@ -23,6 +25,8 @@ impl Run for Cmd {
             Cmd::Init(cmd) => cmd.run(),
             Cmd::Query(cmd) => cmd.run(),
             Cmd::Remove(cmd) => cmd.run(),
+            Cmd::List(cmd) => cmd.run(),
+            Cmd::Clear(cmd) => cmd.run(),
         }
     }
 }

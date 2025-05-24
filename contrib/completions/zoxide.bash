@@ -15,6 +15,9 @@ _zoxide() {
             zoxide,add)
                 cmd="zoxide__add"
                 ;;
+            zoxide,clear)
+                cmd="zoxide__clear"
+                ;;
             zoxide,edit)
                 cmd="zoxide__edit"
                 ;;
@@ -23,6 +26,9 @@ _zoxide() {
                 ;;
             zoxide,init)
                 cmd="zoxide__init"
+                ;;
+            zoxide,list)
+                cmd="zoxide__list"
                 ;;
             zoxide,query)
                 cmd="zoxide__query"
@@ -49,7 +55,7 @@ _zoxide() {
 
     case "${cmd}" in
         zoxide)
-            opts="-h -V --help --version add edit import init query remove"
+            opts="-h -V --help --version add edit import init query remove list clear"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -77,6 +83,20 @@ _zoxide() {
                     COMPREPLY=($(compgen -f "${cur}"))
                     return 0
                     ;;
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__clear)
+            opts="-h -V --help --version"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
                 *)
                     COMPREPLY=()
                     ;;
@@ -187,6 +207,20 @@ _zoxide() {
                     COMPREPLY=($(compgen -W "none prompt pwd" -- "${cur}"))
                     return 0
                     ;;
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__list)
+            opts="-h -V --help --version"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
                 *)
                     COMPREPLY=()
                     ;;

@@ -273,6 +273,34 @@ const completion: Fig.Spec = {
         template: "folders",
       },
     },
+    {
+      name: "list",
+      description: "List all directory in db",
+      options: [
+        {
+          name: ["-h", "--help"],
+          description: "Print help",
+        },
+        {
+          name: ["-V", "--version"],
+          description: "Print version",
+        },
+      ],
+    },
+    {
+      name: "clear",
+      description: "Remove  all directory in db",
+      options: [
+        {
+          name: ["-h", "--help"],
+          description: "Print help",
+        },
+        {
+          name: ["-V", "--version"],
+          description: "Print version",
+        },
+      ],
+    },
   ],
   options: [
     {

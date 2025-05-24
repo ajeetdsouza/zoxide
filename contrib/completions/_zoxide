@@ -144,6 +144,22 @@ _arguments "${_arguments_options[@]}" : \
 '*::paths:_files -/' \
 && ret=0
 ;;
+(list)
+_arguments "${_arguments_options[@]}" : \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+(clear)
+_arguments "${_arguments_options[@]}" : \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
         esac
     ;;
 esac
@@ -158,6 +174,8 @@ _zoxide_commands() {
 'init:Generate shell configuration' \
 'query:Search for a directory in the database' \
 'remove:Remove a directory from the database' \
+'list:List all directory in db' \
+'clear:Remove  all directory in db' \
     )
     _describe -t commands 'zoxide commands' commands "$@"
 }
@@ -165,6 +183,11 @@ _zoxide_commands() {
 _zoxide__add_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide add commands' commands "$@"
+}
+(( $+functions[_zoxide__clear_commands] )) ||
+_zoxide__clear_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide clear commands' commands "$@"
 }
 (( $+functions[_zoxide__edit_commands] )) ||
 _zoxide__edit_commands() {
@@ -205,6 +228,11 @@ _zoxide__import_commands() {
 _zoxide__init_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide init commands' commands "$@"
+}
+(( $+functions[_zoxide__list_commands] )) ||
+_zoxide__list_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide list commands' commands "$@"
 }
 (( $+functions[_zoxide__query_commands] )) ||
 _zoxide__query_commands() {

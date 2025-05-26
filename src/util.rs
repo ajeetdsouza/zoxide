@@ -169,13 +169,12 @@ pub fn write(path: impl AsRef<Path>, contents: impl AsRef<[u8]>) -> Result<()> {
         #[cfg(unix)]
         if let Ok(metadata) = path.metadata() {
             use std::os::unix::fs::MetadataExt;
-            use std::os::unix::io::AsRawFd;
 
             use nix::unistd::{self, Gid, Uid};
 
             let uid = Uid::from_raw(metadata.uid());
             let gid = Gid::from_raw(metadata.gid());
-            _ = unistd::fchown(tmp_file.as_raw_fd(), Some(uid), Some(gid));
+            _ = unistd::fchown(&tmp_file, Some(uid), Some(gid));
         }
 
         // Close and rename the tmpfile.

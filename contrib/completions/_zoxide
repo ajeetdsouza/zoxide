@@ -30,8 +30,8 @@ _zoxide() {
         case $line[1] in
             (add)
 _arguments "${_arguments_options[@]}" : \
-'-s+[The rank to increment the entry if it exists or initialize it with if it doesn'\''t]:SCORE: ' \
-'--score=[The rank to increment the entry if it exists or initialize it with if it doesn'\''t]:SCORE: ' \
+'-s+[The rank to increment the entry if it exists or initialize it with if it doesn'\''t]:SCORE:_default' \
+'--score=[The rank to increment the entry if it exists or initialize it with if it doesn'\''t]:SCORE:_default' \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \
@@ -61,7 +61,7 @@ _arguments "${_arguments_options[@]}" : \
 '--help[Print help]' \
 '-V[Print version]' \
 '--version[Print version]' \
-':path:' \
+':path:_default' \
 && ret=0
 ;;
 (delete)
@@ -70,7 +70,7 @@ _arguments "${_arguments_options[@]}" : \
 '--help[Print help]' \
 '-V[Print version]' \
 '--version[Print version]' \
-':path:' \
+':path:_default' \
 && ret=0
 ;;
 (increment)
@@ -79,7 +79,7 @@ _arguments "${_arguments_options[@]}" : \
 '--help[Print help]' \
 '-V[Print version]' \
 '--version[Print version]' \
-':path:' \
+':path:_default' \
 && ret=0
 ;;
 (reload)
@@ -107,7 +107,7 @@ _arguments "${_arguments_options[@]}" : \
 ;;
 (init)
 _arguments "${_arguments_options[@]}" : \
-'--cmd=[Changes the prefix of the \`z\` and \`zi\` commands]:CMD: ' \
+'--cmd=[Changes the prefix of the \`z\` and \`zi\` commands]:CMD:_default' \
 '--hook=[Changes how often zoxide increments a directory'\''s score]:HOOK:(none prompt pwd)' \
 '--no-cmd[Prevents zoxide from defining the \`z\` and \`zi\` commands]' \
 '-h[Print help]' \
@@ -132,7 +132,7 @@ _arguments "${_arguments_options[@]}" : \
 '--help[Print help]' \
 '-V[Print version]' \
 '--version[Print version]' \
-'*::keywords:' \
+'*::keywords:_default' \
 && ret=0
 ;;
 (remove)

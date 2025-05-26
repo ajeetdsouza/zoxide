@@ -14,10 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for Tcsh.
 - Added `--score` flag to `zoxide add`.
 - POSIX: add doctor to diagnose common issues.
+- Nushell: add CLI completions.
 
 ### Changed
 
-- Bash: zoxide will now rewrite the prompt when using Space-Tab completions.
+- Bash: zoxide will now automatically `cd` when selecting Space-Tab completions.
 
 ### Fixed
 
@@ -27,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nushell: stop ignoring symlinks when `cd`-ing into a directory.
 - Fzf: updated minimum supported version to v0.51.0.
 - PowerShell: avoid setting `$error` when defining `__zoxide_hooked`.
+- PowerShell: handle special characters in file paths when `cd`-ing into them.
+- Database corruption issue when the filesystem is 100% full.
 
 ## [0.9.7] - 2025-02-10
 

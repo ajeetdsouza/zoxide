@@ -49,12 +49,15 @@ complete -c zoxide -n "__fish_zoxide_using_subcommand edit; and __fish_seen_subc
 complete -c zoxide -n "__fish_zoxide_using_subcommand edit; and __fish_seen_subcommand_from increment" -s V -l version -d 'Print version'
 complete -c zoxide -n "__fish_zoxide_using_subcommand edit; and __fish_seen_subcommand_from reload" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_zoxide_using_subcommand edit; and __fish_seen_subcommand_from reload" -s V -l version -d 'Print version'
-complete -c zoxide -n "__fish_zoxide_using_subcommand import" -l from -d 'Application to import from' -r -f -a "{autojump\t'',z\t''}"
+complete -c zoxide -n "__fish_zoxide_using_subcommand import" -l from -d 'Application to import from' -r -f -a "autojump\t''
+z\t''"
 complete -c zoxide -n "__fish_zoxide_using_subcommand import" -l merge -d 'Merge into existing database'
 complete -c zoxide -n "__fish_zoxide_using_subcommand import" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_zoxide_using_subcommand import" -s V -l version -d 'Print version'
 complete -c zoxide -n "__fish_zoxide_using_subcommand init" -l cmd -d 'Changes the prefix of the `z` and `zi` commands' -r
-complete -c zoxide -n "__fish_zoxide_using_subcommand init" -l hook -d 'Changes how often zoxide increments a directory\'s score' -r -f -a "{none\t'',prompt\t'',pwd\t''}"
+complete -c zoxide -n "__fish_zoxide_using_subcommand init" -l hook -d 'Changes how often zoxide increments a directory\'s score' -r -f -a "none\t''
+prompt\t''
+pwd\t''"
 complete -c zoxide -n "__fish_zoxide_using_subcommand init" -l no-cmd -d 'Prevents zoxide from defining the `z` and `zi` commands'
 complete -c zoxide -n "__fish_zoxide_using_subcommand init" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_zoxide_using_subcommand init" -s V -l version -d 'Print version'

@@ -55,29 +55,63 @@ export-env {
 # When using zoxide with --no-cmd, alias these internal functions as desired.
 #
 
-# Jump to a directory using only keywords.
-def --env --wrapped __zoxide_z [...rest: string] {
-  let path = match $rest {
-    [] => {'~'},
-    [ '-' ] => {'-'},
-    [ $arg ] if ($arg | path expand | path type) == 'dir' => {$arg}
-    _ => {
-      zoxide query --exclude $env.PWD -- ...$rest | str trim -r -c "\n"
+# For hiding the "nu-complete zoxide path" command
+module zoxide-commands {
+  def "nu-complete zoxide path" [context: string] {
+    let parts = $context | str trim | split row " " | skip 1 | each { str downcase }
+    let completions = (
+      zoxide query --list --exclude $env.PWD -- ...$parts
+        | lines
+        | each { |dir|
+          if ($parts | length) <= 1 {
+            $dir
+          } else {
+            let dir_lower = $dir | str downcase
+            let rem_start = $parts | drop 1 | reduce --fold 0 { |part, rem_start|
+              ($dir_lower | str index-of --range $rem_start.. $part) + ($part | str length)
+            }
+            {
+              value: ($dir | str substring $rem_start..),
+              description: $dir
+            }
+          }
+        })
+    {
+      options: {
+        sort: false,
+        completion_algorithm: substring,
+        case_sensitive: false,
+      },
+      completions: $completions,
     }
   }
-  cd $path
-{%- if echo %}
-  echo $env.PWD
-{%- endif %}
+
+  # Jump to a directory using only keywords.
+  export def --env --wrapped __zoxide_z [...rest: string@"nu-complete zoxide path"] {
+    let path = match $rest {
+      [] => {'~'},
+      [ '-' ] => {'-'},
+      [ $arg ] if ($arg | path expand | path type) == 'dir' => {$arg}
+      _ => {
+        zoxide query --exclude $env.PWD -- ...$rest | str trim -r -c "\n"
+      }
+    }
+    cd $path
+  {%- if echo %}
+    echo $env.PWD
+  {%- endif %}
+  }
+
+  # Jump to a directory using interactive search.
+  export def --env --wrapped __zoxide_zi [...rest:string@"nu-complete zoxide path"] {
+    cd $'(zoxide query --interactive -- ...$rest | str trim -r -c "\n")'
+  {%- if echo %}
+    echo $env.PWD
+  {%- endif %}
+  }
 }
 
-# Jump to a directory using interactive search.
-def --env --wrapped __zoxide_zi [...rest:string] {
-  cd $'(zoxide query --interactive -- ...$rest | str trim -r -c "\n")'
-{%- if echo %}
-  echo $env.PWD
-{%- endif %}
-}
+use zoxide-commands *
 
 {{ section }}
 # Commands for zoxide. Disable these using --no-cmd.

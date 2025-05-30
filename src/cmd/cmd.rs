@@ -186,6 +186,10 @@ pub struct Query {
     /// Exclude the current directory
     #[clap(long, value_hint = ValueHint::DirPath, value_name = "path")]
     pub exclude: Option<String>,
+
+    /// Only match exact
+    #[clap(long, short)]
+    pub exact: bool,
 }
 
 /// Remove a directory from the database

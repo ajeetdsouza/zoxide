@@ -273,6 +273,7 @@ pub fn path_to_str(path: &impl AsRef<Path>) -> Result<&str> {
 pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
     let path = path.as_ref();
     let base_path;
+    let unc_path;
 
     let mut components = path.components().peekable();
     let mut stack = Vec::new();
@@ -314,6 +315,9 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
             Ok(path)
         }
 
+        fn get_network_path(server: &OsStr, share: &OsStr) -> PathBuf {
+            format!(r"\\{}\{}", server.to_string_lossy(), share.to_string_lossy()).into()
+        }
         match components.peek() {
             Some(Component::Prefix(prefix)) => match prefix.kind() {
                 Prefix::Disk(drive_letter) => {
@@ -335,6 +339,28 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
 
                     base_path = get_drive_path(drive_letter);
                     stack.extend(base_path.components());
+                }
+                Prefix::VerbatimUNC(server, share) => {
+                    unc_path = get_network_path(server, share);
+
+                    components.next(); // Consume the Prefix component
+
+                    if components.peek() == Some(&Component::RootDir) {
+                        components.next();
+                    }
+
+                    stack.extend(unc_path.components());
+                }
+                Prefix::UNC(server, share) => {
+                    unc_path = get_network_path(server, share);
+
+                    components.next(); // Consume the Prefix component
+
+                    if components.peek() == Some(&Component::RootDir) {
+                        components.next();
+                    }
+
+                    stack.extend(unc_path.components());
                 }
                 _ => bail!("invalid path: {}", path.display()),
             },

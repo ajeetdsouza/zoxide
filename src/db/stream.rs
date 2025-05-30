@@ -48,16 +48,16 @@ impl<'a> Stream<'a> {
     }
 
     fn filter_by_keywords(&self, path: &str) -> bool {
-        let (keywords_last, keywords) = match self.options.keywords.split_last() {
+        let (last_keyword, keywords) = match self.options.keywords.split_last() {
             Some(split) => split,
             None => return true,
         };
 
         let path = util::to_lowercase(path);
         let mut path = path.as_str();
-        match path.rfind(keywords_last) {
+        match path.rfind(last_keyword) {
             Some(idx) => {
-                if path[idx + keywords_last.len()..].contains(path::is_separator) {
+                if path[idx + last_keyword.len()..].contains(path::is_separator) {
                     return false;
                 }
                 path = &path[..idx];

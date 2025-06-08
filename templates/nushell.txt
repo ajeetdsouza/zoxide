@@ -26,7 +26,7 @@ export-env {
   if not $__zoxide_hooked {
     $env.config.hooks.pre_prompt = ($env.config.hooks.pre_prompt | append {
       __zoxide_hook: true,
-      code: {|| zoxide add -- $env.PWD}
+      code: {|| ^zoxide add -- $env.PWD}
     })
   }
 {%- else if hook == InitHook::Pwd %}
@@ -43,7 +43,7 @@ export-env {
   if not $__zoxide_hooked {
     $env.config.hooks.env_change.PWD = ($env.config.hooks.env_change.PWD | append {
       __zoxide_hook: true,
-      code: {|_, dir| zoxide add -- $dir}
+      code: {|_, dir| ^zoxide add -- $dir}
     })
   }
 {%- endif %}
@@ -60,7 +60,7 @@ module zoxide-commands {
   def "nu-complete zoxide path" [context: string] {
     let parts = $context | str trim | split row " " | skip 1 | each { str downcase }
     let completions = (
-      zoxide query --list --exclude $env.PWD -- ...$parts
+      ^zoxide query --list --exclude $env.PWD -- ...$parts
         | lines
         | each { |dir|
           if ($parts | length) <= 1 {
@@ -93,7 +93,7 @@ module zoxide-commands {
       [ '-' ] => {'-'},
       [ $arg ] if ($arg | path expand | path type) == 'dir' => {$arg}
       _ => {
-        zoxide query --exclude $env.PWD -- ...$rest | str trim -r -c "\n"
+        ^zoxide query --exclude $env.PWD -- ...$rest | str trim -r -c "\n"
       }
     }
     cd $path
@@ -104,7 +104,7 @@ module zoxide-commands {
 
   # Jump to a directory using interactive search.
   export def --env --wrapped __zoxide_zi [...rest:string@"nu-complete zoxide path"] {
-    cd $'(zoxide query --interactive -- ...$rest | str trim -r -c "\n")'
+    cd $'(^zoxide query --interactive -- ...$rest | str trim -r -c "\n")'
   {%- if echo %}
     echo $env.PWD
   {%- endif %}

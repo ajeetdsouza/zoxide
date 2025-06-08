@@ -10,7 +10,7 @@ pub struct Opts<'a> {
 
 macro_rules! make_template {
     ($name:ident, $path:expr) => {
-        #[derive(::std::fmt::Debug, ::rinja::Template)]
+        #[derive(::std::fmt::Debug, ::askama::Template)]
         #[template(path = $path)]
         pub struct $name<'a>(pub &'a self::Opts<'a>);
 
@@ -36,8 +36,8 @@ make_template!(Zsh, "zsh.txt");
 #[cfg(feature = "nix-dev")]
 #[cfg(test)]
 mod tests {
+    use askama::Template;
     use assert_cmd::Command;
-    use rinja::Template;
     use rstest::rstest;
     use rstest_reuse::{apply, template};
 

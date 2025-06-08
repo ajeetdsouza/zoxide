@@ -10,44 +10,48 @@ name = "zoxide"
 readme = "README.md"
 repository = "https://github.com/ajeetdsouza/zoxide"
 rust-version = "1.85.0"
-version = "0.9.7"
+version = "0.9.8"
 
 [badges]
 maintenance = { status = "actively-developed" }
 
 [dependencies]
 anyhow = "1.0.32"
+askama = { version = "0.14.0", default-features = false, features = [
+    "derive",
+    "std",
+] }
 bincode = "1.3.1"
 clap = { version = "4.3.0", features = ["derive"] }
 color-print = "0.3.4"
-dirs = "5.0.0"
+dirs = "6.0.0"
 dunce = "1.0.1"
 fastrand = "2.0.0"
 glob = "0.3.0"
 ouroboros = "0.18.3"
-rinja = { version = "0.3.2", default-features = false }
 serde = { version = "1.0.116", features = ["derive"] }
 
 [target.'cfg(unix)'.dependencies]
-nix = { version = "0.29.0", default-features = false, features = [
+nix = { version = "0.30.1", default-features = false, features = [
     "fs",
     "user",
 ] }
 
 [target.'cfg(windows)'.dependencies]
-which = "6.0.0"
+which = "7.0.3"
 
 [build-dependencies]
 clap = { version = "4.3.0", features = ["derive"] }
-clap_complete = "4.3.0"
-clap_complete_fig = "4.3.0"
+clap_complete = "4.5.50"
+clap_complete_fig = "4.5.2"
+clap_complete_nushell = "4.5.5"
 color-print = "0.3.4"
 
 [dev-dependencies]
 assert_cmd = "2.0.0"
-rstest = { version = "0.23.0", default-features = false }
+rstest = { version = "0.25.0", default-features = false }
 rstest_reuse = "0.7.0"
-tempfile = "3.1.0"
+tempfile = "=3.15.0"
 
 [features]
 default = []

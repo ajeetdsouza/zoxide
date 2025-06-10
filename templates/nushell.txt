@@ -58,7 +58,7 @@ export-env {
 # For hiding the "nu-complete zoxide path" command
 module zoxide-commands {
   def "nu-complete zoxide path" [context: string] {
-    let parts = $context | str trim | split row " " | skip 1 | each { str downcase }
+    let parts = $context | str trim --left | split row " " | skip 1 | each { str downcase }
     let completions = (
       ^zoxide query --list --exclude $env.PWD -- ...$parts
         | lines
@@ -79,7 +79,8 @@ module zoxide-commands {
     {
       options: {
         sort: false,
-        completion_algorithm: substring,
+        completion_algorithm: prefix,
+        positional: false,
         case_sensitive: false,
       },
       completions: $completions,

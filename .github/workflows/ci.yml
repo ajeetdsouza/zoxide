@@ -46,7 +46,7 @@ jobs:
           authToken: ${{ env.CACHIX_AUTH_TOKEN }}
           name: zoxide
       - name: Setup cache
-        uses: Swatinem/rust-cache@v2.7.8
+        uses: Swatinem/rust-cache@v2.8.0
         with:
           key: ${{ matrix.os }}
       - name: Install just

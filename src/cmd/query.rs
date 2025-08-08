@@ -78,7 +78,7 @@ impl Query {
 
     fn get_stream<'a>(&self, db: &'a mut Database, now: Epoch) -> Result<Stream<'a>> {
         let mut options = StreamOptions::new(now)
-            .with_keywords(self.keywords.iter().map(|s| s.as_str()))
+            .with_keywords(self.transformed_keywords())
             .with_exclude(config::exclude_dirs()?);
         if !self.all {
             let resolve_symlinks = config::resolve_symlinks();
@@ -116,5 +116,24 @@ impl Query {
             .enable_preview()
         }
         .spawn()
+    }
+
+    /// ## Returns
+    /// `self.keywords` with file paths transformed into
+    /// their parent directory paths, directory paths unchanged
+    ///
+    /// ## Notes
+    /// - Heap allocates an iterator of Strings with length of self.keywords
+    /// - Only uses sans-IO Path methods
+    fn transformed_keywords(&self) -> impl Iterator<Item = String> + use<'_> {
+        self.keywords.iter().map(|keyword| {
+            let path = std::path::Path::new(keyword);
+            match path.parent() {
+                None => keyword,
+                Some(path) if path.to_str() == Some("") => keyword,
+                Some(path) => path.to_str().unwrap(),
+            }
+            .to_string()
+        })
     }
 }

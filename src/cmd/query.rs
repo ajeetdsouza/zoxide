@@ -79,6 +79,7 @@ impl Query {
     fn get_stream<'a>(&self, db: &'a mut Database, now: Epoch) -> Result<Stream<'a>> {
         let mut options = StreamOptions::new(now)
             .with_keywords(self.keywords.iter().map(|s| s.as_str()))
+            .with_case_sensitivity(config::case_sensitivity())
             .with_exclude(config::exclude_dirs()?);
         if !self.all {
             let resolve_symlinks = config::resolve_symlinks();

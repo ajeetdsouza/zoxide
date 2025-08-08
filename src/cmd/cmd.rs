@@ -183,6 +183,10 @@ pub struct Query {
     #[clap(long, short)]
     pub score: bool,
 
+    /// Print `last_accessed` with results, no effect without `--list` option
+    #[clap(long, short)]
+    pub time: bool,
+
     /// Exclude the current directory
     #[clap(long, value_hint = ValueHint::DirPath, value_name = "path")]
     pub exclude: Option<String>,

@@ -54,7 +54,7 @@ impl<'a> Stream<'a> {
     }
 
     fn filter_by_base_dir(&self, path: &str) -> bool {
-        match path {
+        match &self.options.base_dir {
             Some(base_dir) => Path::new(path).starts_with(base_dir),
             None => true,
         }

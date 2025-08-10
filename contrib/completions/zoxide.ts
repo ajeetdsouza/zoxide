@@ -215,6 +215,16 @@ const completion: Fig.Spec = {
           },
         },
         {
+          name: "--base-dir",
+          description: "Only search within this directory",
+          isRepeatable: true,
+          args: {
+            name: "base_dir",
+            isOptional: true,
+            template: "folders",
+          },
+        },
+        {
           name: ["-a", "--all"],
           description: "Show unavailable directories",
         },

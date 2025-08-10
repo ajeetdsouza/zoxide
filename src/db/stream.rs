@@ -29,19 +29,20 @@ impl<'a> Stream<'a> {
                 continue;
             }
 
+            if !self.filter_by_base_dir(&dir.path) {
+                continue;
+            }
+
             if !self.filter_by_exclude(&dir.path) {
                 self.db.swap_remove(idx);
                 continue;
             }
 
+            // Exists queries are slow, this should always be checked last.
             if !self.filter_by_exists(&dir.path) {
                 if dir.last_accessed < self.options.ttl {
                     self.db.swap_remove(idx);
                 }
-                continue;
-            }
-
-            if !self.filter_by_base_dir(&dir.path) {
                 continue;
             }
 
@@ -50,6 +51,30 @@ impl<'a> Stream<'a> {
         }
 
         None
+    }
+
+    fn filter_by_base_dir(&self, path: &str) -> bool {
+        match path {
+            Some(base_dir) => Path::new(path).starts_with(base_dir),
+            None => true,
+        }
+    }
+
+    fn filter_by_exclude(&self, path: &str) -> bool {
+        !self.options.exclude.iter().any(|pattern| pattern.matches(path))
+    }
+
+    fn filter_by_exists(&self, path: &str) -> bool {
+        if !self.options.exists {
+            return true;
+        }
+
+        // The logic here is reversed - if we resolve symlinks when adding entries to
+        // the database, we should not return symlinks when querying back from
+        // the database.
+        let resolver =
+            if self.options.resolve_symlinks { fs::symlink_metadata } else { fs::metadata };
+        resolver(path).map(|metadata| metadata.is_dir()).unwrap_or_default()
     }
 
     fn filter_by_keywords(&self, path: &str) -> bool {
@@ -75,32 +100,6 @@ impl<'a> Stream<'a> {
                 Some(idx) => path = &path[..idx],
                 None => return false,
             }
-        }
-
-        true
-    }
-
-    fn filter_by_exclude(&self, path: &str) -> bool {
-        !self.options.exclude.iter().any(|pattern| pattern.matches(path))
-    }
-
-    fn filter_by_exists(&self, path: &str) -> bool {
-        if !self.options.exists {
-            return true;
-        }
-
-        // The logic here is reversed - if we resolve symlinks when adding entries to
-        // the database, we should not return symlinks when querying back from
-        // the database.
-        let resolver =
-            if self.options.resolve_symlinks { fs::symlink_metadata } else { fs::metadata };
-        resolver(path).map(|metadata| metadata.is_dir()).unwrap_or_default()
-    }
-
-    fn filter_by_base_dir(&self, path: &str) -> bool {
-        if let Some(base_dir) = &self.options.base_dir {
-            let path = Path::new(path);
-            return path.starts_with(base_dir);
         }
 
         true

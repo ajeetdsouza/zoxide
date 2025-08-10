@@ -215,14 +215,11 @@ const completion: Fig.Spec = {
           },
         },
         {
-          name: "--basedir",
+          name: "--base-dir",
           description: "Only search within this directory",
-          exclusiveOn: [
-            "--exclude",
-          ],
           isRepeatable: true,
           args: {
-            name: "basedir",
+            name: "base_dir",
             isOptional: true,
             template: "folders",
           },

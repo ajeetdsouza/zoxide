@@ -21,7 +21,7 @@ impl<'a> Stream<'a> {
         Stream { db, idxs, options }
     }
 
-    pub fn next(&mut self) -> Option<&Dir> {
+    pub fn next(&mut self) -> Option<&Dir<'_>> {
         while let Some(idx) = self.idxs.next() {
             let dir = &self.db.dirs()[idx];
 
@@ -41,7 +41,7 @@ impl<'a> Stream<'a> {
                 continue;
             }
 
-            if !self.filter_by_basedir(&dir.path) {
+            if !self.filter_by_base_dir(&dir.path) {
                 continue;
             }
 
@@ -97,10 +97,10 @@ impl<'a> Stream<'a> {
         resolver(path).map(|metadata| metadata.is_dir()).unwrap_or_default()
     }
 
-    fn filter_by_basedir(&self, path: &str) -> bool {
-        if let Some(basedir) = &self.options.basedir {
+    fn filter_by_base_dir(&self, path: &str) -> bool {
+        if let Some(base_dir) = &self.options.base_dir {
             let path = Path::new(path);
-            return path.starts_with(basedir);
+            return path.starts_with(base_dir);
         }
 
         true
@@ -129,7 +129,7 @@ pub struct StreamOptions {
 
     /// Only return directories within this parent directory
     /// Does not check if the path exists
-    basedir: Option<String>,
+    base_dir: Option<String>,
 }
 
 impl StreamOptions {
@@ -141,7 +141,7 @@ impl StreamOptions {
             exists: false,
             resolve_symlinks: false,
             ttl: now.saturating_sub(3 * MONTH),
-            basedir: None,
+            base_dir: None,
         }
     }
 
@@ -169,8 +169,8 @@ impl StreamOptions {
         self
     }
 
-    pub fn with_basedir(mut self, basedir: Option<String>) -> Self {
-        self.basedir = basedir;
+    pub fn with_base_dir(mut self, base_dir: Option<String>) -> Self {
+        self.base_dir = base_dir;
         self
     }
 }
@@ -204,7 +204,7 @@ mod tests {
     #[case(&["/foo/", "/bar"], "/foo/bar", false)]
     #[case(&["/foo/", "/bar"], "/foo/baz/bar", true)]
     fn query(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
-        let db = &mut Database::new(PathBuf::default(), Vec::default(), |_| Vec::default(), false);
+        let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
         let options = StreamOptions::new(0).with_keywords(keywords.iter());
         let stream = Stream::new(db, options);
         assert_eq!(is_match, stream.filter_by_keywords(path));

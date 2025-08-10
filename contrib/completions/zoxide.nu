@@ -81,6 +81,7 @@ module completions {
     --interactive(-i)         # Use interactive selection
     --list(-l)                # List all matching directories
     --score(-s)               # Print score with results
+    --time(-t)                # Print `last_accessed` with results, no effect without `--list` option
     --exclude: path           # Exclude the current directory
     --base-dir: path          # Only search within this directory
     --help(-h)                # Print help

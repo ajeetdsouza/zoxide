@@ -188,8 +188,9 @@ pub struct Query {
     pub exclude: Option<String>,
 
     /// Only search within this directory
+    /// (does not check if the path exists)
     #[clap(long, value_hint = ValueHint::DirPath, value_name = "path")]
-    pub base_dir: Option<String>,
+    pub base_dir: Option<PathBuf>,
 }
 
 /// Remove a directory from the database

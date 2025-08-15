@@ -91,6 +91,7 @@ zoxide can be installed in 4 easy steps:
    > | **_Any_**           | **[crates.io]**           | `cargo install zoxide --locked`                                                                       |
    > | _Any_               | [asdf]                    | `asdf plugin add zoxide https://github.com/nyrst/asdf-zoxide.git` <br /> `asdf install zoxide latest` |
    > | _Any_               | [conda-forge]             | `conda install -c conda-forge zoxide`                                                                 |
+   > | _Any_               | [gah]                     | `gah install zoxide`                                                                                  |
    > | _Any_               | [guix]                    | `guix install zoxide`                                                                                 |
    > | _Any_               | [Linuxbrew]               | `brew install zoxide`                                                                                 |
    > | _Any_               | [nixpkgs]                 | `nix-env -iA nixpkgs.zoxide`                                                                          |
@@ -129,6 +130,7 @@ zoxide can be installed in 4 easy steps:
    > | **[Homebrew]**  | `brew install zoxide`                                                                                 |
    > | [asdf]          | `asdf plugin add zoxide https://github.com/nyrst/asdf-zoxide.git` <br /> `asdf install zoxide latest` |
    > | [conda-forge]   | `conda install -c conda-forge zoxide`                                                                 |
+   > | [gah]           | `gah install zoxide`                                                                                  |
    > | [MacPorts]      | `port install zoxide`                                                                                 |
    > | [nixpkgs]       | `nix-env -iA nixpkgs.zoxide`                                                                          |
    >
@@ -525,6 +527,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 [fzf-installation]: https://github.com/junegunn/fzf#installation
 [fzf-man]: https://manpages.ubuntu.com/manpages/en/man1/fzf.1.html
 [fzf]: https://github.com/junegunn/fzf
+[gah]: https://github.com/marverix/gah
 [gentoo packages]: https://packages.gentoo.org/packages/app-shells/zoxide
 [glob]: https://man7.org/linux/man-pages/man7/glob.7.html
 [guix]: https://packages.guix.gnu.org/packages/zoxide/

@@ -473,6 +473,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 | [lf]                  | File manager                                 | See the [wiki][lf-wiki]    |
 | [nnn]                 | File manager                                 | [nnn-autojump]             |
 | [ranger]              | File manager                                 | [ranger-zoxide]            |
+| [raycast]             | macOS launcher                               | [raycast-zoxide]           |
 | [rfm]                 | File manager                                 | Natively supported         |
 | [sesh]                | `tmux` session manager                       | Natively supported         |
 | [telescope.nvim]      | Fuzzy finder for Neovim                      | [telescope-zoxide]         |
@@ -485,7 +486,6 @@ Environment variables[^2] can be used for configuration. They must be set before
 | [zabb]                | Finds the shortest possible query for a path | Natively supported         |
 | [zesh]                | `zellij` session manager                     | Natively supported         |
 | [zsh-autocomplete]    | Realtime completions for zsh                 | Natively supported         |
-| [raycast]             | macOS launcher                               | [raycast-zoxide]           |
 
 [^1]:
     Debian / Ubuntu derivatives update their packages very slowly. If you're
@@ -543,6 +543,8 @@ Environment variables[^2] can be used for configuration. They must be set before
 [ranger-zoxide]: https://github.com/jchook/ranger-zoxide
 [ranger]: https://github.com/ranger/ranger
 [raspbian packages]: https://archive.raspbian.org/raspbian/pool/main/r/rust-zoxide/
+[raycast]: https://www.raycast.com/
+[raycast-zoxide]: https://www.raycast.com/mrpunkin/raycast-zoxide
 [releases]: https://github.com/ajeetdsouza/zoxide/releases
 [rfm]: https://github.com/dsxmachina/rfm
 [scoop]: https://github.com/ScoopInstaller/Main/tree/master/bucket/zoxide.json
@@ -570,5 +572,3 @@ Environment variables[^2] can be used for configuration. They must be set before
 [zoxide.vim]: https://github.com/nanotee/zoxide.vim
 [zoxide.xplr]: https://github.com/sayanarijit/zoxide.xplr
 [zsh-autocomplete]: https://github.com/marlonrichert/zsh-autocomplete
-[raycast]: https://www.raycast.com/
-[raycast-zoxide]: https://www.raycast.com/mrpunkin/raycast-zoxide

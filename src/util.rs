@@ -135,7 +135,7 @@ impl FzfChild {
         mem::drop(self.0.stdin.take());
 
         let mut stdout = self.0.stdout.take().unwrap();
-        let mut output = String::default();
+        let mut output = String::new();
         stdout.read_to_string(&mut output).context("failed to read from fzf")?;
 
         let status = self.0.wait().context("wait failed on fzf")?;
@@ -169,16 +169,21 @@ pub fn write(path: impl AsRef<Path>, contents: impl AsRef<[u8]>) -> Result<()> {
         #[cfg(unix)]
         if let Ok(metadata) = path.metadata() {
             use std::os::unix::fs::MetadataExt;
-            use std::os::unix::io::AsRawFd;
 
             use nix::unistd::{self, Gid, Uid};
 
             let uid = Uid::from_raw(metadata.uid());
             let gid = Gid::from_raw(metadata.gid());
-            _ = unistd::fchown(tmp_file.as_raw_fd(), Some(uid), Some(gid));
+            _ = unistd::fchown(&tmp_file, Some(uid), Some(gid));
         }
 
         // Close and rename the tmpfile.
+        // In some cases, errors from the last write() are reported only on close().
+        // Rust ignores errors from close(), since it occurs inside `Drop`. To
+        // catch these errors, we manually call `File::sync_all()` first.
+        tmp_file
+            .sync_all()
+            .with_context(|| format!("could not sync writes to file: {}", tmp_path.display()))?;
         mem::drop(tmp_file);
         rename(&tmp_path, path)
     })();

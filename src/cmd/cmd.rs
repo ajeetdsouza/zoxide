@@ -58,6 +58,11 @@ pub enum Cmd {
 pub struct Add {
     #[clap(num_args = 1.., required = true, value_hint = ValueHint::DirPath)]
     pub paths: Vec<PathBuf>,
+
+    /// The rank to increment the entry if it exists or initialize it with if it
+    /// doesn't
+    #[clap(short, long)]
+    pub score: Option<f64>,
 }
 
 /// Edit the database
@@ -148,6 +153,7 @@ pub enum InitShell {
     #[clap(alias = "ksh")]
     Posix,
     Powershell,
+    Tcsh,
     Xonsh,
     Zsh,
 }
@@ -180,6 +186,10 @@ pub struct Query {
     /// Exclude the current directory
     #[clap(long, value_hint = ValueHint::DirPath, value_name = "path")]
     pub exclude: Option<String>,
+
+    /// Only search within this directory
+    #[clap(long, value_hint = ValueHint::DirPath, value_name = "path")]
+    pub base_dir: Option<String>,
 }
 
 /// Remove a directory from the database

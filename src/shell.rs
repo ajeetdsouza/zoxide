@@ -10,7 +10,7 @@ pub struct Opts<'a> {
 
 macro_rules! make_template {
     ($name:ident, $path:expr) => {
-        #[derive(::std::fmt::Debug, ::rinja::Template)]
+        #[derive(::std::fmt::Debug, ::askama::Template)]
         #[template(path = $path)]
         pub struct $name<'a>(pub &'a self::Opts<'a>);
 
@@ -29,14 +29,15 @@ make_template!(Fish, "fish.txt");
 make_template!(Nushell, "nushell.txt");
 make_template!(Posix, "posix.txt");
 make_template!(Powershell, "powershell.txt");
+make_template!(Tcsh, "tcsh.txt");
 make_template!(Xonsh, "xonsh.txt");
 make_template!(Zsh, "zsh.txt");
 
 #[cfg(feature = "nix-dev")]
 #[cfg(test)]
 mod tests {
+    use askama::Template;
     use assert_cmd::Command;
-    use rinja::Template;
     use rstest::rstest;
     use rstest_reuse::{apply, template};
 
@@ -96,7 +97,7 @@ mod tests {
     #[apply(opts)]
     fn elvish_elvish(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
-        let mut source = String::default();
+        let mut source = String::new();
 
         // Filter out lines using edit:*, since those functions are only available in
         // the interactive editor.
@@ -242,6 +243,20 @@ mod tests {
 
         Command::new("pwsh")
             .args(["-NoLogo", "-NonInteractive", "-NoProfile", "-Command", &source])
+            .assert()
+            .success()
+            .stdout("")
+            .stderr("");
+    }
+
+    #[apply(opts)]
+    fn tcsh_tcsh(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+        let source = Tcsh(&opts).render().unwrap();
+
+        Command::new("tcsh")
+            .args(["-e", "-f", "-s"])
+            .write_stdin(source)
             .assert()
             .success()
             .stdout("")

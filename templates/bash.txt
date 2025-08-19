@@ -66,8 +66,11 @@ function __zoxide_doctor() {
     return 0
 
 {%- else %}
-    [[ ${_ZO_DOCTOR:-1} -ne 0 ]] || return 0
-    [[ ${PROMPT_COMMAND:=} != *'__zoxide_hook'* ]] || return 0
+    [[ ${_ZO_DOCTOR:-1} -eq 0 ]] && return 0
+    # shellcheck disable=SC2199
+    [[ ${PROMPT_COMMAND[@]:-} == *'__zoxide_hook'* ]] && return 0
+    # shellcheck disable=SC2199
+    [[ ${__vsc_original_prompt_command[@]:-} == *'__zoxide_hook'* ]] && return 0
 
     _ZO_DOCTOR=0
     \builtin printf '%s\n' \
@@ -144,8 +147,13 @@ function {{cmd}}i() {
 # - Completions don't work on `dumb` terminals.
 if [[ ${BASH_VERSINFO[0]:-0} -eq 4 && ${BASH_VERSINFO[1]:-0} -ge 4 || ${BASH_VERSINFO[0]:-0} -ge 5 ]] &&
     [[ :"${SHELLOPTS}": =~ :(vi|emacs): && ${TERM} != 'dumb' ]]; then
-    # Use `printf '\e[5n'` to redraw line after fzf closes.
-    \builtin bind '"\e[0n": redraw-current-line' &>/dev/null
+
+    function __zoxide_z_complete_helper() {
+        READLINE_LINE="{{ cmd }} ${__zoxide_result@Q}"
+        READLINE_POINT={{ "${#READLINE_LINE}" }}
+        bind '"\e[0n": accept-line'
+        \builtin printf '\e[5n' >/dev/tty
+    }
 
     function __zoxide_z_complete() {
         # Only show completions when the cursor is at the end of the line.
@@ -157,12 +165,20 @@ if [[ ${BASH_VERSINFO[0]:-0} -eq 4 && ${BASH_VERSINFO[1]:-0} -ge 4 || ${BASH_VER
                 \builtin compgen -A directory -- "${COMP_WORDS[-1]}" || \builtin true
             )
         # If there is a space after the last word, use interactive selection.
-        elif [[ -z ${COMP_WORDS[-1]} ]] && [[ ${COMP_WORDS[-2]} != "${__zoxide_z_prefix}"?* ]]; then
-            \builtin local result
+        elif [[ -z ${COMP_WORDS[-1]} ]]; then
             # shellcheck disable=SC2312
-            result="$(\command zoxide query --exclude "$(__zoxide_pwd)" --interactive -- "{{ "${COMP_WORDS[@]:1:${#COMP_WORDS[@]}-2}" }}")" &&
-                COMPREPLY=("${__zoxide_z_prefix}${result}/")
-            \builtin printf '\e[5n'
+            __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd)" --interactive -- "{{ "${COMP_WORDS[@]:1:${#COMP_WORDS[@]}-2}" }}")" && {
+                # In case the terminal does not respond to \e[5n or another
+                # mechanism steals the response, it is still worth completing
+                # the directory in the command line.
+                COMPREPLY=("${__zoxide_z_prefix}${__zoxide_result}/")
+
+                # Note: We here call "bind" without prefixing "\builtin" to be
+                # compatible with frameworks like ble.sh, which emulates Bash's
+                # builtin "bind".
+                bind -x '"\e[0n": __zoxide_z_complete_helper'
+                \builtin printf '\e[5n' >/dev/tty
+            }
         fi
     }
 

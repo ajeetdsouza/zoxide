@@ -76,7 +76,7 @@ impl<'a> Stream<'a> {
 
         acronym_lower == util::to_lowercase(&user_input)
     }
-      
+
     fn filter_by_base_dir(&self, path: &str) -> bool {
         match &self.options.base_dir {
             Some(base_dir) => Path::new(path).starts_with(base_dir),

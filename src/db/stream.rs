@@ -1,6 +1,6 @@
 use std::iter::Rev;
 use std::ops::Range;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::{fs, path};
 
 use glob::Pattern;
@@ -128,7 +128,7 @@ pub struct StreamOptions {
 
     /// Only return directories within this parent directory
     /// Does not check if the path exists
-    base_dir: Option<String>,
+    base_dir: Option<PathBuf>,
 }
 
 impl StreamOptions {
@@ -168,7 +168,7 @@ impl StreamOptions {
         self
     }
 
-    pub fn with_base_dir(mut self, base_dir: Option<String>) -> Self {
+    pub fn with_base_dir(mut self, base_dir: Option<PathBuf>) -> Self {
         self.base_dir = base_dir;
         self
     }

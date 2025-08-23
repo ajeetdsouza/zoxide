@@ -51,12 +51,25 @@ export-env {
 
 {%- endif %}
 
+def "nu-complete zoxide path" [context: string] {
+  let parts = $context | split row " " | skip 1
+  {
+    options: {
+      sort: false
+      completion_algorithm: prefix
+      positional: false
+      case_sensitive: false
+    }
+    completions: (zoxide query --list --exclude $env.PWD -- ...$parts | lines)
+  }
+}
+
 {{ section }}
 # When using zoxide with --no-cmd, alias these internal functions as desired.
 #
 
 # Jump to a directory using only keywords.
-def --env --wrapped __zoxide_z [...rest: string] {
+def --env --wrapped __zoxide_z [...rest: string@"nu-complete zoxide path"] {
   let path = match $rest {
     [] => {'~'},
     [ '-' ] => {'-'},

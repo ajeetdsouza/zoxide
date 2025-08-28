@@ -492,12 +492,12 @@ Environment variables[^3] can be used for configuration. They must be set before
     Debian and its derivatives update their packages very slowly. If you're
     using one of these distributions, consider using the install script instead.
 
+[^2]:
+    [apt.cli.rs] is sunsetting.
+
 [^3]:
     If you're not sure how to set an environment variable on your shell, check
     out the [wiki][wiki-env].
-
-[^2]:
-    [apt.cli.rs] is sunsetting.
 
 [aerc]: https://github.com/rjarry/aerc
 [alfred]: https://www.alfredapp.com/

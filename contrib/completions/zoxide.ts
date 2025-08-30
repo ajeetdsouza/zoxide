@@ -7,6 +7,15 @@ const completion: Fig.Spec = {
       description: "Add a new directory or increment its rank",
       options: [
         {
+          name: ["-s", "--score"],
+          description: "The rank to increment the entry if it exists or initialize it with if it doesn't",
+          isRepeatable: true,
+          args: {
+            name: "score",
+            isOptional: true,
+          },
+        },
+        {
           name: ["-h", "--help"],
           description: "Print help",
         },
@@ -185,6 +194,7 @@ const completion: Fig.Spec = {
           "nushell",
           "posix",
           "powershell",
+          "tcsh",
           "xonsh",
           "zsh",
         ],
@@ -200,6 +210,16 @@ const completion: Fig.Spec = {
           isRepeatable: true,
           args: {
             name: "exclude",
+            isOptional: true,
+            template: "folders",
+          },
+        },
+        {
+          name: "--base-dir",
+          description: "Only search within this directory",
+          isRepeatable: true,
+          args: {
+            name: "base_dir",
             isOptional: true,
             template: "folders",
           },

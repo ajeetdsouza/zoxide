@@ -42,7 +42,7 @@ jobs:
             target: aarch64-pc-windows-msvc
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Get version
@@ -59,7 +59,7 @@ jobs:
           override: true
           target: ${{ matrix.target }}
       - name: Setup cache
-        uses: Swatinem/rust-cache@v2.7.7
+        uses: Swatinem/rust-cache@v2.8.0
         with:
           key: ${{ matrix.target }}
       - name: Install cross
@@ -67,7 +67,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: install
-          args: --color=always --git=https://github.com/cross-rs/cross.git --locked --rev=02bf930e0cb0c6f1beffece0788f3932ecb2c7eb --verbose cross
+          args: --color=always --git=https://github.com/cross-rs/cross.git --locked --rev=e281947ca900da425e4ecea7483cfde646c8a1ea --verbose cross
       - name: Build binary
         uses: actions-rs/cargo@v1
         with:

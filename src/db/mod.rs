@@ -190,7 +190,7 @@ impl Database {
         *self.borrow_dirty()
     }
 
-    pub fn dirs(&self) -> &[Dir] {
+    pub fn dirs(&self) -> &[Dir<'_>] {
         &self.borrow_dirs().0
     }
 
@@ -223,7 +223,10 @@ impl Database {
         .context("could not serialize database")
     }
 
-    fn deserialize(bytes: &[u8], path: PathBuf) -> Result<(Vec<Dir>, HashMap<String, PathBuf>)> {
+    fn deserialize(
+        bytes: &[u8],
+        path: PathBuf,
+    ) -> Result<(Vec<Dir<'_>>, HashMap<String, PathBuf>)> {
         // Assume a maximum size for the database. This prevents bincode from throwing
         // strange errors when it encounters invalid data.
         const MAX_SIZE: u64 = 32 << 20; // 32 MiB

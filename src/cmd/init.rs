@@ -1,12 +1,12 @@
 use std::io::{self, Write};
 
 use anyhow::{Context, Result};
-use rinja::Template;
+use askama::Template;
 
 use crate::cmd::{Init, InitShell, Run};
 use crate::config;
 use crate::error::BrokenPipeHandler;
-use crate::shell::{Bash, Elvish, Fish, Nushell, Opts, Posix, Powershell, Xonsh, Zsh};
+use crate::shell::{Bash, Elvish, Fish, Nushell, Opts, Posix, Powershell, Tcsh, Xonsh, Zsh};
 
 impl Run for Init {
     fn run(&self) -> Result<()> {
@@ -22,6 +22,7 @@ impl Run for Init {
             InitShell::Nushell => Nushell(opts).render(),
             InitShell::Posix => Posix(opts).render(),
             InitShell::Powershell => Powershell(opts).render(),
+            InitShell::Tcsh => Tcsh(opts).render(),
             InitShell::Xonsh => Xonsh(opts).render(),
             InitShell::Zsh => Zsh(opts).render(),
         }

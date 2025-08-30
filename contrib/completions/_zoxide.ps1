@@ -35,6 +35,8 @@ Register-ArgumentCompleter -Native -CommandName 'zoxide' -ScriptBlock {
             break
         }
         'zoxide;add' {
+            [CompletionResult]::new('-s', '-s', [CompletionResultType]::ParameterName, 'The rank to increment the entry if it exists or initialize it with if it doesn''t')
+            [CompletionResult]::new('--score', '--score', [CompletionResultType]::ParameterName, 'The rank to increment the entry if it exists or initialize it with if it doesn''t')
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
@@ -101,6 +103,7 @@ Register-ArgumentCompleter -Native -CommandName 'zoxide' -ScriptBlock {
         }
         'zoxide;query' {
             [CompletionResult]::new('--exclude', '--exclude', [CompletionResultType]::ParameterName, 'Exclude the current directory')
+            [CompletionResult]::new('--base-dir', '--base-dir', [CompletionResultType]::ParameterName, 'Only search within this directory')
             [CompletionResult]::new('-a', '-a', [CompletionResultType]::ParameterName, 'Show unavailable directories')
             [CompletionResult]::new('--all', '--all', [CompletionResultType]::ParameterName, 'Show unavailable directories')
             [CompletionResult]::new('-i', '-i', [CompletionResultType]::ParameterName, 'Use interactive selection')

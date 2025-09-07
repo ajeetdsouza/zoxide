@@ -266,6 +266,28 @@ mod tests {
         }
     }
 
+    #[test]
+    fn murex_template_has_direct_path_handling() {
+        let opts = Opts { cmd: Some("z"), hook: InitHook::None, echo: false, resolve_symlinks: false };
+        let source = Murex(&opts).render().unwrap();
+
+        // Ensure murex z handles: "-- path" and tries direct cd on single-arg
+        assert!(
+            source.contains("if { $__zoxide_argc == 2 && $PARAMS[0] == \"--\" }"),
+            "murex template should handle literal path with --"
+        );
+        assert!(
+            source.contains("fexec function __zoxide_cd $PARAMS[0]"),
+            "murex template should attempt cd directly on single-arg"
+        );
+
+        // Ensure __zoxide_zi exists (interactive-only)
+        assert!(
+            source.contains("fexec builtin function __zoxide_zi"),
+            "murex template should define __zoxide_zi"
+        );
+    }
+
     #[apply(opts)]
     fn tcsh_tcsh(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };

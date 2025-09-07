@@ -52,6 +52,18 @@ fexec builtin function __zoxide_z {
         fexec function __zoxide_cd -
         fexec builtin return
     }
+    # If a literal path is provided with "--", cd to it directly.
+    if { $__zoxide_argc == 2 && $PARAMS[0] == "--" } then {
+        fexec function __zoxide_cd $PARAMS[1]
+        fexec builtin return
+    }
+    # If a single argument is provided, try cd directly; if it fails, fall back to query.
+    if { $__zoxide_argc == 1 } then {
+        trypipe <!null> {
+            fexec function __zoxide_cd $PARAMS[0]
+            fexec builtin return
+        }
+    }
     # Quiet query: capture result; suppress noise; return 1 on no match
     fexec builtin out '' -> set: str __zoxide_result
     trypipe <!null> {
@@ -66,7 +78,7 @@ fexec builtin function __zoxide_z {
 
 # Jump to a directory using interactive search.
 fexec builtin function __zoxide_zi {
-    # Quiet interactive query; return 1 when no selection
+    # Interactive query; return 1 when no selection
     fexec builtin out '' -> set: str __zoxide_result
     trypipe <!null> {
         exec zoxide query --interactive -- @PARAMS -> set: str __zoxide_result

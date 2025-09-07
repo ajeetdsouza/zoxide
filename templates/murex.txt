@@ -28,7 +28,7 @@ fexec builtin event onPrompt __zoxide_hook=command-completion {
 }
 
 {%- when InitHook::Pwd -%}
-fexec builtin out "zoxide: PWD hooks are not supported on Murex.
+fexec builtin out "zoxide: PWD hooks are not supported on Murex."
 fexec builtin out "        Use 'zoxide init murex --hook prompt' instead."
 
 {%- endmatch %}

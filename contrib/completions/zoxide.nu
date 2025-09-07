@@ -57,7 +57,7 @@ module completions {
   ]
 
   def "nu-complete zoxide init shell" [] {
-    [ "bash" "elvish" "fish" "nushell" "posix" "powershell" "tcsh" "xonsh" "zsh" ]
+    [ "bash" "elvish" "fish" "murex" "nushell" "posix" "powershell" "tcsh" "xonsh" "zsh" ]
   }
 
   def "nu-complete zoxide init hook" [] {

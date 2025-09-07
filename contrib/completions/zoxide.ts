@@ -191,6 +191,7 @@ const completion: Fig.Spec = {
           "bash",
           "elvish",
           "fish",
+          "murex",
           "nushell",
           "posix",
           "powershell",

@@ -26,6 +26,7 @@ macro_rules! make_template {
 make_template!(Bash, "bash.txt");
 make_template!(Elvish, "elvish.txt");
 make_template!(Fish, "fish.txt");
+make_template!(Murex, "murex.txt");
 make_template!(Nushell, "nushell.txt");
 make_template!(Posix, "posix.txt");
 make_template!(Powershell, "powershell.txt");
@@ -247,6 +248,22 @@ mod tests {
             .success()
             .stdout("")
             .stderr("");
+    }
+
+    #[apply(opts)]
+    fn murex_murex(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+        let source = Murex(&opts).render().unwrap();
+
+        let assert = Command::new("murex")
+            .args(["-c", &source, "--quiet"])
+            .assert()
+            .success()
+            .stderr("");
+
+        if opts.hook != InitHook::Pwd {
+            assert.stdout("");
+        }
     }
 
     #[apply(opts)]

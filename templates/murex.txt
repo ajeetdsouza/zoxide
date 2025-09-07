@@ -28,8 +28,14 @@ fexec builtin event onPrompt __zoxide_hook=command-completion {
 }
 
 {%- when InitHook::Pwd -%}
-fexec builtin out "zoxide: PWD hooks are not supported on Murex."
-fexec builtin out "        Use 'zoxide init murex --hook prompt' instead."
+# Emulate a PWD hook by tracking the last directory and updating on prompt.
+fexec builtin out $PWD -> set: str __zoxide_oldpwd
+fexec builtin event onPrompt __zoxide_hook=command-completion {
+    if { $__zoxide_oldpwd != $PWD } then {
+        fexec builtin out $PWD -> set: str __zoxide_oldpwd
+        exec zoxide add -- $PWD
+    }
+}
 
 {%- endmatch %}
 
@@ -39,20 +45,37 @@ fexec builtin out "        Use 'zoxide init murex --hook prompt' instead."
 
 # Jump to a directory using only keywords.
 fexec builtin function __zoxide_z {
-    if { !$PARAMS } then {
-        fexec function __zoxide_cd ~
-        fexec builtin return
-    }
+    __zoxide_argc = 0
+    trypipe <!null> { @PARAMS -> count -> set int __zoxide_argc }
+    if { $__zoxide_argc == 0 } then { fexec function __zoxide_cd $HOME; fexec builtin return }
     if { $PARAMS[0] == "-" } then {
         fexec function __zoxide_cd -
         fexec builtin return
     }
-    exec zoxide query --exclude $PWD -- @PARAMS -> set: str __zoxide_result && fexec function __zoxide_cd $__zoxide_result
+    # Quiet query: capture result; suppress noise; return 1 on no match
+    fexec builtin out '' -> set: str __zoxide_result
+    trypipe <!null> {
+        exec zoxide query --exclude $PWD -- @PARAMS -> set: str __zoxide_result
+    }
+    if { $__zoxide_result } then {
+        fexec function __zoxide_cd $__zoxide_result
+    } else {
+        fexec builtin return 1
+    }
 }
 
 # Jump to a directory using interactive search.
 fexec builtin function __zoxide_zi {
-    exec zoxide query --interactive -- @PARAMS -> set: str __zoxide_result && fexec function __zoxide_cd $__zoxide_result
+    # Quiet interactive query; return 1 when no selection
+    fexec builtin out '' -> set: str __zoxide_result
+    trypipe <!null> {
+        exec zoxide query --interactive -- @PARAMS -> set: str __zoxide_result
+    }
+    if { $__zoxide_result } then {
+        fexec function __zoxide_cd $__zoxide_result
+    } else {
+        fexec builtin return 1
+    }
 }
 
 {{ section }}

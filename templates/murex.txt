@@ -29,10 +29,12 @@ fexec builtin event onPrompt __zoxide_hook=command-completion {
 
 {%- when InitHook::Pwd -%}
 # Emulate a PWD hook by tracking the last directory and updating on prompt.
-fexec builtin out $PWD -> set: str __zoxide_oldpwd
+fexec builtin out $PWD -> global: str __zoxide_oldpwd
 fexec builtin event onPrompt __zoxide_hook=command-completion {
+    # Initialize global if missing (eg new session or cleared state)
+    if { !$__zoxide_oldpwd } then { fexec builtin out $PWD -> global: str __zoxide_oldpwd }
     if { $__zoxide_oldpwd != $PWD } then {
-        fexec builtin out $PWD -> set: str __zoxide_oldpwd
+        fexec builtin out $PWD -> global: str __zoxide_oldpwd
         exec zoxide add -- $PWD
     }
 }
@@ -109,4 +111,4 @@ function {{cmd}}i { __zoxide_zi @PARAMS }
 {{ section }}
 # To initialize zoxide, add this to your shell configuration file (usually ~/.murex_profile):
 #
-# zoxide init murex --hook prompt -> source
+# zoxide init murex -> source

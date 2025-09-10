@@ -460,6 +460,10 @@ Environment variables[^2] can be used for configuration. They must be set before
 - `_ZO_RESOLVE_SYMLINKS`
   - When set to 1, `z` will resolve symlinks before adding directories to the
     database.
+- `_ZO_DISABLE_EXISTENCE_CHECK`
+  - When set to 1, `z` will not filter the list for the existing files.
+    This improves the performance when the files on the list are on
+    a slow drive, such as a network drive.
 
 ## Third-party integrations
 

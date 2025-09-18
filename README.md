@@ -11,9 +11,10 @@
 
 <sup>Special thanks to:</sup>
 
-<div><img src="contrib/warp.png" width="230" alt="Warp" /></div>
-<div><sup><b>Warp, the intelligent terminal</b></sup></div>
-<div><sup>Available for MacOS, Linux, and Windows</sup></div>
+<!-- markdownlint-disable-next-line MD013 -->
+<div><img alt="Sponsored by Warp" width="230" src="https://raw.githubusercontent.com/warpdotdev/brand-assets/refs/heads/main/Github/Sponsor/Warp-Github-LG-03.png" /></div>
+<div><sup><b>Warp, built for coding with multiple AI agents.</b></sup></div>
+<div><sup>Available for macOS, Linux, and Windows.</sup></div>
 <div><sup>
   Visit
   <a href="https://www.warp.dev/?utm_source=github&utm_medium=referral&utm_campaign=zoxide_20231001"><u>warp.dev</u></a>
@@ -61,10 +62,6 @@ z foo<SPACE><TAB>  # show interactive completions (zoxide v0.8.0+, bash 4.4+/fis
 ```
 
 Read more about the matching algorithm [here][algorithm-matching].
-
-<a href="https://app.warp.dev/drive/folder/zoxide-EyHNpQumHVWNcYB8GJgDxG?utm_source=github&utm_medium=warp_pack&utm_campaign=zoxide_20231001">
-  <img src="contrib/warp-packs-green.png" alt="Follow tutorial in Warp">
-</a>
 
 ## Installation
 

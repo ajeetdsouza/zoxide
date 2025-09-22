@@ -250,7 +250,7 @@ zoxide can be installed in 4 easy steps:
    > Execute this command:
    >
    > ```sh
-   > zoxide init nushell | save -f ~/.config/nushell/autoload/zoxide.nu
+   > zoxide init nushell | save -f ($nu.user-autoload-dirs.0)/zoxide.nu
    > ```
    >
    > **Note**

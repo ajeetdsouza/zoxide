@@ -247,22 +247,14 @@ zoxide can be installed in 4 easy steps:
    <details>
    <summary>Nushell</summary>
 
-   > Add this to the <ins>**end**</ins> of your env file (find it by running `$nu.env-path`
-   > in Nushell):
+   > Add this to the <ins>**end**</ins> of your config file (find it by running `$nu.config-path` in Nushell):
    >
    > ```sh
-   > zoxide init nushell | save -f ~/.zoxide.nu
-   > ```
-   >
-   > Now, add this to the <ins>**end**</ins> of your config file (find it by running
-   > `$nu.config-path` in Nushell):
-   >
-   > ```sh
-   > source ~/.zoxide.nu
+   > zoxide init nushell | save -f ($nu.user-autoload-dirs.0)/zoxide.nu
    > ```
    >
    > **Note**
-   > zoxide only supports Nushell v0.89.0+.
+   > zoxide only supports Nushell v0.96.0+.
 
    </details>
 

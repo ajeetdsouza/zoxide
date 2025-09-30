@@ -17,7 +17,7 @@
 <div><sup>Available for macOS, Linux, and Windows.</sup></div>
 <div><sup>
   Visit
-  <a href="https://www.warp.dev/?utm_source=github&utm_medium=referral&utm_campaign=zoxide_20231001"><u>warp.dev</u></a>
+  <a href="https://go.warp.dev/zoxide"><u>warp.dev</u></a>
   to learn more.
 </sup></div>
 

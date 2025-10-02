@@ -12,7 +12,7 @@
 <sup>Special thanks to:</sup>
 
 <!-- markdownlint-disable-next-line MD013 -->
-<div><img alt="Sponsored by Warp" width="230" src="https://raw.githubusercontent.com/warpdotdev/brand-assets/refs/heads/main/Github/Sponsor/Warp-Github-LG-03.png" /></div>
+<div><a href="https://go.warp.dev/zoxide"><img alt="Sponsored by Warp" width="230" src="https://raw.githubusercontent.com/warpdotdev/brand-assets/refs/heads/main/Github/Sponsor/Warp-Github-LG-03.png" /></a></div>
 <div><sup><b>Warp, built for coding with multiple AI agents.</b></sup></div>
 <div><sup>Available for macOS, Linux, and Windows.</sup></div>
 <div><sup>

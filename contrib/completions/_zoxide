@@ -129,6 +129,8 @@ _arguments "${_arguments_options[@]}" : \
 '(-i --interactive)--list[List all matching directories]' \
 '-s[Print score with results]' \
 '--score[Print score with results]' \
+'-t[Print \`last_accessed\` with results, no effect without \`--list\` option]' \
+'--time[Print \`last_accessed\` with results, no effect without \`--list\` option]' \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \

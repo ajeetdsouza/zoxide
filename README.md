@@ -55,6 +55,7 @@ z ~/foo            # z also works like a regular cd command
 z foo/             # cd into relative path
 z ..               # cd one level up
 z -                # cd into previous directory
+z                  # cd into home directory
 
 zi foo             # cd with interactive selection (using fzf)
 
@@ -405,6 +406,7 @@ When calling `zoxide init`, the following flags are available:
   - `--cmd j` would change the commands to (`j`, `ji`).
   - `--cmd cd` would replace the `cd` command.
 - `--hook <HOOK>`
+
   - Changes how often zoxide increments a directory's score:
 
     | Hook            | Description                       |
@@ -424,6 +426,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 `zoxide init` is called.
 
 - `_ZO_DATA_DIR`
+
   - Specifies the directory in which the database is stored.
   - The default value varies across OSes:
 
@@ -437,6 +440,7 @@ Environment variables[^2] can be used for configuration. They must be set before
   - When set to 1, `z` will print the matched directory before navigating to
     it.
 - `_ZO_EXCLUDE_DIRS`
+
   - Excludes the specified directories from the database.
   - This is provided as a list of [globs][glob], separated by OS-specific
     characters:
@@ -447,6 +451,7 @@ Environment variables[^2] can be used for configuration. They must be set before
     | Windows             | `;`       | `$HOME;$HOME/private/*` |
 
   - By default, this is set to `"$HOME"`.
+
 - `_ZO_FZF_OPTS`
   - Custom options to pass to [fzf] during interactive selection. See
     [`man fzf`][fzf-man] for the list of options.

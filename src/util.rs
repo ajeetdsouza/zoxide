@@ -9,6 +9,7 @@ use std::{env, mem};
 #[cfg(windows)]
 use anyhow::anyhow;
 use anyhow::{Context, Result, bail};
+use walkdir::WalkDir;
 
 use crate::db::{Dir, Epoch};
 use crate::error::SilentExit;
@@ -381,4 +382,13 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
 pub fn to_lowercase(s: impl AsRef<str>) -> String {
     let s = s.as_ref();
     if s.is_ascii() { s.to_ascii_lowercase() } else { s.to_lowercase() }
+}
+
+/// Recursively walk a directory and yield all directories.
+pub fn walk_dir(path: &Path) -> impl Iterator<Item = PathBuf> {
+    WalkDir::new(path)
+        .into_iter()
+        .filter_map(|p| p.ok())
+        .filter(|p| p.file_type().is_dir())
+        .map(|p| p.into_path())
 }

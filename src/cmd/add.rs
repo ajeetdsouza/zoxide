@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use anyhow::{Result, bail};
 
@@ -18,10 +18,17 @@ impl Run for Add {
 
         let mut db = Database::open()?;
 
-        for path in &self.paths {
+        // Build a unified iterator of PathBufs, whether recursive or not.
+        let paths: Box<dyn Iterator<Item = PathBuf>> = if self.recursive {
+            Box::new(self.paths.iter().flat_map(|p| util::walk_dir(p)))
+        } else {
+            Box::new(self.paths.iter().cloned())
+        };
+
+        for path in paths {
             let path =
                 if config::resolve_symlinks() { util::canonicalize } else { util::resolve_path }(
-                    path,
+                    &path,
                 )?;
             let path = util::path_to_str(&path)?;
 

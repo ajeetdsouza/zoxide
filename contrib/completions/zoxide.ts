@@ -16,6 +16,10 @@ const completion: Fig.Spec = {
           },
         },
         {
+          name: ["-r", "--recursive"],
+          description: "Recursively add directories",
+        },
+        {
           name: ["-h", "--help"],
           description: "Print help",
         },
@@ -267,6 +271,10 @@ const completion: Fig.Spec = {
       name: "remove",
       description: "Remove a directory from the database",
       options: [
+        {
+          name: ["-r", "--recursive"],
+          description: "Recursively remove directories",
+        },
         {
           name: ["-h", "--help"],
           description: "Print help",

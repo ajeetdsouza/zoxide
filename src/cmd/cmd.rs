@@ -63,6 +63,10 @@ pub struct Add {
     /// doesn't
     #[clap(short, long)]
     pub score: Option<f64>,
+
+    /// Recursively add directories
+    #[clap(short, long, default_value_t = false)]
+    pub recursive: bool,
 }
 
 /// Edit the database
@@ -200,5 +204,9 @@ pub struct Query {
 )]
 pub struct Remove {
     #[clap(value_hint = ValueHint::DirPath)]
-    pub paths: Vec<String>,
+    pub paths: Vec<PathBuf>,
+
+    /// Recursively remove directories
+    #[clap(short, long, default_value_t = false)]
+    pub recursive: bool,
 }

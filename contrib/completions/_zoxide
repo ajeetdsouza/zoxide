@@ -32,6 +32,8 @@ _zoxide() {
 _arguments "${_arguments_options[@]}" : \
 '-s+[The rank to increment the entry if it exists or initialize it with if it doesn'\''t]:SCORE:_default' \
 '--score=[The rank to increment the entry if it exists or initialize it with if it doesn'\''t]:SCORE:_default' \
+'-r[Recursively add directories]' \
+'--recursive[Recursively add directories]' \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \
@@ -138,6 +140,8 @@ _arguments "${_arguments_options[@]}" : \
 ;;
 (remove)
 _arguments "${_arguments_options[@]}" : \
+'-r[Recursively remove directories]' \
+'--recursive[Recursively remove directories]' \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \

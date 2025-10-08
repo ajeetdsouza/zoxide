@@ -10,6 +10,7 @@ module completions {
   export extern "zoxide add" [
     ...paths: path
     --score(-s): string       # The rank to increment the entry if it exists or initialize it with if it doesn't
+    --recursive(-r)           # Recursively add directories
     --help(-h)                # Print help
     --version(-V)             # Print version
   ]
@@ -90,6 +91,7 @@ module completions {
   # Remove a directory from the database
   export extern "zoxide remove" [
     ...paths: path
+    --recursive(-r)           # Recursively remove directories
     --help(-h)                # Print help
     --version(-V)             # Print version
   ]

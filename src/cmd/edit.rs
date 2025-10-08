@@ -17,7 +17,7 @@ impl Run for Edit {
                 match cmd {
                     EditCommand::Decrement { path } => db.add(path, -1.0, now),
                     EditCommand::Delete { path } => {
-                        db.remove(path);
+                        db.remove(path, false);
                     }
                     EditCommand::Increment { path } => db.add(path, 1.0, now),
                     EditCommand::Reload => {}

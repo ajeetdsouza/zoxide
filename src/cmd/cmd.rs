@@ -204,7 +204,7 @@ pub struct Query {
 )]
 pub struct Remove {
     #[clap(value_hint = ValueHint::DirPath)]
-    pub paths: Vec<PathBuf>,
+    pub paths: Vec<String>,
 
     /// Recursively remove directories
     #[clap(short, long, default_value_t = false)]

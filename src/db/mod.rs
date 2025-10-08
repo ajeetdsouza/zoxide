@@ -101,15 +101,33 @@ impl Database {
     }
 
     /// Removes the directory with `path` from the store. This does not preserve
-    /// ordering, but is O(1).
-    pub fn remove(&mut self, path: impl AsRef<str>) -> bool {
-        match self.dirs().iter().position(|dir| dir.path == path.as_ref()) {
-            Some(idx) => {
-                self.swap_remove(idx);
-                true
+    /// ordering, but is O(1). If recursive, this will remove all directories
+    /// starting with `path`. This is O(n)
+    pub fn remove(&mut self, path: impl AsRef<str>, recursive: bool) -> bool {
+        if recursive {
+            self.remove_recursive(path)
+        } else {
+            match self.dirs().iter().position(|dir| dir.path == path.as_ref()) {
+                Some(idx) => {
+                    self.swap_remove(idx);
+                    true
+                }
+                None => false,
             }
-            None => false,
         }
+    }
+
+    pub fn remove_recursive(&mut self, path: impl AsRef<str>) -> bool {
+        let mut removed = false;
+        self.with_dirs_mut(|dirs| {
+            dirs.retain(|dir| {
+                let keep = !dir.path.starts_with(path.as_ref());
+                removed |= !keep;
+                keep
+            });
+        });
+        self.with_dirty_mut(|dirty| *dirty = removed);
+        removed
     }
 
     pub fn swap_remove(&mut self, idx: usize) {
@@ -273,14 +291,14 @@ mod tests {
 
         {
             let mut db = Database::open_dir(data_dir.path()).unwrap();
-            assert!(db.remove(path));
+            assert!(db.remove(path, false));
             db.save().unwrap();
         }
 
         {
             let mut db = Database::open_dir(data_dir.path()).unwrap();
             assert!(db.dirs().is_empty());
-            assert!(!db.remove(path));
+            assert!(!db.remove(path, false));
             db.save().unwrap();
         }
     }

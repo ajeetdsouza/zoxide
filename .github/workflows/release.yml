@@ -100,7 +100,7 @@ jobs:
             CHANGELOG.md LICENSE README.md ./man/ ./contrib/completions/ `
             ./target/${{ matrix.target }}/release/zoxide.exe
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.target }}
           path: |

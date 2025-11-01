@@ -1,5 +1,6 @@
 use std::iter::Rev;
 use std::ops::Range;
+use std::path::Path;
 use std::{fs, path};
 
 use glob::Pattern;
@@ -20,11 +21,15 @@ impl<'a> Stream<'a> {
         Stream { db, idxs, options }
     }
 
-    pub fn next(&mut self) -> Option<&Dir> {
+    pub fn next(&mut self) -> Option<&Dir<'_>> {
         while let Some(idx) = self.idxs.next() {
             let dir = &self.db.dirs()[idx];
 
             if !self.filter_by_keywords(&dir.path) {
+                continue;
+            }
+
+            if !self.filter_by_base_dir(&dir.path) {
                 continue;
             }
 
@@ -33,6 +38,7 @@ impl<'a> Stream<'a> {
                 continue;
             }
 
+            // Exists queries are slow, this should always be checked last.
             if !self.filter_by_exists(&dir.path) {
                 if dir.last_accessed < self.options.ttl {
                     self.db.swap_remove(idx);
@@ -45,6 +51,30 @@ impl<'a> Stream<'a> {
         }
 
         None
+    }
+
+    fn filter_by_base_dir(&self, path: &str) -> bool {
+        match &self.options.base_dir {
+            Some(base_dir) => Path::new(path).starts_with(base_dir),
+            None => true,
+        }
+    }
+
+    fn filter_by_exclude(&self, path: &str) -> bool {
+        !self.options.exclude.iter().any(|pattern| pattern.matches(path))
+    }
+
+    fn filter_by_exists(&self, path: &str) -> bool {
+        if !self.options.exists {
+            return true;
+        }
+
+        // The logic here is reversed - if we resolve symlinks when adding entries to
+        // the database, we should not return symlinks when querying back from
+        // the database.
+        let resolver =
+            if self.options.resolve_symlinks { fs::symlink_metadata } else { fs::metadata };
+        resolver(path).map(|metadata| metadata.is_dir()).unwrap_or_default()
     }
 
     fn filter_by_keywords(&self, path: &str) -> bool {
@@ -74,23 +104,6 @@ impl<'a> Stream<'a> {
 
         true
     }
-
-    fn filter_by_exclude(&self, path: &str) -> bool {
-        !self.options.exclude.iter().any(|pattern| pattern.matches(path))
-    }
-
-    fn filter_by_exists(&self, path: &str) -> bool {
-        if !self.options.exists {
-            return true;
-        }
-
-        // The logic here is reversed - if we resolve symlinks when adding entries to
-        // the database, we should not return symlinks when querying back from
-        // the database.
-        let resolver =
-            if self.options.resolve_symlinks { fs::symlink_metadata } else { fs::metadata };
-        resolver(path).map(|metadata| metadata.is_dir()).unwrap_or_default()
-    }
 }
 
 pub struct StreamOptions {
@@ -112,6 +125,10 @@ pub struct StreamOptions {
     /// Directories that do not exist and haven't been accessed since TTL will
     /// be lazily removed.
     ttl: Epoch,
+
+    /// Only return directories within this parent directory
+    /// Does not check if the path exists
+    base_dir: Option<String>,
 }
 
 impl StreamOptions {
@@ -123,6 +140,7 @@ impl StreamOptions {
             exists: false,
             resolve_symlinks: false,
             ttl: now.saturating_sub(3 * MONTH),
+            base_dir: None,
         }
     }
 
@@ -147,6 +165,11 @@ impl StreamOptions {
 
     pub fn with_resolve_symlinks(mut self, resolve_symlinks: bool) -> Self {
         self.resolve_symlinks = resolve_symlinks;
+        self
+    }
+
+    pub fn with_base_dir(mut self, base_dir: Option<String>) -> Self {
+        self.base_dir = base_dir;
         self
     }
 }

@@ -97,7 +97,7 @@ mod tests {
     #[apply(opts)]
     fn elvish_elvish(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
-        let mut source = String::default();
+        let mut source = String::new();
 
         // Filter out lines using edit:*, since those functions are only available in
         // the interactive editor.

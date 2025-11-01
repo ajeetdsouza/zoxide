@@ -55,7 +55,12 @@ function __zoxide_hook() {
 
 # Initialize hook.
 if [[ ${PROMPT_COMMAND:=} != *'__zoxide_hook'* ]]; then
-    PROMPT_COMMAND="__zoxide_hook;${PROMPT_COMMAND#;}"
+    if [[ "$(declare -p PROMPT_COMMAND 2>&1)" == "declare -a"* ]]; then
+        PROMPT_COMMAND=(__zoxide_hook "${PROMPT_COMMAND[@]}")
+    else
+        # shellcheck disable=SC2178
+        PROMPT_COMMAND="__zoxide_hook;${PROMPT_COMMAND#;}"
+    fi
 fi
 
 {%- endif %}

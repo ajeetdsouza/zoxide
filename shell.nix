@@ -1,10 +1,10 @@
 let
   pkgs = import (builtins.fetchTarball
-    "https://github.com/NixOS/nixpkgs/archive/056faf24027e12f0ba6edebe299ed136e030d29a.tar.gz") {
+    "https://github.com/NixOS/nixpkgs/archive/ec9ef366451af88284d7dfd18ee017b7e86a0710.tar.gz") {
       overlays = [ rust ];
     };
   rust = import (builtins.fetchTarball
-    "https://github.com/oxalica/rust-overlay/archive/f61820fa2c3844d6940cce269a6afdec30aa2e6c.tar.gz");
+    "https://github.com/oxalica/rust-overlay/archive/026e8fedefd6b167d92ed04b195c658d95ffc7a5.tar.gz");
 
   rust-nightly =
     pkgs.rust-bin.selectLatestNightlyWith (toolchain: toolchain.minimal);
@@ -27,6 +27,7 @@ in pkgs.mkShell {
     pkgs.ksh
     pkgs.nushell
     pkgs.powershell
+    pkgs.tcsh
     pkgs.xonsh
     pkgs.zsh
 

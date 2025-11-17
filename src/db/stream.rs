@@ -85,19 +85,21 @@ impl<'a> Stream<'a> {
 
         let path = util::to_lowercase(path);
         let mut path = path.as_str();
-        match path.rfind(keywords_last) {
-            Some(idx) => {
-                if path[idx + keywords_last.len()..].contains(path::is_separator) {
+
+        let (idx, end) = match rfind_component_match(path, keywords_last) {
+            Some((idx, end)) => {
+                if path[end..].contains(path::is_separator) {
                     return false;
                 }
-                path = &path[..idx];
+                (idx, end)
             }
             None => return false,
-        }
+        };
+        path = &path[..idx];
 
         for keyword in keywords.iter().rev() {
-            match path.rfind(keyword) {
-                Some(idx) => path = &path[..idx],
+            match rfind_component_match(path, keyword) {
+                Some((idx, _)) => path = &path[..idx],
                 None => return false,
             }
         }
@@ -174,6 +176,75 @@ impl StreamOptions {
     }
 }
 
+fn rfind_component_match(path: &str, keyword: &str) -> Option<(usize, usize)> {
+    if keyword.is_empty() {
+        return None;
+    }
+
+    // Favor exact substring matches; fall back to fuzzy subsequence within a
+    // single component. Keywords that contain a path separator are matched
+    // literally to preserve existing slash semantics.
+    if !keyword.contains(path::is_separator) {
+        if let Some(idx) = path.rfind(keyword) {
+            return Some((idx, idx + keyword.len()));
+        }
+    } else if let Some(idx) = path.rfind(keyword) {
+        return Some((idx, idx + keyword.len()));
+    }
+
+    // Fuzzy: rightmost component where keyword is a subsequence.
+    for (component_start, component) in rsplit_components_with_indices(path) {
+        if let Some((start, end)) = subsequence_bounds(component, keyword) {
+            return Some((component_start + start, component_start + end));
+        }
+    }
+
+    None
+}
+
+fn rsplit_components_with_indices(path: &str) -> impl Iterator<Item = (usize, &str)> {
+    let mut components = Vec::new();
+    let mut end = path.len();
+
+    for (idx, ch) in path.char_indices().rev() {
+        if path::is_separator(ch) {
+            if idx + ch.len_utf8() < end {
+                components.push((idx + ch.len_utf8(), &path[idx + ch.len_utf8()..end]));
+            }
+            end = idx;
+        }
+    }
+
+    if end > 0 {
+        components.push((0, &path[..end]));
+    }
+
+    components.into_iter()
+}
+
+fn subsequence_bounds(haystack: &str, needle: &str) -> Option<(usize, usize)> {
+    if needle.is_empty() {
+        return None;
+    }
+
+    let mut start = None;
+    let mut needle_chars = needle.chars();
+    let mut next_needed = needle_chars.next()?;
+
+    for (idx, ch) in haystack.char_indices() {
+        if ch == next_needed {
+            start.get_or_insert(idx);
+            if let Some(n) = needle_chars.next() {
+                next_needed = n;
+            } else {
+                return Some((start.unwrap(), idx + ch.len_utf8()));
+            }
+        }
+    }
+
+    None
+}
+
 #[cfg(test)]
 mod tests {
     use std::path::PathBuf;
@@ -202,6 +273,9 @@ mod tests {
     #[case(&["foo", "o", "bar"], "/foo/bar", false)]
     #[case(&["/foo/", "/bar"], "/foo/bar", false)]
     #[case(&["/foo/", "/bar"], "/foo/baz/bar", true)]
+    // Fuzzy subsequence within component
+    #[case(&["docs"], "/home/Documents", true)]
+    #[case(&["dcmts"], "/home/Documents", true)]
     fn query(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
         let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
         let options = StreamOptions::new(0).with_keywords(keywords.iter());

@@ -32,6 +32,8 @@ jobs:
             deb: true
           - os: ubuntu-latest
             target: aarch64-linux-android
+          - os: ubuntu-latest
+            target: armv7-linux-androideabi
           - os: macos-latest
             target: x86_64-apple-darwin
           - os: macos-latest
@@ -42,7 +44,7 @@ jobs:
             target: aarch64-pc-windows-msvc
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Get version
@@ -59,7 +61,7 @@ jobs:
           override: true
           target: ${{ matrix.target }}
       - name: Setup cache
-        uses: Swatinem/rust-cache@v2.7.8
+        uses: Swatinem/rust-cache@v2.8.1
         with:
           key: ${{ matrix.target }}
       - name: Install cross
@@ -67,7 +69,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: install
-          args: --color=always --git=https://github.com/cross-rs/cross.git --locked --rev=02bf930e0cb0c6f1beffece0788f3932ecb2c7eb --verbose cross
+          args: --color=always --git=https://github.com/cross-rs/cross.git --locked --rev=e281947ca900da425e4ecea7483cfde646c8a1ea --verbose cross
       - name: Build binary
         uses: actions-rs/cargo@v1
         with:
@@ -100,7 +102,7 @@ jobs:
             CHANGELOG.md LICENSE README.md ./man/ ./contrib/completions/ `
             ./target/${{ matrix.target }}/release/zoxide.exe
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.target }}
           path: |

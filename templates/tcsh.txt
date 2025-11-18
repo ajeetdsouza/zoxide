@@ -1,0 +1,74 @@
+{%- let section = "# =============================================================================\n#" -%}
+{%- let not_configured = "# -- not configured --" -%}
+
+{%- let pwd_cmd -%}
+{%- if resolve_symlinks -%}
+{%- let pwd_cmd = "pwd -P" -%}
+{%- else -%}
+{%- let pwd_cmd = "pwd -L" -%}
+{%- endif -%}
+
+{{ section }}
+# Hook configuration for zoxide.
+#
+{%- if hook != InitHook::None %}
+
+# Hook to add new entries to the database.
+{%- if hook == InitHook::Prompt %}
+alias __zoxide_hook 'zoxide add -- "`{{ pwd_cmd }}`"'
+
+{%- else if hook == InitHook::Pwd %}
+set __zoxide_pwd_old = `{{ pwd_cmd }}`
+alias __zoxide_hook 'set __zoxide_pwd_tmp = "`{{ pwd_cmd }}`"; test "$__zoxide_pwd_tmp" != "$__zoxide_pwd_old" && zoxide add -- "$__zoxide_pwd_tmp"; set __zoxide_pwd_old = "$__zoxide_pwd_tmp"'
+{%- endif %}
+
+# Initialize hook.
+alias precmd ';__zoxide_hook'
+
+{%- endif %}
+
+{{ section }}
+# When using zoxide with --no-cmd, alias these internal functions as desired.
+#
+
+# Jump to a directory using only keywords.
+alias __zoxide_z 'set __zoxide_args = (\!*)\
+if ("$#__zoxide_args" == 0) then\
+    cd ~\
+else\
+    if ("$#__zoxide_args" == 1 && "$__zoxide_args[1]" == "-") then\
+        cd -\
+    else if ("$#__zoxide_args" == 1 && -d "$__zoxide_args[1]") then\
+        cd "$__zoxide_args[1]"\
+    else\
+        set __zoxide_pwd = `{{ pwd_cmd }}`\
+        set __zoxide_result = "`zoxide query --exclude '"'"'$__zoxide_pwd'"'"' -- $__zoxide_args`" && cd "$__zoxide_result"\
+    endif\
+endif'
+
+# Jump to a directory using interactive search.
+alias __zoxide_zi 'set __zoxide_args = (\!*)\
+set __zoxide_pwd = `{{ pwd_cmd }}`\
+set __zoxide_result = "`zoxide query --exclude '"'"'$__zoxide_pwd'"'"' --interactive -- $__zoxide_args`" && cd "$__zoxide_result"'
+
+{{ section }}
+# Commands for zoxide. Disable these using --no-cmd.
+#
+
+{%- match cmd %}
+{%- when Some with (cmd) %}
+
+alias {{cmd}} __zoxide_z
+alias {{cmd}}i __zoxide_zi
+
+{%- when None %}
+
+{{ not_configured }}
+
+{%- endmatch %}
+
+{{ section }}
+# To initialize zoxide, add this to your shell configuration file (usually ~/.tcshrc):
+#
+#     zoxide init tcsh > ~/.zoxide.tcsh
+#     source ~/.zoxide.tcsh

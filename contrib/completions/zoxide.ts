@@ -194,6 +194,7 @@ const completion: Fig.Spec = {
           "nushell",
           "posix",
           "powershell",
+          "tcsh",
           "xonsh",
           "zsh",
         ],
@@ -209,6 +210,16 @@ const completion: Fig.Spec = {
           isRepeatable: true,
           args: {
             name: "exclude",
+            isOptional: true,
+            template: "folders",
+          },
+        },
+        {
+          name: "--base-dir",
+          description: "Only search within this directory",
+          isRepeatable: true,
+          args: {
+            name: "base_dir",
             isOptional: true,
             template: "folders",
           },

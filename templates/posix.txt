@@ -43,6 +43,30 @@ if [ "${PS1:=}" = "${PS1#*\$(__zoxide_hook)}" ]; then
     PS1="${PS1}\$(__zoxide_hook)"
 fi
 
+# Report common issues.
+__zoxide_doctor() {
+{%- if hook != InitHook::Prompt %}
+    return 0
+{%- else %}
+    [ "${_ZO_DOCTOR:-1}" -eq 0 ] && return 0
+    case "${PS1:-}" in
+    *__zoxide_hook*) return 0 ;;
+    *) ;;
+    esac
+
+    _ZO_DOCTOR=0
+    \command printf '%s\n' \
+        'zoxide: detected a possible configuration issue.' \
+        'Please ensure that zoxide is initialized right at the end of your shell configuration file.' \
+        '' \
+        'If the issue persists, consider filing an issue at:' \
+        'https://github.com/ajeetdsouza/zoxide/issues' \
+        '' \
+        'Disable this message by setting _ZO_DOCTOR=0.' \
+        '' >&2
+{%- endif %}
+}
+
 {%- when InitHook::Pwd -%}
 \command printf "%s\n%s\n" \
     "zoxide: PWD hooks are not supported on POSIX shells." \
@@ -56,6 +80,8 @@ fi
 
 # Jump to a directory using only keywords.
 __zoxide_z() {
+    __zoxide_doctor
+
     if [ "$#" -eq 0 ]; then
         __zoxide_cd ~
     elif [ "$#" -eq 1 ] && [ "$1" = '-' ]; then
@@ -76,6 +102,7 @@ __zoxide_z() {
 
 # Jump to a directory using interactive search.
 __zoxide_zi() {
+    __zoxide_doctor
     __zoxide_result="$(\command zoxide query --interactive -- "$@")" && __zoxide_cd "${__zoxide_result}"
 }
 

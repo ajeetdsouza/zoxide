@@ -31,7 +31,7 @@ main() {
 
     # Create and enter a temporary directory.
     local _tmp_dir
-    _tmp_dir="$(mktemp -d)" || err "mktemp: could not create temporary directory"
+    _tmp_dir="$(mktemp -d /tmp/zoxide_XXXXXX)" || err "mktemp: could not create temporary directory"
     cd "${_tmp_dir}" || err "cd: failed to enter directory: ${_tmp_dir}"
 
     # Download and extract zoxide.

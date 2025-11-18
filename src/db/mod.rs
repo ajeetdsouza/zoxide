@@ -191,7 +191,7 @@ impl Database {
     }
 
     fn has_exact_match(path: &str, keywords: &[String]) -> bool {
-        keywords.last().map_or(false, |keyword| {
+        keywords.last().is_some_and(|keyword| {
             let path_lower = util::to_lowercase(path);
             let last_component = path_lower.rsplit(std::path::is_separator).next().unwrap_or("");
             last_component == keyword

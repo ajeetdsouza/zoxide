@@ -32,6 +32,8 @@ jobs:
             deb: true
           - os: ubuntu-latest
             target: aarch64-linux-android
+          - os: ubuntu-latest
+            target: armv7-linux-androideabi
           - os: macos-latest
             target: x86_64-apple-darwin
           - os: macos-latest
@@ -59,7 +61,7 @@ jobs:
           override: true
           target: ${{ matrix.target }}
       - name: Setup cache
-        uses: Swatinem/rust-cache@v2.8.0
+        uses: Swatinem/rust-cache@v2.8.1
         with:
           key: ${{ matrix.target }}
       - name: Install cross
@@ -100,7 +102,7 @@ jobs:
             CHANGELOG.md LICENSE README.md ./man/ ./contrib/completions/ `
             ./target/${{ matrix.target }}/release/zoxide.exe
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.target }}
           path: |

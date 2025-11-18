@@ -16,7 +16,11 @@ pub struct Stream<'a> {
 
 impl<'a> Stream<'a> {
     pub fn new(db: &'a mut Database, options: StreamOptions) -> Self {
-        db.sort_by_score(options.now);
+        let now = options.now;
+        let keywords = &options.keywords;
+
+        db.sort_by_score(now);
+        db.sort_by_keywords(keywords);
         let idxs = (0..db.dirs().len()).rev();
         Stream { db, idxs, options }
     }

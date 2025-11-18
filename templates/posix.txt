@@ -10,7 +10,7 @@
 # pwd based on the value of _ZO_RESOLVE_SYMLINKS.
 __zoxide_pwd() {
 {%- if cfg!(windows) %}
-    \command cygpath -w "$(\builtin pwd -P)"
+    \command cygpath -w "$(\command pwd -P)"
 {%- else if resolve_symlinks %}
     \command pwd -P
 {%- else %}
@@ -35,7 +35,7 @@ __zoxide_cd() {
 {%- when InitHook::Prompt -%}
 # Hook to add new entries to the database.
 __zoxide_hook() {
-    \command zoxide add -- "$(__zoxide_pwd || \builtin true)"
+    \command zoxide add -- "$(__zoxide_pwd || \command true)"
 }
 
 # Initialize hook.
@@ -95,7 +95,7 @@ __zoxide_z() {
     elif [ "$#" -eq 1 ] && [ -d "$1" ]; then
         __zoxide_cd "$1"
     else
-        __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd || \builtin true)" -- "$@")" &&
+        __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd || \command true)" -- "$@")" &&
             __zoxide_cd "${__zoxide_result}"
     fi
 }

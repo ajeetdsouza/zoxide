@@ -1,0 +1,114 @@
+{%- let section = "# =============================================================================\n#" -%}
+{%- let not_configured = "# -- not configured --" -%}
+
+{{ section }}
+# Utility functions for zoxide.
+#
+
+# cd + custom logic based on the value of _ZO_ECHO.
+fexec builtin function __zoxide_cd {
+    fexec builtin cd $PARAMS[0]
+    {%- if echo %}
+    fexec builtin out $PWD
+    {%- endif %}
+}
+
+{{ section }}
+# Hook configuration for zoxide.
+#
+
+{% match hook %}
+{%- when InitHook::None -%}
+{{ not_configured }}
+
+{%- when InitHook::Prompt -%}
+# Initialize hook to add new entries to the database.
+fexec builtin event onPrompt __zoxide_hook=command-completion {
+    exec zoxide add -- $PWD
+}
+
+{%- when InitHook::Pwd -%}
+# Emulate a PWD hook by tracking the last directory and updating on prompt.
+fexec builtin out $PWD -> global: str __zoxide_oldpwd
+fexec builtin event onPrompt __zoxide_hook=command-completion {
+    # Initialize global if missing (eg new session or cleared state)
+    if { !$__zoxide_oldpwd } then { fexec builtin out $PWD -> global: str __zoxide_oldpwd }
+    if { $__zoxide_oldpwd != $PWD } then {
+        fexec builtin out $PWD -> global: str __zoxide_oldpwd
+        exec zoxide add -- $PWD
+    }
+}
+
+{%- endmatch %}
+
+{{ section }}
+# When using zoxide with --no-cmd, alias these internal functions as desired.
+#
+
+# Jump to a directory using only keywords.
+fexec builtin function __zoxide_z {
+    __zoxide_argc = 0
+    trypipe <!null> { @PARAMS -> count -> set int __zoxide_argc }
+    if { $__zoxide_argc == 0 } then { fexec function __zoxide_cd $HOME; fexec builtin return }
+    if { $PARAMS[0] == "-" } then {
+        fexec function __zoxide_cd -
+        fexec builtin return
+    }
+    # If a literal path is provided with "--", cd to it directly.
+    if { $__zoxide_argc == 2 && $PARAMS[0] == "--" } then {
+        fexec function __zoxide_cd $PARAMS[1]
+        fexec builtin return
+    }
+    # If a single argument is provided, try cd directly; if it fails, fall back to query.
+    if { $__zoxide_argc == 1 } then {
+        trypipe <!null> {
+            fexec function __zoxide_cd $PARAMS[0]
+            fexec builtin return
+        }
+    }
+    # Quiet query: capture result; suppress noise; return 1 on no match
+    fexec builtin out '' -> set: str __zoxide_result
+    trypipe <!null> {
+        exec zoxide query --exclude $PWD -- @PARAMS -> set: str __zoxide_result
+    }
+    if { $__zoxide_result } then {
+        fexec function __zoxide_cd $__zoxide_result
+    } else {
+        fexec builtin return 1
+    }
+}
+
+# Jump to a directory using interactive search.
+fexec builtin function __zoxide_zi {
+    # Interactive query; return 1 when no selection
+    fexec builtin out '' -> set: str __zoxide_result
+    trypipe <!null> {
+        exec zoxide query --interactive -- @PARAMS -> set: str __zoxide_result
+    }
+    if { $__zoxide_result } then {
+        fexec function __zoxide_cd $__zoxide_result
+    } else {
+        fexec builtin return 1
+    }
+}
+
+{{ section }}
+# Commands for zoxide. Disable these using --no-cmd.
+#
+
+{%- match cmd %}
+{%- when Some with (cmd) %}
+
+function {{cmd}}  { __zoxide_z  @PARAMS }
+function {{cmd}}i { __zoxide_zi @PARAMS }
+
+{%- when None %}
+
+{{ not_configured }}
+
+{%- endmatch %}
+
+{{ section }}
+# To initialize zoxide, add this to your shell configuration file (usually ~/.murex_profile):
+#
+# zoxide init murex -> source

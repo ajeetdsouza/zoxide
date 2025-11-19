@@ -1,6 +1,6 @@
 let
   pkgs = import (builtins.fetchTarball
-    "https://github.com/NixOS/nixpkgs/archive/ec9ef366451af88284d7dfd18ee017b7e86a0710.tar.gz") {
+    "https://github.com/NixOS/nixpkgs/archive/f7a9bed32efd78bf1fafb504e1a41228c2c0e7d2.tar.gz") {
       overlays = [ rust ];
     };
   rust = import (builtins.fetchTarball
@@ -27,7 +27,7 @@ in pkgs.mkShell {
     pkgs.ksh
     pkgs.nushell
     pkgs.powershell
-    pkgs.murex
+    (pkgs.murex.overrideAttrs (old: { doCheck = false; }))
     pkgs.tcsh
     pkgs.xonsh
     pkgs.zsh

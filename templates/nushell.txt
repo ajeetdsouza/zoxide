@@ -55,8 +55,25 @@ export-env {
 # When using zoxide with --no-cmd, alias these internal functions as desired.
 #
 
+# Provide suitable completion for zoxide jump commands
+def zoxide_completer [context: string] {
+      let query = $context | split row " " | slice 1..
+      let matches = zoxide query -l ...$query | lines | where {|x| $x != $env.PWD}
+      let completions = $matches | if ($in | is-not-empty) { $in } else { null }
+
+      {
+        options: {
+            case_sensitive: false,
+            completion_algorithm: fuzzy,
+            positional: false,
+            sort: false,
+        },
+        completions: $completions
+    }
+}
+
 # Jump to a directory using only keywords.
-def --env --wrapped __zoxide_z [...rest: string] {
+def --env --wrapped __zoxide_z [...rest: string@zoxide_completer] {
   let path = match $rest {
     [] => {'~'},
     [ '-' ] => {'-'},
@@ -72,7 +89,7 @@ def --env --wrapped __zoxide_z [...rest: string] {
 }
 
 # Jump to a directory using interactive search.
-def --env --wrapped __zoxide_zi [...rest:string] {
+def --env --wrapped __zoxide_zi [...rest:string@zoxide_completer] {
   cd $'(^zoxide query --interactive -- ...$rest | str trim -r -c "\n")'
 {%- if echo %}
   echo $env.PWD

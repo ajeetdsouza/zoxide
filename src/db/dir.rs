@@ -11,6 +11,7 @@ pub struct Dir<'a> {
     pub path: Cow<'a, str>,
     pub rank: Rank,
     pub last_accessed: Epoch,
+    pub alias: Option<String>,
 }
 
 impl Dir<'_> {

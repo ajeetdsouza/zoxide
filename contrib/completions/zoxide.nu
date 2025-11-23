@@ -10,6 +10,7 @@ module completions {
   export extern "zoxide add" [
     ...paths: path
     --score(-s): string       # The rank to increment the entry if it exists or initialize it with if it doesn't
+    --alias(-a): string       # The alias for the entry to initialize without and then set afterwards or initialize with it
     --help(-h)                # Print help
     --version(-V)             # Print version
   ]

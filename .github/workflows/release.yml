@@ -61,7 +61,7 @@ jobs:
           override: true
           target: ${{ matrix.target }}
       - name: Setup cache
-        uses: Swatinem/rust-cache@v2.8.1
+        uses: Swatinem/rust-cache@v2.8.2
         with:
           key: ${{ matrix.target }}
       - name: Install cross

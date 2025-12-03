@@ -25,7 +25,9 @@ impl<'a> Stream<'a> {
         while let Some(idx) = self.idxs.next() {
             let dir = &self.db.dirs()[idx];
 
-            if !self.filter_by_keywords(&dir.path) {
+            if !self.filter_path_by_keywords(&dir.path)
+                && !self.filter_alias_by_keywords(&dir.alias)
+            {
                 continue;
             }
 
@@ -77,7 +79,7 @@ impl<'a> Stream<'a> {
         resolver(path).map(|metadata| metadata.is_dir()).unwrap_or_default()
     }
 
-    fn filter_by_keywords(&self, path: &str) -> bool {
+    fn filter_path_by_keywords(&self, path: &str) -> bool {
         let (keywords_last, keywords) = match self.options.keywords.split_last() {
             Some(split) => split,
             None => return true,
@@ -103,6 +105,16 @@ impl<'a> Stream<'a> {
         }
 
         true
+    }
+
+    fn filter_alias_by_keywords(&self, alias: &Option<String>) -> bool {
+        match alias {
+            Some(alias) => {
+                let alias = alias.to_lowercase();
+                self.options.keywords.iter().all(|kw| alias.contains(kw))
+            }
+            None => false,
+        }
     }
 }
 
@@ -206,6 +218,6 @@ mod tests {
         let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
         let options = StreamOptions::new(0).with_keywords(keywords.iter());
         let stream = Stream::new(db, options);
-        assert_eq!(is_match, stream.filter_by_keywords(path));
+        assert_eq!(is_match, stream.filter_path_by_keywords(path));
     }
 }

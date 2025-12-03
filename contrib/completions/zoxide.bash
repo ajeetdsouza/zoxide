@@ -67,7 +67,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__add)
-            opts="-s -h -V --score --help --version <PATHS>..."
+            opts="-s -r -h -V --score --recursive --help --version <PATHS>..."
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -227,7 +227,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__remove)
-            opts="-h -V --help --version [PATHS]..."
+            opts="-r -h -V --recursive --help --version [PATHS]..."
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0

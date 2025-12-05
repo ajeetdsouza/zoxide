@@ -94,6 +94,13 @@ module completions {
     --version(-V)             # Print version
   ]
 
+  export extern "zoxide bookmark" [
+    bookmark_id: string
+    path: path
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+  ]
+
 }
 
 export use completions *

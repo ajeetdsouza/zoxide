@@ -55,6 +55,9 @@ export-env {
 # When using zoxide with --no-cmd, alias these internal functions as desired.
 #
 
+# Alias cd to avoid alias loop when cmd = cd
+alias __nu_cd = cd
+
 # Jump to a directory using only keywords.
 def --env --wrapped __zoxide_z [...rest: string] {
   let path = match $rest {
@@ -65,7 +68,7 @@ def --env --wrapped __zoxide_z [...rest: string] {
       ^zoxide query --exclude $env.PWD -- ...$rest | str trim -r -c "\n"
     }
   }
-  cd $path
+  __nu_cd $path
 {%- if echo %}
   echo $env.PWD
 {%- endif %}
@@ -73,7 +76,7 @@ def --env --wrapped __zoxide_z [...rest: string] {
 
 # Jump to a directory using interactive search.
 def --env --wrapped __zoxide_zi [...rest:string] {
-  cd $'(^zoxide query --interactive -- ...$rest | str trim -r -c "\n")'
+  __nu_cd $'(^zoxide query --interactive -- ...$rest | str trim -r -c "\n")'
 {%- if echo %}
   echo $env.PWD
 {%- endif %}
@@ -96,13 +99,14 @@ alias {{cmd}}i = __zoxide_zi
 {%- endmatch %}
 
 {{ section }}
-# Add this to your env file (find it by running `$nu.env-path` in Nushell):
+# Add this to your config file (find it by running `$nu.config-path` in Nushell):
 #
-#   zoxide init nushell | save -f ~/.zoxide.nu
+# def vendor_autoload [filename, block] {
+#   let dir = $nu.data-dir | path join "vendor/autoload"
+#   mkdir $dir
+#   do $block | save -f ($dir | path join $filename)
+# }
+# vendor_autoload "zoxide.nu" { ^zoxide init nushell }
 #
-# Now, add this to the end of your config file (find it by running
-# `$nu.config-path` in Nushell):
-#
-#   source ~/.zoxide.nu
-#
-# Note: zoxide only supports Nushell v0.89.0+.
+# Note: zoxide only supports Nushell v0.96.0+.
+# https://www.nushell.sh/blog/2024-07-23-nushell_0_96_0.html#autoload-directories-for-package-managers-toc

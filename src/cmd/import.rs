@@ -40,7 +40,7 @@ fn import_autojump(db: &mut Database, buffer: &str) -> Result<()> {
         // take a while to get normalized.
         rank = sigmoid(rank);
 
-        db.add_unchecked(path, rank, 0);
+        db.add_unchecked(path, rank, 0, None);
     }
 
     if db.dirty() {
@@ -65,7 +65,7 @@ fn import_z(db: &mut Database, buffer: &str) -> Result<()> {
 
         let path = split.next().with_context(|| format!("invalid entry: {line}"))?;
 
-        db.add_unchecked(path, rank, last_accessed);
+        db.add_unchecked(path, rank, last_accessed, None);
     }
 
     if db.dirty() {
@@ -94,7 +94,7 @@ mod tests {
             ("/xyzzy/thud", 8.0, 800),
             ("/foo/bar", 9.0, 900),
         ] {
-            db.add_unchecked(path, rank, last_accessed);
+            db.add_unchecked(path, rank, last_accessed, None);
         }
 
         let buffer = "\
@@ -107,12 +107,22 @@ mod tests {
         println!("got: {:?}", &db.dirs());
 
         let exp = [
-            Dir { path: "/baz".into(), rank: sigmoid(7.0), last_accessed: 0 },
-            Dir { path: "/corge/grault/garply".into(), rank: 6.0, last_accessed: 600 },
-            Dir { path: "/foo/bar".into(), rank: 9.0 + sigmoid(2.0), last_accessed: 900 },
-            Dir { path: "/quux/quuz".into(), rank: 1.0 + sigmoid(5.0), last_accessed: 100 },
-            Dir { path: "/waldo/fred/plugh".into(), rank: 3.0, last_accessed: 300 },
-            Dir { path: "/xyzzy/thud".into(), rank: 8.0, last_accessed: 800 },
+            Dir { path: "/baz".into(), rank: sigmoid(7.0), last_accessed: 0, alias: None },
+            Dir { path: "/corge/grault/garply".into(), rank: 6.0, last_accessed: 600, alias: None },
+            Dir {
+                path: "/foo/bar".into(),
+                rank: 9.0 + sigmoid(2.0),
+                last_accessed: 900,
+                alias: None,
+            },
+            Dir {
+                path: "/quux/quuz".into(),
+                rank: 1.0 + sigmoid(5.0),
+                last_accessed: 100,
+                alias: None,
+            },
+            Dir { path: "/waldo/fred/plugh".into(), rank: 3.0, last_accessed: 300, alias: None },
+            Dir { path: "/xyzzy/thud".into(), rank: 8.0, last_accessed: 800, alias: None },
         ];
         println!("exp: {exp:?}");
 
@@ -134,7 +144,7 @@ mod tests {
             ("/xyzzy/thud", 8.0, 800),
             ("/foo/bar", 9.0, 900),
         ] {
-            db.add_unchecked(path, rank, last_accessed);
+            db.add_unchecked(path, rank, last_accessed, None);
         }
 
         let buffer = "\
@@ -148,12 +158,12 @@ mod tests {
         println!("got: {:?}", &db.dirs());
 
         let exp = [
-            Dir { path: "/baz".into(), rank: 7.0, last_accessed: 700 },
-            Dir { path: "/corge/grault/garply".into(), rank: 6.0, last_accessed: 600 },
-            Dir { path: "/foo/bar".into(), rank: 11.0, last_accessed: 900 },
-            Dir { path: "/quux/quuz".into(), rank: 10.0, last_accessed: 500 },
-            Dir { path: "/waldo/fred/plugh".into(), rank: 3.0, last_accessed: 300 },
-            Dir { path: "/xyzzy/thud".into(), rank: 8.0, last_accessed: 800 },
+            Dir { path: "/baz".into(), rank: 7.0, last_accessed: 700, alias: None },
+            Dir { path: "/corge/grault/garply".into(), rank: 6.0, last_accessed: 600, alias: None },
+            Dir { path: "/foo/bar".into(), rank: 11.0, last_accessed: 900, alias: None },
+            Dir { path: "/quux/quuz".into(), rank: 10.0, last_accessed: 500, alias: None },
+            Dir { path: "/waldo/fred/plugh".into(), rank: 3.0, last_accessed: 300, alias: None },
+            Dir { path: "/xyzzy/thud".into(), rank: 8.0, last_accessed: 800, alias: None },
         ];
         println!("exp: {exp:?}");
 

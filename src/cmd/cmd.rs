@@ -47,6 +47,7 @@ pub enum Cmd {
     Init(Init),
     Query(Query),
     Remove(Remove),
+    Bookmark(Bookmark),
 }
 
 /// Add a new directory or increment its rank
@@ -201,4 +202,12 @@ pub struct Query {
 pub struct Remove {
     #[clap(value_hint = ValueHint::DirPath)]
     pub paths: Vec<String>,
+}
+
+#[derive(Debug, Parser)]
+#[clap(author, help_template = HelpTemplate)]
+pub struct Bookmark {
+    pub bookmark_id: String,
+    #[clap(value_hint = ValueHint::DirPath)]
+    pub path: PathBuf,
 }

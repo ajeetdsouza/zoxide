@@ -37,7 +37,7 @@ fn import_autojump(db: &mut Database, buffer: &str) -> Result<()> {
         let mut rank = rank.parse::<f64>().with_context(|| format!("invalid rank: {rank}"))?;
         // Normalize the rank using a sigmoid function. Don't import actual ranks from
         // autojump, since its scoring algorithm is very different and might
-        // take a while to get normalized.
+        // take a while to normalize.
         rank = sigmoid(rank);
 
         db.add_unchecked(path, rank, 0);

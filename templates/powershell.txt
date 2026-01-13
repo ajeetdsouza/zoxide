@@ -28,7 +28,11 @@ function global:__zoxide_pwd {
 # cd + custom logic based on the value of _ZO_ECHO.
 function global:__zoxide_cd($dir, $literal) {
     $dir = if ($literal) {
-        Set-Location -LiteralPath $dir -Passthru -ErrorAction Stop
+        if ($null -eq $dir) {
+            Set-Location
+        } else {
+            Set-Location -LiteralPath $dir -Passthru -ErrorAction Stop
+        }
     } else {
         if ($dir -eq '-' -and ($PSVersionTable.PSVersion -lt 6.1)) {
             Write-Error "cd - is not supported below PowerShell 6.1. Please upgrade your version of PowerShell."
@@ -101,6 +105,9 @@ if ($global:__zoxide_hooked -ne 1) {
 # Jump to a directory using only keywords.
 function global:__zoxide_z {
     if ($args.Length -eq 0) {
+        __zoxide_cd $null $true
+    }
+    elseif ($args.Length -eq 1 -and $args[0] -eq '~') {
         __zoxide_cd ~ $true
     }
     elseif ($args.Length -eq 1 -and ($args[0] -eq '-' -or $args[0] -eq '+')) {

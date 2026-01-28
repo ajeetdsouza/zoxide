@@ -1,6 +1,12 @@
 {%- let section = "::: ===========================================================================\n:::" -%}
 {%- let not_configured = "::: -- not configured --" -%}
 
+{%- if hook != InitHook::None -%}
+echo zoxide: hooks are not supported on cmd.exe shell.
+echo         Use '%program% init cmd --hook none' instead.
+
+{% endif -%}
+
 @if "%=^%=" == "%=%=" (set \p=%%<nul) else (set \p=^%<nul)
 
 set program=zoxide
@@ -10,19 +16,6 @@ set builtin_pwd=(chdir)
 
 ::: Get Windows' system directory, like GetSystemDirectoryW.
 @if "" == "%SystemRoot%" (set sysdir="%__APPDIR__%") else (set sysdir="%SystemRoot%\system32\")
-
-{{ section }}
-::: Hook configuration for zoxide.
-:::
-
-{% if hook != InitHook::None -%}
-echo zoxide: hooks are not supported on cmd.exe shell.
-echo         Use '%program% init cmd --hook none' instead.
-
-{%- else -%}
-{{ not_configured }}
-
-{%- endif %}
 
 {{ section }}
 ::: Utility functions for zoxide.
@@ -41,7 +34,6 @@ set __zoxide_cd=if /i "%\p%CD%\p%" neq "%\p%~fd" (%builtin_cd% "%\p%~fd" ^^^&^^^
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-::: @TODO for args %* %1 etc., boundary checking
 ::: Jump to a directory using only keywords.
 %sysdir%doskey.exe {{ cmd }} = @for /f "delims=" %\p%s in ('"%sysdir%chcp.com 2>nul"') do @for %\p%c in (%\p%~s) do @%sysdir%chcp.com %\p%~nc ^>nul 2^>^&1 ^&^& %sysdir%chcp.com 65001 ^>nul 2^>^&1 ^&^& @(for %\p%^^^^ in ("") do @for /f "delims=" %\p%i in (^^""$*%\p%~^^"^") do @if "%\p%~i" equ "" (if "%\p%HOMEDRIVE%\p%%\p%HOMEPATH%\p%" equ "" (for /f "delims=" %\p%d in (^^""%\p%USERPROFILE%\p%"^") do @%__zoxide_cd%) else for /f "delims=" %\p%d in (^^""%\p%HOMEDRIVE%\p%%\p%HOMEPATH%\p%"^") do @%__zoxide_cd%) else if "%\p%~i" equ "~" (if "%\p%HOMEDRIVE%\p%%\p%HOMEPATH%\p%" equ "" (for /f "delims=" %\p%d in (^^""%\p%USERPROFILE%\p%"^") do @%__zoxide_cd%) else for /f "delims=" %\p%d in (^^""%\p%HOMEDRIVE%\p%%\p%HOMEPATH%\p%"^") do @%__zoxide_cd%) else if "%\p%~i" equ "-" (if defined OLDPWD (for /f "delims=" %\p%d in (^^""%\p%OLDPWD%\p%"^") do @%__zoxide_cd%) else ^>^&2 (echo(%program%: OLDPWD not set) ^& call) else for /f "delims=" %\p%~ in (^^"%\p%~i^") do @for /f "tokens=1,* delims=d" %\p%a in ("-%\p%~a~") do @if "%\p%b" neq "" (for /f "delims=" %\p%d in (^^""%\p%~f~"^") do @%__zoxide_cd%) else if /i "%\p%CD%\p%" neq "%\p%__CD__%\p%" (for /f "delims=" %\p%q in ('^^"%program% query --exclude "%\p%CD%\p%" -- %\p%~i^"') do @(for /f "delims=" %\p%d in (^^""%\p%~fq"^") do @%__zoxide_cd%)) else (for /f "delims=" %\p%q in ('^^"%program% query --exclude "%\p%__CD__%\p%\" -- %\p%~i^"') do @(for /f "delims=" %\p%d in (^^""%\p%~fq"^") do @%__zoxide_cd%))) ^&^& %sysdir%chcp.com %\p%~nc ^>nul 2^>^&1 ^|^| %sysdir%chcp.com %\p%~nc ^>nul 2^>^&1 ^&^& call
 
@@ -55,7 +47,8 @@ set __zoxide_cd=if /i "%\p%CD%\p%" neq "%\p%~fd" (%builtin_cd% "%\p%~fd" ^^^&^^^
 {%- endmatch %}
 
 {{ section }}
-::: To initialize zoxide, add this to your configuration or AutoRun command:
+::: To initialize zoxide, add this to your configuration or AutoRun command
+::: (usually HKEY_CURRENT_USER\Software\Microsoft\Command Processor\AutoRun):
 :::
 :::   zoxide init cmd | cmd /d/q/k echo off
 

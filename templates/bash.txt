@@ -21,7 +21,6 @@ function __zoxide_pwd() {
     {{ pwd }}
 {%- endif %}
 }
-{%- endif %}
 
 # cd + custom logic based on the value of _ZO_ECHO.
 function __zoxide_cd() {

@@ -76,8 +76,9 @@ impl Database {
     }
 
     /// Creates a new directory. This will create a duplicate entry if this
-    /// directory is always in the database, it is expected that the user either
-    /// does a check before calling this, or calls `dedup()` afterward.
+    /// directory is already in the database, it is expected that the user
+    /// either does a check before calling this, or calls `dedup()`
+    /// afterward.
     pub fn add_unchecked(&mut self, path: impl AsRef<str> + Into<String>, rank: Rank, now: Epoch) {
         self.with_dirs_mut(|dirs| {
             dirs.push(Dir { path: path.into().into(), rank, last_accessed: now })

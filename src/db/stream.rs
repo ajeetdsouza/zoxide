@@ -70,7 +70,7 @@ impl<'a> Stream<'a> {
         }
 
         // The logic here is reversed - if we resolve symlinks when adding entries to
-        // the database, we should not return symlinks when querying back from
+        // the database, we should not return symlinks when querying from
         // the database.
         let resolver =
             if self.options.resolve_symlinks { fs::symlink_metadata } else { fs::metadata };

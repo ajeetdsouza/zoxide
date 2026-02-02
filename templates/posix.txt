@@ -8,15 +8,28 @@
 #
 
 # pwd based on the value of _ZO_RESOLVE_SYMLINKS.
-__zoxide_pwd() {
+{%- let pwd -%}
+{%- if resolve_symlinks -%}
+{%- let pwd = "\\command pwd -P" -%}
+{%- else -%}
+{%- let pwd = "\\command pwd -L" -%}
+{%- endif -%}
 {%- if cfg!(windows) %}
-    \command cygpath -w "$(\command pwd -P)"
-{%- else if resolve_symlinks %}
-    \command pwd -P
+if \command -v cygpath >/dev/null
+then
+  __zoxide_pwd() {
+    \command cygpath -w "$({{ pwd }})"
+  }
+else
+  __zoxide_pwd() {
+    {{ pwd }}
+  }
+fi
 {%- else %}
-    \command pwd -L
-{%- endif %}
+__zoxide_pwd() {
+    {{ pwd }}
 }
+{%- endif %}
 
 # cd + custom logic based on the value of _ZO_ECHO.
 __zoxide_cd() {

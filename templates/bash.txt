@@ -134,6 +134,43 @@ function __zoxide_zi() {
     result="$(\command zoxide query --interactive -- "$@")" && __zoxide_cd "${result}"
 }
 
+# Jump to a directory within the current directory.
+function __zoxide_zc() {
+    __zoxide_doctor
+
+    # shellcheck disable=SC2199
+    if [[ $# -eq 0 ]]; then
+        __zoxide_cd ~
+    elif [[ $# -eq 1 && $1 == '-' ]]; then
+        __zoxide_cd "${OLDPWD}"
+    elif [[ $# -eq 1 && -d $1 ]]; then
+        __zoxide_cd "$1"
+    elif [[ $# -eq 2 && $1 == '--' ]]; then
+        __zoxide_cd "$2"
+    elif [[ ${@: -1} == "${__zoxide_z_prefix}"?* ]]; then
+        # shellcheck disable=SC2124
+        \builtin local result="${@: -1}"
+        __zoxide_cd "{{ "${result:${#__zoxide_z_prefix}}" }}"
+    else
+        \builtin local base_dir
+        \builtin local result
+        base_dir="$(__zoxide_pwd)"
+        # shellcheck disable=SC2312
+        result="$(\command zoxide query --exclude "${base_dir}" --base-dir "${base_dir}" -- "$@")" &&
+            __zoxide_cd "${result}"
+    fi
+}
+
+# Jump to a directory within the current directory using interactive search.
+function __zoxide_zci() {
+    __zoxide_doctor
+    \builtin local base_dir
+    \builtin local result
+    base_dir="$(__zoxide_pwd)"
+    result="$(\command zoxide query --interactive --base-dir "${base_dir}" -- "$@")" &&
+        __zoxide_cd "${result}"
+}
+
 {{ section }}
 # Commands for zoxide. Disable these using --no-cmd.
 #
@@ -149,6 +186,16 @@ function {{cmd}}() {
 \builtin unalias {{cmd}}i &>/dev/null || \builtin true
 function {{cmd}}i() {
     __zoxide_zi "$@"
+}
+
+\builtin unalias {{cmd}}c &>/dev/null || \builtin true
+function {{cmd}}c() {
+    __zoxide_zc "$@"
+}
+
+\builtin unalias {{cmd}}ci &>/dev/null || \builtin true
+function {{cmd}}ci() {
+    __zoxide_zci "$@"
 }
 
 # Load completions.

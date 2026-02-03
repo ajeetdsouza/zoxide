@@ -155,6 +155,51 @@ def __zoxide_zi(args: list[str]) -> None:
     __zoxide_cd(result)
 
 
+@__zoxide_errhandler
+def __zoxide_zc(args: list[str]) -> None:
+    """Jump to a directory within the current directory using only keywords."""
+    if args == []:
+        __zoxide_cd()
+    elif args == ["-"]:
+        __zoxide_cd("-")
+    elif len(args) == 1 and os.path.isdir(args[0]):
+        __zoxide_cd(args[0])
+    else:
+        base_dir = __zoxide_pwd()
+        try:
+            zoxide = __zoxide_bin()
+            cmd = subprocess.run(
+                [zoxide, "query", "--exclude", base_dir, "--base-dir", base_dir, "--"] + args,
+                check=True,
+                env=__zoxide_env(),
+                stdout=subprocess.PIPE,
+            )
+        except subprocess.CalledProcessError as exc:
+            raise ZoxideSilentException() from exc
+
+        result = cmd.stdout[:-1]
+        __zoxide_cd(result)
+
+
+@__zoxide_errhandler
+def __zoxide_zci(args: list[str]) -> None:
+    """Jump to a directory within the current directory using interactive search."""
+    base_dir = __zoxide_pwd()
+    try:
+        zoxide = __zoxide_bin()
+        cmd = subprocess.run(
+            [zoxide, "query", "-i", "--base-dir", base_dir, "--"] + args,
+            check=True,
+            env=__zoxide_env(),
+            stdout=subprocess.PIPE,
+        )
+    except subprocess.CalledProcessError as exc:
+        raise ZoxideSilentException() from exc
+
+    result = cmd.stdout[:-1]
+    __zoxide_cd(result)
+
+
 {{ section }}
 # Commands for zoxide. Disable these using --no-cmd.
 #
@@ -164,6 +209,8 @@ def __zoxide_zi(args: list[str]) -> None:
 
 builtins.aliases["{{cmd}}"] = __zoxide_z  # type: ignore  # pylint:disable=no-member
 builtins.aliases["{{cmd}}i"] = __zoxide_zi  # type: ignore  # pylint:disable=no-member
+builtins.aliases["{{cmd}}c"] = __zoxide_zc  # type: ignore  # pylint:disable=no-member
+builtins.aliases["{{cmd}}ci"] = __zoxide_zci  # type: ignore  # pylint:disable=no-member
 
 {%- when None %}
 

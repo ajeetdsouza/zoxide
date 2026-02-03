@@ -74,7 +74,7 @@ mod tests {
     ) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Bash(&opts).render().unwrap();
-        assert!(source.contains("[[ -n \"${__zoxide_result}\" ]] || return"));
+        assert!(source.contains("[[ -n ${__zoxide_result} ]] || return"));
     }
 
     #[apply(opts)]

@@ -179,7 +179,7 @@ if [[ ${BASH_VERSINFO[0]:-0} -eq 4 && ${BASH_VERSINFO[1]:-0} -ge 4 || ${BASH_VER
         elif [[ -z ${COMP_WORDS[-1]} ]]; then
             # shellcheck disable=SC2312
             __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd)" --interactive -- "{{ "${COMP_WORDS[@]:1:${#COMP_WORDS[@]}-2}" }}")" || return
-            [[ -n "${__zoxide_result}" ]] || return
+            [[ -n ${__zoxide_result} ]] || return
 
             # In case the terminal does not respond to \e[5n or another
             # mechanism steals the response, it is still worth completing

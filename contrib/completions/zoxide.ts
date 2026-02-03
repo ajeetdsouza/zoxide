@@ -17,7 +17,7 @@ const completion: Fig.Spec = {
         },
         {
           name: ["-a", "--alias"],
-          description: "The alias for the entry to initialize without and then set afterwards or initialize with it",
+          description: "The alias for the entry to initialize the entry with You can set a new alias after initialization",
           isRepeatable: true,
           args: {
             name: "alias",

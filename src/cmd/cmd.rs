@@ -64,8 +64,8 @@ pub struct Add {
     #[clap(short, long)]
     pub score: Option<f64>,
 
-    /// The alias for the entry to initialize without and then set afterwards or
-    /// initialize with it
+    /// The alias for the entry to initialize with
+    /// You can set a new alias after initialization
     #[clap(short, long)]
     pub alias: Option<String>,
 }

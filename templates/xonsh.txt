@@ -169,7 +169,16 @@ def __zoxide_zc(args: list[str]) -> None:
         try:
             zoxide = __zoxide_bin()
             cmd = subprocess.run(
-                [zoxide, "query", "--exclude", base_dir, "--base-dir", base_dir, "--"] + args,
+                [
+                    zoxide,
+                    "query",
+                    "--exclude",
+                    base_dir,
+                    "--base-dir",
+                    base_dir,
+                    "--",
+                    *args,
+                ],
                 check=True,
                 env=__zoxide_env(),
                 stdout=subprocess.PIPE,
@@ -188,7 +197,7 @@ def __zoxide_zci(args: list[str]) -> None:
     try:
         zoxide = __zoxide_bin()
         cmd = subprocess.run(
-            [zoxide, "query", "-i", "--base-dir", base_dir, "--"] + args,
+            [zoxide, "query", "-i", "--base-dir", base_dir, "--", *args],
             check=True,
             env=__zoxide_env(),
             stdout=subprocess.PIPE,

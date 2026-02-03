@@ -67,7 +67,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__add)
-            opts="-s -h -V --score --help --version <PATHS>..."
+            opts="-s -a -h -V --score --alias --help --version <PATHS>..."
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -78,6 +78,14 @@ _zoxide() {
                     return 0
                     ;;
                 -s)
+                    COMPREPLY=($(compgen -f "${cur}"))
+                    return 0
+                    ;;
+                --alias)
+                    COMPREPLY=($(compgen -f "${cur}"))
+                    return 0
+                    ;;
+                -a)
                     COMPREPLY=($(compgen -f "${cur}"))
                     return 0
                     ;;

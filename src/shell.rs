@@ -66,7 +66,12 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn bash_init_guards_empty_completion(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
+    fn bash_init_guards_empty_completion(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+    ) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Bash(&opts).render().unwrap();
         assert!(source.contains("[[ -n \"${__zoxide_result}\" ]] || return"));
@@ -149,7 +154,12 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn fish_init_guards_empty_completion(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
+    fn fish_init_guards_empty_completion(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+    ) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Fish(&opts).render().unwrap();
         assert!(source.contains("and test -n \"$result\""));

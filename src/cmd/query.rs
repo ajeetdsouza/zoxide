@@ -142,9 +142,9 @@ impl Query {
         suffix_query: SuffixQuery,
     ) -> Result<()> {
         if self.interactive {
-            if self.query_interactive_normal(db, now)? {
-                Ok(())
-            } else if self.query_interactive_suffix(db, now, &suffix_query)? {
+            if self.query_interactive_normal(db, now)?
+                || self.query_interactive_suffix(db, now, &suffix_query)?
+            {
                 Ok(())
             } else {
                 anyhow::bail!("no match found")

@@ -135,7 +135,12 @@ impl Query {
         .spawn()
     }
 
-    fn query_with_suffix(&self, db: &mut Database, now: Epoch, suffix_query: SuffixQuery) -> Result<()> {
+    fn query_with_suffix(
+        &self,
+        db: &mut Database,
+        now: Epoch,
+        suffix_query: SuffixQuery,
+    ) -> Result<()> {
         if self.interactive {
             if self.query_interactive_normal(db, now)? {
                 Ok(())
@@ -389,8 +394,7 @@ mod tests {
     #[test]
     fn split_suffix_replaces_only_one_keyword() {
         let result =
-            SuffixQuery::from_keywords(&[String::from("abc/uniq"), String::from("extra")])
-                .unwrap();
+            SuffixQuery::from_keywords(&[String::from("abc/uniq"), String::from("extra")]).unwrap();
         assert_eq!(result.base_keywords, vec![String::from("abc"), String::from("extra")]);
         assert_eq!(result.suffix, "uniq");
     }

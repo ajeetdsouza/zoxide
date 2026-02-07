@@ -19,7 +19,7 @@ main() {
     parse_args "$@"
 
     local _arch
-    _arch="${ARCH:-$(ensure get_architecture)}"
+    _arch="${ARCH:-$(get_architecture)}" || exit $?
     assert_nz "${_arch}" "arch"
     echo "Detected architecture: ${_arch}"
 
@@ -36,7 +36,7 @@ main() {
 
     # Download and extract zoxide.
     local _package
-    _package="$(ensure download_zoxide "${_arch}")"
+    _package="$(download_zoxide "${_arch}")" || exit $?
     assert_nz "${_package}" "package"
     echo "Downloaded package: ${_package}"
     case "${_package}" in

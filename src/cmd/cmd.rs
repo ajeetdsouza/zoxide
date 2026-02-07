@@ -63,6 +63,11 @@ pub struct Add {
     /// doesn't
     #[clap(short, long)]
     pub score: Option<f64>,
+
+    /// The alias for the entry to initialize the entry with
+    /// You can set a new alias after initialization
+    #[clap(short, long)]
+    pub alias: Option<String>,
 }
 
 /// Edit the database

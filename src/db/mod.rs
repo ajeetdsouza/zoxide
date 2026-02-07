@@ -64,13 +64,27 @@ impl Database {
         Ok(())
     }
 
-    /// Increments the rank of a directory, or creates it if it does not exist.
-    pub fn add(&mut self, path: impl AsRef<str> + Into<String>, by: Rank, now: Epoch) {
+    /// Increments the rank of a directory and updates its alias if provided, or
+    /// creates with an optional alias it if it does not exist.
+    pub fn add(
+        &mut self,
+        path: impl AsRef<str> + Into<String>,
+        by: Rank,
+        now: Epoch,
+        alias: Option<String>,
+    ) {
         self.with_dirs_mut(|dirs| match dirs.iter_mut().find(|dir| dir.path == path.as_ref()) {
-            Some(dir) => dir.rank = (dir.rank + by).max(0.0),
-            None => {
-                dirs.push(Dir { path: path.into().into(), rank: by.max(0.0), last_accessed: now })
+            Some(dir) if alias.is_some() => {
+                dir.rank = (dir.rank + by).max(0.0);
+                dir.alias = alias;
             }
+            Some(dir) => dir.rank = (dir.rank + by).max(0.0),
+            None => dirs.push(Dir {
+                path: path.into().into(),
+                rank: by.max(0.0),
+                last_accessed: now,
+                alias,
+            }),
         });
         self.with_dirty_mut(|dirty| *dirty = true);
     }
@@ -79,24 +93,44 @@ impl Database {
     /// directory is already in the database, it is expected that the user
     /// either does a check before calling this, or calls `dedup()`
     /// afterward.
-    pub fn add_unchecked(&mut self, path: impl AsRef<str> + Into<String>, rank: Rank, now: Epoch) {
+    pub fn add_unchecked(
+        &mut self,
+        path: impl AsRef<str> + Into<String>,
+        rank: Rank,
+        now: Epoch,
+        alias: Option<String>,
+    ) {
         self.with_dirs_mut(|dirs| {
-            dirs.push(Dir { path: path.into().into(), rank, last_accessed: now })
+            dirs.push(Dir { path: path.into().into(), rank, last_accessed: now, alias })
         });
         self.with_dirty_mut(|dirty| *dirty = true);
     }
 
-    /// Increments the rank and updates the last_accessed of a directory, or
-    /// creates it if it does not exist.
-    pub fn add_update(&mut self, path: impl AsRef<str> + Into<String>, by: Rank, now: Epoch) {
+    /// Increments the rank and updates the last_accessed and alias of a
+    /// directory or creates it if it does not exist.
+    pub fn add_update(
+        &mut self,
+        path: impl AsRef<str> + Into<String>,
+        by: Rank,
+        now: Epoch,
+        alias: Option<String>,
+    ) {
         self.with_dirs_mut(|dirs| match dirs.iter_mut().find(|dir| dir.path == path.as_ref()) {
+            Some(dir) if alias.is_some() => {
+                dir.rank = (dir.rank + by).max(0.0);
+                dir.last_accessed = now;
+                dir.alias = alias;
+            }
             Some(dir) => {
                 dir.rank = (dir.rank + by).max(0.0);
                 dir.last_accessed = now;
             }
-            None => {
-                dirs.push(Dir { path: path.into().into(), rank: by.max(0.0), last_accessed: now })
-            }
+            None => dirs.push(Dir {
+                path: path.into().into(),
+                rank: by.max(0.0),
+                last_accessed: now,
+                alias,
+            }),
         });
         self.with_dirty_mut(|dirty| *dirty = true);
     }
@@ -241,11 +275,14 @@ mod tests {
         let data_dir = tempfile::tempdir().unwrap();
         let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
         let now = 946684800;
+        let empty_alias: Option<String> = None;
+        let alias: Option<String> = Some(String::from("alias"));
 
         {
             let mut db = Database::open_dir(data_dir.path()).unwrap();
-            db.add(path, 1.0, now);
-            db.add(path, 1.0, now);
+            db.add(path, 1.0, now, empty_alias.clone());
+            db.add(path, 1.0, now, alias.clone());
+            db.add(path, 1.0, now, empty_alias.clone());
             db.save().unwrap();
         }
 
@@ -255,8 +292,10 @@ mod tests {
 
             let dir = &db.dirs()[0];
             assert_eq!(dir.path, path);
-            assert!((dir.rank - 2.0).abs() < 0.01);
+            assert!((dir.rank - 3.0).abs() < 0.01);
             assert_eq!(dir.last_accessed, now);
+            assert_eq!(dir.alias, alias);
+            assert_ne!(dir.alias, empty_alias);
         }
     }
 
@@ -268,7 +307,7 @@ mod tests {
 
         {
             let mut db = Database::open_dir(data_dir.path()).unwrap();
-            db.add(path, 1.0, now);
+            db.add(path, 1.0, now, None);
             db.save().unwrap();
         }
 

@@ -119,6 +119,37 @@ __zoxide_zi() {
     __zoxide_result="$(\command zoxide query --interactive -- "$@")" && __zoxide_cd "${__zoxide_result}"
 }
 
+# Jump to a directory within the current directory.
+__zoxide_zc() {
+    __zoxide_doctor
+
+    if [ "$#" -eq 0 ]; then
+        __zoxide_cd ~
+    elif [ "$#" -eq 1 ] && [ "$1" = '-' ]; then
+        if [ -n "${OLDPWD}" ]; then
+            __zoxide_cd "${OLDPWD}"
+        else
+            # shellcheck disable=SC2016
+            \command printf 'zoxide: $OLDPWD is not set'
+            return 1
+        fi
+    elif [ "$#" -eq 1 ] && [ -d "$1" ]; then
+        __zoxide_cd "$1"
+    else
+        __zoxide_base="$(__zoxide_pwd || \command true)"
+        __zoxide_result="$(\command zoxide query --exclude "${__zoxide_base}" --base-dir "${__zoxide_base}" -- "$@")" &&
+            __zoxide_cd "${__zoxide_result}"
+    fi
+}
+
+# Jump to a directory within the current directory using interactive search.
+__zoxide_zci() {
+    __zoxide_doctor
+    __zoxide_base="$(__zoxide_pwd || \command true)"
+    __zoxide_result="$(\command zoxide query --interactive --base-dir "${__zoxide_base}" -- "$@")" &&
+        __zoxide_cd "${__zoxide_result}"
+}
+
 {{ section }}
 # Commands for zoxide. Disable these using --no-cmd.
 #
@@ -134,6 +165,16 @@ __zoxide_zi() {
 \command unalias {{cmd}}i >/dev/null 2>&1 || \true
 {{cmd}}i() {
     __zoxide_zi "$@"
+}
+
+\command unalias {{cmd}}c >/dev/null 2>&1 || \true
+{{cmd}}c() {
+    __zoxide_zc "$@"
+}
+
+\command unalias {{cmd}}ci >/dev/null 2>&1 || \true
+{{cmd}}ci() {
+    __zoxide_zci "$@"
 }
 
 {%- when None %}

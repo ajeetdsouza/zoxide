@@ -106,6 +106,27 @@ function __zoxide_zi() {
     result="$(\command zoxide query --interactive -- "$@")" && __zoxide_cd "${result}"
 }
 
+# Jump to a directory within the current directory.
+function __zoxide_zc() {
+    __zoxide_doctor
+    \builtin local base_dir
+    base_dir="$(__zoxide_pwd)"
+    \builtin local result
+    # shellcheck disable=SC2312
+    result="$(\command zoxide query --exclude "${base_dir}" --base-dir "${base_dir}" -- "$@")" &&
+        __zoxide_cd "${result}"
+}
+
+# Jump to a directory within the current directory using interactive search.
+function __zoxide_zci() {
+    __zoxide_doctor
+    \builtin local base_dir
+    base_dir="$(__zoxide_pwd)"
+    \builtin local result
+    result="$(\command zoxide query --interactive --base-dir "${base_dir}" -- "$@")" &&
+        __zoxide_cd "${result}"
+}
+
 {{ section }}
 # Commands for zoxide. Disable these using --no-cmd.
 #
@@ -119,6 +140,14 @@ function {{ cmd }}() {
 
 function {{ cmd }}i() {
     __zoxide_zi "$@"
+}
+
+function {{ cmd }}c() {
+    __zoxide_zc "$@"
+}
+
+function {{ cmd }}ci() {
+    __zoxide_zci "$@"
 }
 
 {%- when None %}

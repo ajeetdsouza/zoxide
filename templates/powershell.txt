@@ -134,6 +134,45 @@ function global:__zoxide_zi {
     }
 }
 
+# Jump to a directory within the current directory.
+function global:__zoxide_zc {
+    if ($args.Length -eq 0) {
+        __zoxide_cd $HOME $false
+    }
+    elseif ($args.Length -eq 1 -and $args[0] -eq '-') {
+        __zoxide_cd $args[0] $true
+    }
+    elseif ($args.Length -eq 1 -and (Test-Path -PathType Container -Path $args[0] )) {
+        __zoxide_cd $args[0] $false
+    }
+    else {
+        $baseDir = __zoxide_pwd
+        if ($null -ne $baseDir) {
+            $result = __zoxide_bin query --exclude $baseDir --base-dir $baseDir "--" @args
+        }
+        else {
+            $result = __zoxide_bin query "--" @args
+        }
+        if ($LASTEXITCODE -eq 0) {
+            __zoxide_cd $result $true
+        }
+    }
+}
+
+# Jump to a directory within the current directory using interactive search.
+function global:__zoxide_zci {
+    $baseDir = __zoxide_pwd
+    if ($null -ne $baseDir) {
+        $result = __zoxide_bin query -i --base-dir $baseDir "--" @args
+    }
+    else {
+        $result = __zoxide_bin query -i "--" @args
+    }
+    if ($LASTEXITCODE -eq 0) {
+        __zoxide_cd $result $true
+    }
+}
+
 {{ section }}
 # Commands for zoxide. Disable these using --no-cmd.
 #
@@ -143,6 +182,8 @@ function global:__zoxide_zi {
 
 Set-Alias -Name {{cmd}} -Value __zoxide_z -Option AllScope -Scope Global -Force
 Set-Alias -Name {{cmd}}i -Value __zoxide_zi -Option AllScope -Scope Global -Force
+Set-Alias -Name {{cmd}}c -Value __zoxide_zc -Option AllScope -Scope Global -Force
+Set-Alias -Name {{cmd}}ci -Value __zoxide_zci -Option AllScope -Scope Global -Force
 
 {%- when None %}
 

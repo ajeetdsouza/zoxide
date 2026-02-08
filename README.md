@@ -50,6 +50,7 @@ zoxide works on all major shells.
 z foo              # cd into highest ranked directory matching foo
 z foo bar          # cd into highest ranked directory matching foo and bar
 z foo /            # cd into a subdirectory starting with foo
+z foo/bar          # cd into a child path within a matching foo directory
 
 z ~/foo            # z also works like a regular cd command
 z foo/             # cd into relative path

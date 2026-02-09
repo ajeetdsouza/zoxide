@@ -9,10 +9,10 @@ impl Run for Remove {
         let mut db = Database::open()?;
 
         for path in &self.paths {
-            if !db.remove(path) {
+            if !db.remove(path, self.recursive) {
                 let path_abs = util::resolve_path(path)?;
                 let path_abs = util::path_to_str(&path_abs)?;
-                if path_abs == path || !db.remove(path_abs) {
+                if path_abs == path || !db.remove(path_abs, self.recursive) {
                     bail!("path not found in database: {path}")
                 }
             }

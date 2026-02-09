@@ -180,6 +180,25 @@ impl Database {
         self.with_dirty_mut(|dirty| *dirty = true);
     }
 
+    pub fn sort_by_keywords(&mut self, keywords: &[String]) {
+        if keywords.is_empty() {
+            return;
+        }
+
+        self.with_dirs_mut(|dirs| {
+            dirs.sort_by_key(|dir| Self::has_exact_match(&dir.path, keywords));
+        });
+        self.with_dirty_mut(|dirty| *dirty = true);
+    }
+
+    fn has_exact_match(path: &str, keywords: &[String]) -> bool {
+        keywords.last().is_some_and(|keyword| {
+            let path_lower = util::to_lowercase(path);
+            let last_component = path_lower.rsplit(std::path::is_separator).next().unwrap_or("");
+            last_component == keyword
+        })
+    }
+
     pub fn dirty(&self) -> bool {
         *self.borrow_dirty()
     }

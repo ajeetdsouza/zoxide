@@ -27,7 +27,8 @@ https://github.com/ajeetdsouza/zoxide
 {tab}<bold>_ZO_EXCLUDE_DIRS</bold>    {tab}List of directory globs to be excluded
 {tab}<bold>_ZO_FZF_OPTS</bold>        {tab}Custom flags to pass to fzf
 {tab}<bold>_ZO_MAXAGE</bold>          {tab}Maximum total age after which entries start getting deleted
-{tab}<bold>_ZO_RESOLVE_SYMLINKS</bold>{tab}Resolve symlinks when storing paths").into_resettable()
+{tab}<bold>_ZO_RESOLVE_SYMLINKS</bold>{tab}Resolve symlinks when storing paths
+{tab}<bold>_ZO_DISABLE_EXISTENCE_CHECK</bold>{tab}Do not filter the list by existing files").into_resettable()
     }
 }
 

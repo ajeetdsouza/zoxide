@@ -8,6 +8,17 @@ use crate::db::{Database, Epoch, Stream, StreamOptions};
 use crate::error::BrokenPipeHandler;
 use crate::util::{self, Fzf, FzfChild};
 
+fn expand_tilde(path: &str) -> String {
+    if let Some(stripped) = path.strip_prefix('~') {
+        if let Some(home) = dirs::home_dir() {
+            if let Some(home_str) = home.to_str() {
+                return format!("{}{}", home_str, stripped);
+            }
+        }
+    }
+    path.to_string()
+}
+
 impl Run for Query {
     fn run(&self) -> Result<()> {
         let mut db = crate::db::Database::open()?;
@@ -47,7 +58,8 @@ impl Query {
             print!("{selection}");
         } else {
             let path = selection.get(7..).context("could not read selection from fzf")?;
-            print!("{path}");
+            let expanded_path = expand_tilde(path);
+            print!("{expanded_path}");
         }
         Ok(())
     }

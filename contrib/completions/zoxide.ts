@@ -283,6 +283,28 @@ const completion: Fig.Spec = {
         template: "folders",
       },
     },
+    {
+      name: "bookmark",
+      options: [
+        {
+          name: ["-h", "--help"],
+          description: "Print help",
+        },
+        {
+          name: ["-V", "--version"],
+          description: "Print version",
+        },
+      ],
+      args: [
+        {
+          name: "bookmark_id",
+        },
+        {
+          name: "path",
+          template: "folders",
+        },
+      ]
+    },
   ],
   options: [
     {

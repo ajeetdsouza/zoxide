@@ -19,6 +19,9 @@ _zoxide() {
             zoxide,add)
                 cmd="zoxide__add"
                 ;;
+            zoxide,bookmark)
+                cmd="zoxide__bookmark"
+                ;;
             zoxide,edit)
                 cmd="zoxide__edit"
                 ;;
@@ -53,7 +56,7 @@ _zoxide() {
 
     case "${cmd}" in
         zoxide)
-            opts="-h -V --help --version add edit import init query remove"
+            opts="-h -V --help --version add edit import init query remove bookmark"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -81,6 +84,20 @@ _zoxide() {
                     COMPREPLY=($(compgen -f "${cur}"))
                     return 0
                     ;;
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__bookmark)
+            opts="-h -V --help --version <BOOKMARK_ID> <PATH>"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
                 *)
                     COMPREPLY=()
                     ;;

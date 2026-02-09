@@ -67,6 +67,7 @@ complete -c zoxide -n "__fish_zoxide_using_subcommand query" -s a -l all -d 'Sho
 complete -c zoxide -n "__fish_zoxide_using_subcommand query" -s i -l interactive -d 'Use interactive selection'
 complete -c zoxide -n "__fish_zoxide_using_subcommand query" -s l -l list -d 'List all matching directories'
 complete -c zoxide -n "__fish_zoxide_using_subcommand query" -s s -l score -d 'Print score with results'
+complete -c zoxide -n "__fish_zoxide_using_subcommand query" -s t -l time -d 'Print `last_accessed` with results, no effect without `--list` option'
 complete -c zoxide -n "__fish_zoxide_using_subcommand query" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_zoxide_using_subcommand query" -s V -l version -d 'Print version'
 complete -c zoxide -n "__fish_zoxide_using_subcommand remove" -s h -l help -d 'Print help'

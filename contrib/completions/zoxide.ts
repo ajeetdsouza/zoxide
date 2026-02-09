@@ -216,7 +216,7 @@ const completion: Fig.Spec = {
         },
         {
           name: "--base-dir",
-          description: "Only search within this directory",
+          description: "Only search within this directory (does not check if the path exists)",
           isRepeatable: true,
           args: {
             name: "base_dir",

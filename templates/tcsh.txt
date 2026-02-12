@@ -38,8 +38,14 @@ if ("$#__zoxide_args" == 0) then\
 else\
     if ("$#__zoxide_args" == 1 && "$__zoxide_args[1]" == "-") then\
         cd -\
-    else if ("$#__zoxide_args" == 1 && -d "$__zoxide_args[1]") then\
-        cd "$__zoxide_args[1]"\
+    else if ("$#__zoxide_args" == 1) then\
+        set __zoxide_arg_tmp = `echo "$__zoxide_args[1]" | sed "s|/*$||"`\
+        if (-d "$__zoxide_arg_tmp") then\
+            cd "$__zoxide_args[1]"\
+        else\
+            set __zoxide_pwd = `{{ pwd_cmd }}`\
+            set __zoxide_result = "`zoxide query --exclude '"'"'$__zoxide_pwd'"'"' -- $__zoxide_args`" && cd "$__zoxide_result"\
+        endif\
     else\
         set __zoxide_pwd = `{{ pwd_cmd }}`\
         set __zoxide_result = "`zoxide query --exclude '"'"'$__zoxide_pwd'"'"' -- $__zoxide_args`" && cd "$__zoxide_result"\

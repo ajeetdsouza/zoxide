@@ -56,7 +56,7 @@ module zoxide_integration {
     | lines | each {
       if $in starts-with $"($homedir)(char psep)" {
         str replace $homedir "~"
-      } else {}
+      } else {} | debug --raw-value
     } | wrap value
     | insert span { start: ($ast | first).span.start, end: ($ast | last).span.end }
 

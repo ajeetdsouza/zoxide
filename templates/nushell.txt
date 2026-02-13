@@ -63,6 +63,7 @@ module zoxide_integration {
     {
       options: {
         sort: false,
+        filter: false,
         case_sensitive: false,
         completion_algorithm: "substring",
       }

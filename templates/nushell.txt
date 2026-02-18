@@ -19,7 +19,10 @@ module zoxide_integration {
   # Initialize hook to add new entries to the database.
   export-env {
   {%- if hook == InitHook::Prompt %}
-    let __zoxide_hooked = $env.config.hooks.pre_prompt | any { get __zoxide_hook? }
+    let __zoxide_hooked = (
+      $env.config.hooks.pre_prompt
+      | any { get __zoxide_hook? | default false }
+    )
     if not $__zoxide_hooked {
       $env.config.hooks.pre_prompt = ($env.config.hooks.pre_prompt | append {
         __zoxide_hook: true,
@@ -27,7 +30,10 @@ module zoxide_integration {
       })
     }
   {%- else if hook == InitHook::Pwd %}
-    let __zoxide_hooked = $env.config.hooks.env_change.PWD? | default [] | any { get __zoxide_hook? }
+    let __zoxide_hooked = (
+      $env.config.hooks.env_change.PWD? | default []
+      | any { get __zoxide_hook? | default false }
+    )
     if not $__zoxide_hooked {
       $env.config.hooks.env_change.PWD = ($env.config.hooks.env_change.PWD? | append {
         __zoxide_hook: true,

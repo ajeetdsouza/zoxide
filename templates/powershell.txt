@@ -62,6 +62,15 @@ function global:__zoxide_cd($dir, $literal) {
 function global:__zoxide_hook {
     $result = __zoxide_pwd
     if ($null -ne $result) {
+        if ($global:__zoxide_current_dir -ne $result) {
+            $now = [DateTimeOffset]::Now.ToUnixTimeSeconds()
+            $elapsed = $now - $global:__zoxide_entered_at
+            if ($elapsed -ge $global:__zoxide_rest_threshold -and $null -ne $global:__zoxide_current_dir -and $global:__zoxide_current_dir -ne '') {
+                $global:__zoxide_last_rested = $global:__zoxide_current_dir
+            }
+            $global:__zoxide_entered_at = $now
+            $global:__zoxide_current_dir = $result
+        }
         zoxide add "--" $result
     }
 }
@@ -71,6 +80,13 @@ $global:__zoxide_oldpwd = __zoxide_pwd
 function global:__zoxide_hook {
     $result = __zoxide_pwd
     if ($result -ne $global:__zoxide_oldpwd) {
+        $now = [DateTimeOffset]::Now.ToUnixTimeSeconds()
+        $elapsed = $now - $global:__zoxide_entered_at
+        if ($elapsed -ge $global:__zoxide_rest_threshold -and $null -ne $global:__zoxide_current_dir -and $global:__zoxide_current_dir -ne '') {
+            $global:__zoxide_last_rested = $global:__zoxide_current_dir
+        }
+        $global:__zoxide_entered_at = $now
+        $global:__zoxide_current_dir = $result
         if ($null -ne $result) {
             zoxide add "--" $result
         }
@@ -78,6 +94,12 @@ function global:__zoxide_hook {
     }
 }
 {%- endif %}
+
+# Rest tracking for z --.
+$global:__zoxide_rest_threshold = if ($null -ne $env:_ZO_REST_THRESHOLD) { [int]$env:_ZO_REST_THRESHOLD } else { 5 }
+$global:__zoxide_entered_at = [DateTimeOffset]::Now.ToUnixTimeSeconds()
+$global:__zoxide_current_dir = __zoxide_pwd
+$global:__zoxide_last_rested = ''
 
 # Initialize hook.
 $global:__zoxide_hooked = (Get-Variable __zoxide_hooked -ErrorAction Ignore -ValueOnly)
@@ -111,6 +133,14 @@ function global:__zoxide_z {
     }
     elseif ($args.Length -eq 1 -and (Test-Path -PathType Container -Path $args[0] )) {
         __zoxide_cd $args[0] $false
+    }
+    elseif ($args.Length -eq 1 -and $args[0] -eq '--') {
+        if ($null -ne $global:__zoxide_last_rested -and $global:__zoxide_last_rested -ne '') {
+            __zoxide_cd $global:__zoxide_last_rested $true
+        }
+        else {
+            Write-Error "zoxide: no rested directory found"
+        }
     }
     else {
         $result = __zoxide_pwd

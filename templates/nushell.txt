@@ -26,7 +26,18 @@ export-env {
   if not $__zoxide_hooked {
     $env.config.hooks.pre_prompt = ($env.config.hooks.pre_prompt | append {
       __zoxide_hook: true,
-      code: {|| ^zoxide add -- $env.PWD}
+      code: {||
+        if $env.__zoxide_current_dir != $env.PWD {
+          let now = (date now | format date '%s' | into int)
+          let elapsed = $now - $env.__zoxide_entered_at
+          if $elapsed >= $env.__zoxide_rest_threshold and ($env.__zoxide_current_dir | is-not-empty) {
+            $env.__zoxide_last_rested = $env.__zoxide_current_dir
+          }
+          $env.__zoxide_entered_at = $now
+          $env.__zoxide_current_dir = $env.PWD
+        }
+        ^zoxide add -- $env.PWD
+      }
     })
   }
 {%- else if hook == InitHook::Pwd %}
@@ -43,10 +54,25 @@ export-env {
   if not $__zoxide_hooked {
     $env.config.hooks.env_change.PWD = ($env.config.hooks.env_change.PWD | append {
       __zoxide_hook: true,
-      code: {|_, dir| ^zoxide add -- $dir}
+      code: {|_, dir|
+        let now = (date now | format date '%s' | into int)
+        let elapsed = $now - $env.__zoxide_entered_at
+        if $elapsed >= $env.__zoxide_rest_threshold and ($env.__zoxide_current_dir | is-not-empty) {
+          $env.__zoxide_last_rested = $env.__zoxide_current_dir
+        }
+        $env.__zoxide_entered_at = $now
+        $env.__zoxide_current_dir = $dir
+        ^zoxide add -- $dir
+      }
     })
   }
 {%- endif %}
+
+  # Rest tracking for z --.
+  $env.__zoxide_rest_threshold = (try { $env._ZO_REST_THRESHOLD | into int } catch { 5 })
+  $env.__zoxide_entered_at = (date now | format date '%s' | into int)
+  $env.__zoxide_current_dir = $env.PWD
+  $env.__zoxide_last_rested = ''
 }
 
 {%- endif %}
@@ -61,6 +87,13 @@ def --env --wrapped __zoxide_z [...rest: string] {
     [] => {'~'},
     [ '-' ] => {'-'},
     [ $arg ] if ($arg | path expand | path type) == 'dir' => {$arg}
+    [ '--' ] => {
+      if $env.__zoxide_last_rested != '' {
+        $env.__zoxide_last_rested
+      } else {
+        error make {msg: "zoxide: no rested directory found"}
+      }
+    }
     _ => {
       ^zoxide query --exclude $env.PWD -- ...$rest | str trim -r -c "\n"
     }

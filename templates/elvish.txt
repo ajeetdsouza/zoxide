@@ -3,6 +3,7 @@
 
 use builtin
 use path
+use time
 
 {{ section }}
 # Utility functions for zoxide.
@@ -32,11 +33,37 @@ set builtin:before-chdir = [$@builtin:before-chdir {|_| set oldpwd = $builtin:pw
 if (builtin:not (builtin:eq $E:__zoxide_shlvl $E:SHLVL)) {
     set E:__zoxide_shlvl = $E:SHLVL
 {%- if hook == InitHook::Prompt %}
-    set edit:before-readline = [$@edit:before-readline {|| zoxide add -- $pwd }]
+    set edit:before-readline = [$@edit:before-readline {||
+        if (builtin:not-eq $__zoxide_current_dir $pwd) {
+            var now = (num (time:now)[unix])
+            var elapsed = (- $now $__zoxide_entered_at)
+            if (and (>= $elapsed $__zoxide_rest_threshold) (builtin:not-eq $__zoxide_current_dir '')) {
+                set __zoxide_last_rested = $__zoxide_current_dir
+            }
+            set __zoxide_entered_at = $now
+            set __zoxide_current_dir = $pwd
+        }
+        zoxide add -- $pwd
+    }]
 {%- else if hook == InitHook::Pwd %}
-    set builtin:after-chdir = [$@builtin:after-chdir {|_| zoxide add -- $pwd }]
+    set builtin:after-chdir = [$@builtin:after-chdir {|_|
+        var now = (num (time:now)[unix])
+        var elapsed = (- $now $__zoxide_entered_at)
+        if (and (>= $elapsed $__zoxide_rest_threshold) (builtin:not-eq $__zoxide_current_dir '')) {
+            set __zoxide_last_rested = $__zoxide_current_dir
+        }
+        set __zoxide_entered_at = $now
+        set __zoxide_current_dir = $pwd
+        zoxide add -- $pwd
+    }]
 {%- endif %}
 }
+
+# Rest tracking for z --.
+var __zoxide_rest_threshold = (if (builtin:not-eq $E:_ZO_REST_THRESHOLD '') { num $E:_ZO_REST_THRESHOLD } else { num 5 })
+var __zoxide_entered_at = (num (time:now)[unix])
+var __zoxide_current_dir = $builtin:pwd
+var __zoxide_last_rested = ''
 
 {%- endif %}
 
@@ -52,6 +79,12 @@ fn __zoxide_z {|@rest|
         __zoxide_cd $oldpwd
     } elif (and ('builtin:==' (builtin:count $rest) 1) (path:is-dir &follow-symlink=$true $rest[0])) {
         __zoxide_cd $rest[0]
+    } elif (builtin:eq [--] $rest) {
+        if (builtin:not-eq $__zoxide_last_rested '') {
+            __zoxide_cd $__zoxide_last_rested
+        } else {
+            fail "zoxide: no rested directory found"
+        }
     } else {
         var path
         try {

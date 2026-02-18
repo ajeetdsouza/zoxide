@@ -15,12 +15,39 @@
 
 # Hook to add new entries to the database.
 {%- if hook == InitHook::Prompt %}
-alias __zoxide_hook 'zoxide add -- "`{{ pwd_cmd }}`"'
+alias __zoxide_hook 'set __zoxide_hook_pwd = "`{{ pwd_cmd }}`"\
+; if ("$__zoxide_hook_pwd" != "$__zoxide_current_dir") then\
+;   set __zoxide_hook_now = `date +%s`\
+;   @ __zoxide_hook_elapsed = $__zoxide_hook_now - $__zoxide_entered_at\
+;   if ($__zoxide_hook_elapsed >= $__zoxide_rest_threshold && "$__zoxide_current_dir" != "") set __zoxide_last_rested = "$__zoxide_current_dir"\
+;   set __zoxide_entered_at = "$__zoxide_hook_now"\
+;   set __zoxide_current_dir = "$__zoxide_hook_pwd"\
+; endif\
+; zoxide add -- "$__zoxide_hook_pwd"'
 
 {%- else if hook == InitHook::Pwd %}
 set __zoxide_pwd_old = `{{ pwd_cmd }}`
-alias __zoxide_hook 'set __zoxide_pwd_tmp = "`{{ pwd_cmd }}`"; test "$__zoxide_pwd_tmp" != "$__zoxide_pwd_old" && zoxide add -- "$__zoxide_pwd_tmp"; set __zoxide_pwd_old = "$__zoxide_pwd_tmp"'
+alias __zoxide_hook 'set __zoxide_pwd_tmp = "`{{ pwd_cmd }}`"\
+; if ("$__zoxide_pwd_tmp" != "$__zoxide_pwd_old") then\
+;   set __zoxide_hook_now = `date +%s`\
+;   @ __zoxide_hook_elapsed = $__zoxide_hook_now - $__zoxide_entered_at\
+;   if ($__zoxide_hook_elapsed >= $__zoxide_rest_threshold && "$__zoxide_current_dir" != "") set __zoxide_last_rested = "$__zoxide_current_dir"\
+;   set __zoxide_entered_at = "$__zoxide_hook_now"\
+;   set __zoxide_current_dir = "$__zoxide_pwd_tmp"\
+;   zoxide add -- "$__zoxide_pwd_tmp"\
+; endif\
+; set __zoxide_pwd_old = "$__zoxide_pwd_tmp"'
 {%- endif %}
+
+# Rest tracking for z --.
+if ($?_ZO_REST_THRESHOLD) then
+    set __zoxide_rest_threshold = "$_ZO_REST_THRESHOLD"
+else
+    set __zoxide_rest_threshold = 5
+endif
+set __zoxide_entered_at = `date +%s`
+set __zoxide_current_dir = `{{ pwd_cmd }}`
+set __zoxide_last_rested = ""
 
 # Initialize hook.
 alias precmd ';__zoxide_hook'
@@ -38,6 +65,12 @@ if ("$#__zoxide_args" == 0) then\
 else\
     if ("$#__zoxide_args" == 1 && "$__zoxide_args[1]" == "-") then\
         cd -\
+    else if ("$#__zoxide_args" == 1 && "$__zoxide_args[1]" == "--") then\
+        if ("$__zoxide_last_rested" != "") then\
+            cd "$__zoxide_last_rested"\
+        else\
+            echo "zoxide: no rested directory found"\
+        endif\
     else if ("$#__zoxide_args" == 1 && -d "$__zoxide_args[1]") then\
         cd "$__zoxide_args[1]"\
     else\

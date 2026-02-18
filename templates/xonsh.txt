@@ -8,6 +8,7 @@ import os
 import os.path
 import subprocess
 import sys
+import time
 import typing
 
 import xonsh.dirstack  # type: ignore # pylint: disable=import-error
@@ -98,13 +99,29 @@ if "__zoxide_hook" not in globals():
 {%- endif %}
     def __zoxide_hook(**_kwargs: typing.Any) -> None:
         """Hook to add new entries to the database."""
+        global __zoxide_entered_at, __zoxide_current_dir, __zoxide_last_rested  # pylint: disable=global-statement
         pwd = __zoxide_pwd()
+        if __zoxide_current_dir != pwd:
+            now = time.time()
+            elapsed = now - __zoxide_entered_at
+            if elapsed >= __zoxide_rest_threshold and __zoxide_current_dir:
+                __zoxide_last_rested = __zoxide_current_dir
+            __zoxide_entered_at = now
+            __zoxide_current_dir = pwd
         zoxide = __zoxide_bin()
         subprocess.run(
             [zoxide, "add", "--", pwd],
             check=False,
             env=__zoxide_env(),
         )
+
+
+# Rest tracking for z --.
+if "__zoxide_rest_threshold" not in globals():
+    __zoxide_rest_threshold = int(os.environ.get("_ZO_REST_THRESHOLD", "5"))
+    __zoxide_entered_at: float = time.time()
+    __zoxide_current_dir: typing.Optional[str] = __zoxide_pwd()
+    __zoxide_last_rested: typing.Optional[str] = None
 {% endif %}
 
 {{ section }}
@@ -121,6 +138,11 @@ def __zoxide_z(args: list[str]) -> None:
         __zoxide_cd("-")
     elif len(args) == 1 and os.path.isdir(args[0]):
         __zoxide_cd(args[0])
+    elif args == ["--"]:
+        if __zoxide_last_rested is not None:
+            __zoxide_cd(__zoxide_last_rested)
+        else:
+            raise RuntimeError("no rested directory found")
     else:
         try:
             zoxide = __zoxide_bin()

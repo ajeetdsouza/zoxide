@@ -34,9 +34,26 @@ function __zoxide_cd() {
 
 # Hook to add new entries to the database.
 function __zoxide_hook() {
+    \builtin local __zoxide_pwd_tmp
+    __zoxide_pwd_tmp="$(__zoxide_pwd)"
+    if [[ "${__zoxide_current_dir:-}" != "${__zoxide_pwd_tmp}" ]]; then
+        \builtin local __zoxide_now="${SECONDS%.*}"
+        \builtin local __zoxide_elapsed=$(( __zoxide_now - ${__zoxide_entered_at:-0} ))
+        if [[ ${__zoxide_elapsed} -ge ${__zoxide_rest_threshold:-5} ]] && [[ -n "${__zoxide_current_dir:-}" ]]; then
+            __zoxide_last_rested="${__zoxide_current_dir}"
+        fi
+        __zoxide_entered_at="${__zoxide_now}"
+        __zoxide_current_dir="${__zoxide_pwd_tmp}"
+    fi
     # shellcheck disable=SC2312
-    \command zoxide add -- "$(__zoxide_pwd)"
+    \command zoxide add -- "${__zoxide_pwd_tmp}"
 }
+
+# Rest tracking for z --.
+__zoxide_rest_threshold="${_ZO_REST_THRESHOLD:-5}"
+__zoxide_entered_at="${SECONDS%.*}"
+__zoxide_current_dir="$(__zoxide_pwd)"
+__zoxide_last_rested=""
 
 # Initialize hook.
 \builtin typeset -ga precmd_functions
@@ -90,6 +107,13 @@ function __zoxide_z() {
         __zoxide_cd ~
     elif [[ "$#" -eq 1 ]] && { [[ -d "$1" ]] || [[ "$1" = '-' ]] || [[ "$1" =~ ^[-+][0-9]+$ ]]; }; then
         __zoxide_cd "$1"
+    elif [[ "$#" -eq 1 ]] && [[ "$1" = "--" ]]; then
+        if [[ -n "${__zoxide_last_rested:-}" ]]; then
+            __zoxide_cd "${__zoxide_last_rested}"
+        else
+            \builtin printf 'zoxide: no rested directory found\n' >&2
+            return 1
+        fi
     elif [[ "$#" -eq 2 ]] && [[ "$1" = "--" ]]; then
         __zoxide_cd "$2"
     else

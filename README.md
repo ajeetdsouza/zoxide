@@ -55,6 +55,7 @@ z ~/foo            # z also works like a regular cd command
 z foo/             # cd into relative path
 z ..               # cd one level up
 z -                # cd into previous directory
+z --               # cd into last directory you stayed in for 5+ seconds
 
 zi foo             # cd with interactive selection (using fzf)
 
@@ -452,6 +453,11 @@ Environment variables[^2] can be used for configuration. They must be set before
 - `_ZO_RESOLVE_SYMLINKS`
   - When set to 1, `z` will resolve symlinks before adding directories to the
     database.
+- `_ZO_REST_THRESHOLD`
+  - Sets the minimum number of seconds you must stay in a directory before it is
+    saved as a "rested" directory. Running `z --` will jump back to the last
+    rested directory.
+  - By default, this is set to 5.
 
 ## Third-party integrations
 

@@ -12,7 +12,6 @@ pub use crate::db::dir::{Dir, Epoch, Rank};
 pub use crate::db::stream::{Stream, StreamOptions};
 
 pub struct Database {
-    path: PathBuf,
     conn: Connection,
     dirty: bool,
 }
@@ -49,7 +48,7 @@ impl Database {
             );",
         )?;
 
-        Ok(Database { path, conn, dirty: false })
+        Ok(Database { conn, dirty: false })
     }
 
     pub fn save(&mut self) -> Result<()> {

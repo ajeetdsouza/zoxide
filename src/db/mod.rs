@@ -100,10 +100,25 @@ impl Database {
     /// directory is already in the database, it is expected that the user
     /// either does a check before calling this, or calls `dedup()`
     /// afterward.
+    #[cfg(test)]
     pub fn add_unchecked(&mut self, path: impl AsRef<str> + Into<String>, rank: Rank, now: Epoch) {
         let path_s: String = path.into();
         let _ = self.conn.execute(
             "INSERT OR REPLACE INTO dirs (path, rank, last_accessed) VALUES (?1, ?2, ?3)",
+            params![&path_s, rank, now],
+        );
+        self.dirty = true;
+    }
+
+    /// choose the max `now`
+    /// sum `rank`
+    pub fn add_unchecked_merge(&mut self, path: impl AsRef<str> + Into<String>, rank: Rank, now: Epoch) {
+        let path_s: String = path.into();
+        let _ = self.conn.execute(
+            "INSERT INTO dirs (path, rank, last_accessed) VALUES (?1, ?2, ?3)
+             ON CONFLICT(path) DO UPDATE SET
+               rank = dirs.rank + excluded.rank,
+               last_accessed = MAX(dirs.last_accessed, excluded.last_accessed)",
             params![&path_s, rank, now],
         );
         self.dirty = true;
@@ -215,6 +230,7 @@ impl Database {
         // Using path as PRIMARY KEY ensures uniqueness, nothing to do here.
     }
 
+    #[cfg(test)]
     pub fn sort_by_path(&mut self) {
         // Sorting is done at query time in the sqlite-backed implementation.
     }

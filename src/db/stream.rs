@@ -1,5 +1,3 @@
-use std::iter::Rev;
-use std::ops::Range;
 use std::path::Path;
 use std::{fs, path};
 
@@ -10,20 +8,25 @@ use crate::util::{self, MONTH};
 
 pub struct Stream<'a> {
     db: &'a mut Database,
-    idxs: Rev<Range<usize>>,
+    entries: Vec<Dir<'static>>,
+    pos: usize,
     options: StreamOptions,
 }
 
 impl<'a> Stream<'a> {
     pub fn new(db: &'a mut Database, options: StreamOptions) -> Self {
-        db.sort_by_score(options.now);
-        let idxs = (0..db.dirs().len()).rev();
-        Stream { db, idxs, options }
+        // Load entries and sort by score.
+        let mut entries = db.dirs();
+        entries.sort_unstable_by(|a, b| a.score(options.now).total_cmp(&b.score(options.now)));
+        // iterate from highest to lowest
+        entries.reverse();
+        Stream { db, entries, pos: 0, options }
     }
 
     pub fn next(&mut self) -> Option<&Dir<'_>> {
-        while let Some(idx) = self.idxs.next() {
-            let dir = &self.db.dirs()[idx];
+        while self.pos < self.entries.len() {
+            let dir = &self.entries[self.pos];
+            self.pos += 1;
 
             if !self.filter_by_keywords(&dir.path) {
                 continue;
@@ -34,20 +37,20 @@ impl<'a> Stream<'a> {
             }
 
             if !self.filter_by_exclude(&dir.path) {
-                self.db.swap_remove(idx);
+                // lazily remove from database
+                let _ = self.db.remove(&*dir.path);
                 continue;
             }
 
             // Exists queries are slow, this should always be checked last.
             if !self.filter_by_exists(&dir.path) {
                 if dir.last_accessed < self.options.ttl {
-                    self.db.swap_remove(idx);
+                    let _ = self.db.remove(&*dir.path);
                 }
                 continue;
             }
 
-            let dir = &self.db.dirs()[idx];
-            return Some(dir);
+            return Some(&self.entries[self.pos - 1]);
         }
 
         None
@@ -203,9 +206,10 @@ mod tests {
     #[case(&["/foo/", "/bar"], "/foo/bar", false)]
     #[case(&["/foo/", "/bar"], "/foo/baz/bar", true)]
     fn query(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
-        let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
+        let data_dir = tempfile::tempdir().unwrap();
+        let mut db = Database::open_dir(data_dir.path()).unwrap();
         let options = StreamOptions::new(0).with_keywords(keywords.iter());
-        let stream = Stream::new(db, options);
+        let stream = Stream::new(&mut db, options);
         assert_eq!(is_match, stream.filter_by_keywords(path));
     }
 }

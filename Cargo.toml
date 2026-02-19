@@ -31,6 +31,7 @@ glob = "0.3.0"
 ouroboros = "0.18.3"
 serde = { version = "1.0.116", features = ["derive"] }
 time = { version = "0.3.47", default-features = false, features = ["parsing", "macros", "std"] }
+rusqlite = "0.40"
 
 [target.'cfg(windows)'.dependencies]
 which = "8.0.2"

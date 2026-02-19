@@ -85,7 +85,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__subcmd__add)
-            opts="-s -h -V --score --help --version <PATHS>..."
+            opts="-s -h -V --score --help --version"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -121,7 +121,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__subcmd__edit__subcmd__decrement)
-            opts="-h -V --help --version <PATH>"
+            opts="-h -V --help --version"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -135,7 +135,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__subcmd__edit__subcmd__delete)
-            opts="-h -V --help --version <PATH>"
+            opts="-h -V --help --version"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -149,7 +149,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__subcmd__edit__subcmd__increment)
-            opts="-h -V --help --version <PATH>"
+            opts="-h -V --help --version"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -297,7 +297,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__subcmd__query)
-            opts="-a -i -l -s -h -V --all --interactive --list --score --exclude --base-dir --help --version [KEYWORDS]..."
+            opts="-a -i -l -s -h -V --all --interactive --list --score --exclude --base-dir --help --version"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -325,7 +325,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__subcmd__remove)
-            opts="-h -V --help --version [PATHS]..."
+            opts="-h -V --help --version"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0

@@ -60,7 +60,7 @@ pub(crate) fn run(importer: &impl Importer, db: &mut Database) -> Result<()> {
                 if exclude_dirs.iter().any(|glob| glob.matches(&dir.path)) {
                     continue;
                 }
-                db.add_unchecked(dir.path, dir.rank, dir.last_accessed);
+                db.add_unchecked_merge(dir.path, dir.rank, dir.last_accessed);
             }
             Err(e) => {
                 let location = match &e.path {

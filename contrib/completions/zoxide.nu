@@ -11,7 +11,7 @@ module completions {
     --score(-s): string       # The rank to increment the entry if it exists or initialize it with if it doesn't
     --help(-h)                # Print help
     --version(-V)             # Print version
-    ...paths: path
+    ...paths: directory
   ]
 
   # Edit the database
@@ -116,8 +116,8 @@ module completions {
     --interactive(-i)         # Use interactive selection
     --list(-l)                # List all matching directories
     --score(-s)               # Print score with results
-    --exclude: path           # Exclude the current directory
-    --base-dir: path          # Only search within this directory
+    --exclude: directory      # Exclude the current directory
+    --base-dir: directory     # Only search within this directory
     --help(-h)                # Print help
     --version(-V)             # Print version
     ...keywords: string
@@ -127,7 +127,7 @@ module completions {
   export extern "zoxide remove" [
     --help(-h)                # Print help
     --version(-V)             # Print version
-    ...paths: path
+    ...paths: directory
   ]
 
 }

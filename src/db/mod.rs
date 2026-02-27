@@ -6,10 +6,56 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use rusqlite::{Connection, OptionalExtension, params};
+use bincode::Options;
 
 use crate::config;
 pub use crate::db::dir::{Dir, Epoch, Rank};
 pub use crate::db::stream::{Stream, StreamOptions};
+
+/// Attempt to read an old bincode-formatted database and write its entries into
+/// the provided SQLite connection.
+fn migrate_from_bincode(conn: &mut Connection, old_path: &Path) -> Result<()> {
+    // The on-disk format used by the legacy database is very similar to the
+    // struct definitions we already use.  We simply serialise a version number
+    // followed by a `Vec<Dir>`.
+    const MAX_SIZE: u64 = 32 << 20; // 32 MiB
+
+    let data = fs::read(old_path)
+        .with_context(|| format!("could not read legacy database: {}", old_path.display()))?;
+
+    let deserializer = &mut bincode::options()
+        .with_fixint_encoding()
+        .with_limit(MAX_SIZE);
+
+    let version_size = deserializer.serialized_size(&Database::VERSION)? as usize;
+    if data.len() < version_size {
+        anyhow::bail!("legacy database is corrupted");
+    }
+    let (bytes_version, bytes_dirs) = data.split_at(version_size);
+
+    let version: u32 = deserializer.deserialize(bytes_version)?;
+    if version != Database::VERSION {
+        anyhow::bail!(
+            "unsupported legacy database version (got {}, expected {})",
+            version,
+            Database::VERSION
+        );
+    }
+
+    let dirs: Vec<Dir<'_>> = deserializer.deserialize(bytes_dirs)?;
+
+    let tx = conn.transaction()?;
+    for dir in dirs {
+        let path_s: String = dir.path.into_owned();
+        tx.execute(
+            "INSERT OR REPLACE INTO dirs (path, rank, last_accessed) VALUES (?1, ?2, ?3)",
+            params![&path_s, dir.rank, dir.last_accessed],
+        )?;
+    }
+    tx.commit()?;
+
+    Ok(())
+}
 
 pub struct Database {
     conn: Connection,
@@ -33,7 +79,9 @@ impl Database {
             .with_context(|| format!("unable to create data directory: {}", data_dir.display()))?;
 
         // Open or create sqlite database file.
-        let conn = Connection::open(&path)
+        let existed = path.exists();
+
+        let mut conn = Connection::open(&path)
             .with_context(|| format!("could not open database: {}", path.display()))?;
 
         // Enable WAL for better concurrency and durability.
@@ -47,6 +95,24 @@ impl Database {
                 last_accessed INTEGER NOT NULL
             );",
         )?;
+
+        // If the sqlite database didn't previously exist, attempt to migrate data
+        // from the legacy bincode-backed file.  This keeps behaviour identical to
+        // older versions of zoxide while ensuring users transparently upgrade.
+        if !existed {
+            let old_path = data_dir.join("db.zo");
+            if old_path.exists() {
+                // Migration errors shouldn't prevent the program from running;
+                // just print a warning so users can investigate.
+                if let Err(e) = migrate_from_bincode(&mut conn, &old_path) {
+                    eprintln!(
+                        "warning: failed to migrate legacy database ({}): {}",
+                        old_path.display(),
+                        e
+                    );
+                }
+            }
+        }
 
         Ok(Database { conn, dirty: false })
     }
@@ -323,5 +389,35 @@ mod tests {
             assert!(!db.remove(path));
             db.save().unwrap();
         }
+    }
+
+    #[test]
+    fn migrate_from_bincode() {
+        let data_dir = tempfile::tempdir().unwrap();
+        let old_path = data_dir.path().join("db.zo");
+
+        // prepare a legacy file with one entry
+        let dirs = vec![Dir {
+            path: "/foo".into(),
+            rank: 1.0,
+            last_accessed: 12345,
+        }];
+        let mut bytes = Vec::new();
+        let mut serializer = bincode::options().with_fixint_encoding();
+        serializer.serialize_into(&mut bytes, &Database::VERSION).unwrap();
+        serializer.serialize_into(&mut bytes, &dirs).unwrap();
+        fs::write(&old_path, &bytes).unwrap();
+
+        // opening should automatically migrate the data
+        let db = Database::open_dir(data_dir.path()).unwrap();
+        let dirs = db.dirs();
+        assert_eq!(dirs.len(), 1);
+        assert_eq!(dirs[0].path, "/foo");
+        assert!((dirs[0].rank - 1.0).abs() < f64::EPSILON);
+        assert_eq!(dirs[0].last_accessed, 12345);
+        // sqlite file should exist after opening
+        assert!(data_dir.path().join("db.sqlite3").exists());
+        // old file is left intact so future runs are no-ops
+        assert!(old_path.exists());
     }
 }

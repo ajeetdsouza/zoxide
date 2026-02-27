@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - POSIX: support for non-Cygwin Windows environments (e.g. Busybox).
+- Automatically migrate data from the legacy bincode-backed `db.zo` file
+  when upgrading to the sqlite backend (only performed if no
+  `db.sqlite3` exists).
 
 ### Fixed
 

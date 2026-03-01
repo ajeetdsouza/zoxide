@@ -107,9 +107,6 @@ function global:__zoxide_z {
     if ($args.Length -eq 0) {
         __zoxide_cd $null $true
     }
-    elseif ($args.Length -eq 1 -and $args[0] -eq '~') {
-        __zoxide_cd ~ $true
-    }
     elseif ($args.Length -eq 1 -and ($args[0] -eq '-' -or $args[0] -eq '+')) {
         __zoxide_cd $args[0] $false
     }

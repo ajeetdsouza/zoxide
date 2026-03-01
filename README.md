@@ -24,13 +24,6 @@
         to learn more.
       </sup></div>
     </td>
-    <td align="center">
-      <!-- markdownlint-disable-next-line MD013 -->
-      <a href="https://www.recall.ai/careers?ashby_jid=7b02811e-bc91-4ef2-925d-f56a5acac13b&utm_source=github&utm_medium=sponsorship&utm_campaign=zoxide"><img alt="Sponsored by Recall.ai" width="230" src="https://github.com/user-attachments/assets/0c5cb177-561c-4637-bef6-cf584939c829" /></a>
-      <div><sup>Processing over 3TB/s of video at peak load,</sup></div>
-      <!-- markdownlint-disable-next-line MD013 -->
-      <div><sup>now <a href="https://www.recall.ai/careers?ashby_jid=7b02811e-bc91-4ef2-925d-f56a5acac13b&utm_source=github&utm_medium=sponsorship&utm_campaign=zoxide">hiring in SF.</a></sup></div>
-    </td>
   </tr>
 </table>
 
@@ -235,7 +228,7 @@ zoxide can be installed in 4 easy steps:
    > eval (zoxide init elvish | slurp)
    > ```
    >
-   > **Note**
+   > **Note:**
    > zoxide only supports elvish v0.18.0 and above.
 
    </details>
@@ -269,7 +262,7 @@ zoxide can be installed in 4 easy steps:
    > source ~/.zoxide.nu
    > ```
    >
-   > **Note**
+   > **Note:**
    > zoxide only supports Nushell v0.89.0+.
 
    </details>
@@ -335,12 +328,16 @@ zoxide can be installed in 4 easy steps:
 
    </details>
 
+   > **Note:**
+   > [Warp Terminal] users need to set `Input Type` to `Shell (PS1)` under
+   > `Settings > Appearance > Input` for completions to work.
+
 3. **Install fzf** <sup>(optional)</sup>
 
    [fzf] is a command-line fuzzy finder, used by zoxide for completions /
    interactive selection. It can be installed from [here][fzf-installation].
 
-   > **Note**
+   > **Note:**
    > The minimum supported fzf version is v0.51.0.
 
 4. **Import your data** <sup>(optional)</sup>
@@ -567,6 +564,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 [ubuntu packages]: https://packages.ubuntu.com/jammy/zoxide
 [vim]: https://github.com/vim/vim
 [void linux packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide
+[warp terminal]: https://www.warp.dev
 [wiki-env]: https://github.com/ajeetdsouza/zoxide/wiki/HOWTO:-set-environment-variables "HOWTO: set environment variables"
 [xplr]: https://github.com/sayanarijit/xplr
 [xxh-plugin-prerun-zoxide]: https://github.com/xxh/xxh-plugin-prerun-zoxide

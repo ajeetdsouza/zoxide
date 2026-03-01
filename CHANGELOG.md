@@ -7,6 +7,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- POSIX: support for non-Cygwin Windows environments (e.g. Busybox).
+
+### Fixed
+
+- Bash/Fish/POSIX/Zsh: resolve symlinks on Windows.
+
+## [0.9.9] - 2026-01-31
+
+### Added
+
+- Support for Android ARMv7.
+- Fish: support for v4.1.0+.
+
+### Fixed
+
+- Nushell: use sigil operator when calling external commands.
+- Zsh: support multiple digits in `z +N` and `z -N` dirstack commands.
+- Bash: avoid downcasting `$PROMPT_COMMAND` array into a string.
+- Bash: avoid overwriting `$PIPESTATUS`.
+- POSIX: remove non-POSIX compliant calls to `builtin`.
+- Fish: clear existing completions when defining `z` command.
+
 ## [0.9.8] - 2025-05-27
 
 ### Added
@@ -22,7 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Bash: doctor now handles `PROMPT_COMMAND` being an array.
+- Bash: doctor now handles `$PROMPT_COMMAND` being an array.
 - Bash: doctor now handles Visual Studio Code's shell integration.
 - Bash: completions now work with `ble.sh`.
 - Nushell: stop ignoring symlinks when `cd`-ing into a directory.
@@ -35,7 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Nushell: support for 0.102.0.
+- Nushell: support for v0.102.0.
 - Bash / Zsh: add doctor to diagnose common issues.
 
 ### Fixed
@@ -302,7 +328,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `zoxide query --all` for listing deleted directories.
 - Lazy deletion for removed directories that have not been accessed in > 90
   days.
-- Nushell: support for 0.32.0+.
+- Nushell: support for v0.32.0+.
 
 ### Fixed
 
@@ -536,6 +562,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions pipeline to build and upload releases.
 - Add support for Zsh.
 
+[0.9.9]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.8...v0.9.9
 [0.9.8]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.7...v0.9.8
 [0.9.7]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.6...v0.9.7
 [0.9.6]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.5...v0.9.6

@@ -19,7 +19,7 @@ main() {
     parse_args "$@"
 
     local _arch
-    _arch="${ARCH:-$(ensure get_architecture)}"
+    _arch="${_ZOXIDE_ARCH:-$(get_architecture)}" || exit $?
     assert_nz "${_arch}" "arch"
     echo "Detected architecture: ${_arch}"
 
@@ -36,7 +36,7 @@ main() {
 
     # Download and extract zoxide.
     local _package
-    _package="$(ensure download_zoxide "${_arch}")"
+    _package="$(download_zoxide "${_arch}")" || exit $?
     assert_nz "${_package}" "package"
     echo "Downloaded package: ${_package}"
     case "${_package}" in
@@ -54,44 +54,44 @@ main() {
     esac
 
     # Install binary.
-    ensure try_sudo mkdir -p -- "${BIN_DIR}"
-    ensure try_sudo cp -- "${_bin_name}" "${BIN_DIR}/${_bin_name}"
-    ensure try_sudo chmod +x "${BIN_DIR}/${_bin_name}"
-    echo "Installed zoxide to ${BIN_DIR}"
+    ensure try_sudo mkdir -p -- "${_ZOXIDE_BIN_DIR}"
+    ensure try_sudo cp -- "${_bin_name}" "${_ZOXIDE_BIN_DIR}/${_bin_name}"
+    ensure try_sudo chmod +x "${_ZOXIDE_BIN_DIR}/${_bin_name}"
+    echo "Installed zoxide to ${_ZOXIDE_BIN_DIR}"
 
     # Install manpages.
-    ensure try_sudo mkdir -p -- "${MAN_DIR}/man1"
-    ensure try_sudo cp -- "man/man1/"* "${MAN_DIR}/man1/"
-    echo "Installed manpages to ${MAN_DIR}"
+    ensure try_sudo mkdir -p -- "${_ZOXIDE_MAN_DIR}/man1"
+    ensure try_sudo cp -- "man/man1/"* "${_ZOXIDE_MAN_DIR}/man1/"
+    echo "Installed manpages to ${_ZOXIDE_MAN_DIR}"
 
     # Print success message and check $PATH.
     echo ""
     echo "zoxide is installed!"
-    if ! echo ":${PATH}:" | grep -Fq ":${BIN_DIR}:"; then
-        echo "Note: ${BIN_DIR} is not on your \$PATH. zoxide will not work unless it is added to \$PATH."
+    if ! echo ":${PATH}:" | grep -Fq ":${_ZOXIDE_BIN_DIR}:"; then
+        echo "Note: ${_ZOXIDE_BIN_DIR} is not on your \$PATH. zoxide will not work unless it is added to \$PATH."
     fi
 }
 
 # Parse the arguments passed and set variables accordingly.
 parse_args() {
-    BIN_DIR_DEFAULT="${HOME}/.local/bin"
-    MAN_DIR_DEFAULT="${HOME}/.local/share/man"
-    SUDO_DEFAULT="sudo"
+    _ZOXIDE_BIN_DIR_DEFAULT="${HOME}/.local/bin"
+    _ZOXIDE_MAN_DIR_DEFAULT="${HOME}/.local/share/man"
+    _ZOXIDE_SUDO_DEFAULT="sudo"
 
-    BIN_DIR="${BIN_DIR_DEFAULT}"
-    MAN_DIR="${MAN_DIR_DEFAULT}"
-    SUDO="${SUDO_DEFAULT}"
+    _ZOXIDE_BIN_DIR="${_ZOXIDE_BIN_DIR_DEFAULT}"
+    _ZOXIDE_MAN_DIR="${_ZOXIDE_MAN_DIR_DEFAULT}"
+    _ZOXIDE_SUDO="${_ZOXIDE_SUDO_DEFAULT}"
 
     while [ "$#" -gt 0 ]; do
         case "$1" in
-        --arch) ARCH="$2" && shift 2 ;;
-        --arch=*) ARCH="${1#*=}" && shift 1 ;;
-        --bin-dir) BIN_DIR="$2" && shift 2 ;;
-        --bin-dir=*) BIN_DIR="${1#*=}" && shift 1 ;;
-        --man-dir) MAN_DIR="$2" && shift 2 ;;
-        --man-dir=*) MAN_DIR="${1#*=}" && shift 1 ;;
-        --sudo) SUDO="$2" && shift 2 ;;
-        --sudo=*) SUDO="${1#*=}" && shift 1 ;;
+        --arch) _ZOXIDE_ARCH="$2" && shift 2 ;;
+        --arch=*) _ZOXIDE_ARCH="${1#*=}" && shift 1 ;;
+        --bin-dir) _ZOXIDE_BIN_DIR="$2" && shift 2 ;;
+        --bin-dir=*) _ZOXIDE_BIN_DIR="${1#*=}" && shift 1 ;;
+        --man-dir) _ZOXIDE_MAN_DIR="$2" && shift 2 ;;
+        --man-dir=*) _ZOXIDE_MAN_DIR="${1#*=}" && shift 1 ;;
+        --sudo) _ZOXIDE_SUDO="$2" && shift 2 ;;
+        --sudo=*) _ZOXIDE_SUDO="${1#*=}" && shift 1 ;;
         -h | --help) usage && exit 0 ;;
         *) err "Unknown option: $1" ;;
         esac
@@ -119,9 +119,9 @@ ${_text_heading}Usage:${_text_reset}
 
 ${_text_heading}Options:${_text_reset}
       --arch     Override the architecture identified by the installer [current: ${_arch}]
-      --bin-dir  Override the installation directory [default: ${BIN_DIR_DEFAULT}]
-      --man-dir  Override the manpage installation directory [default: ${MAN_DIR_DEFAULT}]
-      --sudo     Override the command used to elevate to root privileges [default: ${SUDO_DEFAULT}]
+      --bin-dir  Override the installation directory [default: ${_ZOXIDE_BIN_DIR_DEFAULT}]
+      --man-dir  Override the manpage installation directory [default: ${_ZOXIDE_MAN_DIR_DEFAULT}]
+      --sudo     Override the command used to elevate to root privileges [default: ${_ZOXIDE_SUDO_DEFAULT}]
   -h, --help     Print help"
 }
 
@@ -176,19 +176,19 @@ try_sudo() {
     fi
 
     need_sudo
-    "${SUDO}" "$@"
+    "${_ZOXIDE_SUDO}" "$@"
 }
 
 need_sudo() {
-    if ! check_cmd "${SUDO}"; then
+    if ! check_cmd "${_ZOXIDE_SUDO}"; then
         err "\
-could not find the command \`${SUDO}\` needed to get permissions for install.
+could not find the command \`${_ZOXIDE_SUDO}\` needed to get permissions for install.
 
 If you are on Windows, please run your shell as an administrator, then rerun this script.
 Otherwise, please run this script as root, or install \`sudo\`."
     fi
 
-    if ! "${SUDO}" -v; then
+    if ! "${_ZOXIDE_SUDO}" -v; then
         err "sudo permissions not granted, aborting installation"
     fi
 }

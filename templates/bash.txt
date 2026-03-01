@@ -9,12 +9,16 @@
 
 # pwd based on the value of _ZO_RESOLVE_SYMLINKS.
 function __zoxide_pwd() {
+{%- let pwd -%}
+{%- if resolve_symlinks -%}
+{%- let pwd = "\\builtin pwd -P" -%}
+{%- else -%}
+{%- let pwd = "\\builtin pwd -L" -%}
+{%- endif -%}
 {%- if cfg!(windows) %}
-    \command cygpath -w "$(\builtin pwd -P)"
-{%- else if resolve_symlinks %}
-    \builtin pwd -P
+    \command cygpath -w "{{ pwd }}"
 {%- else %}
-    \builtin pwd -L
+    {{ pwd }}
 {%- endif %}
 }
 

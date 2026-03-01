@@ -11,15 +11,28 @@
 
 <sup>Special thanks to:</sup>
 
-<!-- markdownlint-disable-next-line MD013 -->
-<div><a href="https://go.warp.dev/zoxide"><img alt="Sponsored by Warp" width="230" src="https://raw.githubusercontent.com/warpdotdev/brand-assets/refs/heads/main/Github/Sponsor/Warp-Github-LG-03.png" /></a></div>
-<div><sup><b>Warp, built for coding with multiple AI agents.</b></sup></div>
-<div><sup>Available for macOS, Linux, and Windows.</sup></div>
-<div><sup>
-  Visit
-  <a href="https://go.warp.dev/zoxide"><u>warp.dev</u></a>
-  to learn more.
-</sup></div>
+<table>
+  <tr>
+    <td align="center">
+      <!-- markdownlint-disable-next-line MD013 -->
+      <a href="https://go.warp.dev/zoxide"><img alt="Sponsored by Warp" width="230" src="https://raw.githubusercontent.com/warpdotdev/brand-assets/refs/heads/main/Github/Sponsor/Warp-Github-LG-03.png" /></a>
+      <div><sup><b>Warp, built for coding with multiple AI agents.</b></sup></div>
+      <div><sup>Available for macOS, Linux, and Windows.</sup></div>
+      <div><sup>
+        Visit
+        <a href="https://go.warp.dev/zoxide"><u>warp.dev</u></a>
+        to learn more.
+      </sup></div>
+    </td>
+    <td align="center">
+      <!-- markdownlint-disable-next-line MD013 -->
+      <a href="https://www.recall.ai/careers?ashby_jid=7b02811e-bc91-4ef2-925d-f56a5acac13b&utm_source=github&utm_medium=sponsorship&utm_campaign=zoxide"><img alt="Sponsored by Recall.ai" width="230" src="https://github.com/user-attachments/assets/0c5cb177-561c-4637-bef6-cf584939c829" /></a>
+      <div><sup>Processing over 3TB/s of video at peak load,</sup></div>
+      <!-- markdownlint-disable-next-line MD013 -->
+      <div><sup>now <a href="https://www.recall.ai/careers?ashby_jid=7b02811e-bc91-4ef2-925d-f56a5acac13b&utm_source=github&utm_medium=sponsorship&utm_campaign=zoxide">hiring in SF.</a></sup></div>
+    </td>
+  </tr>
+</table>
 
 <hr />
 

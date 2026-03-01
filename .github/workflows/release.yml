@@ -44,7 +44,7 @@ jobs:
             target: aarch64-pc-windows-msvc
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Get version
@@ -61,7 +61,7 @@ jobs:
           override: true
           target: ${{ matrix.target }}
       - name: Setup cache
-        uses: Swatinem/rust-cache@v2.8.1
+        uses: Swatinem/rust-cache@v2.8.2
         with:
           key: ${{ matrix.target }}
       - name: Install cross
@@ -102,7 +102,7 @@ jobs:
             CHANGELOG.md LICENSE README.md ./man/ ./contrib/completions/ `
             ./target/${{ matrix.target }}/release/zoxide.exe
       - name: Upload artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.target }}
           path: |

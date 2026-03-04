@@ -11,15 +11,21 @@
 
 <sup>Special thanks to:</sup>
 
-<!-- markdownlint-disable-next-line MD013 -->
-<div><a href="https://go.warp.dev/zoxide"><img alt="Sponsored by Warp" width="230" src="https://raw.githubusercontent.com/warpdotdev/brand-assets/refs/heads/main/Github/Sponsor/Warp-Github-LG-03.png" /></a></div>
-<div><sup><b>Warp, built for coding with multiple AI agents.</b></sup></div>
-<div><sup>Available for macOS, Linux, and Windows.</sup></div>
-<div><sup>
-  Visit
-  <a href="https://go.warp.dev/zoxide"><u>warp.dev</u></a>
-  to learn more.
-</sup></div>
+<table>
+  <tr>
+    <td align="center">
+      <!-- markdownlint-disable-next-line MD013 -->
+      <a href="https://go.warp.dev/zoxide"><img alt="Sponsored by Warp" width="230" src="https://raw.githubusercontent.com/warpdotdev/brand-assets/refs/heads/main/Github/Sponsor/Warp-Github-LG-03.png" /></a>
+      <div><sup><b>Warp, built for coding with multiple AI agents.</b></sup></div>
+      <div><sup>Available for macOS, Linux, and Windows.</sup></div>
+      <div><sup>
+        Visit
+        <a href="https://go.warp.dev/zoxide"><u>warp.dev</u></a>
+        to learn more.
+      </sup></div>
+    </td>
+  </tr>
+</table>
 
 <hr />
 
@@ -222,7 +228,7 @@ zoxide can be installed in 4 easy steps:
    > eval (zoxide init elvish | slurp)
    > ```
    >
-   > **Note**
+   > **Note:**
    > zoxide only supports elvish v0.18.0 and above.
 
    </details>
@@ -256,7 +262,7 @@ zoxide can be installed in 4 easy steps:
    > source ~/.zoxide.nu
    > ```
    >
-   > **Note**
+   > **Note:**
    > zoxide only supports Nushell v0.106.0+.
 
    </details>
@@ -322,12 +328,16 @@ zoxide can be installed in 4 easy steps:
 
    </details>
 
+   > **Note:**
+   > [Warp Terminal] users need to set `Input Type` to `Shell (PS1)` under
+   > `Settings > Appearance > Input` for completions to work.
+
 3. **Install fzf** <sup>(optional)</sup>
 
    [fzf] is a command-line fuzzy finder, used by zoxide for completions /
    interactive selection. It can be installed from [here][fzf-installation].
 
-   > **Note**
+   > **Note:**
    > The minimum supported fzf version is v0.51.0.
 
 4. **Import your data** <sup>(optional)</sup>
@@ -554,6 +564,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 [ubuntu packages]: https://packages.ubuntu.com/jammy/zoxide
 [vim]: https://github.com/vim/vim
 [void linux packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide
+[warp terminal]: https://www.warp.dev
 [wiki-env]: https://github.com/ajeetdsouza/zoxide/wiki/HOWTO:-set-environment-variables "HOWTO: set environment variables"
 [xplr]: https://github.com/sayanarijit/xplr
 [xxh-plugin-prerun-zoxide]: https://github.com/xxh/xxh-plugin-prerun-zoxide

@@ -24,6 +24,13 @@
         to learn more.
       </sup></div>
     </td>
+    <td align="center">
+      <!-- markdownlint-disable-next-line MD013 -->
+      <a href="https://www.recall.ai/careers?ashby_jid=7b02811e-bc91-4ef2-925d-f56a5acac13b&utm_source=github&utm_medium=sponsorship&utm_campaign=zoxide"><img alt="Sponsored by Recall.ai" width="230" src="https://github.com/user-attachments/assets/0c5cb177-561c-4637-bef6-cf584939c829" /></a>
+      <div><sup>Processing over 3TB/s of video at peak load,</sup></div>
+      <!-- markdownlint-disable-next-line MD013 -->
+      <div><sup>now <a href="https://www.recall.ai/careers?ashby_jid=7b02811e-bc91-4ef2-925d-f56a5acac13b&utm_source=github&utm_medium=sponsorship&utm_campaign=zoxide">hiring in SF.</a></sup></div>
+    </td>
   </tr>
 </table>
 
@@ -329,7 +336,8 @@ zoxide can be installed in 4 easy steps:
    </details>
 
    > **Note:**
-   > [Warp] provides its own completions, so `Space+Tab` completions are not supported there.
+   > [Warp] provides its own completions, so `Space+Tab` completions are not
+   > supported there.
 
 3. **Install fzf** <sup>(optional)</sup>
 

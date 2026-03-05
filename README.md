@@ -64,7 +64,7 @@ z -                # cd into previous directory
 
 zi foo             # cd with interactive selection (using fzf)
 
-z foo<SPACE><TAB>  # show interactive completions (zoxide v0.8.0+, bash 4.4+/fish/zsh only)
+z foo<SPACE><TAB>  # show interactive completions (bash 4.4+/fish/zsh only)
 ```
 
 Read more about the matching algorithm [here][algorithm-matching].
@@ -329,8 +329,7 @@ zoxide can be installed in 4 easy steps:
    </details>
 
    > **Note:**
-   > [Warp Terminal] users need to set `Input Type` to `Shell (PS1)` under
-   > `Settings > Appearance > Input` for completions to work.
+   > [Warp] provides its own completions, so `Space+Tab` completions are not supported there.
 
 3. **Install fzf** <sup>(optional)</sup>
 
@@ -564,7 +563,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 [ubuntu packages]: https://packages.ubuntu.com/jammy/zoxide
 [vim]: https://github.com/vim/vim
 [void linux packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide
-[warp terminal]: https://www.warp.dev
+[warp]: https://www.warp.dev
 [wiki-env]: https://github.com/ajeetdsouza/zoxide/wiki/HOWTO:-set-environment-variables "HOWTO: set environment variables"
 [xplr]: https://github.com/sayanarijit/xplr
 [xxh-plugin-prerun-zoxide]: https://github.com/xxh/xxh-plugin-prerun-zoxide

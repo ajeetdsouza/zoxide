@@ -105,8 +105,18 @@ __zoxide_z() {
             \command printf 'zoxide: $OLDPWD is not set'
             return 1
         fi
-    elif [ "$#" -eq 1 ] && [ -d "$1" ]; then
-        __zoxide_cd "$1"
+    elif [ "$#" -eq 1 ]; then
+        __zoxide_arg="$1"
+        # Strip trailing slashes for directory test
+        while [ "${__zoxide_arg}" != "${__zoxide_arg%/}" ] && [ "${__zoxide_arg}" != / ]; do
+            __zoxide_arg="${__zoxide_arg%/}"
+        done
+        if [ -d "${__zoxide_arg}" ]; then
+            __zoxide_cd "$1"
+        else
+            __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd || \command true)" -- "$@")" &&
+                __zoxide_cd "${__zoxide_result}"
+        fi
     else
         __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd || \command true)" -- "$@")" &&
             __zoxide_cd "${__zoxide_result}"

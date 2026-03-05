@@ -199,7 +199,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__query)
-            opts="-a -i -l -s -h -V --all --interactive --list --score --exclude --base-dir --help --version [KEYWORDS]..."
+            opts="-a -i -l -s -t -h -V --all --interactive --list --score --time --exclude --base-dir --help --version [KEYWORDS]..."
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0

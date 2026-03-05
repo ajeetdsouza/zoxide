@@ -1,6 +1,6 @@
 group_imports = "StdExternalCrate"
 imports_granularity = "Module"
-newline_style = "Native"
+newline_style = "Unix"
 use_field_init_shorthand = true
 use_small_heuristics = "Max"
 use_try_shorthand = true

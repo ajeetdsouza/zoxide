@@ -79,6 +79,32 @@ def --env --wrapped __zoxide_zi [...rest:string] {
 {%- endif %}
 }
 
+# Jump to a directory within the current directory.
+def --env --wrapped __zoxide_zc [...rest: string] {
+  let base_dir = $env.PWD
+  let path = match $rest {
+    [] => {'~'},
+    [ '-' ] => {'-'},
+    [ $arg ] if ($arg | path expand | path type) == 'dir' => {$arg}
+    _ => {
+      ^zoxide query --exclude $base_dir --base-dir $base_dir -- ...$rest | str trim -r -c "\n"
+    }
+  }
+  cd $path
+{%- if echo %}
+  echo $env.PWD
+{%- endif %}
+}
+
+# Jump to a directory within the current directory using interactive search.
+def --env --wrapped __zoxide_zci [...rest:string] {
+  let base_dir = $env.PWD
+  cd $'(^zoxide query --interactive --base-dir ($base_dir) -- ...$rest | str trim -r -c "\n")'
+{%- if echo %}
+  echo $env.PWD
+{%- endif %}
+}
+
 {{ section }}
 # Commands for zoxide. Disable these using --no-cmd.
 #
@@ -88,6 +114,8 @@ def --env --wrapped __zoxide_zi [...rest:string] {
 
 alias {{cmd}} = __zoxide_z
 alias {{cmd}}i = __zoxide_zi
+alias {{cmd}}c = __zoxide_zc
+alias {{cmd}}ci = __zoxide_zci
 
 {%- when None %}
 

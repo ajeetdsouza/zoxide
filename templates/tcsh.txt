@@ -51,6 +51,26 @@ alias __zoxide_zi 'set __zoxide_args = (\!*)\
 set __zoxide_pwd = `{{ pwd_cmd }}`\
 set __zoxide_result = "`zoxide query --exclude '"'"'$__zoxide_pwd'"'"' --interactive -- $__zoxide_args`" && cd "$__zoxide_result"'
 
+# Jump to a directory within the current directory.
+alias __zoxide_zc 'set __zoxide_args = (\!*)\
+if ("$#__zoxide_args" == 0) then\
+    cd ~\
+else\
+    if ("$#__zoxide_args" == 1 && "$__zoxide_args[1]" == "-") then\
+        cd -\
+    else if ("$#__zoxide_args" == 1 && -d "$__zoxide_args[1]") then\
+        cd "$__zoxide_args[1]"\
+    else\
+        set __zoxide_pwd = `{{ pwd_cmd }}`\
+        set __zoxide_result = "`zoxide query --exclude '"'"'$__zoxide_pwd'"'"' --base-dir '"'"'$__zoxide_pwd'"'"' -- $__zoxide_args`" && cd "$__zoxide_result"\
+    endif\
+endif'
+
+# Jump to a directory within the current directory using interactive search.
+alias __zoxide_zci 'set __zoxide_args = (\!*)\
+set __zoxide_pwd = `{{ pwd_cmd }}`\
+set __zoxide_result = "`zoxide query --exclude '"'"'$__zoxide_pwd'"'"' --interactive --base-dir '"'"'$__zoxide_pwd'"'"' -- $__zoxide_args`" && cd "$__zoxide_result"'
+
 {{ section }}
 # Commands for zoxide. Disable these using --no-cmd.
 #
@@ -60,6 +80,8 @@ set __zoxide_result = "`zoxide query --exclude '"'"'$__zoxide_pwd'"'"' --interac
 
 alias {{cmd}} __zoxide_z
 alias {{cmd}}i __zoxide_zi
+alias {{cmd}}c __zoxide_zc
+alias {{cmd}}ci __zoxide_zci
 
 {%- when None %}
 

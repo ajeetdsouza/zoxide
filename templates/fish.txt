@@ -113,6 +113,31 @@ function __zoxide_zi
     and __zoxide_cd $result
 end
 
+# Jump to a directory within the current directory.
+function __zoxide_zc
+    set -l base_dir (__zoxide_pwd)
+    set -l argc (builtin count $argv)
+    if test $argc -eq 0
+        __zoxide_cd $HOME
+    else if test "$argv" = -
+        __zoxide_cd -
+    else if test $argc -eq 1 -a -d $argv[1]
+        __zoxide_cd $argv[1]
+    else if test $argc -eq 2 -a $argv[1] = --
+        __zoxide_cd -- $argv[2]
+    else
+        set -l result (command zoxide query --exclude $base_dir --base-dir $base_dir -- $argv)
+        and __zoxide_cd $result
+    end
+end
+
+# Jump to a directory within the current directory using interactive search.
+function __zoxide_zci
+    set -l base_dir (__zoxide_pwd)
+    set -l result (command zoxide query --interactive --base-dir $base_dir -- $argv)
+    and __zoxide_cd $result
+end
+
 {{ section }}
 # Commands for zoxide. Disable these using --no-cmd.
 #
@@ -127,6 +152,14 @@ alias {{cmd}}=__zoxide_z
 abbr --erase {{cmd}}i &>/dev/null
 complete --erase --command {{cmd}}i
 alias {{cmd}}i=__zoxide_zi
+
+abbr --erase {{cmd}}c &>/dev/null
+complete --erase --command {{cmd}}c
+alias {{cmd}}c=__zoxide_zc
+
+abbr --erase {{cmd}}ci &>/dev/null
+complete --erase --command {{cmd}}ci
+alias {{cmd}}ci=__zoxide_zci
 
 {%- when None %}
 

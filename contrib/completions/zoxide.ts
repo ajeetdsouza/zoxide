@@ -124,6 +124,7 @@ const completion: Fig.Spec = {
             suggestions: [
               "autojump",
               "z",
+              "jump",
             ],
           },
         },

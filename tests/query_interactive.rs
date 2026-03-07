@@ -1,8 +1,7 @@
 #![cfg(not(windows))]
 
-use std::env;
-use std::fs;
 use std::os::unix::fs::PermissionsExt;
+use std::{env, fs};
 
 use assert_cmd::Command;
 

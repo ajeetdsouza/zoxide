@@ -36,6 +36,8 @@ Register-ArgumentCompleter -Native -CommandName 'zoxide' -ScriptBlock {
         'zoxide;add' {
             [CompletionResult]::new('-s', '-s', [CompletionResultType]::ParameterName, 'The rank to increment the entry if it exists or initialize it with if it doesn''t')
             [CompletionResult]::new('--score', '--score', [CompletionResultType]::ParameterName, 'The rank to increment the entry if it exists or initialize it with if it doesn''t')
+            [CompletionResult]::new('-a', '-a', [CompletionResultType]::ParameterName, 'The alias for the entry to initialize the entry with You can set a new alias after initialization')
+            [CompletionResult]::new('--alias', '--alias', [CompletionResultType]::ParameterName, 'The alias for the entry to initialize the entry with You can set a new alias after initialization')
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')

@@ -33,6 +33,7 @@ complete -c zoxide -n "__fish_zoxide_needs_command" -f -a "init" -d 'Generate sh
 complete -c zoxide -n "__fish_zoxide_needs_command" -f -a "query" -d 'Search for a directory in the database'
 complete -c zoxide -n "__fish_zoxide_needs_command" -f -a "remove" -d 'Remove a directory from the database'
 complete -c zoxide -n "__fish_zoxide_using_subcommand add" -s s -l score -d 'The rank to increment the entry if it exists or initialize it with if it doesn\'t' -r
+complete -c zoxide -n "__fish_zoxide_using_subcommand add" -s a -l alias -d 'The alias for the entry to initialize the entry with You can set a new alias after initialization' -r
 complete -c zoxide -n "__fish_zoxide_using_subcommand add" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_zoxide_using_subcommand add" -s V -l version -d 'Print version'
 complete -c zoxide -n "__fish_zoxide_using_subcommand edit; and not __fish_seen_subcommand_from decrement delete increment reload" -s h -l help -d 'Print help'

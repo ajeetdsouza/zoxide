@@ -15,6 +15,7 @@ impl Run for Add {
         let exclude_dirs = config::exclude_dirs()?;
         let max_age = config::maxage()?;
         let now = util::current_time()?;
+        let mut first_entry = true;
 
         let mut db = Database::open()?;
 
@@ -35,7 +36,14 @@ impl Run for Add {
             }
 
             let by = self.score.unwrap_or(1.0);
-            db.add_update(path, by, now);
+
+            // Adds the alias only to the first entry to avoid confusion
+            if first_entry {
+                db.add_update(path, by, now, self.alias.clone());
+                first_entry = false;
+            } else {
+                db.add_update(path, by, now, None);
+            }
         }
 
         if db.dirty() {

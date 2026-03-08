@@ -82,7 +82,7 @@ module completions {
     --list(-l)                # List all matching directories
     --score(-s)               # Print score with results
     --exclude: path           # Exclude the current directory
-    --base-dir: path          # Only search within this directory
+    --base-dir: path          # Only search within this directory (does not check if the path exists)
     --help(-h)                # Print help
     --version(-V)             # Print version
   ]

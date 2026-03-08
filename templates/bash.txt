@@ -63,7 +63,7 @@ if [[ ${PROMPT_COMMAND:=} != *'__zoxide_hook'* ]]; then
         PROMPT_COMMAND=("${PROMPT_COMMAND[@]}" __zoxide_hook)
     else
         # shellcheck disable=SC2128,SC2178
-        PROMPT_COMMAND="${PROMPT_COMMAND%"${PROMPT_COMMAND##*[![:space:]]}"}"
+        PROMPT_COMMAND="${PROMPT_COMMAND%"${PROMPT_COMMAND##*[![:space:];]}"}"
         # shellcheck disable=SC2128,SC2178
         PROMPT_COMMAND="${PROMPT_COMMAND:+${PROMPT_COMMAND};}__zoxide_hook"
     fi

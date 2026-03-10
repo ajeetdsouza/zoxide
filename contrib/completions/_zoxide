@@ -96,7 +96,7 @@ esac
 ;;
 (import)
 _arguments "${_arguments_options[@]}" : \
-'--from=[Application to import from]:FROM:(autojump z)' \
+'--from=[Application to import from]:FROM:(autojump z jump)' \
 '--merge[Merge into existing database]' \
 '-h[Print help]' \
 '--help[Print help]' \

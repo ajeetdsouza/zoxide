@@ -44,7 +44,7 @@ module completions {
   ]
 
   def "nu-complete zoxide import from" [] {
-    [ "autojump" "z" ]
+    [ "autojump" "z" "jump" ]
   }
 
   # Import entries from another application

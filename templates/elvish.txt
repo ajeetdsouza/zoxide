@@ -76,6 +76,40 @@ fn __zoxide_zi {|@rest|
 }
 edit:add-var __zoxide_zi~ $__zoxide_zi~
 
+# Jump to a directory within the current directory.
+fn __zoxide_zc {|@rest|
+    var base_dir = $pwd
+    if (builtin:eq [] $rest) {
+        __zoxide_cd ~
+    } elif (builtin:eq [-] $rest) {
+        __zoxide_cd $oldpwd
+    } elif (and ('builtin:==' (builtin:count $rest) 1) (path:is-dir &follow-symlink=$true $rest[0])) {
+        __zoxide_cd $rest[0]
+    } else {
+        var path
+        try {
+            set path = (zoxide query --exclude $base_dir --base-dir $base_dir -- $@rest)
+        } catch {
+        } else {
+            __zoxide_cd $path
+        }
+    }
+}
+edit:add-var __zoxide_zc~ $__zoxide_zc~
+
+# Jump to a directory within the current directory using interactive search.
+fn __zoxide_zci {|@rest|
+    var base_dir = $pwd
+    var path
+    try {
+        set path = (zoxide query --interactive --base-dir $base_dir -- $@rest)
+    } catch {
+    } else {
+        __zoxide_cd $path
+    }
+}
+edit:add-var __zoxide_zci~ $__zoxide_zci~
+
 {{ section }}
 # Commands for zoxide. Disable these using --no-cmd.
 #
@@ -85,6 +119,8 @@ edit:add-var __zoxide_zi~ $__zoxide_zi~
 
 edit:add-var {{cmd}}~ $__zoxide_z~
 edit:add-var {{cmd}}i~ $__zoxide_zi~
+edit:add-var {{cmd}}c~ $__zoxide_zc~
+edit:add-var {{cmd}}ci~ $__zoxide_zci~
 
 # Load completions.
 {#-

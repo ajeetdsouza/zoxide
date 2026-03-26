@@ -1,5 +1,3 @@
-#![allow(clippy::single_component_path_imports)]
-
 mod cmd;
 mod config;
 mod db;

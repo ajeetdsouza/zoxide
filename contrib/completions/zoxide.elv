@@ -32,6 +32,8 @@ set edit:completion:arg-completer[zoxide] = {|@words|
         &'zoxide;add'= {
             cand -s 'The rank to increment the entry if it exists or initialize it with if it doesn''t'
             cand --score 'The rank to increment the entry if it exists or initialize it with if it doesn''t'
+            cand -r 'Recursively add directories'
+            cand --recursive 'Recursively add directories'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
@@ -105,6 +107,8 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand --version 'Print version'
         }
         &'zoxide;remove'= {
+            cand -r 'Recursively remove directories'
+            cand --recursive 'Recursively remove directories'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'

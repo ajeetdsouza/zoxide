@@ -47,6 +47,11 @@ pub fn fzf_opts() -> Option<OsString> {
     env::var_os("_ZO_FZF_OPTS")
 }
 
+pub fn fzf_opts_file() -> Option<OsString> {
+    env::var_os("_ZO_FZF_OPTS_FILE")
+}
+
+
 pub fn maxage() -> Result<Rank> {
     env::var_os("_ZO_MAXAGE").map_or(Ok(10_000.0), |maxage| {
         let maxage = maxage.to_str().context("invalid unicode in _ZO_MAXAGE")?;

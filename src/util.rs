@@ -60,9 +60,9 @@ impl Fzf {
         self.args([
             // Non-POSIX args are only available on certain operating systems.
             if cfg!(target_os = "linux") {
-                r"--preview=\command -p ls -Cp --color=always --group-directories-first {2..}"
+                r#"--preview=sh -c 'dir=$1; case $dir in "~") dir=$HOME ;; "~/"*) dir=$HOME/${dir#"~/"} ;; esac; \command -p ls -Cp --color=always --group-directories-first -- "$dir"' sh {2..}"#
             } else {
-                r"--preview=\command -p ls -Cp {2..}"
+                r#"--preview=sh -c 'dir=$1; case $dir in "~") dir=$HOME ;; "~/"*) dir=$HOME/${dir#"~/"} ;; esac; \command -p ls -Cp -- "$dir"' sh {2..}"#
             },
             // Rounded edges don't display correctly on some terminals.
             "--preview-window=down,30%,sharp",
@@ -123,7 +123,11 @@ pub struct FzfChild(Child);
 impl FzfChild {
     pub fn write(&mut self, dir: &Dir, now: Epoch) -> Result<Option<String>> {
         let handle = self.0.stdin.as_mut().unwrap();
-        match write!(handle, "{}\0", dir.display().with_score(now).with_separator('\t')) {
+        match write!(
+            handle,
+            "{}\0",
+            dir.display().with_score(now).with_separator('\t').shorten_home_dir()
+        ) {
             Ok(()) => Ok(None),
             Err(e) if e.kind() == io::ErrorKind::BrokenPipe => self.wait().map(Some),
             Err(e) => Err(e).context("could not write to fzf"),
@@ -140,13 +144,30 @@ impl FzfChild {
 
         let status = self.0.wait().context("wait failed on fzf")?;
         match status.code() {
-            Some(0) => Ok(output),
+            Some(0) => Ok(match output.split_once('\t') {
+                Some((score, path)) => format!("{score}\t{}", expand_home_dir(path)),
+                None => expand_home_dir(&output),
+            }),
             Some(1) => bail!("no match found"),
             Some(2) => bail!("fzf returned an error"),
             Some(130) => bail!(SilentExit { code: 130 }),
             Some(128..=254) | None => bail!("fzf was terminated"),
             _ => bail!("fzf returned an unknown error"),
         }
+    }
+}
+
+fn expand_home_dir(path: &str) -> String {
+    let home = crate::config::get_home_dir();
+    if home.is_empty() {
+        return path.to_string();
+    }
+
+    match path.strip_prefix("~") {
+        Some(path) => {
+            format!("{}{}", home.to_str().expect("cannot convert OsString to &str"), path)
+        }
+        None => path.to_string(),
     }
 }
 

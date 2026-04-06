@@ -163,7 +163,7 @@ fn expand_home_dir(path: &str) -> String {
         return path.to_string();
     }
 
-    match path.strip_prefix("~") {
+    match path.strip_prefix('~') {
         Some(path) => {
             format!("{}{}", home.to_str().expect("cannot convert OsString to &str"), path)
         }

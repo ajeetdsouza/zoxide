@@ -36,6 +36,10 @@ make_template!(Zsh, "zsh.txt");
 #[cfg(feature = "nix-dev")]
 #[cfg(test)]
 mod tests {
+    use std::fs;
+    #[cfg(unix)]
+    use std::os::unix::fs::{PermissionsExt, symlink};
+
     use askama::Template;
     use assert_cmd::Command;
     use rstest::rstest;
@@ -342,5 +346,45 @@ mod tests {
             .success()
             .stdout("")
             .stderr("");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn zsh_prefers_builtin_cd_for_symlink_relative_paths() {
+        let tempdir = tempfile::tempdir().unwrap();
+        let tempdir = tempdir.path();
+        let bin_dir = tempdir.join("bin");
+        let query_log = tempdir.join("query.log");
+
+        fs::create_dir_all(&bin_dir).unwrap();
+        fs::create_dir_all(tempdir.join("foo/bar")).unwrap();
+        symlink("foo/bar", tempdir.join("baz")).unwrap();
+
+        let zoxide = bin_dir.join("zoxide");
+        fs::write(
+            &zoxide,
+            format!("#!/bin/sh\nprintf '%s\\n' \"$*\" >> {}\nexit 1\n", query_log.display()),
+        )
+        .unwrap();
+        let mut permissions = fs::metadata(&zoxide).unwrap().permissions();
+        permissions.set_mode(0o755);
+        fs::set_permissions(&zoxide, permissions).unwrap();
+
+        let opts =
+            Opts { cmd: Some("z"), hook: InitHook::None, echo: false, resolve_symlinks: false };
+        let source = Zsh(&opts).render().unwrap();
+        let script = format!("{source}\ncd -- \"$REPRO/baz\"\nz ../foo\nprintf '%s\\n' \"$PWD\"\n");
+        let path = std::env::var("PATH").unwrap();
+
+        Command::new("zsh")
+            .env("PATH", format!("{}:{path}", bin_dir.display()))
+            .env("REPRO", tempdir)
+            .args(["-e", "-u", "-o", "pipefail", "--no-globalrcs", "--no-rcs", "-c", &script])
+            .assert()
+            .success()
+            .stdout(format!("{}/foo\n", tempdir.display()))
+            .stderr("");
+
+        assert_eq!(fs::read_to_string(query_log).unwrap_or_default(), "");
     }
 }

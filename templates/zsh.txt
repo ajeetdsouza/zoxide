@@ -88,8 +88,16 @@ function __zoxide_z() {
     __zoxide_doctor
     if [[ "$#" -eq 0 ]]; then
         __zoxide_cd ~
-    elif [[ "$#" -eq 1 ]] && { [[ -d "$1" ]] || [[ "$1" = '-' ]] || [[ "$1" =~ ^[-+][0-9]+$ ]]; }; then
-        __zoxide_cd "$1"
+    elif [[ "$#" -eq 1 ]]; then
+        if [[ "$1" = '-' ]] || [[ "$1" =~ ^[-+][0-9]+$ ]]; then
+            __zoxide_cd "$1"
+        elif [[ -d "$1" ]]; then
+            __zoxide_cd "$1"
+        elif ! __zoxide_cd "$1" 2>/dev/null; then
+            \builtin local result
+            # shellcheck disable=SC2312
+            result="$(\command zoxide query --exclude "$(__zoxide_pwd)" -- "$@")" && __zoxide_cd "${result}"
+        fi
     elif [[ "$#" -eq 2 ]] && [[ "$1" = "--" ]]; then
         __zoxide_cd "$2"
     else

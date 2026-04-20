@@ -205,10 +205,19 @@ mod tests {
     #[case(&["foo", "o", "bar"], "/foo/bar", false)]
     #[case(&["/foo/", "/bar"], "/foo/bar", false)]
     #[case(&["/foo/", "/bar"], "/foo/baz/bar", true)]
+    fn query(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
+        let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
+        let options = StreamOptions::new(0).with_keywords(keywords.iter());
+        let stream = Stream::new(db, options);
+        assert_eq!(is_match, stream.filter_by_keywords(path));
+    }
+
     // Forward slash matching on Windows-style paths
+    #[cfg(windows)]
+    #[rstest]
     #[case(&["bar/meow"], r"~\foo\bar\meow", true)]
     #[case(&["bar", "meow"], r"~\foo\bar\meow", true)]
-    fn query(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
+    fn query_windows(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
         let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
         let options = StreamOptions::new(0).with_keywords(keywords.iter());
         let stream = Stream::new(db, options);

@@ -105,6 +105,8 @@ __zoxide_z() {
             \command printf 'zoxide: $OLDPWD is not set'
             return 1
         fi
+    elif [ "$#" -eq 1 ] && [ "$1" = '.' -o "$1" = '..' ]; then
+        __zoxide_cd "$1"
     elif [ "$#" -eq 1 ] && [ -d "$1" ]; then
         __zoxide_cd "$1"
     else

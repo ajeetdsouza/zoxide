@@ -111,8 +111,6 @@ function __zoxide_z() {
         __zoxide_cd ~
     elif [[ $# -eq 1 && $1 == '-' ]]; then
         __zoxide_cd "${OLDPWD}"
-    elif [[ $# -eq 1 && $1 == '~' ]]; then
-        __zoxide_cd ~
     elif [[ $# -eq 1 && ($1 == '.' || $1 == '..') ]]; then
         __zoxide_cd "$1"
     elif [[ $# -eq 1 && -d $1 ]]; then

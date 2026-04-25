@@ -53,14 +53,16 @@ mod tests {
     use super::*;
     use crate::db::Dir;
 
+    const TEST_ENTRIES: [(&str, f64, u64); 3] = [
+        ("/home/alice/projects/zoxide", 42.5, 1714000000),
+        ("/home/alice/downloads", 7.0, 1713000000),
+        (r#"/tmp"quotes,commas""#, 1.0, 1712000000),
+    ];
+
     fn create_test_db() -> tempfile::TempDir {
         let data_dir = tempfile::tempdir().unwrap();
         let mut db = Database::open_dir(data_dir.path()).unwrap();
-        for (path, rank, last_accessed) in [
-            ("/home/alice/projects/zoxide", 42.5, 1714000000),
-            ("/home/alice/downloads", 7.0, 1713000000),
-            (r#"/tmp"quotes,commas""#, 1.0, 1712000000),
-        ] {
+        for (path, rank, last_accessed) in TEST_ENTRIES {
             db.add_unchecked(path, rank, last_accessed);
         }
         db.save().unwrap();
@@ -71,6 +73,14 @@ mod tests {
         unsafe {
             std::env::set_var("_ZO_DATA_DIR", data_dir.path());
         }
+    }
+
+    fn find_entry_by_path<'a>(entries: &'a [Dir], path: &str) -> &'a Dir<'a> {
+        entries.iter().find(|d| d.path == path).unwrap()
+    }
+
+    fn find_record_by_path<'a>(records: &'a [csv::StringRecord], path: &str) -> &'a csv::StringRecord {
+        records.iter().find(|r| r.get(0).unwrap() == path).unwrap()
     }
 
     #[test]
@@ -89,9 +99,18 @@ mod tests {
         let result: Vec<Dir> = serde_json::from_str(&content).unwrap();
 
         assert_eq!(result.len(), 3);
-        assert!(result.iter().any(|d| d.path == "/home/alice/projects/zoxide"));
-        assert!(result.iter().any(|d| d.path == "/home/alice/downloads"));
-        assert!(result.iter().any(|d| d.path == r#"/tmp"quotes,commas""#));
+
+        let entry1 = find_entry_by_path(&result, "/home/alice/projects/zoxide");
+        assert!((entry1.rank - 42.5).abs() < 0.001);
+        assert_eq!(entry1.last_accessed, 1714000000);
+
+        let entry2 = find_entry_by_path(&result, "/home/alice/downloads");
+        assert!((entry2.rank - 7.0).abs() < 0.001);
+        assert_eq!(entry2.last_accessed, 1713000000);
+
+        let entry3 = find_entry_by_path(&result, r#"/tmp"quotes,commas""#);
+        assert!((entry3.rank - 1.0).abs() < 0.001);
+        assert_eq!(entry3.last_accessed, 1712000000);
     }
 
     #[test]
@@ -115,10 +134,17 @@ mod tests {
         let records: Vec<csv::StringRecord> = rdr.records().map(|r| r.unwrap()).collect();
         assert_eq!(records.len(), 3);
 
-        let paths: Vec<&str> = records.iter().map(|r| r.get(0).unwrap()).collect();
-        assert!(paths.contains(&"/home/alice/projects/zoxide"));
-        assert!(paths.contains(&"/home/alice/downloads"));
-        assert!(paths.contains(&r#"/tmp"quotes,commas""#));
+        let record1 = find_record_by_path(&records, "/home/alice/projects/zoxide");
+        assert_eq!(record1.get(1).unwrap().parse::<f64>().unwrap(), 42.5);
+        assert_eq!(record1.get(2).unwrap().parse::<u64>().unwrap(), 1714000000);
+
+        let record2 = find_record_by_path(&records, "/home/alice/downloads");
+        assert_eq!(record2.get(1).unwrap().parse::<f64>().unwrap(), 7.0);
+        assert_eq!(record2.get(2).unwrap().parse::<u64>().unwrap(), 1713000000);
+
+        let record3 = find_record_by_path(&records, r#"/tmp"quotes,commas""#);
+        assert_eq!(record3.get(1).unwrap().parse::<f64>().unwrap(), 1.0);
+        assert_eq!(record3.get(2).unwrap().parse::<u64>().unwrap(), 1712000000);
     }
 
     #[test]

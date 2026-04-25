@@ -43,6 +43,18 @@ module completions {
     --version(-V)             # Print version
   ]
 
+  def "nu-complete zoxide export format" [] {
+    [ "json" "csv" ]
+  }
+
+  # Export entries from the database
+  export extern "zoxide export" [
+    --format(-f): string@"nu-complete zoxide export format" # Output format (json or csv)
+    --out(-o): path           # Output file path (default: stdout)
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+  ]
+
   def "nu-complete zoxide import from" [] {
     [ "autojump" "z" ]
   }

@@ -27,6 +27,7 @@ Register-ArgumentCompleter -Native -CommandName 'zoxide' -ScriptBlock {
             [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
             [CompletionResult]::new('add', 'add', [CompletionResultType]::ParameterValue, 'Add a new directory or increment its rank')
             [CompletionResult]::new('edit', 'edit', [CompletionResultType]::ParameterValue, 'Edit the database')
+            [CompletionResult]::new('export', 'export', [CompletionResultType]::ParameterValue, 'Export entries from the database')
             [CompletionResult]::new('import', 'import', [CompletionResultType]::ParameterValue, 'Import entries from another application')
             [CompletionResult]::new('init', 'init', [CompletionResultType]::ParameterValue, 'Generate shell configuration')
             [CompletionResult]::new('query', 'query', [CompletionResultType]::ParameterValue, 'Search for a directory in the database')
@@ -75,6 +76,17 @@ Register-ArgumentCompleter -Native -CommandName 'zoxide' -ScriptBlock {
             break
         }
         'zoxide;edit;reload' {
+            [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
+            [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
+            [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
+            [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
+            break
+        }
+        'zoxide;export' {
+            [CompletionResult]::new('-f', '-f', [CompletionResultType]::ParameterName, 'Output format (json or csv)')
+            [CompletionResult]::new('--format', '--format', [CompletionResultType]::ParameterName, 'Output format (json or csv)')
+            [CompletionResult]::new('-o', '-o', [CompletionResultType]::ParameterName, 'Output file path (default: stdout)')
+            [CompletionResult]::new('--out', '--out', [CompletionResultType]::ParameterName, 'Output file path (default: stdout)')
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')

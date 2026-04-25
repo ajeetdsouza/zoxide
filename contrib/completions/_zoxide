@@ -94,6 +94,18 @@ _arguments "${_arguments_options[@]}" : \
     ;;
 esac
 ;;
+(export)
+_arguments "${_arguments_options[@]}" : \
+'-f+[Output format (json or csv)]:FORMAT:(json csv)' \
+'--format=[Output format (json or csv)]:FORMAT:(json csv)' \
+'-o+[Output file path (default\: stdout)]:OUT:_files' \
+'--out=[Output file path (default\: stdout)]:OUT:_files' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
 (import)
 _arguments "${_arguments_options[@]}" : \
 '--from=[Application to import from]:FROM:(autojump z)' \
@@ -155,6 +167,7 @@ _zoxide_commands() {
     local commands; commands=(
 'add:Add a new directory or increment its rank' \
 'edit:Edit the database' \
+'export:Export entries from the database' \
 'import:Import entries from another application' \
 'init:Generate shell configuration' \
 'query:Search for a directory in the database' \
@@ -196,6 +209,11 @@ _zoxide__edit__increment_commands() {
 _zoxide__edit__reload_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide edit reload commands' commands "$@"
+}
+(( $+functions[_zoxide__export_commands] )) ||
+_zoxide__export_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide export commands' commands "$@"
 }
 (( $+functions[_zoxide__import_commands] )) ||
 _zoxide__import_commands() {

@@ -28,6 +28,7 @@ complete -c zoxide -n "__fish_zoxide_needs_command" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_zoxide_needs_command" -s V -l version -d 'Print version'
 complete -c zoxide -n "__fish_zoxide_needs_command" -f -a "add" -d 'Add a new directory or increment its rank'
 complete -c zoxide -n "__fish_zoxide_needs_command" -f -a "edit" -d 'Edit the database'
+complete -c zoxide -n "__fish_zoxide_needs_command" -f -a "export" -d 'Export entries from the database'
 complete -c zoxide -n "__fish_zoxide_needs_command" -f -a "import" -d 'Import entries from another application'
 complete -c zoxide -n "__fish_zoxide_needs_command" -f -a "init" -d 'Generate shell configuration'
 complete -c zoxide -n "__fish_zoxide_needs_command" -f -a "query" -d 'Search for a directory in the database'
@@ -49,6 +50,11 @@ complete -c zoxide -n "__fish_zoxide_using_subcommand edit; and __fish_seen_subc
 complete -c zoxide -n "__fish_zoxide_using_subcommand edit; and __fish_seen_subcommand_from increment" -s V -l version -d 'Print version'
 complete -c zoxide -n "__fish_zoxide_using_subcommand edit; and __fish_seen_subcommand_from reload" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_zoxide_using_subcommand edit; and __fish_seen_subcommand_from reload" -s V -l version -d 'Print version'
+complete -c zoxide -n "__fish_zoxide_using_subcommand export" -s f -l format -d 'Output format (json or csv)' -r -f -a "json\t''
+csv\t''"
+complete -c zoxide -n "__fish_zoxide_using_subcommand export" -s o -l out -d 'Output file path (default: stdout)' -r -F
+complete -c zoxide -n "__fish_zoxide_using_subcommand export" -s h -l help -d 'Print help'
+complete -c zoxide -n "__fish_zoxide_using_subcommand export" -s V -l version -d 'Print version'
 complete -c zoxide -n "__fish_zoxide_using_subcommand import" -l from -d 'Application to import from' -r -f -a "autojump\t''
 z\t''"
 complete -c zoxide -n "__fish_zoxide_using_subcommand import" -l merge -d 'Merge into existing database'

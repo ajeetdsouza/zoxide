@@ -24,6 +24,7 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand --version 'Print version'
             cand add 'Add a new directory or increment its rank'
             cand edit 'Edit the database'
+            cand export 'Export entries from the database'
             cand import 'Import entries from another application'
             cand init 'Generate shell configuration'
             cand query 'Search for a directory in the database'
@@ -66,6 +67,16 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand --version 'Print version'
         }
         &'zoxide;edit;reload'= {
+            cand -h 'Print help'
+            cand --help 'Print help'
+            cand -V 'Print version'
+            cand --version 'Print version'
+        }
+        &'zoxide;export'= {
+            cand -f 'Output format (json or csv)'
+            cand --format 'Output format (json or csv)'
+            cand -o 'Output file path (default: stdout)'
+            cand --out 'Output file path (default: stdout)'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'

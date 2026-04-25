@@ -112,6 +112,42 @@ const completion: Fig.Spec = {
       ],
     },
     {
+      name: "export",
+      description: "Export entries from the database",
+      options: [
+        {
+          name: ["-f", "--format"],
+          description: "Output format (json or csv)",
+          isRepeatable: true,
+          args: {
+            name: "format",
+            suggestions: [
+              "json",
+              "csv",
+            ],
+          },
+        },
+        {
+          name: ["-o", "--out"],
+          description: "Output file path (default: stdout)",
+          isRepeatable: true,
+          args: {
+            name: "out",
+            isOptional: true,
+            template: "filepaths",
+          },
+        },
+        {
+          name: ["-h", "--help"],
+          description: "Print help",
+        },
+        {
+          name: ["-V", "--version"],
+          description: "Print version",
+        },
+      ],
+    },
+    {
       name: "import",
       description: "Import entries from another application",
       options: [

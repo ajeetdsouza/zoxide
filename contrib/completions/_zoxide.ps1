@@ -85,8 +85,8 @@ Register-ArgumentCompleter -Native -CommandName 'zoxide' -ScriptBlock {
         'zoxide;export' {
             [CompletionResult]::new('-f', '-f', [CompletionResultType]::ParameterName, 'Output format (json or csv)')
             [CompletionResult]::new('--format', '--format', [CompletionResultType]::ParameterName, 'Output format (json or csv)')
-            [CompletionResult]::new('-o', '-o', [CompletionResultType]::ParameterName, 'Output file path (default: stdout)')
-            [CompletionResult]::new('--out', '--out', [CompletionResultType]::ParameterName, 'Output file path (default: stdout)')
+            [CompletionResult]::new('-o', '-o', [CompletionResultType]::ParameterName, 'Output file path')
+            [CompletionResult]::new('--out', '--out', [CompletionResultType]::ParameterName, 'Output file path')
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')

@@ -129,11 +129,10 @@ const completion: Fig.Spec = {
         },
         {
           name: ["-o", "--out"],
-          description: "Output file path (default: stdout)",
+          description: "Output file path",
           isRepeatable: true,
           args: {
             name: "out",
-            isOptional: true,
             template: "filepaths",
           },
         },

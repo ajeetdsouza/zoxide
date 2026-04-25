@@ -75,8 +75,8 @@ set edit:completion:arg-completer[zoxide] = {|@words|
         &'zoxide;export'= {
             cand -f 'Output format (json or csv)'
             cand --format 'Output format (json or csv)'
-            cand -o 'Output file path (default: stdout)'
-            cand --out 'Output file path (default: stdout)'
+            cand -o 'Output file path'
+            cand --out 'Output file path'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'

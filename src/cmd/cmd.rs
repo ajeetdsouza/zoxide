@@ -100,9 +100,9 @@ pub struct Export {
     #[clap(value_enum, long, short)]
     pub format: ExportFormat,
 
-    /// Output file path (default: stdout)
+    /// Output file path
     #[clap(long, short, value_hint = ValueHint::FilePath)]
-    pub out: Option<PathBuf>,
+    pub out: PathBuf,
 }
 
 #[derive(ValueEnum, Clone, Debug)]

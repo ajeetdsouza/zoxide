@@ -98,8 +98,8 @@ esac
 _arguments "${_arguments_options[@]}" : \
 '-f+[Output format (json or csv)]:FORMAT:(json csv)' \
 '--format=[Output format (json or csv)]:FORMAT:(json csv)' \
-'-o+[Output file path (default\: stdout)]:OUT:_files' \
-'--out=[Output file path (default\: stdout)]:OUT:_files' \
+'-o+[Output file path]:OUT:_files' \
+'--out=[Output file path]:OUT:_files' \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \

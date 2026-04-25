@@ -50,7 +50,7 @@ module completions {
   # Export entries from the database
   export extern "zoxide export" [
     --format(-f): string@"nu-complete zoxide export format" # Output format (json or csv)
-    --out(-o): path           # Output file path (default: stdout)
+    --out(-o): path           # Output file path
     --help(-h)                # Print help
     --version(-V)             # Print version
   ]

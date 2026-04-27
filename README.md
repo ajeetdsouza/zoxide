@@ -301,11 +301,21 @@ zoxide can be installed in 4 easy steps:
    <details>
    <summary>Xonsh</summary>
 
-   > Add this to the <ins>**end**</ins> of your config file (usually `~/.xonshrc`):
-   >
-   > ```python
-   > execx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')
+   > Create a config file for your user:
+   > 
+   > ```sh
+   > mkdir -p ~/.config/xonsh/rc.d/
+   > zoxide init xonsh > ~/.config/xonsh/rc.d/zoxide.xsh
    > ```
+   > 
+   > Or for all users:
+   > 
+   > ```sh
+   > mkdir -p /etc/xonsh/rc.d/
+   > zoxide init xonsh > /etc/xonsh/rc.d/zoxide.xsh
+   > ```
+   > 
+   > [Xonsh's config file system](https://xon.sh/xonshrc.html) loads these after your `.xonshrc`.
 
    </details>
 

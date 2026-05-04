@@ -336,6 +336,12 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
                     base_path = get_drive_path(drive_letter);
                     stack.extend(base_path.components());
                 }
+                Prefix::VerbatimUNC(server, share) => {
+                    let server_str = server.to_string_lossy();
+                    let share_str = share.to_string_lossy();
+                    base_path = PathBuf::from(format!(r"\\{}\{}", server_str, share_str));
+                    stack.extend(base_path.components());
+                }
                 _ => bail!("invalid path: {}", path.display()),
             },
             Some(Component::RootDir) => {

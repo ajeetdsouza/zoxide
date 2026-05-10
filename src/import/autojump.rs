@@ -1,9 +1,8 @@
 use std::borrow::Cow;
-use std::env;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
-use std::str;
+use std::{env, str};
 
 use anyhow::{Context, Result, anyhow};
 

@@ -1,16 +1,16 @@
+pub(crate) use crate::import::atuin::Atuin;
+pub(crate) use crate::import::autojump::Autojump;
+pub(crate) use crate::import::fasd::Fasd;
+pub(crate) use crate::import::z::Z;
+pub(crate) use crate::import::z_lua::ZLua;
+pub(crate) use crate::import::zsh_z::ZshZ;
+
 mod atuin;
 mod autojump;
 mod fasd;
 mod z;
 mod z_lua;
 mod zsh_z;
-
-pub(crate) use atuin::Atuin;
-pub(crate) use autojump::Autojump;
-pub(crate) use fasd::Fasd;
-pub(crate) use z::Z;
-pub(crate) use z_lua::ZLua;
-pub(crate) use zsh_z::ZshZ;
 
 use std::io::{self, Write};
 use std::path::PathBuf;

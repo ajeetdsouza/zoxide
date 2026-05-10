@@ -16,7 +16,8 @@ impl Importer for Fasd {
         let path = data_path()?;
         let file = File::open(&path).with_context(|| format!("could not read {path:?}"))?;
         let reader = BufReader::new(file);
-        // fasd uses the same `path|rank|last_accessed` line format as z, so reuse z's iterator.
+        // fasd uses the same `path|rank|last_accessed` line format as z, so reuse z's
+        // iterator.
         Ok(z::Iter::new(reader, path))
     }
 }

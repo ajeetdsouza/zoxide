@@ -7,6 +7,13 @@ use glob::Pattern;
 
 use crate::db::Rank;
 
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub enum RankingMode {
+    #[default]
+    Frecency,
+    Recency,
+}
+
 pub fn data_dir() -> Result<PathBuf> {
     let dir = match env::var_os("_ZO_DATA_DIR") {
         Some(path) => PathBuf::from(path),
@@ -59,4 +66,11 @@ pub fn maxage() -> Result<Rank> {
 
 pub fn resolve_symlinks() -> bool {
     env::var_os("_ZO_RESOLVE_SYMLINKS").is_some_and(|var| var == "1")
+}
+
+pub fn ranking_mode() -> RankingMode {
+    match env::var_os("_ZO_RANKING_MODE") {
+        Some(var) if var.eq_ignore_ascii_case("recency") => RankingMode::Recency,
+        _ => RankingMode::Frecency,
+    }
 }

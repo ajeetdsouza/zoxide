@@ -8,9 +8,10 @@ use anyhow::{Context, Result, bail};
 use bincode::Options;
 use ouroboros::self_referencing;
 
+use crate::config::{self, RankingMode};
 pub use crate::db::dir::{Dir, Epoch, Rank};
 pub use crate::db::stream::{Stream, StreamOptions};
-use crate::{config, util};
+use crate::util;
 
 #[self_referencing]
 pub struct Database {
@@ -171,10 +172,10 @@ impl Database {
         self.with_dirty_mut(|dirty| *dirty = true);
     }
 
-    pub fn sort_by_score(&mut self, now: Epoch) {
+    pub fn sort_by_score(&mut self, now: Epoch, mode: RankingMode) {
         self.with_dirs_mut(|dirs| {
             dirs.sort_unstable_by(|dir1: &Dir, dir2: &Dir| {
-                dir1.score(now).total_cmp(&dir2.score(now))
+                dir1.score(now, mode).total_cmp(&dir2.score(now, mode))
             })
         });
         self.with_dirty_mut(|dirty| *dirty = true);

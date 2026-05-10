@@ -3,6 +3,7 @@ use std::fmt::{self, Display, Formatter};
 
 use serde::{Deserialize, Serialize};
 
+use crate::config::RankingMode;
 use crate::util::{DAY, HOUR, WEEK};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -18,7 +19,14 @@ impl Dir<'_> {
         DirDisplay::new(self)
     }
 
-    pub fn score(&self, now: Epoch) -> Rank {
+    pub fn score(&self, now: Epoch, mode: RankingMode) -> Rank {
+        match mode {
+            RankingMode::Frecency => self.frecency(now),
+            RankingMode::Recency => self.last_accessed as Rank,
+        }
+    }
+
+    pub(crate) fn frecency(&self, now: Epoch) -> Rank {
         // The older the entry, the lesser its importance.
         let duration = now.saturating_sub(self.last_accessed);
         if duration < HOUR {
@@ -58,7 +66,9 @@ impl<'a> DirDisplay<'a> {
 impl Display for DirDisplay<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         if let Some(now) = self.now {
-            let score = self.dir.score(now).clamp(0.0, 9999.0);
+            // Always display the frecency value so that `--score` stays
+            // human-readable regardless of the active ranking mode.
+            let score = self.dir.frecency(now).clamp(0.0, 9999.0);
             write!(f, "{score:>6.1}{}", self.separator)?;
         }
         write!(f, "{}", self.dir.path)
@@ -67,3 +77,43 @@ impl Display for DirDisplay<'_> {
 
 pub type Rank = f64;
 pub type Epoch = u64;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::util::HOUR;
+
+    fn dir(path: &'static str, rank: Rank, last_accessed: Epoch) -> Dir<'static> {
+        Dir { path: Cow::Borrowed(path), rank, last_accessed }
+    }
+
+    #[test]
+    fn frecency_mode_prefers_high_rank() {
+        let now = 10 * HOUR;
+        // Same age bucket (>1h, <1d). Higher rank wins.
+        let popular = dir("/popular", 50.0, now - 2 * HOUR);
+        let recent = dir("/recent", 1.0, now - 2 * HOUR);
+        assert!(
+            popular.score(now, RankingMode::Frecency) > recent.score(now, RankingMode::Frecency)
+        );
+    }
+
+    #[test]
+    fn recency_mode_prefers_recent_access() {
+        let now = 10 * HOUR;
+        let popular_but_old = dir("/popular", 50.0, now - 5 * HOUR);
+        let unpopular_but_recent = dir("/recent", 1.0, now - HOUR);
+        assert!(
+            unpopular_but_recent.score(now, RankingMode::Recency)
+                > popular_but_old.score(now, RankingMode::Recency)
+        );
+    }
+
+    #[test]
+    fn recency_mode_ignores_rank() {
+        let now = 10 * HOUR;
+        let a = dir("/a", 1.0, now - HOUR);
+        let b = dir("/b", 9999.0, now - HOUR);
+        assert_eq!(a.score(now, RankingMode::Recency), b.score(now, RankingMode::Recency));
+    }
+}

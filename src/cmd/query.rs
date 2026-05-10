@@ -80,7 +80,8 @@ impl Query {
         let mut options = StreamOptions::new(now)
             .with_keywords(self.keywords.iter().map(|s| s.as_str()))
             .with_exclude(config::exclude_dirs()?)
-            .with_base_dir(self.base_dir.clone());
+            .with_base_dir(self.base_dir.clone())
+            .with_ranking_mode(config::ranking_mode());
         if !self.all {
             let resolve_symlinks = config::resolve_symlinks();
             options = options.with_exists(true).with_resolve_symlinks(resolve_symlinks);

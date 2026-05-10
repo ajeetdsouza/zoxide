@@ -96,6 +96,13 @@ manpage for the full list of options.
 Configures the aging algorithm, which limits the maximum number of entries in
 the database. By default, this is set to 10000.
 .TP
+.B _ZO_RANKING_MODE
+Selects the ranking function used when sorting query results. Accepted values
+are \fBfrecency\fR (default) and \fBrecency\fR. With \fBrecency\fR, results are
+sorted purely by \fBlast_accessed\fR so the most recently visited match always
+wins. The value is case-insensitive; unrecognized values fall back to
+\fBfrecency\fR.
+.TP
 .B _ZO_RESOLVE_SYMLINKS
 When set to 1, \fBz\fR will resolve symlinks before adding directories to
 the database.

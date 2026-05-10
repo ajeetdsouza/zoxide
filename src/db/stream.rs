@@ -5,6 +5,7 @@ use std::{fs, path};
 
 use glob::Pattern;
 
+use crate::config::RankingMode;
 use crate::db::{Database, Dir, Epoch};
 use crate::util::{self, MONTH};
 
@@ -16,7 +17,7 @@ pub struct Stream<'a> {
 
 impl<'a> Stream<'a> {
     pub fn new(db: &'a mut Database, options: StreamOptions) -> Self {
-        db.sort_by_score(options.now);
+        db.sort_by_score(options.now, options.ranking_mode);
         let idxs = (0..db.dirs().len()).rev();
         Stream { db, idxs, options }
     }
@@ -129,6 +130,9 @@ pub struct StreamOptions {
     /// Only return directories within this parent directory
     /// Does not check if the path exists
     base_dir: Option<String>,
+
+    /// Which scoring function to use when sorting directories.
+    ranking_mode: RankingMode,
 }
 
 impl StreamOptions {
@@ -141,7 +145,13 @@ impl StreamOptions {
             resolve_symlinks: false,
             ttl: now.saturating_sub(3 * MONTH),
             base_dir: None,
+            ranking_mode: RankingMode::default(),
         }
+    }
+
+    pub fn with_ranking_mode(mut self, ranking_mode: RankingMode) -> Self {
+        self.ranking_mode = ranking_mode;
+        self
     }
 
     pub fn with_keywords<I>(mut self, keywords: I) -> Self

@@ -3,6 +3,7 @@ use std::io::{self, Write};
 use anyhow::Result;
 
 use crate::cmd::{Edit, EditCommand, Run};
+use crate::config;
 use crate::db::Database;
 use crate::error::BrokenPipeHandler;
 use crate::util::{self, Fzf, FzfChild};
@@ -32,7 +33,7 @@ impl Run for Edit {
                 Ok(())
             }
             None => {
-                db.sort_by_score(now);
+                db.sort_by_score(now, config::ranking_mode());
                 db.save()?;
                 Self::get_fzf()?.wait()?;
                 Ok(())

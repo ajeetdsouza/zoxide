@@ -426,6 +426,13 @@ Environment variables[^2] can be used for configuration. They must be set before
   - Configures the [aging algorithm][algorithm-aging], which limits the maximum
     number of entries in the database.
   - By default, this is set to 10000.
+- `_ZO_RANKING_MODE`
+  - Selects the ranking function used when sorting query results:
+    - `frecency` (default): combines frequency and recency, as described in
+      [Algorithm][algorithm-frecency].
+    - `recency`: sorts purely by `last_accessed`, so the most recently visited
+      match always wins regardless of how often older directories were used.
+  - The value is case-insensitive. Unrecognized values fall back to `frecency`.
 - `_ZO_RESOLVE_SYMLINKS`
   - When set to 1, `z` will resolve symlinks before adding directories to the
     database.
@@ -469,6 +476,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 [alfred]: https://www.alfredapp.com/
 [alfred-zoxide]: https://github.com/yihou/alfred-zoxide
 [algorithm-aging]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#aging
+[algorithm-frecency]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#frecency
 [algorithm-matching]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#matching
 [alpine linux packages]: https://pkgs.alpinelinux.org/packages?name=zoxide
 [arch linux extra]: https://archlinux.org/packages/extra/x86_64/zoxide/

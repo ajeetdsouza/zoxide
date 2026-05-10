@@ -4,7 +4,7 @@ let
       overlays = [ rust ];
     };
   rust = import (builtins.fetchTarball
-    "https://github.com/oxalica/rust-overlay/archive/026e8fedefd6b167d92ed04b195c658d95ffc7a5.tar.gz");
+    "https://github.com/oxalica/rust-overlay/archive/4568a557ca325ff81fb354382d4a9968daa1001a.tar.gz");
 
   rust-nightly =
     pkgs.rust-bin.selectLatestNightlyWith (toolchain: toolchain.minimal);

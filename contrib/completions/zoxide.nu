@@ -8,10 +8,10 @@ module completions {
 
   # Add a new directory or increment its rank
   export extern "zoxide add" [
-    ...paths: path
     --score(-s): string       # The rank to increment the entry if it exists or initialize it with if it doesn't
     --help(-h)                # Print help
     --version(-V)             # Print version
+    ...paths: path
   ]
 
   # Edit the database
@@ -21,21 +21,21 @@ module completions {
   ]
 
   export extern "zoxide edit decrement" [
-    path: string
     --help(-h)                # Print help
     --version(-V)             # Print version
+    path: string
   ]
 
   export extern "zoxide edit delete" [
-    path: string
     --help(-h)                # Print help
     --version(-V)             # Print version
+    path: string
   ]
 
   export extern "zoxide edit increment" [
-    path: string
     --help(-h)                # Print help
     --version(-V)             # Print version
+    path: string
   ]
 
   export extern "zoxide edit reload" [
@@ -102,17 +102,16 @@ module completions {
 
   # Generate shell configuration
   export extern "zoxide init" [
-    shell: string@"nu-complete zoxide init shell"
     --no-cmd                  # Prevents zoxide from defining the `z` and `zi` commands
     --cmd: string             # Changes the prefix of the `z` and `zi` commands
     --hook: string@"nu-complete zoxide init hook" # Changes how often zoxide increments a directory's score
     --help(-h)                # Print help
     --version(-V)             # Print version
+    shell: string@"nu-complete zoxide init shell"
   ]
 
   # Search for a directory in the database
   export extern "zoxide query" [
-    ...keywords: string
     --all(-a)                 # Show unavailable directories
     --interactive(-i)         # Use interactive selection
     --list(-l)                # List all matching directories
@@ -121,13 +120,14 @@ module completions {
     --base-dir: path          # Only search within this directory
     --help(-h)                # Print help
     --version(-V)             # Print version
+    ...keywords: string
   ]
 
   # Remove a directory from the database
   export extern "zoxide remove" [
-    ...paths: path
     --help(-h)                # Print help
     --version(-V)             # Print version
+    ...paths: path
   ]
 
 }

@@ -45,7 +45,7 @@ _arguments "${_arguments_options[@]}" : \
 '--help[Print help]' \
 '-V[Print version]' \
 '--version[Print version]' \
-":: :_zoxide__edit_commands" \
+":: :_zoxide__subcmd__edit_commands" \
 "*::: :->edit" \
 && ret=0
 
@@ -101,7 +101,7 @@ _arguments "${_arguments_options[@]}" : \
 '--help[Print help]' \
 '-V[Print version]' \
 '--version[Print version]' \
-":: :_zoxide__import_commands" \
+":: :_zoxide__subcmd__import_commands" \
 "*::: :->import" \
 && ret=0
 
@@ -226,13 +226,13 @@ _zoxide_commands() {
     )
     _describe -t commands 'zoxide commands' commands "$@"
 }
-(( $+functions[_zoxide__add_commands] )) ||
-_zoxide__add_commands() {
+(( $+functions[_zoxide__subcmd__add_commands] )) ||
+_zoxide__subcmd__add_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide add commands' commands "$@"
 }
-(( $+functions[_zoxide__edit_commands] )) ||
-_zoxide__edit_commands() {
+(( $+functions[_zoxide__subcmd__edit_commands] )) ||
+_zoxide__subcmd__edit_commands() {
     local commands; commands=(
 'decrement:' \
 'delete:' \
@@ -241,28 +241,28 @@ _zoxide__edit_commands() {
     )
     _describe -t commands 'zoxide edit commands' commands "$@"
 }
-(( $+functions[_zoxide__edit__decrement_commands] )) ||
-_zoxide__edit__decrement_commands() {
+(( $+functions[_zoxide__subcmd__edit__subcmd__decrement_commands] )) ||
+_zoxide__subcmd__edit__subcmd__decrement_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide edit decrement commands' commands "$@"
 }
-(( $+functions[_zoxide__edit__delete_commands] )) ||
-_zoxide__edit__delete_commands() {
+(( $+functions[_zoxide__subcmd__edit__subcmd__delete_commands] )) ||
+_zoxide__subcmd__edit__subcmd__delete_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide edit delete commands' commands "$@"
 }
-(( $+functions[_zoxide__edit__increment_commands] )) ||
-_zoxide__edit__increment_commands() {
+(( $+functions[_zoxide__subcmd__edit__subcmd__increment_commands] )) ||
+_zoxide__subcmd__edit__subcmd__increment_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide edit increment commands' commands "$@"
 }
-(( $+functions[_zoxide__edit__reload_commands] )) ||
-_zoxide__edit__reload_commands() {
+(( $+functions[_zoxide__subcmd__edit__subcmd__reload_commands] )) ||
+_zoxide__subcmd__edit__subcmd__reload_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide edit reload commands' commands "$@"
 }
-(( $+functions[_zoxide__import_commands] )) ||
-_zoxide__import_commands() {
+(( $+functions[_zoxide__subcmd__import_commands] )) ||
+_zoxide__subcmd__import_commands() {
     local commands; commands=(
 'atuin:Import from atuin' \
 'autojump:Import from autojump' \
@@ -273,48 +273,48 @@ _zoxide__import_commands() {
     )
     _describe -t commands 'zoxide import commands' commands "$@"
 }
-(( $+functions[_zoxide__import__atuin_commands] )) ||
-_zoxide__import__atuin_commands() {
+(( $+functions[_zoxide__subcmd__import__subcmd__atuin_commands] )) ||
+_zoxide__subcmd__import__subcmd__atuin_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide import atuin commands' commands "$@"
 }
-(( $+functions[_zoxide__import__autojump_commands] )) ||
-_zoxide__import__autojump_commands() {
+(( $+functions[_zoxide__subcmd__import__subcmd__autojump_commands] )) ||
+_zoxide__subcmd__import__subcmd__autojump_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide import autojump commands' commands "$@"
 }
-(( $+functions[_zoxide__import__fasd_commands] )) ||
-_zoxide__import__fasd_commands() {
+(( $+functions[_zoxide__subcmd__import__subcmd__fasd_commands] )) ||
+_zoxide__subcmd__import__subcmd__fasd_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide import fasd commands' commands "$@"
 }
-(( $+functions[_zoxide__import__z_commands] )) ||
-_zoxide__import__z_commands() {
+(( $+functions[_zoxide__subcmd__import__subcmd__z_commands] )) ||
+_zoxide__subcmd__import__subcmd__z_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide import z commands' commands "$@"
 }
-(( $+functions[_zoxide__import__z.lua_commands] )) ||
-_zoxide__import__z.lua_commands() {
+(( $+functions[_zoxide__subcmd__import__subcmd__z.lua_commands] )) ||
+_zoxide__subcmd__import__subcmd__z.lua_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide import z.lua commands' commands "$@"
 }
-(( $+functions[_zoxide__import__zsh-z_commands] )) ||
-_zoxide__import__zsh-z_commands() {
+(( $+functions[_zoxide__subcmd__import__subcmd__zsh-z_commands] )) ||
+_zoxide__subcmd__import__subcmd__zsh-z_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide import zsh-z commands' commands "$@"
 }
-(( $+functions[_zoxide__init_commands] )) ||
-_zoxide__init_commands() {
+(( $+functions[_zoxide__subcmd__init_commands] )) ||
+_zoxide__subcmd__init_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide init commands' commands "$@"
 }
-(( $+functions[_zoxide__query_commands] )) ||
-_zoxide__query_commands() {
+(( $+functions[_zoxide__subcmd__query_commands] )) ||
+_zoxide__subcmd__query_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide query commands' commands "$@"
 }
-(( $+functions[_zoxide__remove_commands] )) ||
-_zoxide__remove_commands() {
+(( $+functions[_zoxide__subcmd__remove_commands] )) ||
+_zoxide__subcmd__remove_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide remove commands' commands "$@"
 }

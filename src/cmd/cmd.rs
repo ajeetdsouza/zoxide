@@ -112,6 +112,7 @@ pub enum ImportFrom {
     Autojump,
     #[clap(alias = "fasd")]
     Z,
+    Jump,
 }
 
 /// Generate shell configuration

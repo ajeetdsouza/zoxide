@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - POSIX: support for non-Cygwin Windows environments (e.g. Busybox).
+- `import` now supports fetching entries from `atuin`.
+
+### Changed
+
+- `import` now auto-detects database files.
 
 ### Fixed
 

@@ -9,7 +9,7 @@ license = "MIT"
 name = "zoxide"
 readme = "README.md"
 repository = "https://github.com/ajeetdsouza/zoxide"
-rust-version = "1.85.0"
+rust-version = "1.88.0"
 version = "0.9.9"
 
 [badges]
@@ -17,7 +17,7 @@ maintenance = { status = "actively-developed" }
 
 [dependencies]
 anyhow = "1.0.32"
-askama = { version = "0.14.0", default-features = false, features = [
+askama = { version = "0.16.0", default-features = false, features = [
     "derive",
     "std",
 ] }
@@ -30,15 +30,16 @@ fastrand = "2.0.0"
 glob = "0.3.0"
 ouroboros = "0.18.3"
 serde = { version = "1.0.116", features = ["derive"] }
+time = { version = "0.3.47", default-features = false, features = ["parsing", "macros", "std"] }
 
 [target.'cfg(unix)'.dependencies]
-nix = { version = "0.30.1", default-features = false, features = [
+nix = { version = "0.31.2", default-features = false, features = [
     "fs",
     "user",
 ] }
 
 [target.'cfg(windows)'.dependencies]
-which = "7.0.3"
+which = "8.0.2"
 
 [build-dependencies]
 clap = { version = "4.3.0", features = ["derive"] }

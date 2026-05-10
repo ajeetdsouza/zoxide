@@ -72,7 +72,54 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand --version 'Print version'
         }
         &'zoxide;import'= {
-            cand --from 'Application to import from'
+            cand --merge 'Merge into existing database'
+            cand -h 'Print help'
+            cand --help 'Print help'
+            cand -V 'Print version'
+            cand --version 'Print version'
+            cand atuin 'Import from atuin'
+            cand autojump 'Import from autojump'
+            cand fasd 'Import from fasd'
+            cand z 'Import from z'
+            cand z.lua 'Import from z.lua'
+            cand zsh-z 'Import from zsh-z'
+        }
+        &'zoxide;import;atuin'= {
+            cand --merge 'Merge into existing database'
+            cand -h 'Print help'
+            cand --help 'Print help'
+            cand -V 'Print version'
+            cand --version 'Print version'
+        }
+        &'zoxide;import;autojump'= {
+            cand --merge 'Merge into existing database'
+            cand -h 'Print help'
+            cand --help 'Print help'
+            cand -V 'Print version'
+            cand --version 'Print version'
+        }
+        &'zoxide;import;fasd'= {
+            cand --merge 'Merge into existing database'
+            cand -h 'Print help'
+            cand --help 'Print help'
+            cand -V 'Print version'
+            cand --version 'Print version'
+        }
+        &'zoxide;import;z'= {
+            cand --merge 'Merge into existing database'
+            cand -h 'Print help'
+            cand --help 'Print help'
+            cand -V 'Print version'
+            cand --version 'Print version'
+        }
+        &'zoxide;import;z.lua'= {
+            cand --merge 'Merge into existing database'
+            cand -h 'Print help'
+            cand --help 'Print help'
+            cand -V 'Print version'
+            cand --version 'Print version'
+        }
+        &'zoxide;import;zsh-z'= {
             cand --merge 'Merge into existing database'
             cand -h 'Print help'
             cand --help 'Print help'

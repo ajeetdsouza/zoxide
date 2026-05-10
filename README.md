@@ -350,61 +350,21 @@ zoxide can be installed in 4 easy steps:
 4. **Import your data** <sup>(optional)</sup>
 
    If you currently use any of these plugins, you may want to import your data
-   into zoxide:
+   into zoxide. The data file is auto-detected using each plugin's standard
+   conventions.
 
-   <details>
-   <summary>autojump</summary>
+   ```sh
+   zoxide import <plugin>
+   ```
 
-   > Run this command in your terminal:
-   >
-   > ```sh
-   > zoxide import --from=autojump "/path/to/autojump/db"
-   > ```
-   >
-   > The path usually varies according to your system:
-   >
-   > | OS      | Path                                                                                 | Example                                                |
-   > | ------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------ |
-   > | Linux   | `$XDG_DATA_HOME/autojump/autojump.txt` or `$HOME/.local/share/autojump/autojump.txt` | `/home/alice/.local/share/autojump/autojump.txt`       |
-   > | macOS   | `$HOME/Library/autojump/autojump.txt`                                                | `/Users/Alice/Library/autojump/autojump.txt`           |
-   > | Windows | `%APPDATA%\autojump\autojump.txt`                                                    | `C:\Users\Alice\AppData\Roaming\autojump\autojump.txt` |
-
-   </details>
-
-   <details>
-   <summary>fasd, z, z.lua, zsh-z</summary>
-
-   > Run this command in your terminal:
-   >
-   > ```sh
-   > zoxide import --from=z "path/to/z/db"
-   > ```
-   >
-   > The path usually varies according to your system:
-   >
-   > | Plugin           | Path                                                                                |
-   > | ---------------- | ----------------------------------------------------------------------------------- |
-   > | fasd             | `$_FASD_DATA` or `$HOME/.fasd`                                                      |
-   > | z (bash/zsh)     | `$_Z_DATA` or `$HOME/.z`                                                            |
-   > | z (fish)         | `$Z_DATA` or `$XDG_DATA_HOME/z/data` or `$HOME/.local/share/z/data`                 |
-   > | z.lua (bash/zsh) | `$_ZL_DATA` or `$HOME/.zlua`                                                        |
-   > | z.lua (fish)     | `$XDG_DATA_HOME/zlua/zlua.txt` or `$HOME/.local/share/zlua/zlua.txt` or `$_ZL_DATA` |
-   > | zsh-z            | `$ZSHZ_DATA` or `$_Z_DATA` or `$HOME/.z`                                            |
-
-   </details>
-
-   <details>
-   <summary>ZLocation</summary>
-
-   > Run this command in PowerShell:
-   >
-   > ```powershell
-   > $db = New-TemporaryFile
-   > (Get-ZLocation).GetEnumerator() | ForEach-Object { Write-Output ($_.Name+'|'+$_.Value+'|0') } | Out-File $db
-   > zoxide import --from=z $db
-   > ```
-
-   </details>
+   | Plugin     | Command                   |
+   | ---------- | ------------------------- |
+   | atuin      | `zoxide import atuin`     |
+   | autojump   | `zoxide import autojump`  |
+   | fasd       | `zoxide import fasd`      |
+   | z          | `zoxide import z`         |
+   | z.lua      | `zoxide import z.lua`     |
+   | zsh-z      | `zoxide import zsh-z`     |
 
 ## Configuration
 

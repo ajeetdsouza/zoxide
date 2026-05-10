@@ -95,23 +95,30 @@ pub enum EditCommand {
     help_template = HelpTemplate,
 )]
 pub struct Import {
-    #[clap(value_hint = ValueHint::FilePath)]
-    pub path: PathBuf,
-
-    /// Application to import from
-    #[clap(value_enum, long)]
+    #[clap(subcommand)]
     pub from: ImportFrom,
 
     /// Merge into existing database
-    #[clap(long)]
+    #[clap(long, global = true)]
     pub merge: bool,
 }
 
-#[derive(ValueEnum, Clone, Debug)]
+#[derive(Subcommand, Clone, Debug)]
 pub enum ImportFrom {
+    /// Import from atuin
+    Atuin,
+    /// Import from autojump
     Autojump,
-    #[clap(alias = "fasd")]
+    /// Import from fasd
+    Fasd,
+    /// Import from z
     Z,
+    /// Import from z.lua
+    #[clap(name = "z.lua")]
+    ZLua,
+    /// Import from zsh-z
+    #[clap(name = "zsh-z")]
+    ZshZ,
 }
 
 /// Generate shell configuration

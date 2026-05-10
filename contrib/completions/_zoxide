@@ -96,14 +96,78 @@ esac
 ;;
 (import)
 _arguments "${_arguments_options[@]}" : \
-'--from=[Application to import from]:FROM:(autojump z)' \
 '--merge[Merge into existing database]' \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \
 '--version[Print version]' \
-':path:_files' \
+":: :_zoxide__import_commands" \
+"*::: :->import" \
 && ret=0
+
+    case $state in
+    (import)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:zoxide-import-command-$line[1]:"
+        case $line[1] in
+            (atuin)
+_arguments "${_arguments_options[@]}" : \
+'--merge[Merge into existing database]' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+(autojump)
+_arguments "${_arguments_options[@]}" : \
+'--merge[Merge into existing database]' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+(fasd)
+_arguments "${_arguments_options[@]}" : \
+'--merge[Merge into existing database]' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+(z)
+_arguments "${_arguments_options[@]}" : \
+'--merge[Merge into existing database]' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+(z.lua)
+_arguments "${_arguments_options[@]}" : \
+'--merge[Merge into existing database]' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+(zsh-z)
+_arguments "${_arguments_options[@]}" : \
+'--merge[Merge into existing database]' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
 ;;
 (init)
 _arguments "${_arguments_options[@]}" : \
@@ -199,8 +263,45 @@ _zoxide__edit__reload_commands() {
 }
 (( $+functions[_zoxide__import_commands] )) ||
 _zoxide__import_commands() {
-    local commands; commands=()
+    local commands; commands=(
+'atuin:Import from atuin' \
+'autojump:Import from autojump' \
+'fasd:Import from fasd' \
+'z:Import from z' \
+'z.lua:Import from z.lua' \
+'zsh-z:Import from zsh-z' \
+    )
     _describe -t commands 'zoxide import commands' commands "$@"
+}
+(( $+functions[_zoxide__import__atuin_commands] )) ||
+_zoxide__import__atuin_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide import atuin commands' commands "$@"
+}
+(( $+functions[_zoxide__import__autojump_commands] )) ||
+_zoxide__import__autojump_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide import autojump commands' commands "$@"
+}
+(( $+functions[_zoxide__import__fasd_commands] )) ||
+_zoxide__import__fasd_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide import fasd commands' commands "$@"
+}
+(( $+functions[_zoxide__import__z_commands] )) ||
+_zoxide__import__z_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide import z commands' commands "$@"
+}
+(( $+functions[_zoxide__import__z.lua_commands] )) ||
+_zoxide__import__z.lua_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide import z.lua commands' commands "$@"
+}
+(( $+functions[_zoxide__import__zsh-z_commands] )) ||
+_zoxide__import__zsh-z_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide import zsh-z commands' commands "$@"
 }
 (( $+functions[_zoxide__init_commands] )) ||
 _zoxide__init_commands() {

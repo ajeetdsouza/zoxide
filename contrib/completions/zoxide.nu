@@ -43,14 +43,50 @@ module completions {
     --version(-V)             # Print version
   ]
 
-  def "nu-complete zoxide import from" [] {
-    [ "autojump" "z" ]
-  }
-
   # Import entries from another application
   export extern "zoxide import" [
-    path: path
-    --from: string@"nu-complete zoxide import from" # Application to import from
+    --merge                   # Merge into existing database
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+  ]
+
+  # Import from atuin
+  export extern "zoxide import atuin" [
+    --merge                   # Merge into existing database
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+  ]
+
+  # Import from autojump
+  export extern "zoxide import autojump" [
+    --merge                   # Merge into existing database
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+  ]
+
+  # Import from fasd
+  export extern "zoxide import fasd" [
+    --merge                   # Merge into existing database
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+  ]
+
+  # Import from z
+  export extern "zoxide import z" [
+    --merge                   # Merge into existing database
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+  ]
+
+  # Import from z.lua
+  export extern "zoxide import z.lua" [
+    --merge                   # Merge into existing database
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+  ]
+
+  # Import from zsh-z
+  export extern "zoxide import zsh-z" [
     --merge                   # Merge into existing database
     --help(-h)                # Print help
     --version(-V)             # Print version

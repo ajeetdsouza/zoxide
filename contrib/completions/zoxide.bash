@@ -46,6 +46,24 @@ _zoxide() {
             zoxide__edit,reload)
                 cmd="zoxide__edit__reload"
                 ;;
+            zoxide__import,atuin)
+                cmd="zoxide__import__atuin"
+                ;;
+            zoxide__import,autojump)
+                cmd="zoxide__import__autojump"
+                ;;
+            zoxide__import,fasd)
+                cmd="zoxide__import__fasd"
+                ;;
+            zoxide__import,z)
+                cmd="zoxide__import__z"
+                ;;
+            zoxide__import,z.lua)
+                cmd="zoxide__import__z.lua"
+                ;;
+            zoxide__import,zsh-z)
+                cmd="zoxide__import__zsh__z"
+                ;;
             *)
                 ;;
         esac
@@ -159,16 +177,96 @@ _zoxide() {
             return 0
             ;;
         zoxide__import)
-            opts="-h -V --from --merge --help --version <PATH>"
+            opts="-h -V --merge --help --version atuin autojump fasd z z.lua zsh-z"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
             fi
             case "${prev}" in
-                --from)
-                    COMPREPLY=($(compgen -W "autojump z" -- "${cur}"))
-                    return 0
+                *)
+                    COMPREPLY=()
                     ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__import__atuin)
+            opts="-h -V --merge --help --version"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__import__autojump)
+            opts="-h -V --merge --help --version"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__import__fasd)
+            opts="-h -V --merge --help --version"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__import__z)
+            opts="-h -V --merge --help --version"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__import__z.lua)
+            opts="-h -V --merge --help --version"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__import__zsh__z)
+            opts="-h -V --merge --help --version"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
                 *)
                     COMPREPLY=()
                     ;;

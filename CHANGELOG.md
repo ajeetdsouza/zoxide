@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- PowerShell: use fully qualified names when invoking cmdlets.
 - Bash/Fish/POSIX/Zsh: resolve symlinks on Windows.
 
 ## [0.9.9] - 2026-01-31

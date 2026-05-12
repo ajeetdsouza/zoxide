@@ -110,7 +110,7 @@ impl Iterator for Iter {
 
 impl Drop for Iter {
     fn drop(&mut self) {
-        let _ = self.child.kill();
-        let _ = self.child.wait();
+        _ = self.child.kill();
+        _ = self.child.wait();
     }
 }

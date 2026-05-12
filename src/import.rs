@@ -48,7 +48,7 @@ pub(crate) struct ImportError {
 /// format. Doesn't abort on per-record errors — bad rows are skipped, the
 /// rest of the import continues. After the iteration completes successfully,
 /// the database is deduplicated and aged.
-pub(crate) fn run<I: Importer>(importer: &I, db: &mut Database) -> Result<()> {
+pub(crate) fn run(importer: &impl Importer, db: &mut Database) -> Result<()> {
     let stderr = io::stderr();
     let mut stderr = stderr.lock();
 
@@ -60,7 +60,7 @@ pub(crate) fn run<I: Importer>(importer: &I, db: &mut Database) -> Result<()> {
                     Some(path) => format!("{}:{}", path.display(), e.line_num),
                     None => format!("line {}", e.line_num),
                 };
-                let _ = writeln!(stderr, "{location}: {:#}", e.source);
+                _ = writeln!(stderr, "{location}: {:#}", e.source);
             }
         }
     }

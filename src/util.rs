@@ -168,13 +168,9 @@ pub fn write(path: impl AsRef<Path>, contents: impl AsRef<[u8]>) -> Result<()> {
         // Set the owner of the tmpfile (UNIX only).
         #[cfg(unix)]
         if let Ok(metadata) = path.metadata() {
-            use std::os::unix::fs::MetadataExt;
+            use std::os::unix::fs::{MetadataExt, fchown};
 
-            use nix::unistd::{self, Gid, Uid};
-
-            let uid = Uid::from_raw(metadata.uid());
-            let gid = Gid::from_raw(metadata.gid());
-            _ = unistd::fchown(&tmp_file, Some(uid), Some(gid));
+            _ = fchown(&tmp_file, Some(metadata.uid()), Some(metadata.gid()));
         }
 
         // Close and rename the tmpfile.

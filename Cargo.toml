@@ -32,12 +32,6 @@ ouroboros = "0.18.3"
 serde = { version = "1.0.116", features = ["derive"] }
 time = { version = "0.3.47", default-features = false, features = ["parsing", "macros", "std"] }
 
-[target.'cfg(unix)'.dependencies]
-nix = { version = "0.31.2", default-features = false, features = [
-    "fs",
-    "user",
-] }
-
 [target.'cfg(windows)'.dependencies]
 which = "8.0.2"
 

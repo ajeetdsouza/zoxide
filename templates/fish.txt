@@ -7,7 +7,7 @@
 
 # pwd based on the value of _ZO_RESOLVE_SYMLINKS.
 function __zoxide_pwd
-{%- let pwd -%}
+{%- decl pwd -%}
 {%- if resolve_symlinks -%}
 {%- let pwd = "builtin pwd -P" -%}
 {%- else -%}

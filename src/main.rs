@@ -4,6 +4,7 @@ mod cmd;
 mod config;
 mod db;
 mod error;
+mod import;
 mod shell;
 mod util;
 

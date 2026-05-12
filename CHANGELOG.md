@@ -12,9 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - POSIX: support for non-Cygwin Windows environments (e.g. Busybox).
+- `import` now supports fetching entries from `atuin`.
+
+### Changed
+
+- `import` now auto-detects database files.
 
 ### Fixed
 
+- PowerShell: use fully qualified names when invoking cmdlets.
 - Bash/Fish/POSIX/Zsh: resolve symlinks on Windows.
 
 ## [0.9.9] - 2026-01-31

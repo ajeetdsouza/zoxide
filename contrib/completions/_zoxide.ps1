@@ -84,7 +84,60 @@ Register-ArgumentCompleter -Native -CommandName 'zoxide' -ScriptBlock {
             break
         }
         'zoxide;import' {
-            [CompletionResult]::new('--from', '--from', [CompletionResultType]::ParameterName, 'Application to import from')
+            [CompletionResult]::new('--merge', '--merge', [CompletionResultType]::ParameterName, 'Merge into existing database')
+            [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
+            [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
+            [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
+            [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
+            [CompletionResult]::new('atuin', 'atuin', [CompletionResultType]::ParameterValue, 'Import from atuin')
+            [CompletionResult]::new('autojump', 'autojump', [CompletionResultType]::ParameterValue, 'Import from autojump')
+            [CompletionResult]::new('fasd', 'fasd', [CompletionResultType]::ParameterValue, 'Import from fasd')
+            [CompletionResult]::new('z', 'z', [CompletionResultType]::ParameterValue, 'Import from z')
+            [CompletionResult]::new('z.lua', 'z.lua', [CompletionResultType]::ParameterValue, 'Import from z.lua')
+            [CompletionResult]::new('zsh-z', 'zsh-z', [CompletionResultType]::ParameterValue, 'Import from zsh-z')
+            break
+        }
+        'zoxide;import;atuin' {
+            [CompletionResult]::new('--merge', '--merge', [CompletionResultType]::ParameterName, 'Merge into existing database')
+            [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
+            [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
+            [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
+            [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
+            break
+        }
+        'zoxide;import;autojump' {
+            [CompletionResult]::new('--merge', '--merge', [CompletionResultType]::ParameterName, 'Merge into existing database')
+            [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
+            [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
+            [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
+            [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
+            break
+        }
+        'zoxide;import;fasd' {
+            [CompletionResult]::new('--merge', '--merge', [CompletionResultType]::ParameterName, 'Merge into existing database')
+            [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
+            [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
+            [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
+            [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
+            break
+        }
+        'zoxide;import;z' {
+            [CompletionResult]::new('--merge', '--merge', [CompletionResultType]::ParameterName, 'Merge into existing database')
+            [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
+            [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
+            [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
+            [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
+            break
+        }
+        'zoxide;import;z.lua' {
+            [CompletionResult]::new('--merge', '--merge', [CompletionResultType]::ParameterName, 'Merge into existing database')
+            [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
+            [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
+            [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
+            [CompletionResult]::new('--version', '--version', [CompletionResultType]::ParameterName, 'Print version')
+            break
+        }
+        'zoxide;import;zsh-z' {
             [CompletionResult]::new('--merge', '--merge', [CompletionResultType]::ParameterName, 'Merge into existing database')
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')

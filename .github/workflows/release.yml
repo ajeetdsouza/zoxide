@@ -115,7 +115,7 @@ jobs:
       - name: Create release
         if: |
           github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'chore(release)')
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           draft: true
           files: |

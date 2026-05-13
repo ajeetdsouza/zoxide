@@ -1,11 +1,11 @@
 use std::io::{self, Write};
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, bail};
 
 use crate::cmd::{Query, Run};
 use crate::config;
 use crate::db::{Database, Epoch, Stream, StreamOptions};
-use crate::error::BrokenPipeHandler;
+use crate::error::{BrokenPipeHandler, SilentExit};
 use crate::util::{self, Fzf, FzfChild};
 
 impl Run for Query {
@@ -31,16 +31,23 @@ impl Query {
 
     fn query_interactive(&self, stream: &mut Stream, now: Epoch) -> Result<()> {
         let mut fzf = Self::get_fzf()?;
-        let selection = loop {
-            match stream.next() {
-                Some(dir) if Some(dir.path.as_ref()) == self.exclude.as_deref() => continue,
-                Some(dir) => {
-                    if let Some(selection) = fzf.write(dir, now)? {
-                        break selection;
+        let selection = match (|| -> Result<String> {
+            loop {
+                match stream.next() {
+                    Some(dir) if Some(dir.path.as_ref()) == self.exclude.as_deref() => continue,
+                    Some(dir) => {
+                        if let Some(selection) = fzf.write(dir, now)? {
+                            break Ok(selection);
+                        }
                     }
+                    None => break fzf.wait(),
                 }
-                None => break fzf.wait()?,
             }
+        })() {
+            Ok(selection) if selection.is_empty() => bail!(SilentExit { code: 1 }),
+            Ok(selection) => selection,
+            Err(err) if err.to_string() == "no match found" => bail!(SilentExit { code: 1 }),
+            Err(err) => return Err(err),
         };
 
         if self.score {

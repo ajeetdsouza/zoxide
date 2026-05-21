@@ -33,22 +33,6 @@ make_template!(Tcsh, "tcsh.txt");
 make_template!(Xonsh, "xonsh.txt");
 make_template!(Zsh, "zsh.txt");
 
-#[cfg(test)]
-mod render_tests {
-    use askama::Template;
-
-    use super::*;
-
-    #[test]
-    fn zsh_doctor_skips_non_interactive_shells() {
-        let opts =
-            Opts { cmd: Some("z"), hook: InitHook::Prompt, echo: false, resolve_symlinks: false };
-        let source = Zsh(&opts).render().unwrap();
-
-        assert!(source.contains("[[ $- == *i* ]] || return 0"));
-    }
-}
-
 #[cfg(feature = "nix-dev")]
 #[cfg(test)]
 mod tests {

@@ -59,6 +59,7 @@ function __zoxide_doctor() {
 
 {%- else %}
     [[ ${_ZO_DOCTOR:-1} -ne 0 ]] || return 0
+    [[ $- == *i* ]] || return 0
 
 {%- if hook == InitHook::Prompt %}
     [[ ${precmd_functions[(Ie)__zoxide_hook]:-} -eq 0 ]] || return 0

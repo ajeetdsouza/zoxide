@@ -5,7 +5,7 @@ fn interactive_query_accepts_existing_path() {
     let data_dir = tempfile::tempdir().unwrap();
     let target_parent = tempfile::tempdir().unwrap();
     let target = target_parent.path().join("project");
-    std::fs::create_dir(&target).unwrap();
+    std::fs::create_dir_all(&target).unwrap();
 
     let expected = target.to_string_lossy();
 

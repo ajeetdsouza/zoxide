@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `zoxide query --interactive` now accepts a single existing path directly.
 - PowerShell: use fully qualified names when invoking cmdlets.
 - Bash/Fish/POSIX/Zsh: resolve symlinks on Windows.
 

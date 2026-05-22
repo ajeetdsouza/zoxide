@@ -1,4 +1,5 @@
 use std::io::{self, Write};
+use std::path::Path;
 
 use anyhow::{Context, Result};
 
@@ -18,15 +19,48 @@ impl Run for Query {
 impl Query {
     fn query(&self, db: &mut Database) -> Result<()> {
         let now = util::current_time()?;
-        let mut stream = self.get_stream(db, now)?;
 
         if self.interactive {
+            if let Some(path) = self.existing_path()? {
+                println!("{path}");
+                return Ok(());
+            }
+
+            let mut stream = self.get_stream(db, now)?;
             self.query_interactive(&mut stream, now)
         } else if self.list {
+            let mut stream = self.get_stream(db, now)?;
             self.query_list(&mut stream, now)
         } else {
+            let mut stream = self.get_stream(db, now)?;
             self.query_first(&mut stream, now)
         }
+    }
+
+    fn existing_path(&self) -> Result<Option<String>> {
+        if self.score || self.keywords.len() != 1 {
+            return Ok(None);
+        }
+
+        let path = Path::new(&self.keywords[0]);
+        if !path.is_dir() {
+            return Ok(None);
+        }
+
+        let path = util::resolve_path(path)?;
+        let path = util::path_to_str(&path)?;
+
+        if Some(path) == self.exclude.as_deref() {
+            return Ok(None);
+        }
+
+        if let Some(base_dir) = &self.base_dir
+            && !Path::new(path).starts_with(base_dir)
+        {
+            return Ok(None);
+        }
+
+        Ok(Some(path.to_owned()))
     }
 
     fn query_interactive(&self, stream: &mut Stream, now: Epoch) -> Result<()> {

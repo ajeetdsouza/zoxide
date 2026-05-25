@@ -156,6 +156,7 @@ pub enum InitShell {
     Bash,
     Elvish,
     Fish,
+    Murex,
     Nushell,
     #[clap(alias = "ksh")]
     Posix,

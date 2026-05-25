@@ -25,6 +25,17 @@ in pkgs.mkShell {
     pkgs.elvish
     pkgs.fish
     pkgs.ksh
+    (pkgs.murex.overrideAttrs (old: rec {
+      version = "7.2.1001";
+      src = pkgs.fetchFromGitHub {
+        owner = "lmorg";
+        repo = "murex";
+        rev = "v${version}";
+        hash = "sha256-Ua5KEtT1HXRCqW4MwB0dYCd03DBrliEfgiSmcp+vZS8=";
+      };
+      vendorHash = "sha256-MaBBi2Qi7s9lfRWmnYkyr7PtwzC7ZL0jmyUXzISOXVg=";
+      doCheck = false;
+    }))
     pkgs.nushell
     pkgs.powershell
     pkgs.tcsh

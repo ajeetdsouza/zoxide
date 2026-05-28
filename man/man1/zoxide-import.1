@@ -2,27 +2,29 @@
 .SH NAME
 \fBzoxide-import\fR - import data from other tools
 .SH SYNOPSIS
-.B zoxide import PATH --from FORMAT [OPTIONS]
-.SH OPTIONS
-.TP
-.B --from FORMAT
-The format of the database being imported:
+.B zoxide import <PLUGIN> [OPTIONS]
+.SH PLUGINS
 .TS
 tab(|);
 l l.
-    \fBautojump\fR
-    \fBz\fR|(for \fBfasd\fR, \fBz\fR, \fBz.lua\fR, or \fBzsh-z\fR)
+\fBatuin\fR|(Atuin shell history)
+\fBautojump\fR|(Autojump)
+\fBfasd\fR|(Fasd)
+\fBz\fR|(Z)
+\fBz.lua\fR|(Z.lua)
+\fBzsh-z\fR|(Zsh-z)
 .TE
 .sp
 Note: zoxide only imports paths from autojump, since its matching
 algorithm is too different to import the scores.
-.TP
-.B -h, --help
-Print help information.
+.SH OPTIONS
 .TP
 .B --merge
 By default, the import fails if the current database is not already empty. This
 option merges imported data into the existing database.
+.TP
+.B -h, --help
+Print help information.
 .SH REPORTING BUGS
 For any issues, feature requests, or questions, please visit:
 .sp

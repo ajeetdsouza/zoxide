@@ -189,7 +189,7 @@ zoxide can be installed in 4 easy steps:
    > Or, run this command in your terminal:
    >
    > ```sh
-   > curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+   > curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
    > ```
 
    </details>
@@ -206,7 +206,7 @@ zoxide can be installed in 4 easy steps:
    > Or, run this command in your terminal:
    >
    > ```sh
-   > curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+   > curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
    > ```
 
    </details>

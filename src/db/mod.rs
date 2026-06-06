@@ -190,7 +190,8 @@ impl Database {
                         dir.score(now)
                     }
                 };
-                score(dir1).total_cmp(&score(dir2))
+                score(dir1)
+                    .total_cmp(&score(dir2))
                     .then(dir1.score(now).total_cmp(&dir2.score(now)))
             })
         });

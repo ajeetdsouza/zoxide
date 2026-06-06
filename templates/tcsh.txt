@@ -1,7 +1,7 @@
 {%- let section = "# =============================================================================\n#" -%}
 {%- let not_configured = "# -- not configured --" -%}
 
-{%- let pwd_cmd -%}
+{%- decl pwd_cmd -%}
 {%- if resolve_symlinks -%}
 {%- let pwd_cmd = "pwd -P" -%}
 {%- else -%}

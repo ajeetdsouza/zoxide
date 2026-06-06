@@ -100,7 +100,7 @@ mod tests {
         let mut source = String::new();
 
         // Filter out lines using edit:*, since those functions are only available in
-        // the interactive editor.
+        // interactive editor mode.
         for line in Elvish(&opts).render().unwrap().lines().filter(|line| !line.contains("edit:")) {
             source.push_str(line);
             source.push('\n');

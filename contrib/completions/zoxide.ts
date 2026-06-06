@@ -114,19 +114,117 @@ const completion: Fig.Spec = {
     {
       name: "import",
       description: "Import entries from another application",
-      options: [
+      subcommands: [
         {
-          name: "--from",
-          description: "Application to import from",
-          isRepeatable: true,
-          args: {
-            name: "from",
-            suggestions: [
-              "autojump",
-              "z",
-            ],
-          },
+          name: "atuin",
+          description: "Import from atuin",
+          options: [
+            {
+              name: "--merge",
+              description: "Merge into existing database",
+            },
+            {
+              name: ["-h", "--help"],
+              description: "Print help",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version",
+            },
+          ],
         },
+        {
+          name: "autojump",
+          description: "Import from autojump",
+          options: [
+            {
+              name: "--merge",
+              description: "Merge into existing database",
+            },
+            {
+              name: ["-h", "--help"],
+              description: "Print help",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version",
+            },
+          ],
+        },
+        {
+          name: "fasd",
+          description: "Import from fasd",
+          options: [
+            {
+              name: "--merge",
+              description: "Merge into existing database",
+            },
+            {
+              name: ["-h", "--help"],
+              description: "Print help",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version",
+            },
+          ],
+        },
+        {
+          name: "z",
+          description: "Import from z",
+          options: [
+            {
+              name: "--merge",
+              description: "Merge into existing database",
+            },
+            {
+              name: ["-h", "--help"],
+              description: "Print help",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version",
+            },
+          ],
+        },
+        {
+          name: "z.lua",
+          description: "Import from z.lua",
+          options: [
+            {
+              name: "--merge",
+              description: "Merge into existing database",
+            },
+            {
+              name: ["-h", "--help"],
+              description: "Print help",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version",
+            },
+          ],
+        },
+        {
+          name: "zsh-z",
+          description: "Import from zsh-z",
+          options: [
+            {
+              name: "--merge",
+              description: "Merge into existing database",
+            },
+            {
+              name: ["-h", "--help"],
+              description: "Print help",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version",
+            },
+          ],
+        },
+      ],
+      options: [
         {
           name: "--merge",
           description: "Merge into existing database",
@@ -140,10 +238,6 @@ const completion: Fig.Spec = {
           description: "Print version",
         },
       ],
-      args: {
-        name: "path",
-        template: "filepaths",
-      },
     },
     {
       name: "init",

@@ -9,12 +9,16 @@
 
 # pwd based on the value of _ZO_RESOLVE_SYMLINKS.
 function __zoxide_pwd() {
+{%- decl pwd -%}
+{%- if resolve_symlinks -%}
+{%- let pwd = "\\builtin pwd -P" -%}
+{%- else -%}
+{%- let pwd = "\\builtin pwd -L" -%}
+{%- endif -%}
 {%- if cfg!(windows) %}
-    \command cygpath -w "$(\builtin pwd -P)"
-{%- else if resolve_symlinks %}
-    \builtin pwd -P
+    \command cygpath -w "{{ pwd }}"
 {%- else %}
-    \builtin pwd -L
+    {{ pwd }}
 {%- endif %}
 }
 
@@ -59,7 +63,7 @@ if [[ ${PROMPT_COMMAND:=} != *'__zoxide_hook'* ]]; then
         PROMPT_COMMAND=("${PROMPT_COMMAND[@]}" __zoxide_hook)
     else
         # shellcheck disable=SC2128,SC2178
-        PROMPT_COMMAND="${PROMPT_COMMAND%"${PROMPT_COMMAND##*[![:space:]]}"}"
+        PROMPT_COMMAND="${PROMPT_COMMAND%"${PROMPT_COMMAND##*[![:space:];]}"}"
         # shellcheck disable=SC2128,SC2178
         PROMPT_COMMAND="${PROMPT_COMMAND:+${PROMPT_COMMAND};}__zoxide_hook"
     fi

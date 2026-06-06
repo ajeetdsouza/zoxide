@@ -190,6 +190,7 @@ impl Database {
                     }
                 };
                 score(dir1).total_cmp(&score(dir2))
+                    .then(dir1.score(now).total_cmp(&dir2.score(now)))
             })
         });
         self.with_dirty_mut(|dirty| *dirty = true);
@@ -278,7 +279,7 @@ mod tests {
     #[test]
     fn sort_by_score_with_keywords_exact_match_wins() {
         let now = util::current_time().unwrap();
-        let mut db = Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
+        let mut db = Database::new(PathBuf::default(), Vec::default(), |_| Vec::new(), false);
 
         db.add_unchecked("/foo/baz", 100.0, now);
         db.add_unchecked("/foo/bar", 1.0, now);
@@ -299,7 +300,7 @@ mod tests {
     #[test]
     fn sort_by_score_with_keywords_highest_score_wins_without_exact_match() {
         let now = util::current_time().unwrap();
-        let mut db = Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
+        let mut db = Database::new(PathBuf::default(), Vec::default(), |_| Vec::new(), false);
 
         db.add_unchecked("/foo/baz", 100.0, now);
         db.add_unchecked("/foo/bar", 1.0, now);
@@ -309,6 +310,20 @@ mod tests {
 
         let dirs = db.dirs();
         assert_eq!(dirs.last().unwrap().path.as_ref(), "/foo/baz");
+    }
+
+    #[test]
+    fn sort_by_score_with_keywords_both_exact_match_frecency_breaks_tie() {
+        let now = util::current_time().unwrap();
+        let mut db = Database::new(PathBuf::default(), Vec::default(), |_| Vec::new(), false);
+
+        db.add_unchecked("/foo/bar", 1.0, now);
+        db.add_unchecked("/baz/bar", 100.0, now);
+
+        let keywords = vec!["bar".to_string()];
+        db.sort_by_score_with_keywords(&keywords, now);
+
+        assert_eq!(db.dirs().last().unwrap().path.as_ref(), "/baz/bar");
     }
 
     #[test]

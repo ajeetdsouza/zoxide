@@ -182,13 +182,14 @@ impl Database {
     pub fn sort_by_score_with_keywords(&mut self, keywords: &[String], now: Epoch) {
         self.with_dirs_mut(|dirs| {
             dirs.sort_unstable_by(|dir1: &Dir, dir2: &Dir| {
-                let key = |dir: &Dir| {
-                    let exact = keywords.last().is_some_and(|kw| dir.is_exact_match(kw));
-                    (exact, dir.score(now))
+                let score = |dir: &Dir| {
+                    if keywords.last().is_some_and(|kw| dir.is_exact_match(kw)) {
+                        f64::MAX
+                    } else {
+                        dir.score(now)
+                    }
                 };
-                let (exact1, score1) = key(dir1);
-                let (exact2, score2) = key(dir2);
-                exact1.cmp(&exact2).then(score1.total_cmp(&score2))
+                score(dir1).total_cmp(&score(dir2))
             })
         });
         self.with_dirty_mut(|dirty| *dirty = true);

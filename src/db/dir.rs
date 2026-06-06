@@ -34,10 +34,7 @@ impl Dir<'_> {
     }
 
     pub fn is_exact_match(&self, keyword: &str) -> bool {
-        let last = Path::new(self.path.as_ref())
-            .file_name()
-            .and_then(|s| s.to_str())
-            .unwrap_or("");
+        let last = Path::new(self.path.as_ref()).file_name().and_then(|s| s.to_str()).unwrap_or("");
         to_lowercase(last) == keyword
     }
 }

@@ -179,23 +179,19 @@ impl Database {
         self.with_dirty_mut(|dirty| *dirty = true);
     }
 
-    pub fn sort_by_keywords(&mut self, keywords: &[String]) {
-        if keywords.is_empty() {
-            return;
-        }
-
+    pub fn sort_by_score_with_keywords(&mut self, keywords: &[String], now: Epoch) {
         self.with_dirs_mut(|dirs| {
-            dirs.sort_by_key(|dir| Self::has_exact_match(&dir.path, keywords));
+            dirs.sort_unstable_by(|dir1: &Dir, dir2: &Dir| {
+                let key = |dir: &Dir| {
+                    let exact = keywords.last().is_some_and(|kw| dir.is_exact_match(kw));
+                    (exact, dir.score(now))
+                };
+                let (exact1, score1) = key(dir1);
+                let (exact2, score2) = key(dir2);
+                exact1.cmp(&exact2).then(score1.total_cmp(&score2))
+            })
         });
         self.with_dirty_mut(|dirty| *dirty = true);
-    }
-
-    fn has_exact_match(path: &str, keywords: &[String]) -> bool {
-        keywords.last().is_some_and(|keyword| {
-            let path_lower = util::to_lowercase(path);
-            let last_component = path_lower.rsplit(std::path::is_separator).next().unwrap_or("");
-            last_component == keyword
-        })
     }
 
     pub fn dirty(&self) -> bool {
@@ -276,6 +272,42 @@ mod tests {
             assert!((dir.rank - 2.0).abs() < 0.01);
             assert_eq!(dir.last_accessed, now);
         }
+    }
+
+    #[test]
+    fn sort_by_score_with_keywords_exact_match_wins() {
+        let now = util::current_time().unwrap();
+        let mut db = Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
+
+        db.add_unchecked("/foo/baz", 100.0, now);
+        db.add_unchecked("/foo/bar", 1.0, now);
+
+        let keywords = vec!["bar".to_string()];
+
+        let baz = db.dirs()[0].score(now);
+        let bar = db.dirs()[1].score(now);
+        assert!(baz > bar);
+
+        db.sort_by_score_with_keywords(&keywords, now);
+
+        let dirs = db.dirs();
+        assert_eq!(dirs.last().unwrap().path.as_ref(), "/foo/bar");
+        assert!((dirs.last().unwrap().rank - 1.0).abs() < 0.01);
+    }
+
+    #[test]
+    fn sort_by_score_with_keywords_highest_score_wins_without_exact_match() {
+        let now = util::current_time().unwrap();
+        let mut db = Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
+
+        db.add_unchecked("/foo/baz", 100.0, now);
+        db.add_unchecked("/foo/bar", 1.0, now);
+
+        let keywords = vec!["foo".to_string()];
+        db.sort_by_score_with_keywords(&keywords, now);
+
+        let dirs = db.dirs();
+        assert_eq!(dirs.last().unwrap().path.as_ref(), "/foo/baz");
     }
 
     #[test]

@@ -19,8 +19,11 @@ impl<'a> Stream<'a> {
         let now = options.now;
         let keywords = &options.keywords;
 
-        db.sort_by_score(now);
-        db.sort_by_keywords(keywords);
+        if options.prefer_exact_match {
+            db.sort_by_score_with_keywords(keywords, now);
+        } else {
+            db.sort_by_score(now);
+        }
         let idxs = (0..db.dirs().len()).rev();
         Stream { db, idxs, options }
     }
@@ -133,6 +136,9 @@ pub struct StreamOptions {
     /// Only return directories within this parent directory
     /// Does not check if the path exists
     base_dir: Option<String>,
+
+    /// Whether to prefer exact matches over the match with higher score.
+    prefer_exact_match: bool,
 }
 
 impl StreamOptions {
@@ -145,6 +151,7 @@ impl StreamOptions {
             resolve_symlinks: false,
             ttl: now.saturating_sub(3 * MONTH),
             base_dir: None,
+            prefer_exact_match: false,
         }
     }
 
@@ -174,6 +181,11 @@ impl StreamOptions {
 
     pub fn with_base_dir(mut self, base_dir: Option<String>) -> Self {
         self.base_dir = base_dir;
+        self
+    }
+
+    pub fn with_prefer_exact_match(mut self, prefer_exact_match: bool) -> Self {
+        self.prefer_exact_match = prefer_exact_match;
         self
     }
 }

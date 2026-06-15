@@ -209,6 +209,18 @@ _arguments "${_arguments_options[@]}" : \
 '*::paths:_files -/' \
 && ret=0
 ;;
+(rename)
+_arguments "${_arguments_options[@]}" : \
+'--old-name=[]:old_name:_files -/' \
+'--new-name=[]:new_name:_files -/' \
+'-f[skip y/n]' \
+'--force[skip y/n]' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
         esac
     ;;
 esac
@@ -223,6 +235,7 @@ _zoxide_commands() {
 'init:Generate shell configuration' \
 'query:Search for a directory in the database' \
 'remove:Remove a directory from the database' \
+'rename:Batch rename paths by replacing <old-name> with <new-name>' \
     )
     _describe -t commands 'zoxide commands' commands "$@"
 }
@@ -317,6 +330,11 @@ _zoxide__subcmd__query_commands() {
 _zoxide__subcmd__remove_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide remove commands' commands "$@"
+}
+(( $+functions[_zoxide__subcmd__rename_commands] )) ||
+_zoxide__subcmd__rename_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide rename commands' commands "$@"
 }
 
 if [ "$funcstack[1]" = "_zoxide" ]; then

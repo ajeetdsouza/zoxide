@@ -130,6 +130,15 @@ module completions {
     ...paths: path
   ]
 
+  # Batch rename paths by replacing <old-name> with <new-name>
+  export extern "zoxide rename" [
+    --old-name: path
+    --new-name: path
+    --force(-f)               # skip y/n
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+  ]
+
 }
 
 export use completions *

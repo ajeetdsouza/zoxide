@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PowerShell: use fully qualified names when invoking cmdlets.
 - Bash/Fish/POSIX/Zsh: resolve symlinks on Windows.
 - Zsh: avoid inserting a trailing space when cancelling interactive Space-Tab completions.
+- Bash: redraw the prompt instead of blanking it when cancelling interactive Space-Tab completions.
 
 ## [0.9.9] - 2026-01-31
 

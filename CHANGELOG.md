@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - POSIX: support for non-Cygwin Windows environments (e.g. Busybox).
+- Support for RISC-V (riscv64) Linux.
 - `import` now supports fetching entries from `atuin`.
 
 ### Changed
@@ -20,10 +21,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- PowerShell: use fully qualified names when invoking cmdlets.
 - Bash/Fish/POSIX/Zsh: resolve symlinks on Windows.
+- PowerShell: navigate to home directory with `z` on drives that don't define `HOME`.
+- Bash: handle `$PROMPT_COMMAND` values ending in a semicolon.
+- PowerShell: use fully qualified names when invoking cmdlets.
+- Zsh: skip doctor diagnostics in non-interactive shells.
 - Zsh: avoid inserting a trailing space when cancelling interactive Space-Tab completions.
-- Bash: redraw the prompt instead of blanking it when cancelling interactive Space-Tab completions.
+- Bash: avoid blanking the prompt when cancelling interactive Space-Tab completions.
 
 ## [0.9.9] - 2026-01-31
 

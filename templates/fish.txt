@@ -103,6 +103,7 @@ function __zoxide_z_complete
         set -l result (command zoxide query --exclude (__zoxide_pwd) --interactive -- $query)
         and __zoxide_cd $result
         and builtin commandline --function cancel-commandline repaint
+        and builtin history append "{{ cmd.unwrap_or("cd") }} "(string escape -- $result) &>/dev/null
     end
 end
 complete --command __zoxide_z --no-files --arguments '(__zoxide_z_complete)'

@@ -92,6 +92,11 @@ impl Query {
 
     fn get_fzf() -> Result<FzfChild> {
         let mut fzf = Fzf::new()?;
+
+        if let Some(fzf_opts_file) = config::fzf_opts_file() {
+            fzf.env("FZF_DEFAULT_OPTS_FILE", fzf_opts_file);
+        }
+
         if let Some(fzf_opts) = config::fzf_opts() {
             fzf.env("FZF_DEFAULT_OPTS", fzf_opts)
         } else {

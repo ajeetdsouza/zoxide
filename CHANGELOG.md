@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Zsh: skip doctor diagnostics in non-interactive shells.
 - Zsh: avoid inserting a trailing space when cancelling interactive Space-Tab completions.
 - Bash: avoid blanking the prompt when cancelling interactive Space-Tab completions.
+- Bash/Fish/Zsh: avoid drawing a new line when Space-Tab completion finds no matches.
 
 ## [0.9.9] - 2026-01-31
 

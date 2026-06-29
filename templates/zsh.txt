@@ -144,7 +144,7 @@ if [[ -o zle ]]; then
         elif [[ "${words[-1]}" == '' ]]; then
             # Show completions for Space-Tab.
             # shellcheck disable=SC2086
-            __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd || \builtin true)" --interactive -- ${words[2,-1]})" || __zoxide_result=''
+            __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd || \builtin true)" --interactive -- ${words[2,-1]} 2>/dev/null)" || __zoxide_result=''
 
             # Set a result to ensure completion doesn't re-run
             compadd -Q -S "" -- ""

@@ -377,6 +377,40 @@ const completion: Fig.Spec = {
         template: "folders",
       },
     },
+    {
+      name: "rename",
+      description: "Batch rename paths by replacing <old-name> with <new-name>",
+      options: [
+        {
+          name: "--old-name",
+          isRepeatable: true,
+          args: {
+            name: "old_name",
+            template: "folders",
+          },
+        },
+        {
+          name: "--new-name",
+          isRepeatable: true,
+          args: {
+            name: "new_name",
+            template: "folders",
+          },
+        },
+        {
+          name: ["-f", "--force"],
+          description: "skip y/n",
+        },
+        {
+          name: ["-h", "--help"],
+          description: "Print help",
+        },
+        {
+          name: ["-V", "--version"],
+          description: "Print version",
+        },
+      ],
+    },
   ],
   options: [
     {

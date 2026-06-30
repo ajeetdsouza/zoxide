@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - `import` now auto-detects database files.
+- Nushell: export commands so the init script can be imported with `use`.
 
 ### Fixed
 

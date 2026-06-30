@@ -15,8 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `import` now supports fetching entries from `atuin`.
 - `import` now skips directories matching `$_ZO_EXCLUDE_DIRS`.
 - POSIX: support for non-Cygwin Windows environments (e.g. Busybox).
-- Fish: record the selected directory in shell history when using interactive
-  Space-Tab completions.
+- Fish: Space-Tab completions now display and run the selected command.
 
 ### Changed
 

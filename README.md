@@ -96,30 +96,29 @@ zoxide can be installed in 4 easy steps:
    >
    > Or, you can use a package manager:
    >
-   > | Distribution        | Repository                  | Instructions                                                                                          |
-   > | ------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------- |
-   > | **_Any_**           | **[crates.io]**             | `cargo install zoxide --locked`                                                                       |
-   > | _Any_               | [asdf]                      | `asdf plugin add zoxide https://github.com/nyrst/asdf-zoxide.git` <br /> `asdf install zoxide latest` |
-   > | _Any_               | [conda-forge]               | `conda install -c conda-forge zoxide`                                                                 |
-   > | _Any_               | [guix]                      | `guix install zoxide`                                                                                 |
-   > | _Any_               | [Linuxbrew]                 | `brew install zoxide`                                                                                 |
-   > | _Any_               | [nixpkgs]                   | `nix-env -iA nixpkgs.zoxide`                                                                          |
-   > | Alpine Linux 3.13+  | [Alpine Linux Packages]     | `apk add zoxide`                                                                                      |
-   > | Arch Linux          | [Arch Linux Extra]          | `pacman -S zoxide`                                                                                    |
-   > | ~Debian~[^1]    | ~[Debian Packages]~         | ~`apt install zoxide`~                                                                                    |
-   > | Devuan 4.0+         | [Devuan Packages]           | `apt install zoxide`                                                                                  |
-   > | Exherbo Linux       | [Exherbo packages]          | `cave resolve -x repository/rust` <br /> `cave resolve -x zoxide`                                     |
-   > | Fedora 32+          | [Fedora Packages]           | `dnf install zoxide`                                                                                  |
-   > | Gentoo              | [Gentoo Packages]           | `emerge app-shells/zoxide`                                                                            |
-   > | Manjaro             |                             | `pacman -S zoxide`                                                                                    |
-   > | openSUSE Tumbleweed | [openSUSE Factory]          | `zypper install zoxide`                                                                               |
-   > | ~Parrot OS~[^1]     |                             | ~`apt install zoxide`~                                                                                |
-   > | ~Raspbian~[^1]  | ~[Raspbian Packages]~       | ~`apt install zoxide`~                                                                                    |
-   > | Rhino Linux         | [Pacstall Packages]         | `pacstall -I zoxide-deb`                                                                              |
-   > | Slackware 15.0+     | [SlackBuilds]               | [Instructions][slackbuilds-howto]                                                                     |
-   > | Solus               | [Solus Packages]            | `eopkg install zoxide`                                                                                |
-   > | ~Ubuntu~[^1]        | ~[Ubuntu Packages]~         | ~`apt install zoxide`~                                                                                |
-   > | Void Linux          | [Void Linux Packages]       | `xbps-install -S zoxide`                                                                              |
+   > | Distribution        | Repository              | Instructions                                                      |
+   > | ------------------- | ----------------------- | ----------------------------------------------------------------- |
+   > | **_Any_**           | **[crates.io]**         | `cargo install zoxide --locked`                                   |
+   > | _Any_               | [conda-forge]           | `conda install -c conda-forge zoxide`                             |
+   > | _Any_               | [guix]                  | `guix install zoxide`                                             |
+   > | _Any_               | [Linuxbrew]             | `brew install zoxide`                                             |
+   > | _Any_               | [nixpkgs]               | `nix-env -iA nixpkgs.zoxide`                                      |
+   > | Alpine Linux 3.13+  | [Alpine Linux Packages] | `apk add zoxide`                                                  |
+   > | Arch Linux          | [Arch Linux Extra]      | `pacman -S zoxide`                                                |
+   > | ~~Debian~~[^1]      | ~~[Debian Packages]~~   | ~~`apt install zoxide`~~                                          |
+   > | Devuan 4.0+         | [Devuan Packages]       | `apt install zoxide`                                              |
+   > | Exherbo Linux       | [Exherbo packages]      | `cave resolve -x repository/rust` <br /> `cave resolve -x zoxide` |
+   > | Fedora 32+          | [Fedora Packages]       | `dnf install zoxide`                                              |
+   > | Gentoo              | [Gentoo Packages]       | `emerge app-shells/zoxide`                                        |
+   > | Manjaro             |                         | `pacman -S zoxide`                                                |
+   > | openSUSE Tumbleweed | [openSUSE Factory]      | `zypper install zoxide`                                           |
+   > | ~~Parrot OS~~[^1]   |                         | ~~`apt install zoxide`~~                                          |
+   > | ~~Raspbian~~[^1]    | ~~[Raspbian Packages]~~ | ~~`apt install zoxide`~~                                          |
+   > | Rhino Linux         | [Pacstall Packages]     | `pacstall -I zoxide-deb`                                          |
+   > | Slackware 15.0+     | [SlackBuilds]           | [Instructions][slackbuilds-howto]                                 |
+   > | Solus               | [Solus Packages]        | `eopkg install zoxide`                                            |
+   > | ~~Ubuntu~~[^1]      | ~~[Ubuntu Packages]~~   | ~~`apt install zoxide`~~                                          |
+   > | Void Linux          | [Void Linux Packages]   | `xbps-install -S zoxide`                                          |
 
    </details>
 
@@ -128,14 +127,13 @@ zoxide can be installed in 4 easy steps:
 
    > To install zoxide, use a package manager:
    >
-   > | Repository      | Instructions                                                                                          |
-   > | --------------- | ----------------------------------------------------------------------------------------------------- |
-   > | **[crates.io]** | `cargo install zoxide --locked`                                                                       |
-   > | **[Homebrew]**  | `brew install zoxide`                                                                                 |
-   > | [asdf]          | `asdf plugin add zoxide https://github.com/nyrst/asdf-zoxide.git` <br /> `asdf install zoxide latest` |
-   > | [conda-forge]   | `conda install -c conda-forge zoxide`                                                                 |
-   > | [MacPorts]      | `port install zoxide`                                                                                 |
-   > | [nixpkgs]       | `nix-env -iA nixpkgs.zoxide`                                                                          |
+   > | Repository      | Instructions                          |
+   > | --------------- | ------------------------------------- |
+   > | **[crates.io]** | `cargo install zoxide --locked`       |
+   > | **[Homebrew]**  | `brew install zoxide`                 |
+   > | [conda-forge]   | `conda install -c conda-forge zoxide` |
+   > | [MacPorts]      | `port install zoxide`                 |
+   > | [nixpkgs]       | `nix-env -iA nixpkgs.zoxide`          |
    >
    > Or, run this command in your terminal:
    >
@@ -357,14 +355,14 @@ zoxide can be installed in 4 easy steps:
    zoxide import <plugin>
    ```
 
-   | Plugin     | Command                   |
-   | ---------- | ------------------------- |
-   | atuin      | `zoxide import atuin`     |
-   | autojump   | `zoxide import autojump`  |
-   | fasd       | `zoxide import fasd`      |
-   | z          | `zoxide import z`         |
-   | z.lua      | `zoxide import z.lua`     |
-   | zsh-z      | `zoxide import zsh-z`     |
+   | Plugin   | Command                  |
+   | -------- | ------------------------ |
+   | atuin    | `zoxide import atuin`    |
+   | autojump | `zoxide import autojump` |
+   | fasd     | `zoxide import fasd`     |
+   | z        | `zoxide import z`        |
+   | z.lua    | `zoxide import z.lua`    |
+   | zsh-z    | `zoxide import zsh-z`    |
 
 ## Configuration
 
@@ -472,7 +470,6 @@ Environment variables[^2] can be used for configuration. They must be set before
 [algorithm-matching]: https://github.com/ajeetdsouza/zoxide/wiki/Algorithm#matching
 [alpine linux packages]: https://pkgs.alpinelinux.org/packages?name=zoxide
 [arch linux extra]: https://archlinux.org/packages/extra/x86_64/zoxide/
-[asdf]: https://github.com/asdf-vm/asdf
 [builtwithnix-badge]: https://img.shields.io/badge/builtwith-nix-7d81f7?logo=nixos&logoColor=white&style=flat-square
 [builtwithnix]: https://builtwithnix.org/
 [chocolatey]: https://community.chocolatey.org/packages/zoxide

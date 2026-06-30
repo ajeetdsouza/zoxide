@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bash: avoid blanking the prompt when cancelling interactive Space-Tab completions.
 - Bash/Fish/Zsh: avoid drawing a new line when Space-Tab completion finds no matches.
 - Tcsh: preserve any existing `precmd` alias instead of overwriting it.
+- Nushell: complete only directories for `z`, instead of all files.
 
 ## [0.9.9] - 2026-01-31
 

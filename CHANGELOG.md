@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Zsh: avoid inserting a trailing space when cancelling interactive Space-Tab completions.
 - Bash: avoid blanking the prompt when cancelling interactive Space-Tab completions.
 - Bash/Fish/Zsh: avoid drawing a new line when Space-Tab completion finds no matches.
+- Tcsh: preserve any existing `precmd` alias instead of overwriting it.
 
 ## [0.9.9] - 2026-01-31
 

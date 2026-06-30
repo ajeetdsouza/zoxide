@@ -23,7 +23,15 @@ alias __zoxide_hook 'set __zoxide_pwd_tmp = "`{{ pwd_cmd }}`"; test "$__zoxide_p
 {%- endif %}
 
 # Initialize hook.
-alias precmd ';__zoxide_hook'
+set __zoxide_precmd = "`alias precmd`"
+if ( "$__zoxide_precmd" !~ *__zoxide_hook* ) then
+    if ( "$__zoxide_precmd" == "" ) then
+        alias precmd '__zoxide_hook'
+    else
+        alias precmd "$__zoxide_precmd"';__zoxide_hook'
+    endif
+endif
+unset __zoxide_precmd
 
 {%- endif %}
 

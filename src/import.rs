@@ -49,12 +49,19 @@ pub(crate) struct ImportError {
 /// rest of the import continues. After the iteration completes successfully,
 /// the database is deduplicated and aged.
 pub(crate) fn run(importer: &impl Importer, db: &mut Database) -> Result<()> {
+    let exclude_dirs = config::exclude_dirs()?;
+
     let stderr = io::stderr();
     let mut stderr = stderr.lock();
 
     for entry in importer.dirs()? {
         match entry {
-            Ok(dir) => db.add_unchecked(dir.path, dir.rank, dir.last_accessed),
+            Ok(dir) => {
+                if exclude_dirs.iter().any(|glob| glob.matches(&dir.path)) {
+                    continue;
+                }
+                db.add_unchecked(dir.path, dir.rank, dir.last_accessed);
+            }
             Err(e) => {
                 let location = match &e.path {
                     Some(path) => format!("{}:{}", path.display(), e.line_num),

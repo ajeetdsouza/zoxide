@@ -19,7 +19,7 @@ function global:__zoxide_bin {
 
 # pwd based on zoxide's format.
 function global:__zoxide_pwd {
-    $cwd = Get-Location
+    $cwd = Microsoft.PowerShell.Management\Get-Location
     if ($cwd.Provider.Name -eq "FileSystem") {
         $cwd.ProviderPath
     }
@@ -29,23 +29,23 @@ function global:__zoxide_pwd {
 function global:__zoxide_cd($dir, $literal) {
     $dir = if ($literal) {
         if ($null -eq $dir) {
-            Set-Location
+            Microsoft.PowerShell.Management\Set-Location
         } else {
-            Set-Location -LiteralPath $dir -Passthru -ErrorAction Stop
+            Microsoft.PowerShell.Management\Set-Location -LiteralPath $dir -Passthru -ErrorAction Stop
         }
     } else {
         if ($dir -eq '-' -and ($PSVersionTable.PSVersion -lt 6.1)) {
-            Write-Error "cd - is not supported below PowerShell 6.1. Please upgrade your version of PowerShell."
+            Microsoft.PowerShell.Utility\Write-Error "cd - is not supported below PowerShell 6.1. Please upgrade your version of PowerShell."
         }
         elseif ($dir -eq '+' -and ($PSVersionTable.PSVersion -lt 6.2)) {
-            Write-Error "cd + is not supported below PowerShell 6.2. Please upgrade your version of PowerShell."
+            Microsoft.PowerShell.Utility\Write-Error "cd + is not supported below PowerShell 6.2. Please upgrade your version of PowerShell."
         }
         else {
-            Set-Location -Path $dir -Passthru -ErrorAction Stop
+            Microsoft.PowerShell.Management\Set-Location -Path $dir -Passthru -ErrorAction Stop
         }
     }
 {%- if echo %}
-    Write-Output $dir.Path
+    Microsoft.PowerShell.Utility\Write-Output $dir.Path
 {%- endif %}
 }
 
@@ -84,7 +84,7 @@ function global:__zoxide_hook {
 {%- endif %}
 
 # Initialize hook.
-$global:__zoxide_hooked = (Get-Variable __zoxide_hooked -ErrorAction Ignore -ValueOnly)
+$global:__zoxide_hooked = (Microsoft.PowerShell.Utility\Get-Variable __zoxide_hooked -ErrorAction Ignore -ValueOnly)
 if ($global:__zoxide_hooked -ne 1) {
     $global:__zoxide_hooked = 1
     $global:__zoxide_prompt_old = $function:prompt
@@ -110,10 +110,10 @@ function global:__zoxide_z {
     elseif ($args.Length -eq 1 -and ($args[0] -eq '-' -or $args[0] -eq '+')) {
         __zoxide_cd $args[0] $false
     }
-    elseif ($args.Length -eq 1 -and (Test-Path -PathType Container -LiteralPath $args[0])) {
+    elseif ($args.Length -eq 1 -and (Microsoft.PowerShell.Management\Test-Path -PathType Container -LiteralPath $args[0])) {
         __zoxide_cd $args[0] $true
     }
-    elseif ($args.Length -eq 1 -and (Test-Path -PathType Container -Path $args[0] )) {
+    elseif ($args.Length -eq 1 -and (Microsoft.PowerShell.Management\Test-Path -PathType Container -Path $args[0] )) {
         __zoxide_cd $args[0] $false
     }
     else {
@@ -145,8 +145,8 @@ function global:__zoxide_zi {
 {%- match cmd %}
 {%- when Some with (cmd) %}
 
-Set-Alias -Name {{cmd}} -Value __zoxide_z -Option AllScope -Scope Global -Force
-Set-Alias -Name {{cmd}}i -Value __zoxide_zi -Option AllScope -Scope Global -Force
+Microsoft.PowerShell.Utility\Set-Alias -Name {{cmd}} -Value __zoxide_z -Option AllScope -Scope Global -Force
+Microsoft.PowerShell.Utility\Set-Alias -Name {{cmd}}i -Value __zoxide_zi -Option AllScope -Scope Global -Force
 
 {%- when None %}
 

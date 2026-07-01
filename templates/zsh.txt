@@ -9,7 +9,7 @@
 
 # pwd based on the value of _ZO_RESOLVE_SYMLINKS.
 function __zoxide_pwd() {
-{%- let pwd -%}
+{%- decl pwd -%}
 {%- if resolve_symlinks -%}
 {%- let pwd = "\\builtin pwd -P" -%}
 {%- else -%}
@@ -59,6 +59,7 @@ function __zoxide_doctor() {
 
 {%- else %}
     [[ ${_ZO_DOCTOR:-1} -ne 0 ]] || return 0
+    [[ $- == *i* ]] || return 0
 
 {%- if hook == InitHook::Prompt %}
     [[ ${precmd_functions[(Ie)__zoxide_hook]:-} -eq 0 ]] || return 0
@@ -143,10 +144,10 @@ if [[ -o zle ]]; then
         elif [[ "${words[-1]}" == '' ]]; then
             # Show completions for Space-Tab.
             # shellcheck disable=SC2086
-            __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd || \builtin true)" --interactive -- ${words[2,-1]})" || __zoxide_result=''
+            __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd || \builtin true)" --interactive -- ${words[2,-1]} 2>/dev/null)" || __zoxide_result=''
 
             # Set a result to ensure completion doesn't re-run
-            compadd -Q ""
+            compadd -Q -S "" -- ""
 
             # Bind '\e[0n' to helper function.
             \builtin bindkey '\e[0n' '__zoxide_z_complete_helper'

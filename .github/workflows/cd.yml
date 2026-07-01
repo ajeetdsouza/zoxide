@@ -7,10 +7,17 @@ jobs:
   publish-crates-io:
     name: Publish on crates.io
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+      - name: Authenticate with crates.io
+        id: auth
+        uses: rust-lang/crates-io-auth-action@v1
       - name: Publish
-        run: cargo publish --token ${{ secrets.CARGO_TOKEN }}
+        run: cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}

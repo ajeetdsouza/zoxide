@@ -86,6 +86,10 @@ impl Query {
             options = options.with_exists(true).with_resolve_symlinks(resolve_symlinks);
         }
 
+        if config::prefer_exact_match() {
+            options = options.with_prefer_exact_match(true);
+        }
+
         let stream = Stream::new(db, options);
         Ok(stream)
     }

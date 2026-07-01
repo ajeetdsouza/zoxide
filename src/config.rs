@@ -60,3 +60,7 @@ pub fn maxage() -> Result<Rank> {
 pub fn resolve_symlinks() -> bool {
     env::var_os("_ZO_RESOLVE_SYMLINKS").is_some_and(|var| var == "1")
 }
+
+pub fn prefer_exact_match() -> bool {
+    env::var_os("_ZO_PREFER_EXACT_MATCH").is_some_and(|var| var == "1")
+}

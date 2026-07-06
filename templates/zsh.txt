@@ -16,7 +16,7 @@ function __zoxide_pwd() {
 {%- let pwd = "\\builtin pwd -L" -%}
 {%- endif -%}
 {%- if cfg!(windows) %}
-    \command cygpath -w "{{ pwd }}"
+    \command cygpath -w "$({{ pwd }})"
 {%- else %}
     {{ pwd }}
 {%- endif %}

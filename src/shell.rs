@@ -33,6 +33,26 @@ make_template!(Tcsh, "tcsh.txt");
 make_template!(Xonsh, "xonsh.txt");
 make_template!(Zsh, "zsh.txt");
 
+#[cfg(test)]
+mod template_tests {
+    #[test]
+    fn windows_bash_and_zsh_pwd_substitute_before_cygpath() {
+        for (name, template) in [
+            ("bash", include_str!("../templates/bash.txt")),
+            ("zsh", include_str!("../templates/zsh.txt")),
+        ] {
+            assert!(
+                template.contains(r#"\command cygpath -w "$({{ pwd }})""#),
+                "{name} template should pass the output of pwd to cygpath"
+            );
+            assert!(
+                !template.contains(r#"\command cygpath -w "{{ pwd }}""#),
+                "{name} template should not pass the literal pwd command to cygpath"
+            );
+        }
+    }
+}
+
 #[cfg(feature = "nix-dev")]
 #[cfg(test)]
 mod tests {

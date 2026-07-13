@@ -16,6 +16,14 @@ const completion: Fig.Spec = {
           },
         },
         {
+          name: ["-a", "--alias"],
+          isRepeatable: true,
+          args: {
+            name: "alias",
+            isOptional: true,
+          },
+        },
+        {
           name: ["-h", "--help"],
           description: "Print help",
         },

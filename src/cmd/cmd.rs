@@ -63,6 +63,9 @@ pub struct Add {
     /// doesn't
     #[clap(short, long)]
     pub score: Option<f64>,
+
+    #[clap(short, long)]
+    pub alias: Option<String>,
 }
 
 /// Edit the database

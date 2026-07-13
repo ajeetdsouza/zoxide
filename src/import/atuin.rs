@@ -64,6 +64,7 @@ impl Iter {
             path: Cow::Owned(path.to_string()),
             rank: 1.0,
             last_accessed: timestamp as Epoch,
+            aliases: Vec::new(),
         };
         Ok(dir)
     }

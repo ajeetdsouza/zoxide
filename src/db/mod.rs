@@ -65,11 +65,31 @@ impl Database {
     }
 
     /// Increments the rank of a directory, or creates it if it does not exist.
-    pub fn add(&mut self, path: impl AsRef<str> + Into<String>, by: Rank, now: Epoch) {
+    pub fn add(
+        &mut self,
+        path: impl AsRef<str> + Into<String>,
+        by: Rank,
+        now: Epoch,
+        alias: Option<impl AsRef<str> + Into<String>>,
+    ) {
         self.with_dirs_mut(|dirs| match dirs.iter_mut().find(|dir| dir.path == path.as_ref()) {
-            Some(dir) => dir.rank = (dir.rank + by).max(0.0),
+            Some(dir) => {
+                dir.rank = (dir.rank + by).max(0.0);
+                if let Some(al) = alias {
+                    dir.aliases.push(al.into().into());
+                }
+            }
             None => {
-                dirs.push(Dir { path: path.into().into(), rank: by.max(0.0), last_accessed: now })
+                let mut aliases = Vec::new();
+                if let Some(al) = alias {
+                    aliases.push(al.into().into());
+                }
+                dirs.push(Dir {
+                    path: path.into().into(),
+                    rank: by.max(0.0),
+                    last_accessed: now,
+                    aliases,
+                })
             }
         });
         self.with_dirty_mut(|dirty| *dirty = true);
@@ -79,23 +99,51 @@ impl Database {
     /// directory is already in the database, it is expected that the user
     /// either does a check before calling this, or calls `dedup()`
     /// afterward.
-    pub fn add_unchecked(&mut self, path: impl AsRef<str> + Into<String>, rank: Rank, now: Epoch) {
+    pub fn add_unchecked(
+        &mut self,
+        path: impl AsRef<str> + Into<String>,
+        rank: Rank,
+        now: Epoch,
+        alias: Option<impl AsRef<str> + Into<String>>,
+    ) {
         self.with_dirs_mut(|dirs| {
-            dirs.push(Dir { path: path.into().into(), rank, last_accessed: now })
+            let mut aliases = Vec::new();
+            if let Some(al) = alias {
+                aliases.push(al.into().into());
+            }
+            dirs.push(Dir { path: path.into().into(), rank, last_accessed: now, aliases })
         });
         self.with_dirty_mut(|dirty| *dirty = true);
     }
 
     /// Increments the rank and updates the last_accessed of a directory, or
     /// creates it if it does not exist.
-    pub fn add_update(&mut self, path: impl AsRef<str> + Into<String>, by: Rank, now: Epoch) {
+    pub fn add_update(
+        &mut self,
+        path: impl AsRef<str> + Into<String>,
+        by: Rank,
+        now: Epoch,
+        alias: Option<impl AsRef<str> + Into<String>>,
+    ) {
         self.with_dirs_mut(|dirs| match dirs.iter_mut().find(|dir| dir.path == path.as_ref()) {
             Some(dir) => {
                 dir.rank = (dir.rank + by).max(0.0);
                 dir.last_accessed = now;
+                if let Some(al) = alias {
+                    dir.aliases.push(al.into().into());
+                }
             }
             None => {
-                dirs.push(Dir { path: path.into().into(), rank: by.max(0.0), last_accessed: now })
+                let mut aliases = Vec::new();
+                if let Some(al) = alias {
+                    aliases.push(al.into().into());
+                }
+                dirs.push(Dir {
+                    path: path.into().into(),
+                    rank: by.max(0.0),
+                    last_accessed: now,
+                    aliases,
+                })
             }
         });
         self.with_dirty_mut(|dirty| *dirty = true);
@@ -244,8 +292,8 @@ mod tests {
 
         {
             let mut db = Database::open_dir(data_dir.path()).unwrap();
-            db.add(path, 1.0, now);
-            db.add(path, 1.0, now);
+            db.add(path, 1.0, now, Option::<String>::None);
+            db.add(path, 1.0, now, Some(String::from("foo")));
             db.save().unwrap();
         }
 
@@ -268,7 +316,7 @@ mod tests {
 
         {
             let mut db = Database::open_dir(data_dir.path()).unwrap();
-            db.add(path, 1.0, now);
+            db.add(path, 1.0, now, Option::<String>::None);
             db.save().unwrap();
         }
 

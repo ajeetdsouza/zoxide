@@ -52,7 +52,7 @@ impl<R: BufRead> Iter<R> {
         // take a while to normalize.
         let rank = sigmoid(rank);
 
-        Ok(Dir { path: Cow::Owned(path.to_string()), rank, last_accessed: 0 })
+        Ok(Dir { path: Cow::Owned(path.to_string()), rank, last_accessed: 0, aliases: Vec::new() })
     }
 }
 

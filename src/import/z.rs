@@ -54,7 +54,7 @@ impl<R: BufRead> Iter<R> {
 
         let path = split.next().ok_or_else(err)?;
 
-        Ok(Dir { path: Cow::Owned(path.to_string()), rank, last_accessed })
+        Ok(Dir { path: Cow::Owned(path.to_string()), rank, last_accessed, aliases: Vec::new() })
     }
 }
 

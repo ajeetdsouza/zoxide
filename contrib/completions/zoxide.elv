@@ -32,6 +32,8 @@ set edit:completion:arg-completer[zoxide] = {|@words|
         &'zoxide;add'= {
             cand -s 'The rank to increment the entry if it exists or initialize it with if it doesn''t'
             cand --score 'The rank to increment the entry if it exists or initialize it with if it doesn''t'
+            cand -a 'a'
+            cand --alias 'alias'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'

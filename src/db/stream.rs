@@ -234,7 +234,11 @@ mod tests {
     #[case(&["bar/mee"], r"~\foo\bar\meow", false)]
     // Single partial keyword — should NOT match since bar is not last component
     #[case(&["bar"], r"~\foo\bar\meow", false)]
-    fn query_backslash_paths(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
+    fn query_backslash_paths(
+        #[case] keywords: &[&str],
+        #[case] path: &str,
+        #[case] is_match: bool,
+    ) {
         let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
         let options = StreamOptions::new(0).with_keywords(keywords.iter());
         let stream = Stream::new(db, options);

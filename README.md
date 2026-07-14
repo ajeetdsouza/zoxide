@@ -106,6 +106,7 @@ zoxide can be installed in 4 easy steps:
    > | Alpine Linux 3.13+  | [Alpine Linux Packages] | `apk add zoxide`                                                  |
    > | Arch Linux          | [Arch Linux Extra]      | `pacman -S zoxide`                                                |
    > | ~~Debian~~[^1]      | ~~[Debian Packages]~~   | ~~`apt install zoxide`~~                                          |
+   > | Debian 12+[^3]      | [deb.griffo.io]         | [Instructions][deb.griffo.io-debian]                              |
    > | Devuan 4.0+         | [Devuan Packages]       | `apt install zoxide`                                              |
    > | Exherbo Linux       | [Exherbo packages]      | `cave resolve -x repository/rust` <br /> `cave resolve -x zoxide` |
    > | Fedora 32+          | [Fedora Packages]       | `dnf install zoxide`                                              |
@@ -118,6 +119,7 @@ zoxide can be installed in 4 easy steps:
    > | Slackware 15.0+     | [SlackBuilds]           | [Instructions][slackbuilds-howto]                                 |
    > | Solus               | [Solus Packages]        | `eopkg install zoxide`                                            |
    > | ~~Ubuntu~~[^1]      | ~~[Ubuntu Packages]~~   | ~~`apt install zoxide`~~                                          |
+   > | Ubuntu 22.04+[^3]   | [deb.griffo.io]         | [Instructions][deb.griffo.io-ubuntu]                              |
    > | Void Linux          | [Void Linux Packages]   | `xbps-install -S zoxide`                                          |
 
    </details>
@@ -463,6 +465,12 @@ Environment variables[^2] can be used for configuration. They must be set before
     If you're not sure how to set an environment variable on your shell, check
     out the [wiki][wiki-env].
 
+[^3]:
+    [deb.griffo.io] is an unofficial repository maintained by
+    [dariogriffo](https://github.com/dariogriffo). Packages are built
+    automatically from the official zoxide releases, and the packaging is
+    open source.
+
 [aerc]: https://github.com/rjarry/aerc
 [alfred]: https://www.alfredapp.com/
 [alfred-zoxide]: https://github.com/yihou/alfred-zoxide
@@ -478,6 +486,9 @@ Environment variables[^2] can be used for configuration. They must be set before
 [conda-forge]: https://anaconda.org/conda-forge/zoxide
 [crates.io-badge]: https://img.shields.io/crates/v/zoxide?logo=rust&logoColor=white&style=flat-square
 [crates.io]: https://crates.io/crates/zoxide
+[deb.griffo.io]: https://deb.griffo.io/
+[deb.griffo.io-debian]: https://deb.griffo.io/install-latest-zoxide-in-debian.html
+[deb.griffo.io-ubuntu]: https://deb.griffo.io/install-latest-zoxide-in-ubuntu.html
 [debian packages]: https://packages.debian.org/stable/admin/zoxide
 [exherbo packages]: https://gitlab.exherbo.org/exherbo/rust/-/tree/master/packages/sys-apps/zoxide
 [devuan packages]: https://pkginfo.devuan.org/cgi-bin/package-query.html?c=package&q=zoxide

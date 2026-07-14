@@ -11,11 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Nushell: `z` now supports fzf completion
+- Nushell: `z` now supports Space-Tab completions.
 
 ### Fixed
 
-- Bash/Zsh: fix `z` failing on Cygwin/MSYS2 due to `cygpath` being passed a bad string.
+- Bash/Zsh: `z` failing on Cygwin/MSYS2 due to `cygpath` being passed a bad string.
 - Nushell: `z` now handles relative paths through symlinked directories.
 
 ## [0.10.0] - 2026-07-04

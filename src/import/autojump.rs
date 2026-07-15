@@ -6,14 +6,14 @@ use std::{env, str};
 
 use anyhow::{Context, Result, anyhow};
 
-use crate::db::Dir;
+use crate::db::DirV4;
 use crate::import::{ImportError, Importer};
 
 #[derive(clap::Args, Clone, Debug)]
 pub(crate) struct Autojump {}
 
 impl Importer for Autojump {
-    fn dirs(&self) -> Result<impl Iterator<Item = Result<Dir<'static>, ImportError>>> {
+    fn dirs(&self) -> Result<impl Iterator<Item = Result<DirV4<'static>, ImportError>>> {
         let path = data_path()?;
         let file = File::open(&path).with_context(|| format!("could not read {path:?}"))?;
         let reader = BufReader::new(file);
@@ -37,7 +37,7 @@ impl<R: BufRead> Iter<R> {
         ImportError { path: Some(self.path.clone()), line_num: self.line_num, source }
     }
 
-    fn parse_line(&self, line: &[u8]) -> Result<Dir<'static>, ImportError> {
+    fn parse_line(&self, line: &[u8]) -> Result<DirV4<'static>, ImportError> {
         let line =
             str::from_utf8(line).map_err(|e| self.err(anyhow!(e).context("invalid utf-8")))?;
 
@@ -52,12 +52,17 @@ impl<R: BufRead> Iter<R> {
         // take a while to normalize.
         let rank = sigmoid(rank);
 
-        Ok(Dir { path: Cow::Owned(path.to_string()), rank, last_accessed: 0, aliases: Vec::new() })
+        Ok(DirV4 {
+            path: Cow::Owned(path.to_string()),
+            rank,
+            last_accessed: 0,
+            aliases: Vec::new(),
+        })
     }
 }
 
 impl<R: BufRead> Iterator for Iter<R> {
-    type Item = Result<Dir<'static>, ImportError>;
+    type Item = Result<DirV4<'static>, ImportError>;
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {

@@ -8,7 +8,8 @@ use anyhow::{Context, Result, bail};
 use bincode::Options;
 use ouroboros::self_referencing;
 
-pub use crate::db::dir::{Dir, Epoch, Rank};
+use crate::db::dir::{Dir, DirV3};
+pub use crate::db::dir::{DirV4, Epoch, Rank};
 pub use crate::db::stream::{Stream, StreamOptions};
 use crate::{config, util};
 
@@ -18,12 +19,13 @@ pub struct Database {
     bytes: Vec<u8>,
     #[borrows(bytes)]
     #[covariant]
-    pub dirs: Vec<Dir<'this>>,
+    pub dirs: Vec<DirV4<'this>>,
     dirty: bool,
 }
 
 impl Database {
-    const VERSION: u32 = 3;
+    const PREV_VERSION: u32 = 3;
+    const VERSION: u32 = 4;
 
     pub fn open() -> Result<Self> {
         let data_dir = config::data_dir()?;
@@ -82,7 +84,7 @@ impl Database {
             None => {
                 let aliases =
                     if let Some(alias) = alias { vec![alias.into().into()] } else { Vec::new() };
-                dirs.push(Dir {
+                dirs.push(DirV4 {
                     path: path.into().into(),
                     rank: by.max(0.0),
                     last_accessed: now,
@@ -107,7 +109,7 @@ impl Database {
         self.with_dirs_mut(|dirs| {
             let aliases =
                 if let Some(alias) = alias { vec![alias.into().into()] } else { Vec::new() };
-            dirs.push(Dir { path: path.into().into(), rank, last_accessed: now, aliases })
+            dirs.push(DirV4 { path: path.into().into(), rank, last_accessed: now, aliases })
         });
         self.with_dirty_mut(|dirty| *dirty = true);
     }
@@ -132,7 +134,7 @@ impl Database {
             None => {
                 let aliases =
                     if let Some(alias) = alias { vec![alias.into().into()] } else { Vec::new() };
-                dirs.push(Dir {
+                dirs.push(DirV4 {
                     path: path.into().into(),
                     rank: by.max(0.0),
                     last_accessed: now,
@@ -215,7 +217,7 @@ impl Database {
 
     pub fn sort_by_score(&mut self, now: Epoch) {
         self.with_dirs_mut(|dirs| {
-            dirs.sort_unstable_by(|dir1: &Dir, dir2: &Dir| {
+            dirs.sort_unstable_by(|dir1: &DirV4, dir2: &DirV4| {
                 dir1.score(now).total_cmp(&dir2.score(now))
             })
         });
@@ -226,11 +228,11 @@ impl Database {
         *self.borrow_dirty()
     }
 
-    pub fn dirs(&self) -> &[Dir<'_>] {
+    pub fn dirs(&self) -> &[DirV4<'_>] {
         self.borrow_dirs()
     }
 
-    fn serialize(dirs: &[Dir<'_>]) -> Result<Vec<u8>> {
+    fn serialize(dirs: &[DirV4<'_>]) -> Result<Vec<u8>> {
         (|| -> bincode::Result<_> {
             // Preallocate buffer with combined size of sections.
             let buffer_size =
@@ -246,7 +248,7 @@ impl Database {
         .context("could not serialize database")
     }
 
-    fn deserialize(bytes: &[u8]) -> Result<Vec<Dir<'_>>> {
+    fn deserialize(bytes: &[u8]) -> Result<Vec<DirV4<'_>>> {
         // Assume a maximum size for the database. This prevents bincode from throwing
         // strange errors when it encounters invalid data.
         const MAX_SIZE: u64 = 32 << 20; // 32 MiB
@@ -265,8 +267,27 @@ impl Database {
             Self::VERSION => {
                 deserializer.deserialize(bytes_dirs).context("could not deserialize database")?
             }
+            Self::PREV_VERSION => {
+                let old_dirs = deserializer
+                    .deserialize::<Vec<DirV3>>(bytes_dirs)
+                    .context("could not deserialize v3 database")?;
+
+                old_dirs
+                    .into_iter()
+                    .map(|dir: DirV3| DirV4 {
+                        path: dir.path,
+                        rank: dir.rank,
+                        last_accessed: dir.last_accessed,
+                        aliases: Vec::new(),
+                    })
+                    .collect()
+            }
             version => {
-                bail!("unsupported version (got {version}, supports {})", Self::VERSION)
+                bail!(
+                    "unsupported version (got {version}, supports {}, {})",
+                    Self::VERSION,
+                    Self::PREV_VERSION
+                )
             }
         };
 

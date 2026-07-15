@@ -80,10 +80,8 @@ impl Database {
                 }
             }
             None => {
-                let mut aliases = Vec::new();
-                if let Some(al) = alias {
-                    aliases.push(al.into().into());
-                }
+                let aliases =
+                    if let Some(alias) = alias { vec![alias.into().into()] } else { Vec::new() };
                 dirs.push(Dir {
                     path: path.into().into(),
                     rank: by.max(0.0),
@@ -107,10 +105,8 @@ impl Database {
         alias: Option<impl AsRef<str> + Into<String>>,
     ) {
         self.with_dirs_mut(|dirs| {
-            let mut aliases = Vec::new();
-            if let Some(al) = alias {
-                aliases.push(al.into().into());
-            }
+            let aliases =
+                if let Some(alias) = alias { vec![alias.into().into()] } else { Vec::new() };
             dirs.push(Dir { path: path.into().into(), rank, last_accessed: now, aliases })
         });
         self.with_dirty_mut(|dirty| *dirty = true);
@@ -134,10 +130,8 @@ impl Database {
                 }
             }
             None => {
-                let mut aliases = Vec::new();
-                if let Some(al) = alias {
-                    aliases.push(al.into().into());
-                }
+                let aliases =
+                    if let Some(alias) = alias { vec![alias.into().into()] } else { Vec::new() };
                 dirs.push(Dir {
                     path: path.into().into(),
                     rank: by.max(0.0),

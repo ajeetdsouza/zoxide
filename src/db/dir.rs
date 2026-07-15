@@ -11,7 +11,7 @@ pub struct Dir<'a> {
     pub path: Cow<'a, str>,
     pub rank: Rank,
     pub last_accessed: Epoch,
-    #[serde(default)]
+    #[serde(borrow)]
     pub aliases: Vec<Cow<'a, str>>,
 }
 

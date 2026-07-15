@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::iter::Rev;
 use std::ops::Range;
 use std::path::Path;
@@ -25,25 +26,28 @@ impl<'a> Stream<'a> {
         while let Some(idx) = self.idxs.next() {
             let dir = &self.db.dirs()[idx];
 
-            if !self.filter_by_keywords(&dir.path) {
-                continue;
-            }
-
-            if !self.filter_by_base_dir(&dir.path) {
-                continue;
-            }
-
-            if !self.filter_by_exclude(&dir.path) {
-                self.db.swap_remove(idx);
-                continue;
-            }
-
-            // Exists queries are slow, this should always be checked last.
-            if !self.filter_by_exists(&dir.path) {
-                if dir.last_accessed < self.options.ttl {
-                    self.db.swap_remove(idx);
+            // Return dir if any keyword is an alias
+            if !self.match_aliases(&dir.aliases) {
+                if !self.filter_by_keywords(&dir.path) {
+                    continue;
                 }
-                continue;
+
+                if !self.filter_by_base_dir(&dir.path) {
+                    continue;
+                }
+
+                if !self.filter_by_exclude(&dir.path) {
+                    self.db.swap_remove(idx);
+                    continue;
+                }
+
+                // Exists queries are slow, this should always be checked last.
+                if !self.filter_by_exists(&dir.path) {
+                    if dir.last_accessed < self.options.ttl {
+                        self.db.swap_remove(idx);
+                    }
+                    continue;
+                }
             }
 
             let dir = &self.db.dirs()[idx];
@@ -103,6 +107,17 @@ impl<'a> Stream<'a> {
         }
 
         true
+    }
+
+    fn match_aliases(&self, aliases: &[Cow<'a, str>]) -> bool {
+        for keyword in self.options.keywords.iter().rev() {
+            // Alias matching is intended to be case-sensitive
+            if aliases.iter().any(|a| a == keyword.as_str()) {
+                return true;
+            }
+        }
+
+        false
     }
 }
 

@@ -6,7 +6,7 @@ use std::{fs, path};
 
 use glob::Pattern;
 
-use crate::db::{Database, Dir, Epoch};
+use crate::db::{Database, DirV4, Epoch};
 use crate::util::{self, MONTH};
 
 pub struct Stream<'a> {
@@ -22,7 +22,7 @@ impl<'a> Stream<'a> {
         Stream { db, idxs, options }
     }
 
-    pub fn next(&mut self) -> Option<&Dir<'_>> {
+    pub fn next(&mut self) -> Option<&DirV4<'_>> {
         while let Some(idx) = self.idxs.next() {
             let dir = &self.db.dirs()[idx];
 

@@ -10,7 +10,7 @@ use std::{env, mem};
 use anyhow::anyhow;
 use anyhow::{Context, Result, bail};
 
-use crate::db::{Dir, Epoch};
+use crate::db::{DirV4, Epoch};
 use crate::error::SilentExit;
 
 pub const SECOND: Epoch = 1;
@@ -121,7 +121,7 @@ impl Fzf {
 pub struct FzfChild(Child);
 
 impl FzfChild {
-    pub fn write(&mut self, dir: &Dir, now: Epoch) -> Result<Option<String>> {
+    pub fn write(&mut self, dir: &DirV4, now: Epoch) -> Result<Option<String>> {
         let handle = self.0.stdin.as_mut().unwrap();
         match write!(handle, "{}\0", dir.display().with_score(now).with_separator('\t')) {
             Ok(()) => Ok(None),

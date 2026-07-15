@@ -6,14 +6,14 @@ use std::path::PathBuf;
 
 use anyhow::{Context, Result};
 
-use crate::db::Dir;
+use crate::db::DirV4;
 use crate::import::{ImportError, Importer, z};
 
 #[derive(clap::Args, Clone, Debug)]
 pub(crate) struct ZLua {}
 
 impl Importer for ZLua {
-    fn dirs(&self) -> Result<impl Iterator<Item = Result<Dir<'static>, ImportError>>> {
+    fn dirs(&self) -> Result<impl Iterator<Item = Result<DirV4<'static>, ImportError>>> {
         let path = data_path()?;
         let err = match File::open(&path) {
             Ok(file) => return Ok(z::Iter::new(BufReader::new(file), path)),

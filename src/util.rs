@@ -373,8 +373,39 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
     Ok(stack.iter().collect())
 }
 
-/// Convert a string to lowercase, with a fast path for ASCII strings.
-pub fn to_lowercase(s: impl AsRef<str>) -> String {
+/// Normalizes a string for matching, with a fast path for ASCII strings:
+/// Latin characters which are variants of ASCII characters (e.g. `á`, `ø`)
+/// are folded to their ASCII equivalent, ligatures are expanded (e.g. `æ` to
+/// `ae`), combining diacritical marks are removed (macOS stores filenames in
+/// decomposed form, where `á` is an `a` followed by U+0301), and the string
+/// is converted to lowercase.
+pub fn normalize(s: impl AsRef<str>) -> String {
     let s = s.as_ref();
-    if s.is_ascii() { s.to_ascii_lowercase() } else { s.to_lowercase() }
+    if s.is_ascii() {
+        return s.to_ascii_lowercase();
+    }
+
+    let mut result = String::with_capacity(s.len());
+    for c in s.chars() {
+        match c {
+            // Combining marks are not handled by nucleo-matcher, and must be
+            // removed separately.
+            '\u{0300}'..='\u{036f}' | '\u{1ab0}'..='\u{1aff}' | '\u{1dc0}'..='\u{1dff}' => {}
+            // Ligatures expand to multiple characters, which nucleo-matcher's
+            // char-to-char normalization cannot represent.
+            'æ' | 'Æ' => result.push_str("ae"),
+            'œ' | 'Œ' => result.push_str("oe"),
+            'ß' | 'ẞ' => result.push_str("ss"),
+            // nucleo-matcher 0.3.1 only folds the Latin-1 Supplement, Latin
+            // Extended-A, and Latin Extended-B blocks correctly. Its Latin
+            // Extended Additional and super/subscript tables are corrupt due to
+            // a codegen bug and return arbitrary letters, so we restrict folding
+            // to the correct range and leave everything else untouched.
+            '\u{00c0}'..='\u{024f}' => {
+                result.extend(nucleo_matcher::chars::normalize(c).to_lowercase());
+            }
+            _ => result.extend(c.to_lowercase()),
+        }
+    }
+    result
 }

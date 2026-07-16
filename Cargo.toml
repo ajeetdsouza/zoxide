@@ -28,6 +28,7 @@ dirs = "6.0.0"
 dunce = "1.0.1"
 fastrand = "2.0.0"
 glob = "0.3.0"
+nucleo-matcher = "0.3.1"
 ouroboros = "0.18.3"
 serde = { version = "1.0.116", features = ["derive"] }
 time = { version = "0.3.47", default-features = false, features = ["parsing", "macros", "std"] }

@@ -83,7 +83,7 @@ impl<'a> Stream<'a> {
             None => return true,
         };
 
-        let path = util::to_lowercase(path);
+        let path = util::normalize(path);
         let mut path = path.as_str();
         match path.rfind(keywords_last) {
             Some(idx) => {
@@ -149,7 +149,7 @@ impl StreamOptions {
         I: IntoIterator,
         I::Item: AsRef<str>,
     {
-        self.keywords = keywords.into_iter().map(util::to_lowercase).collect();
+        self.keywords = keywords.into_iter().map(util::normalize).collect();
         self
     }
 
@@ -185,6 +185,26 @@ mod tests {
     #[rstest]
     // Case normalization
     #[case(&["fOo", "bAr"], "/foo/bar", true)]
+    // Diacritics are folded on both sides
+    #[case(&["malaga"], "/Málaga", true)]
+    #[case(&["málaga"], "/malaga", true)]
+    #[case(&["munchen"], "/München", true)]
+    #[case(&["lodz"], "/łódź", true)]
+    // Ligatures are expanded
+    #[case(&["aether"], "/Æther", true)]
+    #[case(&["oeuvre"], "/Œuvre", true)]
+    #[case(&["strasse"], "/Straße", true)]
+    // Combining diacritical marks are removed
+    #[case(&["cafe"], "/cafe\u{0301}", true)]
+    #[case(&["café"], "/cafe", true)]
+    #[case(&["malaga"], "/Ma\u{0301}laga", true)]
+    // Characters outside the folding range are only case-normalized (not
+    // mis-folded)
+    #[case(&["ṁ"], "/Ṁ", true)]
+    #[case(&["m"], "/Ṁ", false)]
+    // Non-Latin scripts are only case-normalized
+    #[case(&["папка"], "/ПАПКА", true)]
+    #[case(&["市场"], "/市场", true)]
     // Last component
     #[case(&["ba"], "/foo/bar", true)]
     #[case(&["fo"], "/foo/bar", false)]

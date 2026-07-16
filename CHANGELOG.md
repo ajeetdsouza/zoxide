@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Zsh: when `CDABLE_VARS` is set, `z` now expands a leading named directory
+  without requiring the `~` prefix (e.g. `z foo bar` searches within `~foo`).
+
 ### Fixed
 
 - Bash/Zsh: fix `z` failing on Cygwin/MSYS2 due to `cygpath` being passed a bad string.

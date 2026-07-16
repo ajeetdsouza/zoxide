@@ -97,6 +97,18 @@ function __zoxide_z() {
         __zoxide_cd "$2"
     else
         \builtin local result
+        # When CDABLE_VARS is set, expand a leading named directory without its
+        # '~' prefix, mirroring how `cd` treats its argument, e.g. `z foo bar`
+        # searches within `~foo`. The pattern guard restricts `$1` to identifier
+        # names so that passing it to `eval` is safe; `eval` re-parses `~name`
+        # so that zsh performs named-directory expansion on it.
+        if [[ -o cdablevars ]] && [[ "$1" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+            \builtin local dir
+            \builtin eval "dir=~$1" 2>/dev/null
+            if [[ "${dir}" != "~$1" ]] && [[ -d "${dir}" ]]; then
+                \builtin set -- "${dir}" "${@:2}"
+            fi
+        fi
         # shellcheck disable=SC2312
         result="$(\command zoxide query --exclude "$(__zoxide_pwd)" -- "$@")" && __zoxide_cd "${result}"
     fi

@@ -343,4 +343,65 @@ mod tests {
             .stdout("")
             .stderr("");
     }
+
+    // Regression test for https://github.com/ajeetdsouza/zoxide/issues/491.
+    //
+    // With the `format` and `group-name` completion styles enabled, tab
+    // completion for a local directory prefix must render a single completion
+    // group. The old `_files -/` completer rendered the matches twice; `_cd -/`
+    // renders them once.
+    #[test]
+    fn zsh_completion_no_duplicate_groups() {
+        let opts =
+            Opts { cmd: Some("z"), hook: InitHook::Pwd, echo: false, resolve_symlinks: false };
+        let source = Zsh(&opts).render().unwrap();
+
+        let tempdir = tempfile::tempdir().unwrap();
+        let dir = tempdir.path();
+        std::fs::write(dir.join("init.zsh"), source).unwrap();
+        std::fs::create_dir(dir.join("foobar1")).unwrap();
+        std::fs::create_dir(dir.join("foobar2")).unwrap();
+
+        // Drive `z foobar<TAB>` inside a pseudo-terminal and count how many
+        // completion group headers (rendered by the `format` style) appear.
+        let script = "\
+emulate -LR zsh
+zmodload zsh/zpty
+dir=$1
+cat >$dir/.zshrc <<RC
+autoload -Uz compinit
+compinit -u -d $dir/zcompdump
+source $dir/init.zsh
+zstyle ':completion:*' format '-- %d --'
+zstyle ':completion:*' group-name ''
+cd $dir
+RC
+export ZDOTDIR=$dir HOME=$dir
+zpty ZP zsh -f -i
+zpty -w ZP \"source $dir/.zshrc\"
+local chunk out=
+integer quiet=0
+while (( quiet < 15 )); do
+    if zpty -r -t ZP chunk 2>/dev/null; then quiet=0; else sleep 0.1; (( quiet++ )); fi
+done
+zpty -w ZP $'z foobar\\t'
+quiet=0
+while (( quiet < 20 )); do
+    if zpty -r -t ZP chunk 2>/dev/null; then out+=$chunk; quiet=0; else sleep 0.1; (( quiet++ )); fi
+done
+zpty -d ZP
+integer groups
+groups=$(print -r -- $out | grep -aoE -- '-- [a-z ]+ --' | wc -l)
+if (( groups != 1 )); then
+    print -r -- \"expected 1 completion group, got $groups\"
+    print -r -- $out | cat -v
+    exit 1
+fi
+";
+
+        Command::new("zsh")
+            .args(["-f", "-c", script, "zoxide-test", dir.to_str().unwrap()])
+            .assert()
+            .success();
+    }
 }

@@ -193,6 +193,10 @@ pub struct Query {
     #[clap(long, short)]
     pub score: bool,
 
+    /// Print aliases with results
+    #[clap(long)]
+    pub aliases: bool,
+
     /// Exclude the current directory
     #[clap(long, value_hint = ValueHint::DirPath, value_name = "path")]
     pub exclude: Option<String>,

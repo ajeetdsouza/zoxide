@@ -192,6 +192,25 @@ zoxide can be installed in 4 easy steps:
 
    </details>
 
+   </details>
+
+   <details>
+   <summary>illumos</summary>
+
+   > To install zoxide, use a package manager:
+   >
+   > | Distribution  | Repository      | Instructions                    |
+   > | ------------- | --------------- | ------------------------------- |
+   > | OpenIndiana   | [pkg]           | `pkg install zoxide`            |
+   >
+   > Or, run this command in your terminal:
+   >
+   > ```sh
+   > curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+   > ```
+
+   </details>
+
    <details>
    <summary>Android</summary>
 
@@ -506,6 +525,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 [nnn]: https://github.com/jarun/nnn
 [opensuse factory]: https://build.opensuse.org/package/show/openSUSE:Factory/zoxide
 [pacstall packages]: https://pacstall.dev/packages/zoxide-deb
+[pkg]: https://pkg.openindiana.org/hipster/p5i/0/application%2Fzoxide.p5i
 [pkgsrc]: https://pkgsrc.se/sysutils/zoxide
 [ranger-zoxide]: https://github.com/jchook/ranger-zoxide
 [ranger]: https://github.com/ranger/ranger

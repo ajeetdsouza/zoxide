@@ -30,8 +30,12 @@ impl Run for Edit {
 
                 let stdout = &mut io::stdout().lock();
                 for dir in db.dirs().iter().rev() {
-                    write!(stdout, "{}\0", dir.display().with_score(now).with_separator('\t'))
-                        .pipe_exit("fzf")?;
+                    write!(
+                        stdout,
+                        "{}\0",
+                        dir.display().with_score(now).with_aliases(true).with_separator('\t')
+                    )
+                    .pipe_exit("fzf")?;
                 }
                 Ok(())
             }
@@ -57,9 +61,9 @@ impl Edit {
                 "--bind=\
 btab:up,\
 ctrl-r:reload(zoxide edit reload),\
-ctrl-d:reload(zoxide edit delete {2..}),\
-ctrl-w:reload(zoxide edit increment {2..}),\
-ctrl-s:reload(zoxide edit decrement {2..}),\
+ctrl-d:reload(zoxide edit delete {3..}),\
+ctrl-w:reload(zoxide edit increment {3..}),\
+ctrl-s:reload(zoxide edit decrement {3..}),\
 ctrl-z:ignore,\
 double-click:ignore,\
 enter:abort,\
@@ -74,7 +78,7 @@ tab:down",
 ctrl-r:reload   \tctrl-d:delete
 ctrl-w:increment\tctrl-s:decrement
 
- SCORE\tPATH",
+ SCORE\tALIASES\tPATH",
                 "--info=inline",
                 "--layout=reverse",
                 "--padding=1,0,0,0",

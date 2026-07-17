@@ -195,6 +195,7 @@ _arguments "${_arguments_options[@]}" : \
 '(-i --interactive)--list[List all matching directories]' \
 '-s[Print score with results]' \
 '--score[Print score with results]' \
+'--aliases[Print aliases with results]' \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \

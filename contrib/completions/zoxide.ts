@@ -351,6 +351,10 @@ const completion: Fig.Spec = {
           description: "Print score with results",
         },
         {
+          name: "--aliases",
+          description: "Print aliases with results",
+        },
+        {
           name: ["-h", "--help"],
           description: "Print help",
         },

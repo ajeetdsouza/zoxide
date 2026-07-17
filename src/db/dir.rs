@@ -23,12 +23,13 @@ pub struct DirV3<'a> {
     pub last_accessed: Epoch,
 }
 
-pub trait Dir<'a> {
+pub trait Dir {
     fn path(&self) -> &str;
     fn score(&self, now: Epoch) -> Rank;
+    fn aliases(&self) -> &[Cow<'_, str>];
 }
 
-impl Dir<'_> for DirV4<'_> {
+impl Dir for DirV4<'_> {
     fn path(&self) -> &str {
         &self.path
     }
@@ -45,6 +46,10 @@ impl Dir<'_> for DirV4<'_> {
         } else {
             self.rank * 0.25
         }
+    }
+
+    fn aliases(&self) -> &[Cow<'_, str>] {
+        &self.aliases
     }
 }
 
@@ -54,7 +59,7 @@ impl DirV4<'_> {
     }
 }
 
-impl Dir<'_> for DirV3<'_> {
+impl Dir for DirV3<'_> {
     fn path(&self) -> &str {
         &self.path
     }
@@ -72,17 +77,22 @@ impl Dir<'_> for DirV3<'_> {
             self.rank * 0.25
         }
     }
+
+    fn aliases(&self) -> &[Cow<'_, str>] {
+        return &[];
+    }
 }
 
-pub struct DirDisplay<'a, T: Dir<'a>> {
+pub struct DirDisplay<'a, T: Dir> {
     dir: &'a T,
     now: Option<Epoch>,
     separator: char,
+    aliases: bool,
 }
 
-impl<'a, T: Dir<'a>> DirDisplay<'a, T> {
+impl<'a, T: Dir> DirDisplay<'a, T> {
     fn new(dir: &'a T) -> Self {
-        Self { dir, separator: ' ', now: None }
+        Self { dir, separator: ' ', now: None, aliases: false }
     }
 
     pub fn with_score(mut self, now: Epoch) -> Self {
@@ -94,14 +104,27 @@ impl<'a, T: Dir<'a>> DirDisplay<'a, T> {
         self.separator = separator;
         self
     }
+
+    pub fn with_aliases(mut self, enable: bool) -> Self {
+        self.aliases = enable;
+        self
+    }
 }
 
-impl<'a, T: Dir<'a>> Display for DirDisplay<'a, T> {
+impl<'a, T: Dir> Display for DirDisplay<'a, T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         if let Some(now) = self.now {
             let score = self.dir.score(now).clamp(0.0, 9999.0);
             write!(f, "{score:>6.1}{}", self.separator)?;
         }
+
+        if self.aliases {
+            for alias in self.dir.aliases() {
+                write!(f, "{} ", alias)?;
+            }
+            write!(f, "{}", self.separator)?;
+        }
+
         write!(f, "{}", self.dir.path())
     }
 }

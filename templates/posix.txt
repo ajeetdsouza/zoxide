@@ -105,7 +105,7 @@ __zoxide_z() {
             \command printf 'zoxide: $OLDPWD is not set'
             return 1
         fi
-    elif [ "$#" -eq 1 ] && [ -d "$1" ]; then
+    elif [ "$#" -eq 1 ] && (\command cd -- "$1") >/dev/null 2>&1; then
         __zoxide_cd "$1"
     else
         __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd || \command true)" -- "$@")" &&

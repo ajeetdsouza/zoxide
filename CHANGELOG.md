@@ -7,24 +7,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
-
-### Added
-
-- Support for RISC-V (riscv64) Linux.
-- `import` now supports fetching entries from `atuin`.
-- `import` now skips directories matching `$_ZO_EXCLUDE_DIRS`.
-- POSIX: support for non-Cygwin Windows environments (e.g. Busybox).
-- Fish: Space-Tab completions now display and run the selected command.
-
-### Changed
-
-- `import` now auto-detects database files.
-- Nushell: export commands so the init script can be imported with `use`.
+## [Unreleased]
 
 ### Fixed
 
-- Bash/Fish/POSIX/Zsh: resolve symlinks on Windows.
+- Bash/Zsh: fix `z` failing on Cygwin/MSYS2 due to `cygpath` being passed a bad string.
+- Nushell: `z` now handles relative paths through symlinked directories.
+
+## [0.10.0] - 2026-07-04
+
+### Added
+
+- `import` now supports fetching entries from `atuin`.
+- `import` now auto-detects database files.
+- `import` now skips directories matching `$_ZO_EXCLUDE_DIRS`.
+- POSIX: support for non-Cygwin Windows environments (e.g. Busybox).
+- Fish: Space-Tab completions now display and run the selected command.
+- Bash/POSIX/Zsh: `z` now honors `$CDPATH`.
+- Bash: don't add to the database when history is disabled (`set +o history`).
+- Nushell: export commands so the init script can be imported with `use`.
+- Support for RISC-V (riscv64) Linux.
+
+### Changed
+
+- `import` now takes a subcommand instead of the `--from` flag.
+
+### Fixed
+
+- Bash/POSIX/Zsh: `z` now handles relative paths through symlinked directories.
+- Bash/Fish/POSIX/Zsh: `_ZO_RESOLVE_SYMLINKS` now works on Windows.
 - Bash: handle `$PROMPT_COMMAND` values ending in a semicolon.
 - PowerShell: navigate to home directory with `z` on drives that don't define `HOME`.
 - PowerShell: use fully qualified names when invoking cmdlets.
@@ -580,6 +591,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions pipeline to build and upload releases.
 - Add support for Zsh.
 
+[0.10.0]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.9...v0.10.0
 [0.9.9]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.8...v0.9.9
 [0.9.8]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.7...v0.9.8
 [0.9.7]: https://github.com/ajeetdsouza/zoxide/compare/v0.9.6...v0.9.7

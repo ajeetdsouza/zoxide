@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::collections::HashSet;
 use std::iter::Rev;
 use std::ops::Range;
 use std::path::Path;
@@ -109,10 +110,10 @@ impl<'a> Stream<'a> {
         true
     }
 
-    fn match_aliases(&self, aliases: &[Cow<'a, str>]) -> bool {
+    fn match_aliases(&self, aliases: &HashSet<Cow<'a, str>>) -> bool {
         for keyword in self.options.keywords.iter().rev() {
             // Alias matching is intended to be case-sensitive
-            if aliases.iter().any(|a| a == keyword.as_str()) {
+            if aliases.contains(keyword.as_str()) {
                 return true;
             }
         }

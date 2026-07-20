@@ -1,6 +1,7 @@
 mod dir;
 mod stream;
 
+use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 use std::{fs, io};
 
@@ -78,12 +79,15 @@ impl Database {
             Some(dir) => {
                 dir.rank = (dir.rank + by).max(0.0);
                 if let Some(al) = alias {
-                    dir.aliases.push(al.into().into());
+                    dir.aliases.insert(al.into().into());
                 }
             }
             None => {
-                let aliases =
-                    if let Some(alias) = alias { vec![alias.into().into()] } else { Vec::new() };
+                let aliases = if let Some(alias) = alias {
+                    HashSet::from([alias.into().into()])
+                } else {
+                    HashSet::new()
+                };
                 dirs.push(DirV4 {
                     path: path.into().into(),
                     rank: by.max(0.0),
@@ -107,8 +111,11 @@ impl Database {
         alias: Option<impl AsRef<str> + Into<String>>,
     ) {
         self.with_dirs_mut(|dirs| {
-            let aliases =
-                if let Some(alias) = alias { vec![alias.into().into()] } else { Vec::new() };
+            let aliases = if let Some(alias) = alias {
+                HashSet::from([alias.into().into()])
+            } else {
+                HashSet::new()
+            };
             dirs.push(DirV4 { path: path.into().into(), rank, last_accessed: now, aliases })
         });
         self.with_dirty_mut(|dirty| *dirty = true);
@@ -128,12 +135,15 @@ impl Database {
                 dir.rank = (dir.rank + by).max(0.0);
                 dir.last_accessed = now;
                 if let Some(al) = alias {
-                    dir.aliases.push(al.into().into());
+                    dir.aliases.insert(al.into().into());
                 }
             }
             None => {
-                let aliases =
-                    if let Some(alias) = alias { vec![alias.into().into()] } else { Vec::new() };
+                let aliases = if let Some(alias) = alias {
+                    HashSet::from([alias.into().into()])
+                } else {
+                    HashSet::new()
+                };
                 dirs.push(DirV4 {
                     path: path.into().into(),
                     rank: by.max(0.0),
@@ -278,7 +288,7 @@ impl Database {
                         path: dir.path,
                         rank: dir.rank,
                         last_accessed: dir.last_accessed,
-                        aliases: Vec::new(),
+                        aliases: HashSet::new(),
                     })
                     .collect()
             }

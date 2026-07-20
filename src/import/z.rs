@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
@@ -54,7 +55,12 @@ impl<R: BufRead> Iter<R> {
 
         let path = split.next().ok_or_else(err)?;
 
-        Ok(DirV4 { path: Cow::Owned(path.to_string()), rank, last_accessed, aliases: Vec::new() })
+        Ok(DirV4 {
+            path: Cow::Owned(path.to_string()),
+            rank,
+            last_accessed,
+            aliases: HashSet::new(),
+        })
     }
 }
 

@@ -101,7 +101,7 @@ function __zoxide_z_complete
         # If the last argument is empty, use interactive selection.
         set -l query $tokens[2..-1]
         set -l result (command zoxide query --exclude (__zoxide_pwd) --interactive -- $query 2>/dev/null)
-        if test $status -eq 0
+        if test $status -eq 130
             builtin commandline --function repaint
             return
         else

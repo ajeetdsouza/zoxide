@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::collections::HashSet;
 use std::io::{BufRead, BufReader};
 use std::process::{Child, ChildStdout, Command, Stdio};
 use std::str;
@@ -64,7 +65,7 @@ impl Iter {
             path: Cow::Owned(path.to_string()),
             rank: 1.0,
             last_accessed: timestamp as Epoch,
-            aliases: Vec::new(),
+            aliases: HashSet::new(),
         };
         Ok(dir)
     }

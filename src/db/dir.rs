@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::collections::HashSet;
 use std::fmt::{self, Display, Formatter};
 
 use serde::{Deserialize, Serialize};
@@ -12,7 +13,7 @@ pub struct DirV4<'a> {
     pub rank: Rank,
     pub last_accessed: Epoch,
     #[serde(borrow)]
-    pub aliases: Vec<Cow<'a, str>>,
+    pub aliases: HashSet<Cow<'a, str>>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -26,7 +27,7 @@ pub struct DirV3<'a> {
 pub trait Dir {
     fn path(&self) -> &str;
     fn score(&self, now: Epoch) -> Rank;
-    fn aliases(&self) -> &[Cow<'_, str>];
+    fn aliases(&self) -> Option<&HashSet<Cow<'_, str>>>;
 }
 
 impl Dir for DirV4<'_> {
@@ -48,8 +49,8 @@ impl Dir for DirV4<'_> {
         }
     }
 
-    fn aliases(&self) -> &[Cow<'_, str>] {
-        &self.aliases
+    fn aliases(&self) -> Option<&HashSet<Cow<'_, str>>> {
+        Some(&self.aliases)
     }
 }
 
@@ -78,8 +79,8 @@ impl Dir for DirV3<'_> {
         }
     }
 
-    fn aliases(&self) -> &[Cow<'_, str>] {
-        return &[];
+    fn aliases(&self) -> Option<&HashSet<Cow<'_, str>>> {
+        None
     }
 }
 
@@ -118,8 +119,10 @@ impl<'a, T: Dir> Display for DirDisplay<'a, T> {
             write!(f, "{score:>6.1}{}", self.separator)?;
         }
 
-        if self.aliases {
-            for alias in self.dir.aliases() {
+        if self.aliases
+            && let Some(aliases) = self.dir.aliases()
+        {
+            for alias in aliases {
                 write!(f, "{} ", alias)?;
             }
             write!(f, "{}", self.separator)?;

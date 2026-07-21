@@ -221,6 +221,17 @@ _arguments "${_arguments_options[@]}" : \
 '*::paths:_files -/' \
 && ret=0
 ;;
+(remove-alias)
+_arguments "${_arguments_options[@]}" : \
+'-p+[]:PATH:_files -/' \
+'--path=[]:PATH:_files -/' \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+'*::aliases:_default' \
+&& ret=0
+;;
         esac
     ;;
 esac
@@ -236,6 +247,7 @@ _zoxide_commands() {
 'init:Generate shell configuration' \
 'query:Search for a directory in the database' \
 'remove:Remove a directory from the database' \
+'remove-alias:Remove aliases from a directory' \
     )
     _describe -t commands 'zoxide commands' commands "$@"
 }
@@ -335,6 +347,11 @@ _zoxide__subcmd__query_commands() {
 _zoxide__subcmd__remove_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide remove commands' commands "$@"
+}
+(( $+functions[_zoxide__subcmd__remove-alias_commands] )) ||
+_zoxide__subcmd__remove-alias_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide remove-alias commands' commands "$@"
 }
 
 if [ "$funcstack[1]" = "_zoxide" ]; then

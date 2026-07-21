@@ -29,6 +29,7 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand init 'Generate shell configuration'
             cand query 'Search for a directory in the database'
             cand remove 'Remove a directory from the database'
+            cand remove-alias 'Remove aliases from a directory'
         }
         &'zoxide;add'= {
             cand -s 'The rank to increment the entry if it exists or initialize it with if it doesn''t'
@@ -162,6 +163,14 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand --version 'Print version'
         }
         &'zoxide;remove'= {
+            cand -h 'Print help'
+            cand --help 'Print help'
+            cand -V 'Print version'
+            cand --version 'Print version'
+        }
+        &'zoxide;remove-alias'= {
+            cand -p 'p'
+            cand --path 'path'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'

@@ -144,6 +144,7 @@ impl Database {
         });
         self.with_dirty_mut(|dirty| *dirty = true);
     }
+
     /// Removes the directory with `path` from the store. This does not preserve
     /// ordering, but is O(1).
     pub fn remove(&mut self, path: impl AsRef<str>) -> bool {
@@ -159,6 +160,29 @@ impl Database {
     pub fn swap_remove(&mut self, idx: usize) {
         self.with_dirs_mut(|dirs| dirs.swap_remove(idx));
         self.with_dirty_mut(|dirty| *dirty = true);
+    }
+
+    /// Removes aliases from a directory
+    pub fn remove_alias(
+        &mut self,
+        path: impl AsRef<str>,
+        aliases: impl Iterator<Item = impl AsRef<str>>,
+    ) -> bool {
+        let res = self.with_dirs_mut(|dirs| {
+            match dirs.iter_mut().find(|dir| dir.path == path.as_ref()) {
+                Some(dir) => {
+                    let mut res = false;
+                    aliases.for_each(|alias| {
+                        dir.aliases.remove(alias.as_ref());
+                        res = true;
+                    });
+                    res
+                }
+                None => false,
+            }
+        });
+        self.with_dirty_mut(|dirty| *dirty |= res);
+        res
     }
 
     pub fn age(&mut self, max_age: Rank) {

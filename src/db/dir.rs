@@ -27,7 +27,7 @@ pub struct DirV3<'a> {
 pub trait Dir {
     fn path(&self) -> &str;
     fn score(&self, now: Epoch) -> Rank;
-    fn aliases(&self) -> Option<&HashSet<Cow<'_, str>>>;
+    fn aliases(&self) -> Option<impl Iterator<Item = impl AsRef<str>>>;
 }
 
 impl Dir for DirV4<'_> {
@@ -49,8 +49,8 @@ impl Dir for DirV4<'_> {
         }
     }
 
-    fn aliases(&self) -> Option<&HashSet<Cow<'_, str>>> {
-        Some(&self.aliases)
+    fn aliases(&self) -> Option<impl Iterator<Item = impl AsRef<str>>> {
+        Some(self.aliases.iter())
     }
 }
 
@@ -79,8 +79,9 @@ impl Dir for DirV3<'_> {
         }
     }
 
-    fn aliases(&self) -> Option<&HashSet<Cow<'_, str>>> {
-        None
+    fn aliases(&self) -> Option<impl Iterator<Item = impl AsRef<str>>> {
+        let arr: Option<&[&str]> = None;
+        arr.map(|a| a.iter())
     }
 }
 
@@ -123,7 +124,7 @@ impl<'a, T: Dir> Display for DirDisplay<'a, T> {
             && let Some(aliases) = self.dir.aliases()
         {
             for alias in aliases {
-                write!(f, "{} ", alias)?;
+                write!(f, "{} ", alias.as_ref())?;
             }
             write!(f, "{}", self.separator)?;
         }

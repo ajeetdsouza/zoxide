@@ -125,10 +125,14 @@ impl Database {
         aliases: impl Iterator<Item = impl AsRef<str> + Into<String>>,
         now: Epoch,
     ) {
+        let mut is_dirty = false;
         self.with_dirs_mut(|dirs| match dirs.iter_mut().find(|dir| dir.path == path.as_ref()) {
             Some(dir) => {
+                let starting_len = dir.aliases.len();
                 dir.aliases.extend(aliases.map(|alias| alias.into().into()));
-                dir.last_accessed = now
+                dir.last_accessed = now;
+
+                is_dirty = dir.aliases.len() > starting_len;
             }
             None => {
                 let mut set = HashSet::new();
@@ -139,10 +143,12 @@ impl Database {
                     rank: 0.0,
                     last_accessed: now,
                     aliases: set,
-                })
+                });
+
+                is_dirty = true;
             }
         });
-        self.with_dirty_mut(|dirty| *dirty = true);
+        self.with_dirty_mut(|dirty| *dirty |= is_dirty);
     }
 
     /// Removes the directory with `path` from the store. This does not preserve
@@ -173,8 +179,7 @@ impl Database {
                 Some(dir) => {
                     let mut res = false;
                     aliases.for_each(|alias| {
-                        dir.aliases.remove(alias.as_ref());
-                        res = true;
+                        res |= dir.aliases.remove(alias.as_ref());
                     });
                     res
                 }
@@ -347,6 +352,35 @@ mod tests {
     }
 
     #[test]
+    fn add_alias() {
+        let data_dir = tempfile::tempdir().unwrap();
+        let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
+        let now = 946684800;
+
+        {
+            let mut db = Database::open_dir(data_dir.path()).unwrap();
+            db.add_alias_update(path, ["bar", "fb"].into_iter(), now);
+            db.add_alias_update(path, ["foobar"].into_iter(), now);
+            db.save().unwrap();
+        }
+
+        {
+            let db = Database::open_dir(data_dir.path()).unwrap();
+            assert_eq!(db.dirs().len(), 1);
+
+            let mut aliases = HashSet::from(["bar", "fb", "foobar"]);
+            let dir = &db.dirs()[0];
+            assert_eq!(dir.path, path);
+            assert!(
+                dir.aliases()
+                    .is_some_and(|mut iter| iter.all(|alias| aliases.remove(alias.as_ref())))
+                    && aliases.is_empty()
+            );
+            assert_eq!(dir.last_accessed, now);
+        }
+    }
+
+    #[test]
     fn remove() {
         let data_dir = tempfile::tempdir().unwrap();
         let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
@@ -368,6 +402,38 @@ mod tests {
             let mut db = Database::open_dir(data_dir.path()).unwrap();
             assert!(db.dirs().is_empty());
             assert!(!db.remove(path));
+            db.save().unwrap();
+        }
+    }
+
+    #[test]
+    fn remove_alias() {
+        let data_dir = tempfile::tempdir().unwrap();
+        let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
+        let now = 946684800;
+
+        {
+            let mut db = Database::open_dir(data_dir.path()).unwrap();
+            db.add_alias_update(path, ["fb", "bar", "foobar"].into_iter(), now);
+            db.save().unwrap();
+        }
+
+        {
+            let mut db = Database::open_dir(data_dir.path()).unwrap();
+            assert!(db.remove_alias(path, ["bar", "foobar"].into_iter()));
+            db.save().unwrap();
+        }
+
+        {
+            let mut db = Database::open_dir(data_dir.path()).unwrap();
+            let mut aliases = HashSet::from(["fb"]);
+            assert_eq!(db.dirs().len(), 1);
+            assert!(
+                db.dirs()[0]
+                    .aliases()
+                    .is_some_and(|mut iter| iter.all(|alias| aliases.remove(alias.as_ref())))
+                    && aliases.is_empty()
+            );
             db.save().unwrap();
         }
     }

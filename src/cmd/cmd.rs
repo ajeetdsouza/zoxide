@@ -48,6 +48,7 @@ pub enum Cmd {
     Init(Init),
     Query(Query),
     Remove(Remove),
+    RemoveAlias(RemoveAlias),
 }
 
 /// Add a new directory or increment its rank
@@ -227,4 +228,18 @@ pub struct Query {
 pub struct Remove {
     #[clap(value_hint = ValueHint::DirPath)]
     pub paths: Vec<String>,
+}
+
+/// Remove aliases from a directory
+#[derive(Debug, Parser)]
+#[clap(
+    author,
+    help_template = HelpTemplate,
+)]
+pub struct RemoveAlias {
+    #[clap(num_args = 1.., required = true)]
+    pub aliases: Vec<String>,
+
+    #[clap(short, long, required = true, value_hint = ValueHint::DirPath)]
+    pub path: String,
 }

@@ -139,6 +139,14 @@ module completions {
     ...paths: path
   ]
 
+  # Remove aliases from a directory
+  export extern "zoxide remove-alias" [
+    --path(-p): path
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+    ...aliases: string
+  ]
+
 }
 
 export use completions *

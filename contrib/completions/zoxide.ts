@@ -16,14 +16,6 @@ const completion: Fig.Spec = {
           },
         },
         {
-          name: ["-a", "--alias"],
-          isRepeatable: true,
-          args: {
-            name: "alias",
-            isOptional: true,
-          },
-        },
-        {
           name: ["-h", "--help"],
           description: "Print help",
         },
@@ -36,6 +28,32 @@ const completion: Fig.Spec = {
         name: "paths",
         isVariadic: true,
         template: "folders",
+      },
+    },
+    {
+      name: "add-alias",
+      description: "Add aliases for a directory",
+      options: [
+        {
+          name: ["-p", "--path"],
+          isRepeatable: true,
+          args: {
+            name: "path",
+            template: "folders",
+          },
+        },
+        {
+          name: ["-h", "--help"],
+          description: "Print help",
+        },
+        {
+          name: ["-V", "--version"],
+          description: "Print version",
+        },
+      ],
+      args: {
+        name: "aliases",
+        isVariadic: true,
       },
     },
     {

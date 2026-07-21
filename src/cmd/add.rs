@@ -18,7 +18,6 @@ impl Run for Add {
 
         let mut db = Database::open()?;
 
-        let mut first = true;
         for path in &self.paths {
             let path =
                 if config::resolve_symlinks() { util::canonicalize } else { util::resolve_path }(
@@ -36,9 +35,7 @@ impl Run for Add {
             }
 
             let by = self.score.unwrap_or(1.0);
-            let alias = if first { self.alias.clone() } else { None };
-            db.add_update(path, by, now, alias);
-            first = false;
+            db.add_update(path, by, now);
         }
 
         if db.dirty() {

@@ -15,15 +15,11 @@ impl Run for Edit {
         match &self.cmd {
             Some(cmd) => {
                 match cmd {
-                    EditCommand::Decrement { path } => {
-                        db.add(path, -1.0, now, Option::<String>::None)
-                    }
+                    EditCommand::Decrement { path } => db.add(path, -1.0, now),
                     EditCommand::Delete { path } => {
                         db.remove(path);
                     }
-                    EditCommand::Increment { path } => {
-                        db.add(path, 1.0, now, Option::<String>::None)
-                    }
+                    EditCommand::Increment { path } => db.add(path, 1.0, now),
                     EditCommand::Reload => {}
                 }
                 db.save()?;

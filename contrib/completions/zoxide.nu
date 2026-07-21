@@ -9,10 +9,17 @@ module completions {
   # Add a new directory or increment its rank
   export extern "zoxide add" [
     --score(-s): string       # The rank to increment the entry if it exists or initialize it with if it doesn't
-    --alias(-a): string
     --help(-h)                # Print help
     --version(-V)             # Print version
     ...paths: path
+  ]
+
+  # Add aliases for a directory
+  export extern "zoxide add-alias" [
+    --path(-p): path
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+    ...aliases: string
   ]
 
   # Edit the database

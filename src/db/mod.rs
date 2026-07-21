@@ -68,33 +68,17 @@ impl Database {
     }
 
     /// Increments the rank of a directory, or creates it if it does not exist.
-    pub fn add(
-        &mut self,
-        path: impl AsRef<str> + Into<String>,
-        by: Rank,
-        now: Epoch,
-        alias: Option<impl AsRef<str> + Into<String>>,
-    ) {
+    pub fn add(&mut self, path: impl AsRef<str> + Into<String>, by: Rank, now: Epoch) {
         self.with_dirs_mut(|dirs| match dirs.iter_mut().find(|dir| dir.path == path.as_ref()) {
             Some(dir) => {
                 dir.rank = (dir.rank + by).max(0.0);
-                if let Some(al) = alias {
-                    dir.aliases.insert(al.into().into());
-                }
             }
-            None => {
-                let aliases = if let Some(alias) = alias {
-                    HashSet::from([alias.into().into()])
-                } else {
-                    HashSet::new()
-                };
-                dirs.push(DirV4 {
-                    path: path.into().into(),
-                    rank: by.max(0.0),
-                    last_accessed: now,
-                    aliases,
-                })
-            }
+            None => dirs.push(DirV4 {
+                path: path.into().into(),
+                rank: by.max(0.0),
+                last_accessed: now,
+                aliases: HashSet::new(),
+            }),
         });
         self.with_dirty_mut(|dirty| *dirty = true);
     }
@@ -103,58 +87,63 @@ impl Database {
     /// directory is already in the database, it is expected that the user
     /// either does a check before calling this, or calls `dedup()`
     /// afterward.
-    pub fn add_unchecked(
-        &mut self,
-        path: impl AsRef<str> + Into<String>,
-        rank: Rank,
-        now: Epoch,
-        alias: Option<impl AsRef<str> + Into<String>>,
-    ) {
+    pub fn add_unchecked(&mut self, path: impl AsRef<str> + Into<String>, rank: Rank, now: Epoch) {
         self.with_dirs_mut(|dirs| {
-            let aliases = if let Some(alias) = alias {
-                HashSet::from([alias.into().into()])
-            } else {
-                HashSet::new()
-            };
-            dirs.push(DirV4 { path: path.into().into(), rank, last_accessed: now, aliases })
+            dirs.push(DirV4 {
+                path: path.into().into(),
+                rank,
+                last_accessed: now,
+                aliases: HashSet::new(),
+            })
         });
         self.with_dirty_mut(|dirty| *dirty = true);
     }
 
     /// Increments the rank and updates the last_accessed of a directory, or
     /// creates it if it does not exist.
-    pub fn add_update(
-        &mut self,
-        path: impl AsRef<str> + Into<String>,
-        by: Rank,
-        now: Epoch,
-        alias: Option<impl AsRef<str> + Into<String>>,
-    ) {
+    pub fn add_update(&mut self, path: impl AsRef<str> + Into<String>, by: Rank, now: Epoch) {
         self.with_dirs_mut(|dirs| match dirs.iter_mut().find(|dir| dir.path == path.as_ref()) {
             Some(dir) => {
                 dir.rank = (dir.rank + by).max(0.0);
                 dir.last_accessed = now;
-                if let Some(al) = alias {
-                    dir.aliases.insert(al.into().into());
-                }
+            }
+            None => dirs.push(DirV4 {
+                path: path.into().into(),
+                rank: by.max(0.0),
+                last_accessed: now,
+                aliases: HashSet::new(),
+            }),
+        });
+        self.with_dirty_mut(|dirty| *dirty = true);
+    }
+
+    /// Adds aliases to a directory and updates its last_accessed, or
+    /// creates it and adds aliases to it if it does not exist.
+    pub fn add_alias_update(
+        &mut self,
+        path: impl AsRef<str> + Into<String>,
+        aliases: impl Iterator<Item = impl AsRef<str> + Into<String>>,
+        now: Epoch,
+    ) {
+        self.with_dirs_mut(|dirs| match dirs.iter_mut().find(|dir| dir.path == path.as_ref()) {
+            Some(dir) => {
+                dir.aliases.extend(aliases.map(|alias| alias.into().into()));
+                dir.last_accessed = now
             }
             None => {
-                let aliases = if let Some(alias) = alias {
-                    HashSet::from([alias.into().into()])
-                } else {
-                    HashSet::new()
-                };
+                let mut set = HashSet::new();
+                set.extend(aliases.map(|alias| alias.into().into()));
+
                 dirs.push(DirV4 {
                     path: path.into().into(),
-                    rank: by.max(0.0),
+                    rank: 0.0,
                     last_accessed: now,
-                    aliases,
+                    aliases: set,
                 })
             }
         });
         self.with_dirty_mut(|dirty| *dirty = true);
     }
-
     /// Removes the directory with `path` from the store. This does not preserve
     /// ordering, but is O(1).
     pub fn remove(&mut self, path: impl AsRef<str>) -> bool {
@@ -317,8 +306,8 @@ mod tests {
 
         {
             let mut db = Database::open_dir(data_dir.path()).unwrap();
-            db.add(path, 1.0, now, Option::<String>::None);
-            db.add(path, 1.0, now, Some(String::from("foo")));
+            db.add(path, 1.0, now);
+            db.add(path, 1.0, now);
             db.save().unwrap();
         }
 
@@ -341,7 +330,7 @@ mod tests {
 
         {
             let mut db = Database::open_dir(data_dir.path()).unwrap();
-            db.add(path, 1.0, now, Option::<String>::None);
+            db.add(path, 1.0, now);
             db.save().unwrap();
         }
 

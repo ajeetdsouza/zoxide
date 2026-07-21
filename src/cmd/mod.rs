@@ -6,6 +6,7 @@ mod import;
 mod init;
 mod query;
 mod remove;
+mod remove_alias;
 
 use anyhow::Result;
 
@@ -25,6 +26,7 @@ impl Run for Cmd {
             Cmd::Init(cmd) => cmd.run(),
             Cmd::Query(cmd) => cmd.run(),
             Cmd::Remove(cmd) => cmd.run(),
+            Cmd::RemoveAlias(cmd) => cmd.run(),
         }
     }
 }

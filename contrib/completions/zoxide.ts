@@ -407,6 +407,32 @@ const completion: Fig.Spec = {
         template: "folders",
       },
     },
+    {
+      name: "remove-alias",
+      description: "Remove aliases from a directory",
+      options: [
+        {
+          name: ["-p", "--path"],
+          isRepeatable: true,
+          args: {
+            name: "path",
+            template: "folders",
+          },
+        },
+        {
+          name: ["-h", "--help"],
+          description: "Print help",
+        },
+        {
+          name: ["-V", "--version"],
+          description: "Print version",
+        },
+      ],
+      args: {
+        name: "aliases",
+        isVariadic: true,
+      },
+    },
   ],
   options: [
     {

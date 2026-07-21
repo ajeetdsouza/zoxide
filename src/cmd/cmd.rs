@@ -42,6 +42,7 @@ https://github.com/ajeetdsouza/zoxide
 )]
 pub enum Cmd {
     Add(Add),
+    AddAlias(AddAlias),
     Edit(Edit),
     Import(Import),
     Init(Init),
@@ -63,9 +64,20 @@ pub struct Add {
     /// doesn't
     #[clap(short, long)]
     pub score: Option<f64>,
+}
 
-    #[clap(short, long)]
-    pub alias: Option<String>,
+/// Add aliases for a directory
+#[derive(Debug, Parser)]
+#[clap(
+    author,
+    help_template = HelpTemplate,
+)]
+pub struct AddAlias {
+    #[clap(num_args = 1.., required = true)]
+    pub aliases: Vec<String>,
+
+    #[clap(short, long, required = true, value_hint = ValueHint::DirPath)]
+    pub path: PathBuf,
 }
 
 /// Edit the database

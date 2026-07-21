@@ -19,6 +19,9 @@ _zoxide() {
             zoxide,add)
                 cmd="zoxide__subcmd__add"
                 ;;
+            zoxide,add-alias)
+                cmd="zoxide__subcmd__add__subcmd__alias"
+                ;;
             zoxide,edit)
                 cmd="zoxide__subcmd__edit"
                 ;;
@@ -71,7 +74,7 @@ _zoxide() {
 
     case "${cmd}" in
         zoxide)
-            opts="-h -V --help --version add edit import init query remove"
+            opts="-h -V --help --version add add-alias edit import init query remove"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -85,7 +88,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__subcmd__add)
-            opts="-s -a -h -V --score --alias --help --version <PATHS>..."
+            opts="-s -h -V --score --help --version <PATHS>..."
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -99,12 +102,32 @@ _zoxide() {
                     COMPREPLY=($(compgen -f "${cur}"))
                     return 0
                     ;;
-                --alias)
-                    COMPREPLY=($(compgen -f "${cur}"))
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__subcmd__add__subcmd__alias)
+            opts="-p -h -V --path --help --version <ALIASES>..."
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                --path)
+                    COMPREPLY=()
+                    if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
+                        compopt -o plusdirs
+                    fi
                     return 0
                     ;;
-                -a)
-                    COMPREPLY=($(compgen -f "${cur}"))
+                -p)
+                    COMPREPLY=()
+                    if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
+                        compopt -o plusdirs
+                    fi
                     return 0
                     ;;
                 *)

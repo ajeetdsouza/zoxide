@@ -23,6 +23,7 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand -V 'Print version'
             cand --version 'Print version'
             cand add 'Add a new directory or increment its rank'
+            cand add-alias 'Add aliases for a directory'
             cand edit 'Edit the database'
             cand import 'Import entries from another application'
             cand init 'Generate shell configuration'
@@ -32,8 +33,14 @@ set edit:completion:arg-completer[zoxide] = {|@words|
         &'zoxide;add'= {
             cand -s 'The rank to increment the entry if it exists or initialize it with if it doesn''t'
             cand --score 'The rank to increment the entry if it exists or initialize it with if it doesn''t'
-            cand -a 'a'
-            cand --alias 'alias'
+            cand -h 'Print help'
+            cand --help 'Print help'
+            cand -V 'Print version'
+            cand --version 'Print version'
+        }
+        &'zoxide;add-alias'= {
+            cand -p 'p'
+            cand --path 'path'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'

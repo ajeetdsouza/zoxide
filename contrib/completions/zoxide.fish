@@ -27,15 +27,18 @@ end
 complete -c zoxide -n "__fish_zoxide_needs_command" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_zoxide_needs_command" -s V -l version -d 'Print version'
 complete -c zoxide -n "__fish_zoxide_needs_command" -f -a "add" -d 'Add a new directory or increment its rank'
+complete -c zoxide -n "__fish_zoxide_needs_command" -f -a "add-alias" -d 'Add aliases for a directory'
 complete -c zoxide -n "__fish_zoxide_needs_command" -f -a "edit" -d 'Edit the database'
 complete -c zoxide -n "__fish_zoxide_needs_command" -f -a "import" -d 'Import entries from another application'
 complete -c zoxide -n "__fish_zoxide_needs_command" -f -a "init" -d 'Generate shell configuration'
 complete -c zoxide -n "__fish_zoxide_needs_command" -f -a "query" -d 'Search for a directory in the database'
 complete -c zoxide -n "__fish_zoxide_needs_command" -f -a "remove" -d 'Remove a directory from the database'
 complete -c zoxide -n "__fish_zoxide_using_subcommand add" -s s -l score -d 'The rank to increment the entry if it exists or initialize it with if it doesn\'t' -r
-complete -c zoxide -n "__fish_zoxide_using_subcommand add" -s a -l alias -r
 complete -c zoxide -n "__fish_zoxide_using_subcommand add" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_zoxide_using_subcommand add" -s V -l version -d 'Print version'
+complete -c zoxide -n "__fish_zoxide_using_subcommand add-alias" -s p -l path -r -f -a "(__fish_complete_directories)"
+complete -c zoxide -n "__fish_zoxide_using_subcommand add-alias" -s h -l help -d 'Print help'
+complete -c zoxide -n "__fish_zoxide_using_subcommand add-alias" -s V -l version -d 'Print version'
 complete -c zoxide -n "__fish_zoxide_using_subcommand edit; and not __fish_seen_subcommand_from decrement delete increment reload" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_zoxide_using_subcommand edit; and not __fish_seen_subcommand_from decrement delete increment reload" -s V -l version -d 'Print version'
 complete -c zoxide -n "__fish_zoxide_using_subcommand edit; and not __fish_seen_subcommand_from decrement delete increment reload" -f -a "decrement"

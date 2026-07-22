@@ -237,7 +237,7 @@ mod tests {
                     &path
                         .trim_start_matches("ALIASES=")
                         .split(",")
-                        .map(|alias| Cow::Borrowed(alias))
+                        .map(Cow::Borrowed)
                         .collect::<HashSet<Cow<'_, str>>>(),
                 )
             } else {

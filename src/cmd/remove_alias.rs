@@ -12,7 +12,7 @@ impl Run for RemoveAlias {
             let path_abs = util::resolve_path(&self.path)?;
             let path_abs = util::path_to_str(&path_abs)?;
             if path_abs == self.path || !db.remove_alias(path_abs, self.aliases.iter()) {
-                bail!("path not found in database: {}", &self.path)
+                bail!("path not found in database: {}", self.path)
             }
         }
 

@@ -372,9 +372,7 @@ mod tests {
             let dir = &db.dirs()[0];
             assert_eq!(dir.path, path);
             assert!(
-                dir.aliases()
-                    .is_some_and(|mut iter| iter.all(|alias| aliases.remove(alias.as_ref())))
-                    && aliases.is_empty()
+                dir.aliases().all(|alias| aliases.remove(alias.as_ref())) && aliases.is_empty()
             );
             assert_eq!(dir.last_accessed, now);
         }
@@ -429,9 +427,7 @@ mod tests {
             let mut aliases = HashSet::from(["fb"]);
             assert_eq!(db.dirs().len(), 1);
             assert!(
-                db.dirs()[0]
-                    .aliases()
-                    .is_some_and(|mut iter| iter.all(|alias| aliases.remove(alias.as_ref())))
+                db.dirs()[0].aliases().all(|alias| aliases.remove(alias.as_ref()))
                     && aliases.is_empty()
             );
             db.save().unwrap();

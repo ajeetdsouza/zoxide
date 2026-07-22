@@ -27,7 +27,7 @@ pub struct DirV3<'a> {
 pub trait Dir {
     fn path(&self) -> &str;
     fn score(&self, now: Epoch) -> Rank;
-    fn aliases(&self) -> Option<impl Iterator<Item = impl AsRef<str>>>;
+    fn aliases(&self) -> impl Iterator<Item = impl AsRef<str>>;
 }
 
 impl Dir for DirV4<'_> {
@@ -49,8 +49,8 @@ impl Dir for DirV4<'_> {
         }
     }
 
-    fn aliases(&self) -> Option<impl Iterator<Item = impl AsRef<str>>> {
-        Some(self.aliases.iter())
+    fn aliases(&self) -> impl Iterator<Item = impl AsRef<str>> {
+        self.aliases.iter()
     }
 }
 
@@ -79,9 +79,9 @@ impl Dir for DirV3<'_> {
         }
     }
 
-    fn aliases(&self) -> Option<impl Iterator<Item = impl AsRef<str>>> {
-        let arr: Option<&[&str]> = None;
-        arr.map(|a| a.iter())
+    fn aliases(&self) -> impl Iterator<Item = impl AsRef<str>> {
+        let arr: &[&str] = &[];
+        arr.iter()
     }
 }
 
@@ -120,10 +120,8 @@ impl<'a, T: Dir> Display for DirDisplay<'a, T> {
             write!(f, "{score:>6.1}{}", self.separator)?;
         }
 
-        if self.aliases
-            && let Some(aliases) = self.dir.aliases()
-        {
-            for alias in aliases {
+        if self.aliases {
+            for alias in self.dir.aliases() {
                 write!(f, "{} ", alias.as_ref())?;
             }
             write!(f, "{}", self.separator)?;

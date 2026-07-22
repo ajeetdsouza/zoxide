@@ -111,8 +111,7 @@ impl<'a> Stream<'a> {
     }
 
     fn match_aliases(&self, aliases: &HashSet<Cow<'a, str>>) -> bool {
-        for keyword in self.options.keywords.iter().rev() {
-            // Alias matching is intended to be case-sensitive
+        for keyword in &self.options.keywords {
             if aliases.contains(keyword.as_str()) {
                 return true;
             }
@@ -218,10 +217,32 @@ mod tests {
     #[case(&["foo", "o", "bar"], "/foo/bar", false)]
     #[case(&["/foo/", "/bar"], "/foo/bar", false)]
     #[case(&["/foo/", "/bar"], "/foo/baz/bar", true)]
+    // Aliases
+    // Case normalization
+    #[case(&["fOo", "BaR"], "ALIASES=foo,bar", true)]
+    #[case(&["foo", "BaR"], "ALIASES=foo,bar", true)]
+    // Exact matches
+    #[case(&["fo", "ar"], "ALIASES=foo,bar", false)]
+    #[case(&["foo", "bar"], "ALIASES=foo,bar", true)]
+    // Mixed aliases and paths
+    #[case(&["/foo/", "bar", "/baz"], "ALIASES=foo,bar", true)]
     fn query(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
         let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
         let options = StreamOptions::new(0).with_keywords(keywords.iter());
         let stream = Stream::new(db, options);
-        assert_eq!(is_match, stream.filter_by_keywords(path));
+        assert_eq!(
+            is_match,
+            if path.starts_with("ALIASES=") {
+                stream.match_aliases(
+                    &path
+                        .trim_start_matches("ALIASES=")
+                        .split(",")
+                        .map(|alias| Cow::Borrowed(alias))
+                        .collect::<HashSet<Cow<'_, str>>>(),
+                )
+            } else {
+                stream.filter_by_keywords(path)
+            }
+        );
     }
 }

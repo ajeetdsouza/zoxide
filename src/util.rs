@@ -41,7 +41,7 @@ impl Fzf {
         cmd.args([
             // Search mode
             "--delimiter=\t",
-            "--nth=3",
+            "--nth=2,3",
             // Scripting
             "--read0",
         ])

@@ -112,6 +112,61 @@ const completion: Fig.Spec = {
       ],
     },
     {
+      name: "export",
+      description: "Export entries from the database",
+      subcommands: [
+        {
+          name: "csv",
+          options: [
+            {
+              name: ["-h", "--help"],
+              description: "Print help",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version",
+            },
+          ],
+        },
+        {
+          name: "json",
+          options: [
+            {
+              name: ["-h", "--help"],
+              description: "Print help",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version",
+            },
+          ],
+        },
+        {
+          name: "text",
+          options: [
+            {
+              name: ["-h", "--help"],
+              description: "Print help",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version",
+            },
+          ],
+        },
+      ],
+      options: [
+        {
+          name: ["-h", "--help"],
+          description: "Print help",
+        },
+        {
+          name: ["-V", "--version"],
+          description: "Print version",
+        },
+      ],
+    },
+    {
       name: "import",
       description: "Import entries from another application",
       subcommands: [

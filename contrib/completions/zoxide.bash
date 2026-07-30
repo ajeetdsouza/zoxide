@@ -22,6 +22,9 @@ _zoxide() {
             zoxide,edit)
                 cmd="zoxide__subcmd__edit"
                 ;;
+            zoxide,export)
+                cmd="zoxide__subcmd__export"
+                ;;
             zoxide,import)
                 cmd="zoxide__subcmd__import"
                 ;;
@@ -45,6 +48,15 @@ _zoxide() {
                 ;;
             zoxide__subcmd__edit,reload)
                 cmd="zoxide__subcmd__edit__subcmd__reload"
+                ;;
+            zoxide__subcmd__export,csv)
+                cmd="zoxide__subcmd__export__subcmd__csv"
+                ;;
+            zoxide__subcmd__export,json)
+                cmd="zoxide__subcmd__export__subcmd__json"
+                ;;
+            zoxide__subcmd__export,text)
+                cmd="zoxide__subcmd__export__subcmd__text"
                 ;;
             zoxide__subcmd__import,atuin)
                 cmd="zoxide__subcmd__import__subcmd__atuin"
@@ -71,7 +83,7 @@ _zoxide() {
 
     case "${cmd}" in
         zoxide)
-            opts="-h -V --help --version add edit import init query remove"
+            opts="-h -V --help --version add edit export import init query remove"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -163,6 +175,62 @@ _zoxide() {
             return 0
             ;;
         zoxide__subcmd__edit__subcmd__reload)
+            opts="-h -V --help --version"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__subcmd__export)
+            opts="-h -V --help --version csv json text"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__subcmd__export__subcmd__csv)
+            opts="-h -V --help --version"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__subcmd__export__subcmd__json)
+            opts="-h -V --help --version"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__subcmd__export__subcmd__text)
             opts="-h -V --help --version"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )

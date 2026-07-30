@@ -6,7 +6,6 @@ use crate::cmd::{Export, ExportCommand, Run};
 use crate::db::Database;
 use crate::error::BrokenPipeHandler;
 
-
 impl Run for Export {
     fn run(&self) -> anyhow::Result<()> {
         let db = Database::open()?;

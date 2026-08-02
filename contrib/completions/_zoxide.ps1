@@ -45,8 +45,8 @@ Register-ArgumentCompleter -Native -CommandName 'zoxide' -ScriptBlock {
             break
         }
         'zoxide;add-alias' {
-            [CompletionResult]::new('-p', '-p', [CompletionResultType]::ParameterName, 'p')
-            [CompletionResult]::new('--path', '--path', [CompletionResultType]::ParameterName, 'path')
+            [CompletionResult]::new('-p', '-p', [CompletionResultType]::ParameterName, 'Path to add aliases to')
+            [CompletionResult]::new('--path', '--path', [CompletionResultType]::ParameterName, 'Path to add aliases to')
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')
@@ -190,8 +190,8 @@ Register-ArgumentCompleter -Native -CommandName 'zoxide' -ScriptBlock {
             break
         }
         'zoxide;remove-alias' {
-            [CompletionResult]::new('-p', '-p', [CompletionResultType]::ParameterName, 'p')
-            [CompletionResult]::new('--path', '--path', [CompletionResultType]::ParameterName, 'path')
+            [CompletionResult]::new('-p', '-p', [CompletionResultType]::ParameterName, 'Path to remove aliases from')
+            [CompletionResult]::new('--path', '--path', [CompletionResultType]::ParameterName, 'Path to remove aliases from')
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')

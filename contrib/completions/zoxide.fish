@@ -37,7 +37,7 @@ complete -c zoxide -n "__fish_zoxide_needs_command" -f -a "remove-alias" -d 'Rem
 complete -c zoxide -n "__fish_zoxide_using_subcommand add" -s s -l score -d 'The rank to increment the entry if it exists or initialize it with if it doesn\'t' -r
 complete -c zoxide -n "__fish_zoxide_using_subcommand add" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_zoxide_using_subcommand add" -s V -l version -d 'Print version'
-complete -c zoxide -n "__fish_zoxide_using_subcommand add-alias" -s p -l path -r -f -a "(__fish_complete_directories)"
+complete -c zoxide -n "__fish_zoxide_using_subcommand add-alias" -s p -l path -d 'Path to add aliases to' -r -f -a "(__fish_complete_directories)"
 complete -c zoxide -n "__fish_zoxide_using_subcommand add-alias" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_zoxide_using_subcommand add-alias" -s V -l version -d 'Print version'
 complete -c zoxide -n "__fish_zoxide_using_subcommand edit; and not __fish_seen_subcommand_from decrement delete increment reload" -s h -l help -d 'Print help'
@@ -99,6 +99,6 @@ complete -c zoxide -n "__fish_zoxide_using_subcommand query" -s h -l help -d 'Pr
 complete -c zoxide -n "__fish_zoxide_using_subcommand query" -s V -l version -d 'Print version'
 complete -c zoxide -n "__fish_zoxide_using_subcommand remove" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_zoxide_using_subcommand remove" -s V -l version -d 'Print version'
-complete -c zoxide -n "__fish_zoxide_using_subcommand remove-alias" -s p -l path -r -f -a "(__fish_complete_directories)"
+complete -c zoxide -n "__fish_zoxide_using_subcommand remove-alias" -s p -l path -d 'Path to remove aliases from' -r -f -a "(__fish_complete_directories)"
 complete -c zoxide -n "__fish_zoxide_using_subcommand remove-alias" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_zoxide_using_subcommand remove-alias" -s V -l version -d 'Print version'

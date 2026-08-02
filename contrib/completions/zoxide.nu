@@ -16,7 +16,7 @@ module completions {
 
   # Add aliases for a directory
   export extern "zoxide add-alias" [
-    --path(-p): path
+    --path(-p): path          # Path to add aliases to
     --help(-h)                # Print help
     --version(-V)             # Print version
     ...aliases: string
@@ -141,7 +141,7 @@ module completions {
 
   # Remove aliases from a directory
   export extern "zoxide remove-alias" [
-    --path(-p): path
+    --path(-p): path          # Path to remove aliases from
     --help(-h)                # Print help
     --version(-V)             # Print version
     ...aliases: string

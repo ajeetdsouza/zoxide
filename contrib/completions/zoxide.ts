@@ -36,6 +36,7 @@ const completion: Fig.Spec = {
       options: [
         {
           name: ["-p", "--path"],
+          description: "Path to add aliases to",
           isRepeatable: true,
           args: {
             name: "path",
@@ -413,6 +414,7 @@ const completion: Fig.Spec = {
       options: [
         {
           name: ["-p", "--path"],
+          description: "Path to remove aliases from",
           isRepeatable: true,
           args: {
             name: "path",

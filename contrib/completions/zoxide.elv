@@ -40,8 +40,8 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand --version 'Print version'
         }
         &'zoxide;add-alias'= {
-            cand -p 'p'
-            cand --path 'path'
+            cand -p 'Path to add aliases to'
+            cand --path 'Path to add aliases to'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
@@ -169,8 +169,8 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand --version 'Print version'
         }
         &'zoxide;remove-alias'= {
-            cand -p 'p'
-            cand --path 'path'
+            cand -p 'Path to remove aliases from'
+            cand --path 'Path to remove aliases from'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'

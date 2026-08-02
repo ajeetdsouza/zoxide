@@ -41,8 +41,8 @@ _arguments "${_arguments_options[@]}" : \
 ;;
 (add-alias)
 _arguments "${_arguments_options[@]}" : \
-'-p+[]:PATH:_files -/' \
-'--path=[]:PATH:_files -/' \
+'-p+[Path to add aliases to]:PATH:_files -/' \
+'--path=[Path to add aliases to]:PATH:_files -/' \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \
@@ -223,8 +223,8 @@ _arguments "${_arguments_options[@]}" : \
 ;;
 (remove-alias)
 _arguments "${_arguments_options[@]}" : \
-'-p+[]:PATH:_files -/' \
-'--path=[]:PATH:_files -/' \
+'-p+[Path to remove aliases from]:PATH:_files -/' \
+'--path=[Path to remove aliases from]:PATH:_files -/' \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \

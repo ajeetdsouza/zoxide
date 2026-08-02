@@ -77,6 +77,7 @@ pub struct AddAlias {
     #[clap(num_args = 1.., required = true)]
     pub aliases: Vec<String>,
 
+    /// Path to add aliases to
     #[clap(short, long, required = true, value_hint = ValueHint::DirPath)]
     pub path: PathBuf,
 }
@@ -240,6 +241,7 @@ pub struct RemoveAlias {
     #[clap(num_args = 1.., required = true)]
     pub aliases: Vec<String>,
 
+    /// Path to remove aliases from
     #[clap(short, long, required = true, value_hint = ValueHint::DirPath)]
     pub path: String,
 }

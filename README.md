@@ -164,6 +164,8 @@ zoxide can be installed in 4 easy steps:
    > | [conda-forge]   | `conda install -c conda-forge zoxide` |
    > | [Scoop]         | `scoop install zoxide`                |
    >
+   > Open a **new** terminal after install so `PATH` picks up the `zoxide` shim.
+   >
    > If you're using Cygwin, Git Bash, or MSYS2, you can also use the install script:
    >
    > ```sh

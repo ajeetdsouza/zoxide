@@ -14,14 +14,9 @@
 # Initialize hook to add new entries to the database.
 export-env {
 {%- if hook == InitHook::Prompt %}
-  $env.config = (
-    $env.config?
-    | default {}
-    | upsert hooks { default {} }
-    | upsert hooks.pre_prompt { default [] }
-  )
   let __zoxide_hooked = (
-    $env.config.hooks.pre_prompt | any { try { get __zoxide_hook } catch { false } }
+    $env.config.hooks.pre_prompt
+    | any { get __zoxide_hook? | default false }
   )
   if not $__zoxide_hooked {
     $env.config.hooks.pre_prompt = ($env.config.hooks.pre_prompt | append {
@@ -30,18 +25,12 @@ export-env {
     })
   }
 {%- else if hook == InitHook::Pwd %}
-  $env.config = (
-    $env.config?
-    | default {}
-    | upsert hooks { default {} }
-    | upsert hooks.env_change { default {} }
-    | upsert hooks.env_change.PWD { default [] }
-  )
   let __zoxide_hooked = (
-    $env.config.hooks.env_change.PWD | any { try { get __zoxide_hook } catch { false } }
+    $env.config.hooks.env_change.PWD? | default []
+    | any { get __zoxide_hook? | default false }
   )
   if not $__zoxide_hooked {
-    $env.config.hooks.env_change.PWD = ($env.config.hooks.env_change.PWD | append {
+    $env.config.hooks.env_change.PWD = ($env.config.hooks.env_change.PWD? | append {
       __zoxide_hook: true,
       code: {|_, dir| ^zoxide add -- $dir}
     })
@@ -52,11 +41,32 @@ export-env {
 {%- endif %}
 
 {{ section }}
+# Completion for __zoxide_z
+#
+
+def "nu-complete __zoxide_z" [context: string] {
+  let ast = ast --flatten $context | skip 1 # skip the command name
+
+  # If the user has typed a space after the first argument, use the custom
+  # completer. If not,  use the built-in directory completion.
+  if ($ast | is-empty) { return null }
+  if $ast.0.span.end >= ($context | str length) { return null }
+
+  ^zoxide query --exclude $env.PWD --interactive -- ...$ast.content
+  | if $in starts-with $"($nu.home-dir)(char psep)" { str replace $nu.home-dir "~" } else {}
+  | [{
+    display_override: $in,
+    value: ($in | debug --raw-value),
+    span: { start: ($ast | first).span.start, end: ($ast | last).span.end }
+  }]
+}
+
+{{ section }}
 # When using zoxide with --no-cmd, alias these internal functions as desired.
 #
 
 # Jump to a directory using only keywords.
-export def --env --wrapped __zoxide_z [...rest: directory] {
+export def --env --wrapped __zoxide_z [...rest: directory@"nu-complete __zoxide_z"] {
   match $rest {
     [] => { cd ~ },
     [ '-' ] => { cd - },
@@ -104,4 +114,4 @@ export alias {{cmd}}i = __zoxide_zi
 #
 #   source ~/.zoxide.nu
 #
-# Note: zoxide only supports Nushell v0.89.0+.
+# Note: zoxide only supports Nushell v0.110.0+.

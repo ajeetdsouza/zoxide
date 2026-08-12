@@ -285,6 +285,17 @@ zoxide can be installed in 4 easy steps:
    </details>
 
    <details>
+   <summary>Schemesh</summary>
+
+   > Add this to the <ins>**end**</ins> of your config file (usually `~/.config/schemesh/repl_init.ss`):
+   >
+   > ```scheme
+   > (sh-eval-string (sh-run/string {zoxide init schemesh}) 'scheme)
+   > ```
+
+   </details>
+
+   <details>
    <summary>Tcsh</summary>
 
    > Add this to the <ins>**end**</ins> of your config file (usually `~/.tcshrc`):

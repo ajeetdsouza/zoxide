@@ -160,6 +160,7 @@ pub enum InitShell {
     #[clap(alias = "ksh")]
     Posix,
     Powershell,
+    Schemesh,
     Tcsh,
     Xonsh,
     Zsh,

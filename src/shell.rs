@@ -29,6 +29,7 @@ make_template!(Fish, "fish.txt");
 make_template!(Nushell, "nushell.txt");
 make_template!(Posix, "posix.txt");
 make_template!(Powershell, "powershell.txt");
+make_template!(Schemesh, "schemesh.txt");
 make_template!(Tcsh, "tcsh.txt");
 make_template!(Xonsh, "xonsh.txt");
 make_template!(Zsh, "zsh.txt");
@@ -243,6 +244,18 @@ mod tests {
 
         Command::new("pwsh")
             .args(["-NoLogo", "-NonInteractive", "-NoProfile", "-Command", &source])
+            .assert()
+            .success()
+            .stdout("")
+            .stderr("");
+    }
+
+    #[apply(opts)]
+    fn schemesh_schemesh(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+        let source = Schemesh(&opts).render().unwrap();
+        Command::new("schemesh")
+            .args(["--eval", &source])
             .assert()
             .success()
             .stdout("")

@@ -1,0 +1,115 @@
+{%- let section = ";; =============================================================================\n;;" -%}
+{%- let not_configured = ";; -- not configured --" -%}
+
+{{ section }}
+;; Utility functions for zoxide.
+;;
+
+;; pwd based on the value of _ZO_RESOLVE_SYMLINKS.
+(define __zoxide_pwd
+  (lambda ()
+    (let ((pwd (charspan->string (sh-cwd (sh-globals)))))
+{%- if resolve_symlinks %}
+      (sh-run/string-rtrim-newlines {realpath (values pwd)})
+{%- else %}
+      pwd
+{%- endif %}
+    )))
+
+;; cd + custom logic based on the value of _ZO_ECHO.
+(define __zoxide_cd
+  (lambda args
+    (cond
+      ((null? args) (sh-cd (sh-globals)))
+      ((string=? (car args) "-") (sh-cd- (sh-globals)))
+      (else (sh-cd (sh-globals) (car args))))
+{%- if echo %}
+    (display (__zoxide_pwd))
+    (newline)
+{%- endif %}
+  ))
+
+{{ section }}
+;; Hook configuration for zoxide.
+;;
+
+{%- if hook != InitHook::None %}
+
+;; Hook to add new entries to the database.
+{%- if hook == InitHook::Prompt %}
+(define __zoxide_hook
+  (lambda (pwd-after-eval)
+    (sh-run {command zoxide add -- (values pwd-after-eval)})))
+{%- else if hook == InitHook::Pwd %}
+(define __zoxide_hook
+  (let ((pwd (__zoxide_pwd)))
+    (lambda (pwd-after-eval)
+      (unless (string=? pwd-after-eval pwd)
+        (set! pwd pwd-after-eval)
+        (sh-run {command zoxide add -- (values pwd-after-eval)})))))
+{%- endif %}
+
+;; Initialize hook.
+(let ((repl-original-eval (repl-current-eval)))
+  (repl-current-eval
+    (lambda (form env)
+      (let ((vals (repl-original-eval form env)))
+        (__zoxide_hook (__zoxide_pwd))
+        vals))))
+
+{%- endif %}
+
+{{ section }}
+;; When using zoxide with --no-cmd, alias these internal functions as desired.
+;;
+
+;; Jump to a directory using only keywords.
+(sh-alias "__zoxide_z"
+  (lambda (args)
+    (cond
+      ((null? args) (__zoxide_cd))
+      ((and (= (length args) 1)
+            (string=? (car args) "-"))
+       (__zoxide_cd (car args)))
+      ((and (= (length args) 1)
+            (file-directory? (car args)))
+       (__zoxide_cd (car args)))
+      ((and (= (length args) 2)
+            (string=? (car args) "--"))
+       (__zoxide_cd (cadr args)))
+      (else
+       (let* ((job {command zoxide query --exclude (__zoxide_pwd) -- (values args)})
+              (result (sh-run/string-rtrim-newlines job))
+              (status (sh-job-status job)))
+         (when (ok? status) (__zoxide_cd result)))))
+    (quote ())))
+
+;; Jump to a directory using interactive search.
+(sh-alias "__zoxide_zi"
+  (lambda (args)
+    (let* ((job {command zoxide query --interactive -- (values args)})
+           (result (sh-run/string-rtrim-newlines job))
+           (status (sh-job-status job)))
+      (when (ok? status) (__zoxide_cd result)))
+    (quote ())))
+
+{{ section }}
+;; Commands for zoxide. Disable these using --no-cmd.
+;;
+
+{%- match cmd %}
+{%- when Some with (cmd) %}
+
+(sh-alias "{{cmd}}" (quote ("__zoxide_z")))
+(sh-alias "{{cmd}}i" (quote ("__zoxide_zi")))
+
+{%- when None %}
+
+{{ not_configured }}
+
+{%- endmatch %}
+
+{{ section }}
+;; To initialize zoxide, add this to your configuration (usually ~/.config/schemesh/repl_init.ss):
+;;
+;; (sh-eval-string (sh-run/string {zoxide init schemesh}) 'scheme)

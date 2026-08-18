@@ -36,7 +36,15 @@
 
 <hr />
 
-# zoxide
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./contrib/logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="./contrib/logo-light.svg">
+    <img alt="zoxide logo" src="./contrib/logo-light.svg" height="128" width="128">
+  </picture>
+  <br />
+  zoxide
+</h1>
 
 [![crates.io][crates.io-badge]][crates.io]
 [![Downloads][downloads-badge]][releases]

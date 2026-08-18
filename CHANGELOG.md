@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - `import` now takes a subcommand instead of the `--from` flag.
+- Nushell: upgrade minimum supported version to v0.106.0.
 
 ### Fixed
 

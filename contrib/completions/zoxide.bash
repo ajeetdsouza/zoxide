@@ -19,6 +19,9 @@ _zoxide() {
             zoxide,add)
                 cmd="zoxide__subcmd__add"
                 ;;
+            zoxide,add-alias)
+                cmd="zoxide__subcmd__add__subcmd__alias"
+                ;;
             zoxide,edit)
                 cmd="zoxide__subcmd__edit"
                 ;;
@@ -33,6 +36,9 @@ _zoxide() {
                 ;;
             zoxide,remove)
                 cmd="zoxide__subcmd__remove"
+                ;;
+            zoxide,remove-alias)
+                cmd="zoxide__subcmd__remove__subcmd__alias"
                 ;;
             zoxide__subcmd__edit,decrement)
                 cmd="zoxide__subcmd__edit__subcmd__decrement"
@@ -71,7 +77,7 @@ _zoxide() {
 
     case "${cmd}" in
         zoxide)
-            opts="-h -V --help --version add edit import init query remove"
+            opts="-h -V --help --version add add-alias edit import init query remove remove-alias"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -97,6 +103,34 @@ _zoxide() {
                     ;;
                 -s)
                     COMPREPLY=($(compgen -f "${cur}"))
+                    return 0
+                    ;;
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__subcmd__add__subcmd__alias)
+            opts="-p -h -V --path --help --version <ALIASES>..."
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                --path)
+                    COMPREPLY=()
+                    if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
+                        compopt -o plusdirs
+                    fi
+                    return 0
+                    ;;
+                -p)
+                    COMPREPLY=()
+                    if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
+                        compopt -o plusdirs
+                    fi
                     return 0
                     ;;
                 *)
@@ -297,7 +331,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__subcmd__query)
-            opts="-a -i -l -s -h -V --all --interactive --list --score --exclude --base-dir --help --version [KEYWORDS]..."
+            opts="-a -i -l -s -h -V --all --interactive --list --score --aliases --exclude --base-dir --help --version [KEYWORDS]..."
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -331,6 +365,34 @@ _zoxide() {
                 return 0
             fi
             case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__subcmd__remove__subcmd__alias)
+            opts="-p -h -V --path --help --version <ALIASES>..."
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                --path)
+                    COMPREPLY=()
+                    if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
+                        compopt -o plusdirs
+                    fi
+                    return 0
+                    ;;
+                -p)
+                    COMPREPLY=()
+                    if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
+                        compopt -o plusdirs
+                    fi
+                    return 0
+                    ;;
                 *)
                     COMPREPLY=()
                     ;;

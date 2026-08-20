@@ -1,10 +1,12 @@
 mod add;
+mod add_alias;
 mod cmd;
 mod edit;
 mod import;
 mod init;
 mod query;
 mod remove;
+mod remove_alias;
 
 use anyhow::Result;
 
@@ -18,11 +20,13 @@ impl Run for Cmd {
     fn run(&self) -> Result<()> {
         match self {
             Cmd::Add(cmd) => cmd.run(),
+            Cmd::AddAlias(cmd) => cmd.run(),
             Cmd::Edit(cmd) => cmd.run(),
             Cmd::Import(cmd) => cmd.run(),
             Cmd::Init(cmd) => cmd.run(),
             Cmd::Query(cmd) => cmd.run(),
             Cmd::Remove(cmd) => cmd.run(),
+            Cmd::RemoveAlias(cmd) => cmd.run(),
         }
     }
 }

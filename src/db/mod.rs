@@ -1,6 +1,7 @@
 mod dir;
 mod stream;
 
+use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 use std::{fs, io};
 
@@ -8,7 +9,8 @@ use anyhow::{Context, Result, bail};
 use bincode::Options;
 use ouroboros::self_referencing;
 
-pub use crate::db::dir::{Dir, Epoch, Rank};
+use crate::db::dir::{Dir, DirV3};
+pub use crate::db::dir::{DirV4, Epoch, Rank};
 pub use crate::db::stream::{Stream, StreamOptions};
 use crate::{config, util};
 
@@ -18,12 +20,13 @@ pub struct Database {
     bytes: Vec<u8>,
     #[borrows(bytes)]
     #[covariant]
-    pub dirs: Vec<Dir<'this>>,
+    pub dirs: Vec<DirV4<'this>>,
     dirty: bool,
 }
 
 impl Database {
-    const VERSION: u32 = 3;
+    const PREV_VERSION: u32 = 3;
+    const VERSION: u32 = 4;
 
     pub fn open() -> Result<Self> {
         let data_dir = config::data_dir()?;
@@ -67,10 +70,15 @@ impl Database {
     /// Increments the rank of a directory, or creates it if it does not exist.
     pub fn add(&mut self, path: impl AsRef<str> + Into<String>, by: Rank, now: Epoch) {
         self.with_dirs_mut(|dirs| match dirs.iter_mut().find(|dir| dir.path == path.as_ref()) {
-            Some(dir) => dir.rank = (dir.rank + by).max(0.0),
-            None => {
-                dirs.push(Dir { path: path.into().into(), rank: by.max(0.0), last_accessed: now })
+            Some(dir) => {
+                dir.rank = (dir.rank + by).max(0.0);
             }
+            None => dirs.push(DirV4 {
+                path: path.into().into(),
+                rank: by.max(0.0),
+                last_accessed: now,
+                aliases: HashSet::new(),
+            }),
         });
         self.with_dirty_mut(|dirty| *dirty = true);
     }
@@ -81,7 +89,12 @@ impl Database {
     /// afterward.
     pub fn add_unchecked(&mut self, path: impl AsRef<str> + Into<String>, rank: Rank, now: Epoch) {
         self.with_dirs_mut(|dirs| {
-            dirs.push(Dir { path: path.into().into(), rank, last_accessed: now })
+            dirs.push(DirV4 {
+                path: path.into().into(),
+                rank,
+                last_accessed: now,
+                aliases: HashSet::new(),
+            })
         });
         self.with_dirty_mut(|dirty| *dirty = true);
     }
@@ -94,11 +107,48 @@ impl Database {
                 dir.rank = (dir.rank + by).max(0.0);
                 dir.last_accessed = now;
             }
-            None => {
-                dirs.push(Dir { path: path.into().into(), rank: by.max(0.0), last_accessed: now })
-            }
+            None => dirs.push(DirV4 {
+                path: path.into().into(),
+                rank: by.max(0.0),
+                last_accessed: now,
+                aliases: HashSet::new(),
+            }),
         });
         self.with_dirty_mut(|dirty| *dirty = true);
+    }
+
+    /// Adds aliases to a directory and updates its last_accessed, or
+    /// creates it and adds aliases to it if it does not exist.
+    pub fn add_alias_update(
+        &mut self,
+        path: impl AsRef<str> + Into<String>,
+        aliases: impl Iterator<Item = impl AsRef<str> + Into<String>>,
+        now: Epoch,
+    ) {
+        let mut is_dirty = false;
+        self.with_dirs_mut(|dirs| match dirs.iter_mut().find(|dir| dir.path == path.as_ref()) {
+            Some(dir) => {
+                let starting_len = dir.aliases.len();
+                dir.aliases.extend(aliases.map(|alias| alias.into().into()));
+                dir.last_accessed = now;
+
+                is_dirty = dir.aliases.len() > starting_len;
+            }
+            None => {
+                let mut set = HashSet::new();
+                set.extend(aliases.map(|alias| alias.into().into()));
+
+                dirs.push(DirV4 {
+                    path: path.into().into(),
+                    rank: 0.0,
+                    last_accessed: now,
+                    aliases: set,
+                });
+
+                is_dirty = true;
+            }
+        });
+        self.with_dirty_mut(|dirty| *dirty |= is_dirty);
     }
 
     /// Removes the directory with `path` from the store. This does not preserve
@@ -116,6 +166,28 @@ impl Database {
     pub fn swap_remove(&mut self, idx: usize) {
         self.with_dirs_mut(|dirs| dirs.swap_remove(idx));
         self.with_dirty_mut(|dirty| *dirty = true);
+    }
+
+    /// Removes aliases from a directory
+    pub fn remove_alias(
+        &mut self,
+        path: impl AsRef<str>,
+        aliases: impl Iterator<Item = impl AsRef<str>>,
+    ) -> bool {
+        let res = self.with_dirs_mut(|dirs| {
+            match dirs.iter_mut().find(|dir| dir.path == path.as_ref()) {
+                Some(dir) => {
+                    let mut res = false;
+                    aliases.for_each(|alias| {
+                        res |= dir.aliases.remove(alias.as_ref());
+                    });
+                    res
+                }
+                None => false,
+            }
+        });
+        self.with_dirty_mut(|dirty| *dirty |= res);
+        res
     }
 
     pub fn age(&mut self, max_age: Rank) {
@@ -173,7 +245,7 @@ impl Database {
 
     pub fn sort_by_score(&mut self, now: Epoch) {
         self.with_dirs_mut(|dirs| {
-            dirs.sort_unstable_by(|dir1: &Dir, dir2: &Dir| {
+            dirs.sort_unstable_by(|dir1: &DirV4, dir2: &DirV4| {
                 dir1.score(now).total_cmp(&dir2.score(now))
             })
         });
@@ -184,11 +256,11 @@ impl Database {
         *self.borrow_dirty()
     }
 
-    pub fn dirs(&self) -> &[Dir<'_>] {
+    pub fn dirs(&self) -> &[DirV4<'_>] {
         self.borrow_dirs()
     }
 
-    fn serialize(dirs: &[Dir<'_>]) -> Result<Vec<u8>> {
+    fn serialize(dirs: &[DirV4<'_>]) -> Result<Vec<u8>> {
         (|| -> bincode::Result<_> {
             // Preallocate buffer with combined size of sections.
             let buffer_size =
@@ -204,7 +276,7 @@ impl Database {
         .context("could not serialize database")
     }
 
-    fn deserialize(bytes: &[u8]) -> Result<Vec<Dir<'_>>> {
+    fn deserialize(bytes: &[u8]) -> Result<Vec<DirV4<'_>>> {
         // Assume a maximum size for the database. This prevents bincode from throwing
         // strange errors when it encounters invalid data.
         const MAX_SIZE: u64 = 32 << 20; // 32 MiB
@@ -223,8 +295,27 @@ impl Database {
             Self::VERSION => {
                 deserializer.deserialize(bytes_dirs).context("could not deserialize database")?
             }
+            Self::PREV_VERSION => {
+                let old_dirs = deserializer
+                    .deserialize::<Vec<DirV3>>(bytes_dirs)
+                    .context("could not deserialize v3 database")?;
+
+                old_dirs
+                    .into_iter()
+                    .map(|dir: DirV3| DirV4 {
+                        path: dir.path,
+                        rank: dir.rank,
+                        last_accessed: dir.last_accessed,
+                        aliases: HashSet::new(),
+                    })
+                    .collect()
+            }
             version => {
-                bail!("unsupported version (got {version}, supports {})", Self::VERSION)
+                bail!(
+                    "unsupported version (got {version}, supports {}, {})",
+                    Self::VERSION,
+                    Self::PREV_VERSION
+                )
             }
         };
 
@@ -261,6 +352,33 @@ mod tests {
     }
 
     #[test]
+    fn add_alias() {
+        let data_dir = tempfile::tempdir().unwrap();
+        let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
+        let now = 946684800;
+
+        {
+            let mut db = Database::open_dir(data_dir.path()).unwrap();
+            db.add_alias_update(path, ["bar", "fb"].into_iter(), now);
+            db.add_alias_update(path, ["foobar"].into_iter(), now);
+            db.save().unwrap();
+        }
+
+        {
+            let db = Database::open_dir(data_dir.path()).unwrap();
+            assert_eq!(db.dirs().len(), 1);
+
+            let mut aliases = HashSet::from(["bar", "fb", "foobar"]);
+            let dir = &db.dirs()[0];
+            assert_eq!(dir.path, path);
+            assert!(
+                dir.aliases().all(|alias| aliases.remove(alias.as_ref())) && aliases.is_empty()
+            );
+            assert_eq!(dir.last_accessed, now);
+        }
+    }
+
+    #[test]
     fn remove() {
         let data_dir = tempfile::tempdir().unwrap();
         let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
@@ -282,6 +400,36 @@ mod tests {
             let mut db = Database::open_dir(data_dir.path()).unwrap();
             assert!(db.dirs().is_empty());
             assert!(!db.remove(path));
+            db.save().unwrap();
+        }
+    }
+
+    #[test]
+    fn remove_alias() {
+        let data_dir = tempfile::tempdir().unwrap();
+        let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
+        let now = 946684800;
+
+        {
+            let mut db = Database::open_dir(data_dir.path()).unwrap();
+            db.add_alias_update(path, ["fb", "bar", "foobar"].into_iter(), now);
+            db.save().unwrap();
+        }
+
+        {
+            let mut db = Database::open_dir(data_dir.path()).unwrap();
+            assert!(db.remove_alias(path, ["bar", "foobar"].into_iter()));
+            db.save().unwrap();
+        }
+
+        {
+            let mut db = Database::open_dir(data_dir.path()).unwrap();
+            let mut aliases = HashSet::from(["fb"]);
+            assert_eq!(db.dirs().len(), 1);
+            assert!(
+                db.dirs()[0].aliases().all(|alias| aliases.remove(alias.as_ref()))
+                    && aliases.is_empty()
+            );
             db.save().unwrap();
         }
     }

@@ -23,15 +23,25 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand -V 'Print version'
             cand --version 'Print version'
             cand add 'Add a new directory or increment its rank'
+            cand add-alias 'Add aliases for a directory'
             cand edit 'Edit the database'
             cand import 'Import entries from another application'
             cand init 'Generate shell configuration'
             cand query 'Search for a directory in the database'
             cand remove 'Remove a directory from the database'
+            cand remove-alias 'Remove aliases from a directory'
         }
         &'zoxide;add'= {
             cand -s 'The rank to increment the entry if it exists or initialize it with if it doesn''t'
             cand --score 'The rank to increment the entry if it exists or initialize it with if it doesn''t'
+            cand -h 'Print help'
+            cand --help 'Print help'
+            cand -V 'Print version'
+            cand --version 'Print version'
+        }
+        &'zoxide;add-alias'= {
+            cand -p 'Path to add aliases to'
+            cand --path 'Path to add aliases to'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
@@ -146,12 +156,21 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand --list 'List all matching directories'
             cand -s 'Print score with results'
             cand --score 'Print score with results'
+            cand --aliases 'Print aliases with results'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'
             cand --version 'Print version'
         }
         &'zoxide;remove'= {
+            cand -h 'Print help'
+            cand --help 'Print help'
+            cand -V 'Print version'
+            cand --version 'Print version'
+        }
+        &'zoxide;remove-alias'= {
+            cand -p 'Path to remove aliases from'
+            cand --path 'Path to remove aliases from'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'

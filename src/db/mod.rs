@@ -121,6 +121,14 @@ impl Database {
     pub fn age(&mut self, max_age: Rank) {
         let mut dirty = false;
         self.with_dirs_mut(|dirs| {
+            // A non-finite rank would make the total non-finite too, which
+            // either scales every other rank to zero and drops it, or leaves
+            // the total NaN so that no comparison below ever holds and the
+            // database stops ageing entirely. Drop those entries instead.
+            let len_before = dirs.len();
+            dirs.retain(|dir| dir.rank.is_finite());
+            dirty |= dirs.len() != len_before;
+
             let total_age = dirs.iter().map(|dir| dir.rank).sum::<Rank>();
             if total_age > max_age {
                 let factor = 0.9 * max_age / total_age;
@@ -284,5 +292,42 @@ mod tests {
             assert!(!db.remove(path));
             db.save().unwrap();
         }
+    }
+
+    #[test]
+    fn age_drops_non_finite_ranks() {
+        let data_dir = tempfile::tempdir().unwrap();
+        let now = 946684800;
+
+        let mut db = Database::open_dir(data_dir.path()).unwrap();
+        db.add_unchecked("/foo", 1.0, now);
+        db.add_unchecked("/bar", f64::INFINITY, now);
+        db.add_unchecked("/baz", f64::NAN, now);
+        db.age(10000.0);
+
+        // The finite entry survives, and it is not scaled to zero by a total
+        // that a non-finite rank has poisoned.
+        let dirs = db.dirs();
+        assert_eq!(dirs.len(), 1);
+        assert_eq!(dirs[0].path, "/foo");
+        assert!((dirs[0].rank - 1.0).abs() < 0.01);
+    }
+
+    #[test]
+    fn age_keeps_ageing_after_non_finite_rank() {
+        let data_dir = tempfile::tempdir().unwrap();
+        let now = 946684800;
+
+        let mut db = Database::open_dir(data_dir.path()).unwrap();
+        db.add_unchecked("/poison", f64::NAN, now);
+        for i in 0..20 {
+            db.add_unchecked(format!("/dir{i}"), 600.0, now);
+        }
+        db.age(10000.0);
+
+        // Without dropping the NaN the total stays NaN, no comparison holds,
+        // and the database never ages below max_age again.
+        let total = db.dirs().iter().map(|dir| dir.rank).sum::<Rank>();
+        assert!(total <= 10000.0, "database did not age: total is {total}");
     }
 }

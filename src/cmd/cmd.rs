@@ -47,6 +47,7 @@ pub enum Cmd {
     Init(Init),
     Query(Query),
     Remove(Remove),
+    Rename(Rename),
 }
 
 /// Add a new directory or increment its rank
@@ -208,4 +209,24 @@ pub struct Query {
 pub struct Remove {
     #[clap(value_hint = ValueHint::DirPath)]
     pub paths: Vec<String>,
+}
+
+/// Batch rename paths by replacing <old-name> with <new-name>
+#[derive(Debug, Parser)]
+#[clap(
+    author,
+    help_template = HelpTemplate,
+)]
+pub struct Rename {
+    // old name
+    #[clap(long, value_hint = ValueHint::DirPath, value_name = "old_name")]
+    pub old_name: String,
+
+    // new name
+    #[clap(long, value_hint = ValueHint::DirPath, value_name = "new_name")]
+    pub new_name: String,
+
+    /// skip y/n
+    #[clap(long, short)]
+    pub force: bool,
 }

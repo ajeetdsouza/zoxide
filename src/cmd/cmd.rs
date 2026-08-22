@@ -43,10 +43,44 @@ https://github.com/ajeetdsouza/zoxide
 pub enum Cmd {
     Add(Add),
     Edit(Edit),
+    Env(Env),
     Import(Import),
     Init(Init),
     Query(Query),
     Remove(Remove),
+}
+
+/// Display environment variables
+#[derive(Debug, Parser)]
+#[clap(
+    author,
+    help_template = HelpTemplate,
+)]
+pub struct Env {
+    #[clap(subcommand)]
+    pub cmd: Option<EnvCommand>,
+}
+
+#[derive(Clone, Copy, Debug, Subcommand)]
+pub enum EnvCommand {
+    /// Data directory
+    #[clap(name = "_ZO_DATA_DIR")]
+    DataDir,
+    /// Echo the matched directory before navigating to it
+    #[clap(name = "_ZO_ECHO")]
+    Echo,
+    /// Directories to exclude when jumping
+    #[clap(name = "_ZO_EXCLUDE_DIRS")]
+    ExcludeDirs,
+    /// Custom options for fzf
+    #[clap(name = "_ZO_FZF_OPTS")]
+    FzfOpts,
+    /// Maximum total age of entries
+    #[clap(name = "_ZO_MAXAGE")]
+    Maxage,
+    /// Resolve symlinks before storing paths
+    #[clap(name = "_ZO_RESOLVE_SYMLINKS")]
+    ResolveSymlinks,
 }
 
 /// Add a new directory or increment its rank

@@ -532,7 +532,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 [termux]: https://github.com/termux/termux-packages/tree/master/packages/zoxide
 [tmux-session-wizard]: https://github.com/27medkamal/tmux-session-wizard
 [tmux-sessionx]: https://github.com/omerxx/tmux-sessionx
-[tutorial]: contrib/tutorial.webp
+[tutorial]: contrib/tutorial.gif
 [ubuntu packages]: https://packages.ubuntu.com/jammy/zoxide
 [vim]: https://github.com/vim/vim
 [void linux packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide

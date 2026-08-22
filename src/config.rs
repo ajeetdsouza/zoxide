@@ -60,3 +60,7 @@ pub fn maxage() -> Result<Rank> {
 pub fn resolve_symlinks() -> bool {
     env::var_os("_ZO_RESOLVE_SYMLINKS").is_some_and(|var| var == "1")
 }
+
+pub fn disable_existence_filter() -> bool {
+    env::var_os("_ZO_DISABLE_EXISTENCE_CHECK").is_some_and(|var| var == "1")
+}

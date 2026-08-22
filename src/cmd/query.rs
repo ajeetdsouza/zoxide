@@ -58,7 +58,13 @@ impl Query {
             if Some(dir.path.as_ref()) == self.exclude.as_deref() {
                 continue;
             }
-            let dir = if self.score { dir.display().with_score(now) } else { dir.display() };
+            let dir = match (self.score, self.time) {
+                (true, true) => dir.display().with_score(now).with_last_assessed(),
+                (true, false) => dir.display().with_score(now),
+                (false, true) => dir.display().with_last_assessed(),
+                (false, false) => dir.display(),
+            };
+
             writeln!(handle, "{dir}").pipe_exit("stdout")?;
         }
         Ok(())

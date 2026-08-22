@@ -43,6 +43,7 @@ https://github.com/ajeetdsouza/zoxide
 pub enum Cmd {
     Add(Add),
     Edit(Edit),
+    Export(Export),
     Import(Import),
     Init(Init),
     Query(Query),
@@ -86,6 +87,24 @@ pub enum EditCommand {
     Increment { path: String },
     #[clap(hide = true)]
     Reload,
+}
+
+/// Export entries from the database
+#[derive(Debug, Parser)]
+#[clap(
+    author,
+    help_template = HelpTemplate,
+)]
+pub struct Export {
+    #[clap(subcommand)]
+    pub cmd: ExportCommand,
+}
+
+#[derive(Clone, Debug, Subcommand)]
+pub enum ExportCommand {
+    Csv,
+    Json,
+    Text,
 }
 
 /// Import entries from another application

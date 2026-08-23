@@ -1,6 +1,8 @@
 mod dir;
 mod stream;
 
+use std::borrow::Cow;
+use std::io::Write as _;
 use std::path::{Path, PathBuf};
 use std::{fs, io};
 
@@ -11,6 +13,13 @@ use ouroboros::self_referencing;
 pub use crate::db::dir::{Dir, Epoch, Rank};
 pub use crate::db::stream::{Stream, StreamOptions};
 use crate::{config, util};
+
+/// Width of the timestamp and rank columns.
+const COL_WIDTH: usize = 10;
+/// The smallest rank the database file can hold.
+const MIN_RANK: Rank = 0.01;
+/// The largest rank the database file can hold.
+const MAX_RANK: Rank = 9_999_999.99;
 
 #[self_referencing]
 pub struct Database {
@@ -23,8 +32,6 @@ pub struct Database {
 }
 
 impl Database {
-    const VERSION: u32 = 3;
-
     pub fn open() -> Result<Self> {
         let data_dir = config::data_dir()?;
         Self::open_dir(data_dir)
@@ -32,23 +39,42 @@ impl Database {
 
     pub fn open_dir(data_dir: impl AsRef<Path>) -> Result<Self> {
         let data_dir = data_dir.as_ref();
-        let path = data_dir.join("db.zo");
+        let path = data_dir.join("db.txt");
         let path = fs::canonicalize(&path).unwrap_or(path);
 
         match fs::read(&path) {
-            Ok(bytes) => Self::try_new(path, bytes, |bytes| Self::deserialize(bytes), false),
-            Err(e) if e.kind() == io::ErrorKind::NotFound => {
-                // Create data directory, but don't create any file yet. The file will be
-                // created later by [`Database::save`] if any data is modified.
-                fs::create_dir_all(data_dir).with_context(|| {
-                    format!("unable to create data directory: {}", data_dir.display())
-                })?;
-                Ok(Self::new(path, Vec::new(), |_| Vec::new(), false))
+            Ok(bytes) => {
+                return Self::try_new(path.clone(), bytes, |bytes| Self::deserialize(bytes), false)
+                    .with_context(|| format!("could not parse database: {}", path.display()));
             }
+            Err(e) if e.kind() == io::ErrorKind::NotFound => {}
             Err(e) => {
-                Err(e).with_context(|| format!("could not read from database: {}", path.display()))
+                return Err(e)
+                    .with_context(|| format!("could not read from database: {}", path.display()));
             }
         }
+
+        // Migrate the legacy bincode database, if there is one.
+        let path_legacy = data_dir.join("db.zo");
+        match fs::read(&path_legacy) {
+            Ok(bytes) => {
+                return Self::try_new(path, bytes, |bytes| Self::deserialize_legacy(bytes), true)
+                    .with_context(|| {
+                        format!("could not parse database: {}", path_legacy.display())
+                    });
+            }
+            Err(e) if e.kind() == io::ErrorKind::NotFound => {}
+            Err(e) => {
+                return Err(e).with_context(|| {
+                    format!("could not read from database: {}", path_legacy.display())
+                });
+            }
+        }
+
+        // Create the data directory, but don't create any file yet.
+        fs::create_dir_all(data_dir)
+            .with_context(|| format!("unable to create data directory: {}", data_dir.display()))?;
+        Ok(Self::new(path, Vec::new(), |_| Vec::new(), false))
     }
 
     pub fn save(&mut self) -> Result<()> {
@@ -189,46 +215,90 @@ impl Database {
     }
 
     fn serialize(dirs: &[Dir<'_>]) -> Result<Vec<u8>> {
-        (|| -> bincode::Result<_> {
-            // Preallocate buffer with combined size of sections.
-            let buffer_size =
-                bincode::serialized_size(&Self::VERSION)? + bincode::serialized_size(&dirs)?;
-            let mut buffer = Vec::with_capacity(buffer_size as usize);
+        // timestamp + tab + rank + tab + path + newline.
+        let size_hint: usize =
+            dirs.iter().map(|dir| COL_WIDTH + 1 + COL_WIDTH + 1 + dir.path.len() + 1).sum();
+        let mut buffer = Vec::with_capacity(size_hint);
 
-            // Serialize sections into buffer.
-            bincode::serialize_into(&mut buffer, &Self::VERSION)?;
-            bincode::serialize_into(&mut buffer, &dirs)?;
-
-            Ok(buffer)
-        })()
-        .context("could not serialize database")
+        for dir in dirs {
+            let rank = dir.rank.clamp(MIN_RANK, MAX_RANK);
+            writeln!(
+                buffer,
+                "{:0COL_WIDTH$}\t{rank:0COL_WIDTH$.2}\t{}",
+                dir.last_accessed, dir.path
+            )
+            .context("could not serialize database")?;
+        }
+        Ok(buffer)
     }
 
     fn deserialize(bytes: &[u8]) -> Result<Vec<Dir<'_>>> {
+        let mut dirs = Vec::new();
+        let mut errors = Vec::new();
+
+        for (idx, line) in bytes.split(|byte| *byte == b'\n').enumerate() {
+            match Self::deserialize_line(line) {
+                Ok(Some(dir)) => dirs.push(dir),
+                Ok(None) => {}
+                Err(e) => errors.push(format!("line {}: {e:#}", idx + 1)),
+            }
+        }
+
+        if !errors.is_empty() {
+            const MAX_ERRORS: usize = 8;
+            let total = errors.len();
+            if total > MAX_ERRORS {
+                errors.truncate(MAX_ERRORS);
+                errors.push(format!("... and {} more", total - MAX_ERRORS));
+            }
+            bail!("{}", errors.join("\n"));
+        }
+        Ok(dirs)
+    }
+
+    fn deserialize_line(line: &[u8]) -> Result<Option<Dir<'_>>> {
+        let line = str::from_utf8(line).context("invalid UTF-8")?;
+        let line = line.strip_suffix('\r').unwrap_or(line);
+        if line.trim().is_empty() {
+            return Ok(None);
+        }
+
+        const EXPECTED: &str = "expected: <timestamp> <rank> <path>";
+        let (last_accessed, line) =
+            line.trim_start().split_once(char::is_whitespace).context(EXPECTED)?;
+        let (rank, path) = line.trim_start().split_once(char::is_whitespace).context(EXPECTED)?;
+        let path = path.trim_start();
+
+        let last_accessed = last_accessed
+            .parse::<Epoch>()
+            .with_context(|| format!("could not parse timestamp: {last_accessed}"))?;
+        let rank = rank
+            .parse::<Rank>()
+            .with_context(|| format!("could not parse rank: {rank}"))?
+            .clamp(MIN_RANK, MAX_RANK);
+        if rank.is_nan() {
+            bail!("could not parse rank: {rank}");
+        }
+        if path.is_empty() {
+            bail!("{EXPECTED}");
+        }
+        Ok(Some(Dir { path: Cow::Borrowed(path), rank, last_accessed }))
+    }
+
+    fn deserialize_legacy(bytes: &[u8]) -> Result<Vec<Dir<'_>>> {
         // Assume a maximum size for the database. This prevents bincode from throwing
         // strange errors when it encounters invalid data.
         const MAX_SIZE: u64 = 32 << 20; // 32 MiB
+        const VERSION: u32 = 3;
+        let (bytes_version, bytes_dirs) =
+            bytes.split_at_checked(size_of::<u32>()).context("corrupted data")?;
+
         let deserializer = &mut bincode::options().with_fixint_encoding().with_limit(MAX_SIZE);
-
-        // Split bytes into sections.
-        let version_size = deserializer.serialized_size(&Self::VERSION).unwrap() as _;
-        if bytes.len() < version_size {
-            bail!("could not deserialize database: corrupted data");
+        let version: u32 = deserializer.deserialize(bytes_version)?;
+        if version != VERSION {
+            bail!("corrupted data");
         }
-        let (bytes_version, bytes_dirs) = bytes.split_at(version_size);
-
-        // Deserialize sections.
-        let version = deserializer.deserialize(bytes_version)?;
-        let dirs = match version {
-            Self::VERSION => {
-                deserializer.deserialize(bytes_dirs).context("could not deserialize database")?
-            }
-            version => {
-                bail!("unsupported version (got {version}, supports {})", Self::VERSION)
-            }
-        };
-
-        Ok(dirs)
+        deserializer.deserialize(bytes_dirs).context("corrupted data")
     }
 }
 

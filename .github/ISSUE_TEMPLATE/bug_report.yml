@@ -17,8 +17,6 @@ body:
     attributes:
       label: Checks
       options:
-        - label: I have searched the [existing issues](https://github.com/ajeetdsouza/zoxide/issues?q=is%3Aissue) and this has not already been reported.
-          required: true
         - label: I have reproduced this on the [latest release of zoxide](https://github.com/ajeetdsouza/zoxide/releases/latest).
           required: true
 
@@ -37,22 +35,15 @@ body:
     validations:
       required: true
 
-  - type: dropdown
+  - type: input
     id: shell
     attributes:
       label: Shell
-      description: Which shell are you using zoxide with?
-      options:
-        - bash
-        - elvish
-        - fish
-        - nushell
-        - POSIX shell (dash, ksh, ...)
-        - PowerShell
-        - tcsh
-        - xonsh
-        - zsh
-        - Other (please describe below)
+      description: |
+        Which shell are you using zoxide with, and which version of it? Please
+        include the version if you can — most zoxide bugs live in the shell
+        integration, so it's usually the deciding detail.
+      placeholder: zsh 5.9 / bash 5.2.21 / fish 3.7.1 / nushell 0.106.0 / PowerShell 7.4.6
     validations:
       required: true
 
@@ -62,27 +53,6 @@ body:
       label: Operating system
       description: Which OS (and version) are you on?
       placeholder: Ubuntu 24.04 / macOS 15.1 / Windows 11 / NixOS 25.05
-    validations:
-      required: true
-
-  - type: dropdown
-    id: install-method
-    attributes:
-      label: How did you install zoxide?
-      description: |
-        This helps us tell whether you're running an outdated build shipped by a
-        package manager.
-      options:
-        - Install script (install.sh)
-        - Binary or .deb from the GitHub releases page
-        - cargo install zoxide
-        - Homebrew
-        - Nix / NixOS
-        - winget
-        - Scoop
-        - Distribution package manager (apt, dnf, pacman, ...)
-        - Built from source
-        - Other (please describe below)
     validations:
       required: true
 

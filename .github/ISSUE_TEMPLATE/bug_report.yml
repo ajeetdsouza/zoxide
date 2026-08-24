@@ -1,0 +1,123 @@
+name: Bug report
+description: Report something that isn't working the way it should
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report!
+
+        **Before you continue, please make sure you're on the latest release of
+        zoxide.** A large fraction of reported bugs have already been fixed, and
+        many package managers (Debian, Ubuntu, and their derivatives in
+        particular) ship versions of zoxide that are years out of date.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I have searched the [existing issues](https://github.com/ajeetdsouza/zoxide/issues?q=is%3Aissue) and this has not already been reported.
+          required: true
+        - label: I have reproduced this on the [latest release of zoxide](https://github.com/ajeetdsouza/zoxide/releases/latest).
+          required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: zoxide version
+      description: |
+        Output of `zoxide --version`.
+
+        To find out what the latest version is, open
+        <https://github.com/ajeetdsouza/zoxide/releases/latest> — that link
+        always redirects to the newest release. If you aren't on it, please
+        upgrade and check whether the bug is still there before filing.
+      placeholder: zoxide 0.9.4
+    validations:
+      required: true
+
+  - type: dropdown
+    id: shell
+    attributes:
+      label: Shell
+      description: Which shell are you using zoxide with?
+      options:
+        - bash
+        - elvish
+        - fish
+        - nushell
+        - POSIX shell (dash, ksh, ...)
+        - PowerShell
+        - tcsh
+        - xonsh
+        - zsh
+        - Other (please describe below)
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      description: Which OS (and version) are you on?
+      placeholder: Ubuntu 24.04 / macOS 15.1 / Windows 11 / NixOS 25.05
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: How did you install zoxide?
+      description: |
+        This helps us tell whether you're running an outdated build shipped by a
+        package manager.
+      options:
+        - Install script (install.sh)
+        - Binary or .deb from the GitHub releases page
+        - cargo install zoxide
+        - Homebrew
+        - Nix / NixOS
+        - winget
+        - Scoop
+        - Distribution package manager (apt, dnf, pacman, ...)
+        - Built from source
+        - Other (please describe below)
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: |
+        Describe the bug, and what you expected to happen instead. Paste any
+        error output here as text rather than a screenshot.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: |
+        The minimal set of steps someone else can follow to see the same
+        problem, starting from a fresh shell.
+      placeholder: |
+        1. Add `eval "$(zoxide init bash)"` to ~/.bashrc
+        2. Open a new shell
+        3. Run `z foo`
+        4. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: |
+        Anything else that might be relevant — your zoxide config
+        (`$_ZO_*` environment variables), other shell plugins or prompts you
+        use, whether this worked in an earlier version, and so on.
+    validations:
+      required: false

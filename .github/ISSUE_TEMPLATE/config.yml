@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or usage help
+    url: https://github.com/ajeetdsouza/zoxide/discussions
+    about: Ask questions and share tips with other zoxide users here.
+  - name: Documentation
+    url: https://github.com/ajeetdsouza/zoxide#readme
+    about: Installation instructions, configuration options, and third-party integrations.
+  - name: Latest release
+    url: https://github.com/ajeetdsouza/zoxide/releases/latest
+    about: Check whether your bug has already been fixed before filing an issue.

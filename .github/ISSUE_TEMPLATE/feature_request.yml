@@ -1,0 +1,41 @@
+name: Feature request
+description: Suggest a new feature or an improvement
+labels: [enhancement]
+body:
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I have searched the [existing issues](https://github.com/ajeetdsouza/zoxide/issues?q=is%3Aissue) and this has not already been requested.
+          required: true
+        - label: I have checked the [latest release](https://github.com/ajeetdsouza/zoxide/releases/latest) and the [README](https://github.com/ajeetdsouza/zoxide#readme), and this doesn't exist yet.
+          required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: |
+        Describe the use case you're trying to address, rather than jumping
+        straight to a solution.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What would you like zoxide to do?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: |
+        Other approaches you've thought about, or workarounds you're using
+        today.
+    validations:
+      required: false

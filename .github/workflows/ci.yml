@@ -50,7 +50,7 @@ jobs:
         with:
           key: ${{ matrix.os }}
       - name: Install just
-        uses: taiki-e/install-action@v2.85.13
+        uses: taiki-e/install-action@v2.86.5
         with:
           tool: just
       - name: Run lints + tests

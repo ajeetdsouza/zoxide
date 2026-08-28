@@ -84,7 +84,30 @@ impl<'a> Stream<'a> {
         };
 
         let path = util::to_lowercase(path);
-        let mut path = path.as_str();
+        if Self::keywords_match(&path, keywords_last, keywords) {
+            return true;
+        }
+
+        // Try matching ASCII keywords against the pinyin transliteration of
+        // Chinese directory names. Non-ASCII keywords matched the raw path
+        // above, or cannot be transliterated.
+        let pinyin_eligible = !keywords_last.is_empty()
+            && keywords_last.bytes().all(|b| b.is_ascii_alphabetic())
+            && keywords.iter().all(|k| !k.is_empty() && k.bytes().all(|b| b.is_ascii_alphabetic()));
+        if self.options.pinyin
+            && pinyin_eligible
+            && let Some(variants) = crate::pinyin::variants(&path)
+        {
+            for variant in variants {
+                if Self::keywords_match(&variant, keywords_last, keywords) {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
+    fn keywords_match(mut path: &str, keywords_last: &str, keywords: &[String]) -> bool {
         match path.rfind(keywords_last) {
             Some(idx) => {
                 if path[idx + keywords_last.len()..].contains(path::is_separator) {
@@ -129,6 +152,10 @@ pub struct StreamOptions {
     /// Only return directories within this parent directory
     /// Does not check if the path exists
     base_dir: Option<String>,
+
+    /// Whether to match ASCII keywords against the pinyin transliteration of
+    /// Chinese directory names.
+    pinyin: bool,
 }
 
 impl StreamOptions {
@@ -141,6 +168,7 @@ impl StreamOptions {
             resolve_symlinks: false,
             ttl: now.saturating_sub(3 * MONTH),
             base_dir: None,
+            pinyin: false,
         }
     }
 
@@ -170,6 +198,11 @@ impl StreamOptions {
 
     pub fn with_base_dir(mut self, base_dir: Option<String>) -> Self {
         self.base_dir = base_dir;
+        self
+    }
+
+    pub fn with_pinyin(mut self, pinyin: bool) -> Self {
+        self.pinyin = pinyin;
         self
     }
 }
@@ -205,6 +238,32 @@ mod tests {
     fn query(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
         let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
         let options = StreamOptions::new(0).with_keywords(keywords.iter());
+        let stream = Stream::new(db, options);
+        assert_eq!(is_match, stream.filter_by_keywords(path));
+    }
+
+    #[rstest]
+    // Pinyin transliteration
+    #[case(&["shichang"], "/foo/市场", true)]
+    #[case(&["shichang"], "/foo/时长", true)]
+    #[case(&["fuchang"], "/foo/市场", true)]
+    #[case(&["chang"], "/foo/市场", true)]
+    #[case(&["shanghai"], "/foo/上海", true)]
+    #[case(&["yinhang"], "/foo/银行", true)]
+    // Case normalization
+    #[case(&["ShiChang"], "/foo/市场", true)]
+    // Chinese keyword still matches the raw path
+    #[case(&["市场"], "/foo/市场", true)]
+    // No match
+    #[case(&["sc"], "/foo/市场", false)]
+    #[case(&["bar"], "/foo/市场", false)]
+    #[case(&["beijing"], "/foo/上海", false)]
+    // The last keyword must match the last path component
+    #[case(&["shichang"], "/foo/市场/资料", false)]
+    #[case(&["shichang", "ziliao"], "/foo/市场/资料", true)]
+    fn query_pinyin(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
+        let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
+        let options = StreamOptions::new(0).with_keywords(keywords.iter()).with_pinyin(true);
         let stream = Stream::new(db, options);
         assert_eq!(is_match, stream.filter_by_keywords(path));
     }

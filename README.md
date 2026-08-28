@@ -432,6 +432,11 @@ Environment variables[^2] can be used for configuration. They must be set before
   - Configures the [aging algorithm][algorithm-aging], which limits the maximum
     number of entries in the database.
   - By default, this is set to 10000.
+- `_ZO_PINYIN`
+  - When set to 0, disables pinyin matching, which allows ASCII keywords to
+    match Chinese directory names by their pinyin transliteration (e.g.
+    `z shichang` matches both `市场` and `时长`).
+  - Enabled by default; no effect unless the path contains Chinese characters.
 - `_ZO_RESOLVE_SYMLINKS`
   - When set to 1, `z` will resolve symlinks before adding directories to the
     database.

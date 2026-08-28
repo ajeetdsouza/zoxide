@@ -57,6 +57,13 @@ pub fn maxage() -> Result<Rank> {
     })
 }
 
+/// Whether queries should match keywords against the pinyin transliteration of
+/// Chinese directory names. Enabled by default; can be disabled with
+/// `_ZO_PINYIN=0`.
+pub fn pinyin() -> bool {
+    env::var_os("_ZO_PINYIN").is_none_or(|var| var != "0")
+}
+
 pub fn resolve_symlinks() -> bool {
     env::var_os("_ZO_RESOLVE_SYMLINKS").is_some_and(|var| var == "1")
 }

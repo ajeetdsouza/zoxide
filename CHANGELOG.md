@@ -11,9 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Pinyin matching: ASCII keywords now match Chinese directory names by their
-  pinyin transliteration (e.g. `z shichang` matches `市场` and `时长`). This
-  can be disabled with `_ZO_PINYIN=0`.
+- Pinyin matching (optional `pinyin` Cargo feature): when enabled, ASCII
+  keywords match Chinese directory names by their pinyin transliteration
+  (e.g. `z shichang` matches `市场` and `时长`). Build with
+  `--features pinyin`.
 
 ### Fixed
 

@@ -5,7 +5,9 @@ mod config;
 mod db;
 mod error;
 mod import;
+#[cfg(feature = "pinyin")]
 mod pinyin;
+mod romanize;
 mod shell;
 mod util;
 

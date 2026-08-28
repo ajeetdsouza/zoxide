@@ -1,7 +1,16 @@
 use std::collections::HashSet;
 
-use pinyin::{Pinyin, ToPinyin, ToPinyinMulti};
+use pinyin::{Pinyin as PinyinReading, ToPinyin, ToPinyinMulti};
 
+use crate::romanize::Romanizer;
+
+/// Pinyin romanizer for Chinese (CJK Unified Ideographs) directory names.
+pub struct Pinyin;
+
+/// Upper bound on the number of transliteration variants generated for a
+/// single path. Polyphonic characters can multiply the variant count; once
+/// this limit would be exceeded, only the default reading of each remaining
+/// character is used, keeping the search tractable.
 const MAX_VARIANTS: usize = 64;
 
 fn contains_cjk(s: &str) -> bool {
@@ -27,7 +36,7 @@ fn readings(ch: char) -> Vec<&'static str> {
         Some(multi) => {
             let mut seen = HashSet::new();
             let mut out = Vec::new();
-            for reading in multi.into_iter().map(Pinyin::plain) {
+            for reading in multi.into_iter().map(PinyinReading::plain) {
                 if seen.insert(reading) {
                     out.push(reading);
                 }
@@ -48,7 +57,7 @@ fn readings(ch: char) -> Vec<&'static str> {
 /// each character is used.
 ///
 /// Returns `None` if `s` contains no Chinese characters.
-pub fn variants(s: &str) -> Option<Vec<String>> {
+fn variants(s: &str) -> Option<Vec<String>> {
     if !contains_cjk(s) {
         return None;
     }
@@ -80,12 +89,13 @@ pub fn variants(s: &str) -> Option<Vec<String>> {
             continue;
         }
 
-        let mut next = Vec::with_capacity(out.len() * (readings.len() + 1));
+        let rest: Vec<&'static str> = readings.collect();
+        let mut next = Vec::with_capacity(out.len() * (rest.len() + 1));
         for base in &out {
             let mut variant = base.clone();
             variant.push_str(first);
             next.push(variant);
-            for reading in readings.by_ref() {
+            for reading in &rest {
                 let mut variant = base.clone();
                 variant.push_str(reading);
                 next.push(variant);
@@ -95,6 +105,12 @@ pub fn variants(s: &str) -> Option<Vec<String>> {
     }
 
     Some(out)
+}
+
+impl Romanizer for Pinyin {
+    fn variants(&self, s: &str) -> Option<Vec<String>> {
+        variants(s)
+    }
 }
 
 #[cfg(test)]
@@ -146,5 +162,17 @@ mod tests {
     fn mixed_content() {
         let variants = variants("/foo/mixed市场dir").unwrap();
         assert!(variants.iter().any(|v| v == "/foo/mixedshichangdir"));
+    }
+
+    #[test]
+    fn consecutive_polyphones() {
+        // 行长: both characters are polyphonic.
+        // 行: hang/xing, 长: zhang/chang
+        // All 4 combinations should be generated.
+        let v = variants("行长").unwrap();
+        assert!(v.contains(&"hangzhang".to_owned()), "missing hangzhang in {v:?}");
+        assert!(v.contains(&"hangchang".to_owned()), "missing hangchang in {v:?}");
+        assert!(v.contains(&"xingzhang".to_owned()), "missing xingzhang in {v:?}");
+        assert!(v.contains(&"xingchang".to_owned()), "missing xingchang in {v:?}");
     }
 }

@@ -96,13 +96,6 @@ manpage for the full list of options.
 Configures the aging algorithm, which limits the maximum number of entries in
 the database. By default, this is set to 10000.
 .TP
-.B _ZO_PINYIN
-When set to 0, disables pinyin matching, which allows ASCII keywords to match
-Chinese directory names by their pinyin transliteration (e.g. \fBz shichang\fR
-matches both \fB市场\fR and \fB时长\fR). This is enabled by default, has no
-effect unless the path contains Chinese characters, and only applies when
-every keyword consists entirely of ASCII letters.
-.TP
 .B _ZO_RESOLVE_SYMLINKS
 When set to 1, \fBz\fR will resolve symlinks before adding directories to
 the database.
@@ -111,10 +104,11 @@ the database.
 .B MATCHING
 All terms must be present in the path in order, and the last term must match
 within the last component of the path, with nothing following it in that
-component. Matching is case-insensitive. Additionally, if the terms are ASCII,
-they may match the pinyin transliteration of Chinese path components (e.g.
-\fBz shichang\fR matches \fB/foo/市场\fR and \fB/foo/时长\fR). This can be
-disabled with \fB_ZO_PINYIN\fR.
+component. Matching is case-insensitive. Additionally, when zoxide is built
+with the \fBpinyin\fR feature, ASCII keywords may match the pinyin
+transliteration of Chinese path components (e.g. \fBz shichang\fR matches
+\fB/foo/市场\fR and \fB/foo/时长\fR). This only applies when every keyword
+consists entirely of ASCII letters.
 .TP
 .B AGING
 zoxide uses a parameter called \fB_ZO_MAXAGE\fR to limit the number of entries

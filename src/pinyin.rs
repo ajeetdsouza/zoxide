@@ -2,12 +2,16 @@ use std::collections::HashSet;
 
 use pinyin::{Pinyin, ToPinyin, ToPinyinMulti};
 
-pub const MAX_VARIANTS: usize = 64;
+const MAX_VARIANTS: usize = 64;
 
-pub fn contains_cjk(s: &str) -> bool {
+fn contains_cjk(s: &str) -> bool {
     s.chars().any(is_cjk)
 }
 
+// Covers the CJK Unified Ideographs and their Extension A, plus the CJK
+// Compatibility Ideographs. Extension B and later (U+20000+, rare historical
+// characters) are not covered, which has no practical impact for directory
+// names.
 fn is_cjk(c: char) -> bool {
     matches!(
         u32::from(c),
@@ -15,8 +19,9 @@ fn is_cjk(c: char) -> bool {
     )
 }
 
-/// All distinct readings of a Chinese character, in order of commonness. Empty
-/// for characters with no pinyin (e.g. separators, ASCII, compat ideographs).
+/// All distinct readings of a Chinese character, using the order provided by
+/// the crate (the first reading is the character's default reading). Empty for
+/// characters with no pinyin (e.g. separators, ASCII, compat ideographs).
 fn readings(ch: char) -> Vec<&'static str> {
     match ch.to_pinyin_multi() {
         Some(multi) => {
@@ -35,11 +40,11 @@ fn readings(ch: char) -> Vec<&'static str> {
 
 /// Generates every consistent pinyin transliteration of `s`. Each Chinese
 /// character is expanded to all its possible readings, while non-Chinese
-/// characters (including path separators) are preserved verbatim. Readings are
-/// ordered by commonness, so the first variant is the most likely.
+/// characters (including path separators) are preserved verbatim. The first
+/// variant uses the default reading of each character.
 ///
 /// To keep the search tractable, at most [`MAX_VARIANTS`] variants are
-/// generated; if this limit would be exceeded, only the most common reading of
+/// generated; if this limit would be exceeded, only the default reading of
 /// each character is used.
 ///
 /// Returns `None` if `s` contains no Chinese characters.
@@ -63,8 +68,10 @@ pub fn variants(s: &str) -> Option<Vec<String>> {
             continue;
         };
 
-        // Fall back to the most common reading if there would be too many
-        // variants, so that pathological inputs stay O(n).
+        // `readings` had its first item consumed into `first`, so the total
+        // number of readings for this character is `readings.len() + 1`. Fall
+        // back to the default reading if there would be too many variants, so
+        // that pathological inputs stay O(n).
         if primary_only || out.len().saturating_mul(readings.len() + 1) > MAX_VARIANTS {
             primary_only = true;
             for variant in &mut out {
@@ -114,7 +121,7 @@ mod tests {
 
     #[test]
     fn primary_reading() {
-        // The first variant uses the most common reading of each character.
+        // The first variant uses the default reading of each character.
         assert_eq!(variants("市场").unwrap().first().unwrap(), "shichang");
         assert_eq!(variants("/foo/市场").unwrap().first().unwrap(), "/foo/shichang");
     }
@@ -128,8 +135,8 @@ mod tests {
 
     #[test]
     fn polyphone_variants() {
-        // 时长 (duration) is read shícháng; the most common reading of 长 is
-        // zhǎng, so generating all readings is required to match "shichang".
+        // 时长 (duration) is read shícháng; the default reading of 长 is zhǎng, so
+        // generating all readings is required to match "shichang".
         let variants = variants("时长").unwrap();
         assert!(variants.contains(&"shichang".to_owned()));
         assert!(variants.contains(&"shizhang".to_owned()));

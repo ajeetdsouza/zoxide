@@ -436,7 +436,9 @@ Environment variables[^2] can be used for configuration. They must be set before
   - When set to 0, disables pinyin matching, which allows ASCII keywords to
     match Chinese directory names by their pinyin transliteration (e.g.
     `z shichang` matches both `市场` and `时长`).
-  - Enabled by default; no effect unless the path contains Chinese characters.
+  - Enabled by default; no effect unless the path contains Chinese
+    characters. Pinyin matching only applies when every keyword consists
+    entirely of ASCII letters.
 - `_ZO_RESOLVE_SYMLINKS`
   - When set to 1, `z` will resolve symlinks before adding directories to the
     database.

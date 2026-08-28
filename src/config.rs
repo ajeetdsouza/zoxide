@@ -67,3 +67,33 @@ pub fn pinyin() -> bool {
 pub fn resolve_symlinks() -> bool {
     env::var_os("_ZO_RESOLVE_SYMLINKS").is_some_and(|var| var == "1")
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::env;
+
+    #[test]
+    fn pinyin_env() {
+        // Safe: `_ZO_PINYIN` is not read anywhere else in the test binary, and
+        // the variable is restored at the end.
+        unsafe {
+            env::remove_var("_ZO_PINYIN");
+        }
+        assert!(pinyin());
+
+        unsafe {
+            env::set_var("_ZO_PINYIN", "0");
+        }
+        assert!(!pinyin());
+
+        unsafe {
+            env::set_var("_ZO_PINYIN", "1");
+        }
+        assert!(pinyin());
+
+        unsafe {
+            env::remove_var("_ZO_PINYIN");
+        }
+    }
+}

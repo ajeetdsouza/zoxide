@@ -436,6 +436,18 @@ Environment variables[^2] can be used for configuration. They must be set before
   - When set to 1, `z` will resolve symlinks before adding directories to the
     database.
 
+### Build features
+
+The following optional Cargo features extend keyword matching to non-ASCII
+directory names. They are disabled by default to keep the binary lean; enable
+them when building from source:
+
+- `pinyin`
+  - Allows ASCII keywords to match Chinese directory names by their pinyin
+    transliteration (e.g. `z shichang` matches both `市场` and `时长`). Only
+    applies when every keyword consists entirely of ASCII letters.
+  - Build with `cargo install zoxide --locked --features pinyin`.
+
 ## Third-party integrations
 
 | Application           | Description                                  | Plugin                                  |

@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Pinyin matching (optional `pinyin` Cargo feature): when enabled, ASCII
+  keywords match Chinese directory names by their pinyin transliteration
+  (e.g. `z shichang` matches `市场` and `时长`). Build with
+  `--features pinyin`.
+
 ### Fixed
 
 - Bash/Zsh: fix `z` failing on Cygwin/MSYS2 due to `cygpath` being passed a bad string.

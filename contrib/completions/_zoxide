@@ -94,6 +94,50 @@ _arguments "${_arguments_options[@]}" : \
     ;;
 esac
 ;;
+(export)
+_arguments "${_arguments_options[@]}" : \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+":: :_zoxide__subcmd__export_commands" \
+"*::: :->export" \
+&& ret=0
+
+    case $state in
+    (export)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:zoxide-export-command-$line[1]:"
+        case $line[1] in
+            (csv)
+_arguments "${_arguments_options[@]}" : \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+(json)
+_arguments "${_arguments_options[@]}" : \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+(text)
+_arguments "${_arguments_options[@]}" : \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
 (import)
 _arguments "${_arguments_options[@]}" : \
 '--merge[Merge into existing database]' \
@@ -219,6 +263,7 @@ _zoxide_commands() {
     local commands; commands=(
 'add:Add a new directory or increment its rank' \
 'edit:Edit the database' \
+'export:Export entries from the database' \
 'import:Import entries from another application' \
 'init:Generate shell configuration' \
 'query:Search for a directory in the database' \
@@ -260,6 +305,30 @@ _zoxide__subcmd__edit__subcmd__increment_commands() {
 _zoxide__subcmd__edit__subcmd__reload_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide edit reload commands' commands "$@"
+}
+(( $+functions[_zoxide__subcmd__export_commands] )) ||
+_zoxide__subcmd__export_commands() {
+    local commands; commands=(
+'csv:' \
+'json:' \
+'text:' \
+    )
+    _describe -t commands 'zoxide export commands' commands "$@"
+}
+(( $+functions[_zoxide__subcmd__export__subcmd__csv_commands] )) ||
+_zoxide__subcmd__export__subcmd__csv_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide export csv commands' commands "$@"
+}
+(( $+functions[_zoxide__subcmd__export__subcmd__json_commands] )) ||
+_zoxide__subcmd__export__subcmd__json_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide export json commands' commands "$@"
+}
+(( $+functions[_zoxide__subcmd__export__subcmd__text_commands] )) ||
+_zoxide__subcmd__export__subcmd__text_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide export text commands' commands "$@"
 }
 (( $+functions[_zoxide__subcmd__import_commands] )) ||
 _zoxide__subcmd__import_commands() {

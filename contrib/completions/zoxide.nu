@@ -43,6 +43,27 @@ module completions {
     --version(-V)             # Print version
   ]
 
+  # Export entries from the database
+  export extern "zoxide export" [
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+  ]
+
+  export extern "zoxide export csv" [
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+  ]
+
+  export extern "zoxide export json" [
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+  ]
+
+  export extern "zoxide export text" [
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+  ]
+
   # Import entries from another application
   export extern "zoxide import" [
     --merge                   # Merge into existing database

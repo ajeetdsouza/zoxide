@@ -1,9 +1,10 @@
 use std::borrow::Cow;
 use std::fmt::{self, Display, Formatter};
+use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
-use crate::util::{DAY, HOUR, WEEK};
+use crate::util::{DAY, HOUR, WEEK, to_lowercase};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Dir<'a> {
@@ -30,6 +31,11 @@ impl Dir<'_> {
         } else {
             self.rank * 0.25
         }
+    }
+
+    pub fn is_exact_match(&self, keyword: &str) -> bool {
+        let last = Path::new(self.path.as_ref()).file_name().and_then(|s| s.to_str()).unwrap_or("");
+        to_lowercase(last) == keyword
     }
 }
 

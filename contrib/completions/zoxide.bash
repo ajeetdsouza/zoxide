@@ -34,6 +34,9 @@ _zoxide() {
             zoxide,remove)
                 cmd="zoxide__subcmd__remove"
                 ;;
+            zoxide,rename)
+                cmd="zoxide__subcmd__rename"
+                ;;
             zoxide__subcmd__edit,decrement)
                 cmd="zoxide__subcmd__edit__subcmd__decrement"
                 ;;
@@ -71,7 +74,7 @@ _zoxide() {
 
     case "${cmd}" in
         zoxide)
-            opts="-h -V --help --version add edit import init query remove"
+            opts="-h -V --help --version add edit import init query remove rename"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -331,6 +334,34 @@ _zoxide() {
                 return 0
             fi
             case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__subcmd__rename)
+            opts="-f -h -V --old-name --new-name --force --help --version"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                --old-name)
+                    COMPREPLY=()
+                    if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
+                        compopt -o plusdirs
+                    fi
+                    return 0
+                    ;;
+                --new-name)
+                    COMPREPLY=()
+                    if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
+                        compopt -o plusdirs
+                    fi
+                    return 0
+                    ;;
                 *)
                     COMPREPLY=()
                     ;;

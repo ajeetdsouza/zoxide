@@ -35,7 +35,8 @@ impl Query {
             match stream.next() {
                 Some(dir) if Some(dir.path.as_ref()) == self.exclude.as_deref() => continue,
                 Some(dir) => {
-                    if let Some(selection) = fzf.write(dir, now)? {
+                    // Always enable aliases for interactive queries
+                    if let Some(selection) = fzf.write(dir, now, true)? {
                         break selection;
                     }
                 }
@@ -45,8 +46,16 @@ impl Query {
 
         if self.score {
             print!("{selection}");
-        } else {
+        } else if self.aliases {
             let path = selection.get(7..).context("could not read selection from fzf")?;
+            print!("{path}");
+        } else {
+            let path = selection
+                .get(7..)
+                .map(|path| {
+                    path.get(path.find('\t').map(|idx| idx + 1).unwrap_or(0)..).unwrap_or(path)
+                })
+                .context("could not read selection from fzf")?;
             print!("{path}");
         }
         Ok(())
@@ -59,6 +68,7 @@ impl Query {
                 continue;
             }
             let dir = if self.score { dir.display().with_score(now) } else { dir.display() };
+            let dir = if self.aliases { dir.with_aliases(self.aliases) } else { dir };
             writeln!(handle, "{dir}").pipe_exit("stdout")?;
         }
         Ok(())
@@ -73,6 +83,7 @@ impl Query {
         }
 
         let dir = if self.score { dir.display().with_score(now) } else { dir.display() };
+        let dir = if self.aliases { dir.with_aliases(self.aliases) } else { dir };
         writeln!(handle, "{dir}").pipe_exit("stdout")
     }
 

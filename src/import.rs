@@ -18,7 +18,7 @@ use std::path::PathBuf;
 use anyhow::Result;
 
 use crate::config;
-use crate::db::{Database, Dir};
+use crate::db::{Database, DirV4};
 
 pub(crate) trait Importer {
     /// Yields directory entries to be imported.
@@ -26,7 +26,7 @@ pub(crate) trait Importer {
     /// The outer `Result` reports failure to fetch the input (e.g. missing
     /// file, subprocess errored). The per-item `Result` reports a malformed
     /// row, which doesn't necessarily abort the whole import.
-    fn dirs(&self) -> Result<impl Iterator<Item = Result<Dir<'static>, ImportError>>>;
+    fn dirs(&self) -> Result<impl Iterator<Item = Result<DirV4<'static>, ImportError>>>;
 }
 
 /// A single record that failed to import.

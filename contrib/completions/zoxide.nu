@@ -14,6 +14,14 @@ module completions {
     ...paths: path
   ]
 
+  # Add aliases for a directory
+  export extern "zoxide add-alias" [
+    --path(-p): path          # Path to add aliases to
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+    ...aliases: string
+  ]
+
   # Edit the database
   export extern "zoxide edit" [
     --help(-h)                # Print help
@@ -116,6 +124,7 @@ module completions {
     --interactive(-i)         # Use interactive selection
     --list(-l)                # List all matching directories
     --score(-s)               # Print score with results
+    --aliases                 # Print aliases with results
     --exclude: path           # Exclude the current directory
     --base-dir: path          # Only search within this directory
     --help(-h)                # Print help
@@ -128,6 +137,14 @@ module completions {
     --help(-h)                # Print help
     --version(-V)             # Print version
     ...paths: path
+  ]
+
+  # Remove aliases from a directory
+  export extern "zoxide remove-alias" [
+    --path(-p): path          # Path to remove aliases from
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+    ...aliases: string
   ]
 
 }

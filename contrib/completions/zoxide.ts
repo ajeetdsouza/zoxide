@@ -31,6 +31,33 @@ const completion: Fig.Spec = {
       },
     },
     {
+      name: "add-alias",
+      description: "Add aliases for a directory",
+      options: [
+        {
+          name: ["-p", "--path"],
+          description: "Path to add aliases to",
+          isRepeatable: true,
+          args: {
+            name: "path",
+            template: "folders",
+          },
+        },
+        {
+          name: ["-h", "--help"],
+          description: "Print help",
+        },
+        {
+          name: ["-V", "--version"],
+          description: "Print version",
+        },
+      ],
+      args: {
+        name: "aliases",
+        isVariadic: true,
+      },
+    },
+    {
       name: "edit",
       description: "Edit the database",
       subcommands: [
@@ -343,6 +370,10 @@ const completion: Fig.Spec = {
           description: "Print score with results",
         },
         {
+          name: "--aliases",
+          description: "Print aliases with results",
+        },
+        {
           name: ["-h", "--help"],
           description: "Print help",
         },
@@ -375,6 +406,33 @@ const completion: Fig.Spec = {
         isVariadic: true,
         isOptional: true,
         template: "folders",
+      },
+    },
+    {
+      name: "remove-alias",
+      description: "Remove aliases from a directory",
+      options: [
+        {
+          name: ["-p", "--path"],
+          description: "Path to remove aliases from",
+          isRepeatable: true,
+          args: {
+            name: "path",
+            template: "folders",
+          },
+        },
+        {
+          name: ["-h", "--help"],
+          description: "Print help",
+        },
+        {
+          name: ["-V", "--version"],
+          description: "Print version",
+        },
+      ],
+      args: {
+        name: "aliases",
+        isVariadic: true,
       },
     },
   ],

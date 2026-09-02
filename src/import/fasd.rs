@@ -5,14 +5,14 @@ use std::path::PathBuf;
 
 use anyhow::{Context, Result};
 
-use crate::db::Dir;
+use crate::db::DirV4;
 use crate::import::{ImportError, Importer, z};
 
 #[derive(clap::Args, Clone, Debug)]
 pub(crate) struct Fasd {}
 
 impl Importer for Fasd {
-    fn dirs(&self) -> Result<impl Iterator<Item = Result<Dir<'static>, ImportError>>> {
+    fn dirs(&self) -> Result<impl Iterator<Item = Result<DirV4<'static>, ImportError>>> {
         let path = data_path()?;
         let file = File::open(&path).with_context(|| format!("could not read {path:?}"))?;
         let reader = BufReader::new(file);

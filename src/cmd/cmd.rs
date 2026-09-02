@@ -42,11 +42,13 @@ https://github.com/ajeetdsouza/zoxide
 )]
 pub enum Cmd {
     Add(Add),
+    AddAlias(AddAlias),
     Edit(Edit),
     Import(Import),
     Init(Init),
     Query(Query),
     Remove(Remove),
+    RemoveAlias(RemoveAlias),
 }
 
 /// Add a new directory or increment its rank
@@ -63,6 +65,21 @@ pub struct Add {
     /// doesn't
     #[clap(short, long)]
     pub score: Option<f64>,
+}
+
+/// Add aliases for a directory
+#[derive(Debug, Parser)]
+#[clap(
+    author,
+    help_template = HelpTemplate,
+)]
+pub struct AddAlias {
+    #[clap(num_args = 1.., required = true)]
+    pub aliases: Vec<String>,
+
+    /// Path to add aliases to
+    #[clap(short, long, required = true, value_hint = ValueHint::DirPath)]
+    pub path: PathBuf,
 }
 
 /// Edit the database
@@ -190,6 +207,10 @@ pub struct Query {
     #[clap(long, short)]
     pub score: bool,
 
+    /// Print aliases with results
+    #[clap(long)]
+    pub aliases: bool,
+
     /// Exclude the current directory
     #[clap(long, value_hint = ValueHint::DirPath, value_name = "path")]
     pub exclude: Option<String>,
@@ -208,4 +229,19 @@ pub struct Query {
 pub struct Remove {
     #[clap(value_hint = ValueHint::DirPath)]
     pub paths: Vec<String>,
+}
+
+/// Remove aliases from a directory
+#[derive(Debug, Parser)]
+#[clap(
+    author,
+    help_template = HelpTemplate,
+)]
+pub struct RemoveAlias {
+    #[clap(num_args = 1.., required = true)]
+    pub aliases: Vec<String>,
+
+    /// Path to remove aliases from
+    #[clap(short, long, required = true, value_hint = ValueHint::DirPath)]
+    pub path: String,
 }

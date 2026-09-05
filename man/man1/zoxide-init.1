@@ -94,6 +94,11 @@ Changes the prefix of the \fBz\fR and \fBzi\fR commands.
 \fB--cmd cd\fR would replace the \fBcd\fR command (doesn't work on Nushell /
 POSIX shells).
 .TP
+.B --db-only
+Searches only the database instead of trying existing directories first.
+No-argument navigation, shell history shortcuts, and explicit \fBz -- path\fR
+navigation (where supported) are unchanged.
+.TP
 .B -h, --help
 Print help information.
 .TP

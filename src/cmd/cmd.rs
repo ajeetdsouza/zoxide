@@ -139,6 +139,10 @@ pub struct Init {
     #[clap(long, default_value = "z")]
     pub cmd: String,
 
+    /// Searches only the database instead of trying existing directories first
+    #[clap(long)]
+    pub db_only: bool,
+
     /// Changes how often zoxide increments a directory's score
     #[clap(value_enum, long, default_value = "pwd")]
     pub hook: InitHook,

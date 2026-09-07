@@ -32,6 +32,7 @@ struct Iter {
     reader: BufReader<ChildStdout>,
     buf: Vec<u8>,
     line_num: usize,
+    done: bool,
 
     child: Child,
     prev_cwd: Option<String>,
@@ -39,7 +40,7 @@ struct Iter {
 
 impl Iter {
     fn new(reader: BufReader<ChildStdout>, child: Child) -> Self {
-        Self { reader, buf: Vec::new(), line_num: 0, child, prev_cwd: None }
+        Self { reader, buf: Vec::new(), line_num: 0, done: false, child, prev_cwd: None }
     }
 
     fn err(&self, source: anyhow::Error) -> ImportError {
@@ -73,12 +74,19 @@ impl Iterator for Iter {
     type Item = Result<Dir<'static>, ImportError>;
 
     fn next(&mut self) -> Option<Self::Item> {
+        if self.done {
+            return None;
+        }
+
         loop {
             self.buf.clear();
             self.line_num += 1;
 
             match self.reader.read_until(b'\0', &mut self.buf) {
-                Ok(0) => return None,
+                Ok(0) => {
+                    self.done = true;
+                    return None;
+                }
                 Ok(_) => {
                     if self.buf.last() == Some(&b'\0') {
                         self.buf.pop();
@@ -101,6 +109,7 @@ impl Iterator for Iter {
                     }
                 }
                 Err(e) => {
+                    self.done = true;
                     return Some(Err(self.err(anyhow!(e).context("could not read from atuin"))));
                 }
             }

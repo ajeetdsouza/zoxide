@@ -121,7 +121,43 @@ impl Database {
     pub fn age(&mut self, max_age: Rank) {
         let mut dirty = false;
         self.with_dirs_mut(|dirs| {
-            let total_age = dirs.iter().map(|dir| dir.rank).sum::<Rank>();
+            let mut total_age = dirs.iter().map(|dir| dir.rank).sum::<Rank>();
+
+            // The total can be non-finite even when every individual rank is
+            // finite: `f64` addition saturates, so enough large ranks overflow
+            // the sum to ±inf, and a single NaN or infinite rank poisons it
+            // outright. A factor derived from such a total would scale every
+            // entry to zero (+inf) or never trigger the comparison below at
+            // all (NaN), erasing the database or freezing its ageing. Recover
+            // by dropping the offending entries: non-finite ranks, then ranks
+            // whose magnitude exceeds `max_age` — no single entry can
+            // legitimately outweigh the budget of the whole database, and
+            // keeping such an outlier would still scale every normal entry
+            // away once the total is finite again.
+            if !total_age.is_finite() {
+                dirs.retain(|dir| dir.rank.is_finite() && dir.rank.abs() <= max_age);
+                total_age = dirs.iter().map(|dir| dir.rank).sum::<Rank>();
+                // Defensive: with every |rank| <= max_age an overflowing total
+                // needs an implausible number of entries, but a huge `max_age`
+                // setting could still get there.
+                while total_age.is_infinite() {
+                    let mut idx = 0;
+                    let mut outlier =
+                        if total_age > 0.0 { Rank::NEG_INFINITY } else { Rank::INFINITY };
+                    for (i, dir) in dirs.iter().enumerate() {
+                        if (total_age > 0.0 && dir.rank > outlier)
+                            || (total_age < 0.0 && dir.rank < outlier)
+                        {
+                            idx = i;
+                            outlier = dir.rank;
+                        }
+                    }
+                    dirs.swap_remove(idx);
+                    total_age = dirs.iter().map(|dir| dir.rank).sum::<Rank>();
+                }
+                dirty = true;
+            }
+
             if total_age > max_age {
                 let factor = 0.9 * max_age / total_age;
                 for idx in (0..dirs.len()).rev() {
@@ -284,5 +320,68 @@ mod tests {
             assert!(!db.remove(path));
             db.save().unwrap();
         }
+    }
+
+    #[test]
+    fn age_survives_overflowing_finite_ranks() {
+        let data_dir = tempfile::tempdir().unwrap();
+        let now = 946684800;
+
+        // Each rank is finite, but their sum saturates to +inf, which used to
+        // scale every entry (including /keep) down to zero and drop it.
+        let mut db = Database::open_dir(data_dir.path()).unwrap();
+        db.add_unchecked("/a", 1.0e308, now);
+        db.add_unchecked("/keep", 500.0, now);
+        db.add_unchecked("/b", 1.0e308, now);
+        db.age(10000.0);
+
+        let dirs = db.dirs();
+        assert_eq!(dirs.len(), 1);
+        assert_eq!(dirs[0].path, "/keep");
+        assert!((dirs[0].rank - 500.0).abs() < 0.01);
+    }
+
+    #[test]
+    fn age_survives_negative_overflow() {
+        let data_dir = tempfile::tempdir().unwrap();
+        let now = 946684800;
+
+        // A total of -inf never exceeds max_age, which used to freeze ageing
+        // for the rest of the database's life.
+        let mut db = Database::open_dir(data_dir.path()).unwrap();
+        db.add_unchecked("/a", -1.0e308, now);
+        db.add_unchecked("/keep", 500.0, now);
+        db.add_unchecked("/b", -1.0e308, now);
+        db.age(10000.0);
+
+        let dirs = db.dirs();
+        assert_eq!(dirs.len(), 1);
+        assert_eq!(dirs[0].path, "/keep");
+        assert!((dirs[0].rank - 500.0).abs() < 0.01);
+    }
+
+    #[test]
+    fn age_recovers_from_mixed_poison() {
+        let data_dir = tempfile::tempdir().unwrap();
+        let now = 946684800;
+
+        let mut db = Database::open_dir(data_dir.path()).unwrap();
+        db.add_unchecked("/nan", f64::NAN, now);
+        db.add_unchecked("/inf", f64::INFINITY, now);
+        db.add_unchecked("/big1", 1.0e308, now);
+        db.add_unchecked("/keep", 500.0, now);
+        db.add_unchecked("/big2", 1.0e308, now);
+        db.age(10000.0);
+
+        // /keep is the only entry left once the poison and the overflow are
+        // cleaned up, and the database can age normally afterwards.
+        let dirs = db.dirs();
+        assert_eq!(dirs.len(), 1);
+        assert_eq!(dirs[0].path, "/keep");
+        assert!((dirs[0].rank - 500.0).abs() < 0.01);
+
+        db.add_unchecked("/other", 1.0, now);
+        db.age(10000.0);
+        assert_eq!(db.dirs().len(), 2);
     }
 }

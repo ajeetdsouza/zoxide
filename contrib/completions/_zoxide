@@ -94,6 +94,74 @@ _arguments "${_arguments_options[@]}" : \
     ;;
 esac
 ;;
+(env)
+_arguments "${_arguments_options[@]}" : \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+":: :_zoxide__subcmd__env_commands" \
+"*::: :->env" \
+&& ret=0
+
+    case $state in
+    (env)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:zoxide-env-command-$line[1]:"
+        case $line[1] in
+            (_ZO_DATA_DIR)
+_arguments "${_arguments_options[@]}" : \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+(_ZO_ECHO)
+_arguments "${_arguments_options[@]}" : \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+(_ZO_EXCLUDE_DIRS)
+_arguments "${_arguments_options[@]}" : \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+(_ZO_FZF_OPTS)
+_arguments "${_arguments_options[@]}" : \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+(_ZO_MAXAGE)
+_arguments "${_arguments_options[@]}" : \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+(_ZO_RESOLVE_SYMLINKS)
+_arguments "${_arguments_options[@]}" : \
+'-h[Print help]' \
+'--help[Print help]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
 (import)
 _arguments "${_arguments_options[@]}" : \
 '--merge[Merge into existing database]' \
@@ -219,6 +287,7 @@ _zoxide_commands() {
     local commands; commands=(
 'add:Add a new directory or increment its rank' \
 'edit:Edit the database' \
+'env:Display environment variables' \
 'import:Import entries from another application' \
 'init:Generate shell configuration' \
 'query:Search for a directory in the database' \
@@ -260,6 +329,48 @@ _zoxide__subcmd__edit__subcmd__increment_commands() {
 _zoxide__subcmd__edit__subcmd__reload_commands() {
     local commands; commands=()
     _describe -t commands 'zoxide edit reload commands' commands "$@"
+}
+(( $+functions[_zoxide__subcmd__env_commands] )) ||
+_zoxide__subcmd__env_commands() {
+    local commands; commands=(
+'_ZO_DATA_DIR:Data directory' \
+'_ZO_ECHO:Echo the matched directory before navigating to it' \
+'_ZO_EXCLUDE_DIRS:Directories to exclude when jumping' \
+'_ZO_FZF_OPTS:Custom options for fzf' \
+'_ZO_MAXAGE:Maximum total age of entries' \
+'_ZO_RESOLVE_SYMLINKS:Resolve symlinks before storing paths' \
+    )
+    _describe -t commands 'zoxide env commands' commands "$@"
+}
+(( $+functions[_zoxide__subcmd__env__subcmd___ZO_DATA_DIR_commands] )) ||
+_zoxide__subcmd__env__subcmd___ZO_DATA_DIR_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide env _ZO_DATA_DIR commands' commands "$@"
+}
+(( $+functions[_zoxide__subcmd__env__subcmd___ZO_ECHO_commands] )) ||
+_zoxide__subcmd__env__subcmd___ZO_ECHO_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide env _ZO_ECHO commands' commands "$@"
+}
+(( $+functions[_zoxide__subcmd__env__subcmd___ZO_EXCLUDE_DIRS_commands] )) ||
+_zoxide__subcmd__env__subcmd___ZO_EXCLUDE_DIRS_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide env _ZO_EXCLUDE_DIRS commands' commands "$@"
+}
+(( $+functions[_zoxide__subcmd__env__subcmd___ZO_FZF_OPTS_commands] )) ||
+_zoxide__subcmd__env__subcmd___ZO_FZF_OPTS_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide env _ZO_FZF_OPTS commands' commands "$@"
+}
+(( $+functions[_zoxide__subcmd__env__subcmd___ZO_MAXAGE_commands] )) ||
+_zoxide__subcmd__env__subcmd___ZO_MAXAGE_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide env _ZO_MAXAGE commands' commands "$@"
+}
+(( $+functions[_zoxide__subcmd__env__subcmd___ZO_RESOLVE_SYMLINKS_commands] )) ||
+_zoxide__subcmd__env__subcmd___ZO_RESOLVE_SYMLINKS_commands() {
+    local commands; commands=()
+    _describe -t commands 'zoxide env _ZO_RESOLVE_SYMLINKS commands' commands "$@"
 }
 (( $+functions[_zoxide__subcmd__import_commands] )) ||
 _zoxide__subcmd__import_commands() {

@@ -112,6 +112,106 @@ const completion: Fig.Spec = {
       ],
     },
     {
+      name: "env",
+      description: "Display environment variables",
+      subcommands: [
+        {
+          name: "_ZO_DATA_DIR",
+          description: "Data directory",
+          options: [
+            {
+              name: ["-h", "--help"],
+              description: "Print help",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version",
+            },
+          ],
+        },
+        {
+          name: "_ZO_ECHO",
+          description: "Echo the matched directory before navigating to it",
+          options: [
+            {
+              name: ["-h", "--help"],
+              description: "Print help",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version",
+            },
+          ],
+        },
+        {
+          name: "_ZO_EXCLUDE_DIRS",
+          description: "Directories to exclude when jumping",
+          options: [
+            {
+              name: ["-h", "--help"],
+              description: "Print help",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version",
+            },
+          ],
+        },
+        {
+          name: "_ZO_FZF_OPTS",
+          description: "Custom options for fzf",
+          options: [
+            {
+              name: ["-h", "--help"],
+              description: "Print help",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version",
+            },
+          ],
+        },
+        {
+          name: "_ZO_MAXAGE",
+          description: "Maximum total age of entries",
+          options: [
+            {
+              name: ["-h", "--help"],
+              description: "Print help",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version",
+            },
+          ],
+        },
+        {
+          name: "_ZO_RESOLVE_SYMLINKS",
+          description: "Resolve symlinks before storing paths",
+          options: [
+            {
+              name: ["-h", "--help"],
+              description: "Print help",
+            },
+            {
+              name: ["-V", "--version"],
+              description: "Print version",
+            },
+          ],
+        },
+      ],
+      options: [
+        {
+          name: ["-h", "--help"],
+          description: "Print help",
+        },
+        {
+          name: ["-V", "--version"],
+          description: "Print version",
+        },
+      ],
+    },
+    {
       name: "import",
       description: "Import entries from another application",
       subcommands: [

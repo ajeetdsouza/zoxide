@@ -22,6 +22,9 @@ _zoxide() {
             zoxide,edit)
                 cmd="zoxide__subcmd__edit"
                 ;;
+            zoxide,env)
+                cmd="zoxide__subcmd__env"
+                ;;
             zoxide,import)
                 cmd="zoxide__subcmd__import"
                 ;;
@@ -45,6 +48,24 @@ _zoxide() {
                 ;;
             zoxide__subcmd__edit,reload)
                 cmd="zoxide__subcmd__edit__subcmd__reload"
+                ;;
+            zoxide__subcmd__env,_ZO_DATA_DIR)
+                cmd="zoxide__subcmd__env__subcmd___ZO_DATA_DIR"
+                ;;
+            zoxide__subcmd__env,_ZO_ECHO)
+                cmd="zoxide__subcmd__env__subcmd___ZO_ECHO"
+                ;;
+            zoxide__subcmd__env,_ZO_EXCLUDE_DIRS)
+                cmd="zoxide__subcmd__env__subcmd___ZO_EXCLUDE_DIRS"
+                ;;
+            zoxide__subcmd__env,_ZO_FZF_OPTS)
+                cmd="zoxide__subcmd__env__subcmd___ZO_FZF_OPTS"
+                ;;
+            zoxide__subcmd__env,_ZO_MAXAGE)
+                cmd="zoxide__subcmd__env__subcmd___ZO_MAXAGE"
+                ;;
+            zoxide__subcmd__env,_ZO_RESOLVE_SYMLINKS)
+                cmd="zoxide__subcmd__env__subcmd___ZO_RESOLVE_SYMLINKS"
                 ;;
             zoxide__subcmd__import,atuin)
                 cmd="zoxide__subcmd__import__subcmd__atuin"
@@ -71,7 +92,7 @@ _zoxide() {
 
     case "${cmd}" in
         zoxide)
-            opts="-h -V --help --version add edit import init query remove"
+            opts="-h -V --help --version add edit env import init query remove"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
@@ -163,6 +184,104 @@ _zoxide() {
             return 0
             ;;
         zoxide__subcmd__edit__subcmd__reload)
+            opts="-h -V --help --version"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__subcmd__env)
+            opts="-h -V --help --version _ZO_DATA_DIR _ZO_ECHO _ZO_EXCLUDE_DIRS _ZO_FZF_OPTS _ZO_MAXAGE _ZO_RESOLVE_SYMLINKS"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__subcmd__env__subcmd___ZO_DATA_DIR)
+            opts="-h -V --help --version"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__subcmd__env__subcmd___ZO_ECHO)
+            opts="-h -V --help --version"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__subcmd__env__subcmd___ZO_EXCLUDE_DIRS)
+            opts="-h -V --help --version"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__subcmd__env__subcmd___ZO_FZF_OPTS)
+            opts="-h -V --help --version"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__subcmd__env__subcmd___ZO_MAXAGE)
+            opts="-h -V --help --version"
+            if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
+                COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+                return 0
+            fi
+            case "${prev}" in
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+            return 0
+            ;;
+        zoxide__subcmd__env__subcmd___ZO_RESOLVE_SYMLINKS)
             opts="-h -V --help --version"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 3 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )

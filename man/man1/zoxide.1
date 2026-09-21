@@ -99,6 +99,11 @@ the database. By default, this is set to 10000.
 .B _ZO_RESOLVE_SYMLINKS
 When set to 1, \fBz\fR will resolve symlinks before adding directories to
 the database.
+.TP
+.B _ZO_DISABLE_EXISTENCE_CHECK
+When set to 1, \fBz\fR will not filter the list for the existing files.
+This improves the performance when the files on the list are on a slow drive,
+such as a network drive.
 .SH ALGORITHM
 .TP
 .B AGING

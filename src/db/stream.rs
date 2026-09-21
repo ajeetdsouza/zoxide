@@ -5,6 +5,7 @@ use std::{fs, path};
 
 use glob::Pattern;
 
+use crate::config;
 use crate::db::{Database, Dir, Epoch};
 use crate::util::{self, MONTH};
 
@@ -65,7 +66,7 @@ impl<'a> Stream<'a> {
     }
 
     fn filter_by_exists(&self, path: &str) -> bool {
-        if !self.options.exists {
+        if !self.options.exists || config::disable_existence_filter() {
             return true;
         }
 

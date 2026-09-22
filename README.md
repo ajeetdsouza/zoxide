@@ -497,7 +497,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 [felix]: https://github.com/kyoheiu/felix
 [freshports]: https://www.freshports.org/sysutils/zoxide/
 [fzf-installation]: https://github.com/junegunn/fzf#installation
-[fzf-man]: https://manpages.ubuntu.com/manpages/en/man1/fzf.1.html
+[fzf-man]: https://manpages.ubuntu.com/manpages/noble/en/man1/fzf.1.html
 [fzf]: https://github.com/junegunn/fzf
 [gentoo packages]: https://packages.gentoo.org/packages/app-shells/zoxide
 [glob]: https://man7.org/linux/man-pages/man7/glob.7.html

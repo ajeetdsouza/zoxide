@@ -5,6 +5,21 @@ use serde::{Deserialize, Serialize};
 
 use crate::util::{DAY, HOUR, WEEK};
 
+fn path_with_tilde(path: &str) -> Cow<'_, str> {
+    if let Some(home) = dirs::home_dir() {
+        if let Some(home_str) = home.to_str() {
+            if let Some(suffix) = path.strip_prefix(home_str) {
+                if suffix.is_empty() {
+                    return Cow::Borrowed("~");
+                } else if suffix.starts_with('/') || suffix.starts_with('\\') {
+                    return Cow::Owned(format!("~{}", suffix));
+                }
+            }
+        }
+    }
+    Cow::Borrowed(path)
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Dir<'a> {
     #[serde(borrow)]
@@ -61,7 +76,7 @@ impl Display for DirDisplay<'_> {
             let score = self.dir.score(now).clamp(0.0, 9999.0);
             write!(f, "{score:>6.1}{}", self.separator)?;
         }
-        write!(f, "{}", self.dir.path)
+        write!(f, "{}", path_with_tilde(&self.dir.path))
     }
 }
 

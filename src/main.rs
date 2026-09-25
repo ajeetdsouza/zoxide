@@ -5,6 +5,7 @@ mod config;
 mod db;
 mod error;
 mod import;
+mod path_resolver;
 mod shell;
 mod util;
 

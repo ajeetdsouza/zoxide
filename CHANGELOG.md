@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Nushell: `z` now supports Space-Tab completions.
 
+### Changed
+
+- Nushell: upgrade minimum supported version to v0.116.0.
+
 ### Fixed
 
 - Bash/Zsh: `z` failing on Cygwin/MSYS2 due to `cygpath` being passed a bad string.

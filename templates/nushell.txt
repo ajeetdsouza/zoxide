@@ -44,13 +44,14 @@ export-env {
 # Completion for __zoxide_z
 #
 
-def "nu-complete __zoxide_z" [context: string] {
-  let ast = ast --flatten $context | skip 1 # skip the command name
+@interactive
+def "nu-complete __zoxide_z" [buffer: string] {
+  let ast = ast --flatten $buffer | skip 1 # skip the command name
 
   # If the user has typed a space after the first argument, use the custom
-  # completer. If not,  use the built-in directory completion.
-  if ($ast | is-empty) { return null }
-  if $ast.0.span.end >= ($context | str length) { return null }
+  # completer. If not, use the built-in directory completion.
+  if ($ast | is-empty) { return { fallback: true } }
+  if $ast.0.span.end >= ($buffer | str length) { return { fallback: true } }
 
   ^zoxide query --exclude $env.PWD --interactive -- ...$ast.content
   | if $in starts-with $"($nu.home-dir)(char psep)" { str replace $nu.home-dir "~" } else {}
@@ -68,11 +69,11 @@ def "nu-complete __zoxide_z" [context: string] {
 # Jump to a directory using only keywords.
 export def --env --wrapped __zoxide_z [...rest: directory@"nu-complete __zoxide_z"] {
   match $rest {
-    [] => { cd ~ },
-    [ '-' ] => { cd - },
-    [ $arg ] if (try { cd $arg; true } catch { false }) => {},
+    [] => { %cd ~ },
+    [ '-' ] => { %cd - },
+    [ $arg ] if (try { %cd $arg; true } catch { false }) => {},
     _ => {
-      cd (^zoxide query --exclude $env.PWD -- ...$rest | str trim -r -c "\n")
+      %cd (^zoxide query --exclude $env.PWD -- ...$rest | str trim -r -c "\n")
     }
   }
 {%- if echo %}
@@ -82,7 +83,7 @@ export def --env --wrapped __zoxide_z [...rest: directory@"nu-complete __zoxide_
 
 # Jump to a directory using interactive search.
 export def --env --wrapped __zoxide_zi [...rest: string] {
-  cd $'(^zoxide query --interactive -- ...$rest | str trim -r -c "\n")'
+  %cd (^zoxide query --interactive -- ...$rest | str trim -r -c "\n")
 {%- if echo %}
   echo $env.PWD
 {%- endif %}
@@ -114,4 +115,4 @@ export alias {{cmd}}i = __zoxide_zi
 #
 #   source ~/.zoxide.nu
 #
-# Note: zoxide only supports Nushell v0.110.0+.
+# Note: zoxide only supports Nushell v0.116.0+.

@@ -101,8 +101,12 @@ function __zoxide_z_complete
         # If the last argument is empty, use interactive selection.
         set -l query $tokens[2..-1]
         set -l result (command zoxide query --exclude (__zoxide_pwd) --interactive -- $query 2>/dev/null)
-        and builtin commandline --replace -- "{{ cmd.unwrap_or("cd") }} "(string escape -- $result)
-        and builtin commandline --function repaint execute
+        if test $status -eq 0
+            builtin commandline --replace -- "{{ cmd.unwrap_or("cd") }} "(string escape -- $result)
+            builtin commandline --function repaint execute
+        else
+            builtin commandline --function repaint
+        end
     end
 end
 complete --command __zoxide_z --no-files --arguments '(__zoxide_z_complete)'

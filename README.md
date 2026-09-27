@@ -36,7 +36,15 @@
 
 <hr />
 
-# zoxide
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./contrib/logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="./contrib/logo-light.svg">
+    <img alt="zoxide logo" src="./contrib/logo-light.svg" height="128" width="128">
+  </picture>
+  <br />
+  zoxide
+</h1>
 
 [![crates.io][crates.io-badge]][crates.io]
 [![Downloads][downloads-badge]][releases]
@@ -430,30 +438,31 @@ Environment variables[^2] can be used for configuration. They must be set before
 
 ## Third-party integrations
 
-| Application           | Description                                  | Plugin                     |
-| --------------------- | -------------------------------------------- | -------------------------- |
-| [aerc]                | Email client                                 | Natively supported         |
-| [alfred]              | macOS launcher                               | [alfred-zoxide]            |
-| [clink]               | Improved cmd.exe for Windows                 | [clink-zoxide]             |
-| [emacs]               | Text editor                                  | [zoxide.el]                |
-| [felix]               | File manager                                 | Natively supported         |
-| [joshuto]             | File manager                                 | Natively supported         |
-| [lf]                  | File manager                                 | See the [wiki][lf-wiki]    |
-| [nnn]                 | File manager                                 | [nnn-autojump]             |
-| [ranger]              | File manager                                 | [ranger-zoxide]            |
-| [raycast]             | macOS launcher                               | [raycast-zoxide]           |
-| [rfm]                 | File manager                                 | Natively supported         |
-| [sesh]                | `tmux` session manager                       | Natively supported         |
-| [telescope.nvim]      | Fuzzy finder for Neovim                      | [telescope-zoxide]         |
-| [tmux-session-wizard] | `tmux` session manager                       | Natively supported         |
-| [tmux-sessionx]       | `tmux` session manager                       | Natively supported         |
-| [vim] / [neovim]      | Text editor                                  | [zoxide.vim]               |
-| [xplr]                | File manager                                 | [zoxide.xplr]              |
-| [xxh]                 | Transports shell configuration over SSH      | [xxh-plugin-prerun-zoxide] |
-| [yazi]                | File manager                                 | Natively supported         |
-| [zabb]                | Finds the shortest possible query for a path | Natively supported         |
-| [zesh]                | `zellij` session manager                     | Natively supported         |
-| [zsh-autocomplete]    | Realtime completions for zsh                 | Natively supported         |
+| Application           | Description                                  | Plugin                                  |
+| --------------------- | -------------------------------------------- | --------------------------------------- |
+| [aerc]                | Email client                                 | Natively supported                      |
+| [alfred]              | macOS launcher                               | [alfred-zoxide]                         |
+| [clink]               | Improved cmd.exe for Windows                 | [clink-zoxide]                          |
+| [emacs]               | Text editor                                  | [zoxide.el]                             |
+| [felix]               | File manager                                 | Natively supported                      |
+| [joshuto]             | File manager                                 | Natively supported                      |
+| [lf]                  | File manager                                 | See the [wiki][lf-wiki]                 |
+| [nnn]                 | File manager                                 | [nnn-autojump]                          |
+| [ranger]              | File manager                                 | [ranger-zoxide]                         |
+| [raycast]             | macOS launcher                               | [raycast-zoxide]                        |
+| [rfm]                 | File manager                                 | Natively supported                      |
+| [sesh]                | `tmux` session manager                       | Natively supported                      |
+| [superfile]           | File manager                                 | [Natively supported][superfile-plugins] |
+| [telescope.nvim]      | Fuzzy finder for Neovim                      | [telescope-zoxide]                      |
+| [tmux-session-wizard] | `tmux` session manager                       | Natively supported                      |
+| [tmux-sessionx]       | `tmux` session manager                       | Natively supported                      |
+| [vim] / [neovim]      | Text editor                                  | [zoxide.vim]                            |
+| [xplr]                | File manager                                 | [zoxide.xplr]                           |
+| [xxh]                 | Transports shell configuration over SSH      | [xxh-plugin-prerun-zoxide]              |
+| [yazi]                | File manager                                 | Natively supported                      |
+| [zabb]                | Finds the shortest possible query for a path | Natively supported                      |
+| [zesh]                | `zellij` session manager                     | Natively supported                      |
+| [zsh-autocomplete]    | Realtime completions for zsh                 | Natively supported                      |
 
 [^1]:
     Debian / Ubuntu derivatives update their packages very slowly. If you're
@@ -519,12 +528,14 @@ Environment variables[^2] can be used for configuration. They must be set before
 [slackbuilds]: https://slackbuilds.org/repository/15.0/system/zoxide/
 [slackbuilds-howto]: https://slackbuilds.org/howto/
 [solus packages]: https://github.com/getsolus/packages/tree/main/packages/z/zoxide/
+[superfile]: https://github.com/yorukot/superfile
+[superfile-plugins]: https://superfile.dev/list/plugin-list/
 [telescope-zoxide]: https://github.com/jvgrootveld/telescope-zoxide
 [telescope.nvim]: https://github.com/nvim-telescope/telescope.nvim
 [termux]: https://github.com/termux/termux-packages/tree/master/packages/zoxide
 [tmux-session-wizard]: https://github.com/27medkamal/tmux-session-wizard
 [tmux-sessionx]: https://github.com/omerxx/tmux-sessionx
-[tutorial]: contrib/tutorial.webp
+[tutorial]: contrib/tutorial.gif
 [ubuntu packages]: https://packages.ubuntu.com/jammy/zoxide
 [vim]: https://github.com/vim/vim
 [void linux packages]: https://github.com/void-linux/void-packages/tree/master/srcpkgs/zoxide

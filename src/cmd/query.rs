@@ -1,6 +1,7 @@
 use std::io::{self, Write};
+use std::path::Path;
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, bail};
 
 use crate::cmd::{Query, Run};
 use crate::config;
@@ -67,7 +68,10 @@ impl Query {
     fn query_first(&self, stream: &mut Stream, now: Epoch) -> Result<()> {
         let handle = &mut io::stdout();
 
-        let mut dir = stream.next().context("no match found")?;
+        let mut dir = match stream.next() {
+            Some(dir) => dir,
+            None => bail!("{}", no_match_error(&self.keywords)),
+        };
         while Some(dir.path.as_ref()) == self.exclude.as_deref() {
             dir = stream.next().context("you are already in the only match")?;
         }
@@ -117,5 +121,61 @@ impl Query {
             .enable_preview()
         }
         .spawn()
+    }
+}
+
+/// Error message when no database entry matched.
+///
+/// If the only keyword exists as a non-directory path, report that instead of
+/// "no match found", matching `cd` and `zoxide add`.
+fn no_match_error(keywords: &[String]) -> String {
+    if let [keyword] = keywords {
+        let path = Path::new(keyword);
+        if path.metadata().is_ok_and(|meta| !meta.is_dir()) {
+            return format!("not a directory: {keyword}");
+        }
+    }
+    "no match found".to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use super::no_match_error;
+
+    #[test]
+    fn no_match_error_for_missing_path() {
+        assert_eq!(
+            no_match_error(&["definitely-does-not-exist-zoxide-query-test".into()]),
+            "no match found"
+        );
+    }
+
+    #[test]
+    fn no_match_error_for_existing_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let file = dir.path().join("a-file");
+        fs::write(&file, b"").unwrap();
+        let keywords = [file.to_str().unwrap().to_string()];
+        assert_eq!(no_match_error(&keywords), format!("not a directory: {}", keywords[0]));
+    }
+
+    #[test]
+    fn no_match_error_for_existing_directory() {
+        let dir = tempfile::tempdir().unwrap();
+        let keyword = dir.path().to_str().unwrap().to_string();
+        // Directories that aren't in the database still produce "no match
+        // found".
+        assert_eq!(no_match_error(&[keyword]), "no match found");
+    }
+
+    #[test]
+    fn no_match_error_for_multiple_keywords() {
+        let dir = tempfile::tempdir().unwrap();
+        let file = dir.path().join("a-file");
+        fs::write(&file, b"").unwrap();
+        let keyword = file.to_str().unwrap().to_string();
+        assert_eq!(no_match_error(&[keyword, "other".into()]), "no match found");
     }
 }

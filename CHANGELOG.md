@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `query` now reports `not a directory` when the keyword is an existing file,
+  instead of `no match found`.
 - Bash/Zsh: fix `z` failing on Cygwin/MSYS2 due to `cygpath` being passed a bad string.
 - Nushell: `z` now handles relative paths through symlinked directories.
 

@@ -3,6 +3,7 @@ use std::fmt::{self, Display, Formatter};
 
 use serde::{Deserialize, Serialize};
 
+use crate::config;
 use crate::util::{DAY, HOUR, WEEK};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -52,6 +53,27 @@ impl<'a> DirDisplay<'a> {
     pub fn with_separator(mut self, separator: char) -> Self {
         self.separator = separator;
         self
+    }
+
+    pub fn shorten_home_dir(&self) -> String {
+        let prefix = config::get_home_dir();
+        let prefix = prefix.to_str().expect("cannot convert $HOME to &str");
+        let path = if prefix.is_empty() {
+            self.dir.path.to_string()
+        } else {
+            match self.dir.path.as_ref().strip_prefix(prefix) {
+                Some(path) => format!("~{path}"),
+                None => self.dir.path.to_string(),
+            }
+        };
+
+        match self.now {
+            Some(now) => {
+                let score = self.dir.score(now).clamp(0.0, 9999.0);
+                format!("{score:>6.1}{}{path}", self.separator)
+            }
+            None => path,
+        }
     }
 }
 

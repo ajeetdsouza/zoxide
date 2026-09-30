@@ -26,6 +26,7 @@ https://github.com/ajeetdsouza/zoxide
 {tab}<bold>_ZO_ECHO</bold>            {tab}Print the matched directory before navigating to it when set to 1
 {tab}<bold>_ZO_EXCLUDE_DIRS</bold>    {tab}List of directory globs to be excluded
 {tab}<bold>_ZO_FZF_OPTS</bold>        {tab}Custom flags to pass to fzf
+{tab}<bold>_ZO_FZF_EXTRA_OPTS</bold>  {tab}Custom flags added the the default fzf ones
 {tab}<bold>_ZO_MAXAGE</bold>          {tab}Maximum total age after which entries start getting deleted
 {tab}<bold>_ZO_RESOLVE_SYMLINKS</bold>{tab}Resolve symlinks when storing paths").into_resettable()
     }

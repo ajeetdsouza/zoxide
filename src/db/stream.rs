@@ -83,7 +83,7 @@ impl<'a> Stream<'a> {
             None => return true,
         };
 
-        let path = util::to_lowercase(path);
+        let path = util::normalize_separators(util::to_lowercase(path));
         let mut path = path.as_str();
         match path.rfind(keywords_last) {
             Some(idx) => {
@@ -149,7 +149,10 @@ impl StreamOptions {
         I: IntoIterator,
         I::Item: AsRef<str>,
     {
-        self.keywords = keywords.into_iter().map(util::to_lowercase).collect();
+        self.keywords = keywords
+            .into_iter()
+            .map(|keyword| util::normalize_separators(util::to_lowercase(keyword)))
+            .collect();
         self
     }
 
@@ -203,6 +206,22 @@ mod tests {
     #[case(&["/foo/", "/bar"], "/foo/bar", false)]
     #[case(&["/foo/", "/bar"], "/foo/baz/bar", true)]
     fn query(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
+        let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
+        let options = StreamOptions::new(0).with_keywords(keywords.iter());
+        let stream = Stream::new(db, options);
+        assert_eq!(is_match, stream.filter_by_keywords(path));
+    }
+
+    #[cfg(windows)]
+    #[rstest]
+    // Forward slashes in the query match backslashes in the database
+    #[case(&["bar/meow"], r"c:\users\alice\foo\bar\meow", true)]
+    #[case(&["foo/bar"], r"c:\users\alice\foo\bar\meow", false)]
+    // ...and vice versa
+    #[case(&[r"bar\meow"], "c:/users/alice/foo/bar/meow", true)]
+    // Mixed separators
+    #[case(&["foo/bar", r"\meow"], r"c:\users\alice\foo\bar\meow", true)]
+    fn query_separators(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
         let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
         let options = StreamOptions::new(0).with_keywords(keywords.iter());
         let stream = Stream::new(db, options);

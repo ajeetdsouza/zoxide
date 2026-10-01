@@ -207,6 +207,21 @@ mod tests {
     }
 
     #[apply(opts)]
+    fn posix_dash_doctor(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+        let mut source = Posix(&opts).render().unwrap();
+        // `__zoxide_z` and `__zoxide_zi` call this on every invocation, so it
+        // must be defined for every hook.
+        source.push_str("\n__zoxide_doctor\n");
+
+        let assert =
+            Command::new("dash").args(["-e", "-u", "-c", &source]).assert().success().stderr("");
+        if opts.hook != InitHook::Pwd {
+            assert.stdout("");
+        }
+    }
+
+    #[apply(opts)]
     fn posix_shellcheck(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };
         let source = Posix(&opts).render().unwrap();

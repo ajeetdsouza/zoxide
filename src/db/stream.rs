@@ -53,6 +53,30 @@ impl<'a> Stream<'a> {
         None
     }
 
+    fn match_acronym(&self, path: &str, keywords_last: &str, keywords: &[String]) -> bool {
+        let basename = match path.rsplit(path::is_separator).next() {
+            Some(name) => name,
+            None => return false,
+        };
+
+        let words: Vec<&str> = basename
+            .split(|c| ['-', '_', ' ', '.'].contains(&c))
+            .filter(|s| !s.is_empty())
+            .collect();
+
+        if words.len() < 2 {
+            return false;
+        }
+
+        let acronym: String = words.iter().filter_map(|word| word.chars().next()).collect();
+        let acronym_lower = util::to_lowercase(&acronym);
+
+        let user_input: String =
+            keywords.iter().map(String::as_str).chain(std::iter::once(keywords_last)).collect();
+
+        acronym_lower == util::to_lowercase(&user_input)
+    }
+
     fn filter_by_base_dir(&self, path: &str) -> bool {
         match &self.options.base_dir {
             Some(base_dir) => Path::new(path).starts_with(base_dir),
@@ -83,22 +107,26 @@ impl<'a> Stream<'a> {
             None => return true,
         };
 
-        let path = util::to_lowercase(path);
-        let mut path = path.as_str();
-        match path.rfind(keywords_last) {
-            Some(idx) => {
-                if path[idx + keywords_last.len()..].contains(path::is_separator) {
-                    return false;
-                }
-                path = &path[..idx];
+        let path_lower = util::to_lowercase(path);
+        let mut path_str = path_lower.as_str();
+
+        let mut matched = false;
+        if let Some(idx) = path_str.rfind(keywords_last) {
+            if path_str[idx + keywords_last.len()..].contains(path::is_separator) {
+                return false;
             }
-            None => return false,
+            path_str = &path_str[..idx];
+            matched = true;
+        }
+
+        if !matched {
+            return self.match_acronym(path, keywords_last, keywords);
         }
 
         for keyword in keywords.iter().rev() {
-            match path.rfind(keyword) {
-                Some(idx) => path = &path[..idx],
-                None => return false,
+            match path_str.rfind(keyword) {
+                Some(idx) => path_str = &path_str[..idx],
+                None => return self.match_acronym(path, keywords_last, keywords),
             }
         }
 
@@ -203,6 +231,42 @@ mod tests {
     #[case(&["/foo/", "/bar"], "/foo/bar", false)]
     #[case(&["/foo/", "/bar"], "/foo/baz/bar", true)]
     fn query(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
+        let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
+        let options = StreamOptions::new(0).with_keywords(keywords.iter());
+        let stream = Stream::new(db, options);
+        assert_eq!(is_match, stream.filter_by_keywords(path));
+    }
+
+    #[rstest]
+    #[case(&["hick"], "/home/bachman/Documents/hooli-interactive-computer-keyboard", true)]
+    #[case(&["HICK"], "/home/bachman/Documents/hooli-interactive-computer-keyboard", true)] // Case insensitive
+    #[case(&["hick"], "/home/bachman/Documents/hooli_interactive_computer_keyboard", true)] // Different separators
+    #[case(&["hick"], "/home/bachman/Documents/hooli interactive.computer-keyboard", true)] // Mixed separators
+    #[case(&["hick"], "/home/bachman/Documents/hooli-interactive-keyboard", false)] // Incomplete acronym
+    #[case(&["hik"], "/home/bachman/Documents/hooli-interactive-keyboard", true)] // Correct acronym for shorter name
+    #[case(&["h"], "/home/bachman/Documents/hooli", false)] // Single letter - not an acronym
+    #[case(&["abc"], "/home/bachman/Documents/a-b-c", true)] // Short words
+    #[case(&["abc"], "/home/bachman/Documents/a-b", false)] // Partial match
+    fn acronym_match(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
+        let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
+        let options = StreamOptions::new(0).with_keywords(keywords.iter());
+        let stream = Stream::new(db, options);
+        let last_keyword = keywords.last().unwrap();
+        let other_keywords: Vec<String> =
+            keywords[..keywords.len() - 1].iter().map(|&s| s.to_string()).collect();
+        assert_eq!(is_match, stream.match_acronym(path, last_keyword, &other_keywords));
+    }
+
+    // Ensure the filter_by_keywords function correctly handles acronyms
+    #[rstest]
+    #[case(&["hick"], "/home/bachman/Documents/hooli-interactive-computer-keyboard", true)]
+    #[case(&["hooli"], "/home/bachman/Documents/hooli-interactive-computer-keyboard", true)] // Regular match still works
+    #[case(&["keyb"], "/home/bachman/Documents/hooli-interactive-computer-keyboard", true)] // Regular match still works
+    fn integrated_acronym_keyword_filter(
+        #[case] keywords: &[&str],
+        #[case] path: &str,
+        #[case] is_match: bool,
+    ) {
         let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
         let options = StreamOptions::new(0).with_keywords(keywords.iter());
         let stream = Stream::new(db, options);

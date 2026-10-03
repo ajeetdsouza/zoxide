@@ -397,11 +397,11 @@ Environment variables[^2] can be used for configuration. They must be set before
   - Specifies the directory in which the database is stored.
   - The default value varies across OSes:
 
-    | OS          | Path                                     | Example                                    |
-    | ----------- | ---------------------------------------- | ------------------------------------------ |
-    | Linux / BSD | `$XDG_DATA_HOME` or `$HOME/.local/share` | `/home/alice/.local/share`                 |
-    | macOS       | `$HOME/Library/Application Support`      | `/Users/Alice/Library/Application Support` |
-    | Windows     | `%LOCALAPPDATA%`                         | `C:\Users\Alice\AppData\Local`             |
+    | OS          | Path                                                   | Example                                           |
+    | ----------- | ------------------------------------------------------ | ------------------------------------------------- |
+    | Linux / BSD | `$XDG_DATA_HOME/zoxide` or `$HOME/.local/share/zoxide` | `/home/alice/.local/share/zoxide`                 |
+    | macOS       | `$HOME/Library/Application Support/zoxide`             | `/Users/Alice/Library/Application Support/zoxide` |
+    | Windows     | `%LOCALAPPDATA%\zoxide`                                | `C:\Users\Alice\AppData\Local\zoxide`             |
 
 - `_ZO_ECHO`
   - When set to 1, `z` will print the matched directory before navigating to

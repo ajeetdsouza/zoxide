@@ -91,7 +91,11 @@ function __zoxide_z() {
         __zoxide_cd ~
     elif [[ "$#" -eq 1 ]] && [[ "$1" = '-' ]]; then
         __zoxide_cd "${OLDPWD}"
+{%- if db_only %}
+    elif [[ "$#" -eq 1 ]] && [[ "$1" =~ ^[-+][0-9]+$ ]]; then
+{%- else %}
     elif [[ "$#" -eq 1 ]] && { [[ "$1" =~ ^[-+][0-9]+$ ]] || (\builtin cd -q -- "$1") &>/dev/null; }; then
+{%- endif %}
         __zoxide_cd "$1"
     elif [[ "$#" -eq 2 ]] && [[ "$1" = "--" ]]; then
         __zoxide_cd "$2"

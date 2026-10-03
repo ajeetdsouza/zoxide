@@ -147,6 +147,7 @@ Register-ArgumentCompleter -Native -CommandName 'zoxide' -ScriptBlock {
             [CompletionResult]::new('--cmd', '--cmd', [CompletionResultType]::ParameterName, 'Changes the prefix of the `z` and `zi` commands')
             [CompletionResult]::new('--hook', '--hook', [CompletionResultType]::ParameterName, 'Changes how often zoxide increments a directory''s score')
             [CompletionResult]::new('--no-cmd', '--no-cmd', [CompletionResultType]::ParameterName, 'Prevents zoxide from defining the `z` and `zi` commands')
+            [CompletionResult]::new('--db-only', '--db-only', [CompletionResultType]::ParameterName, 'Searches only the database instead of trying existing directories first')
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')

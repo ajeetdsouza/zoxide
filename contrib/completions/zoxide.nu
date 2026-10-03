@@ -104,6 +104,7 @@ module completions {
   export extern "zoxide init" [
     --no-cmd                  # Prevents zoxide from defining the `z` and `zi` commands
     --cmd: string             # Changes the prefix of the `z` and `zi` commands
+    --db-only                 # Searches only the database instead of trying existing directories first
     --hook: string@"nu-complete zoxide init hook" # Changes how often zoxide increments a directory's score
     --help(-h)                # Print help
     --version(-V)             # Print version

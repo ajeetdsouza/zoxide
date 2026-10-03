@@ -130,6 +130,7 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand --cmd 'Changes the prefix of the `z` and `zi` commands'
             cand --hook 'Changes how often zoxide increments a directory''s score'
             cand --no-cmd 'Prevents zoxide from defining the `z` and `zi` commands'
+            cand --db-only 'Searches only the database instead of trying existing directories first'
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'

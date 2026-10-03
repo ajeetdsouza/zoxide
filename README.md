@@ -382,6 +382,10 @@ When calling `zoxide init`, the following flags are available:
   - Changes the prefix of the `z` and `zi` commands.
   - `--cmd j` would change the commands to (`j`, `ji`).
   - `--cmd cd` would replace the `cd` command.
+- `--db-only`
+  - Searches only the database instead of trying existing directories first.
+  - No-argument navigation, shell history shortcuts, and explicit `z -- path`
+    navigation (where supported) are unchanged.
 - `--hook <HOOK>`
   - Changes how often zoxide increments a directory's score:
 

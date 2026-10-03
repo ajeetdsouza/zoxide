@@ -289,6 +289,12 @@ zoxide can be installed in 4 easy steps:
    > ```powershell
    > Invoke-Expression (& { (zoxide init powershell | Out-String) })
    > ```
+   >
+   > **Note for PowerShell users:** If you use a prompt theme tool (such as
+   > oh-my-posh, starship, or posh-git), make sure zoxide is initialized
+   > **after** it in your profile. This is because zoxide wraps the existing
+   > `prompt` function to record directories. This is not a concern on other
+   > shells like Bash or Zsh.
 
    </details>
 

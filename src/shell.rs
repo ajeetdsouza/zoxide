@@ -159,6 +159,34 @@ mod tests {
             .stderr("");
     }
 
+    #[cfg(unix)]
+    #[apply(opts)]
+    fn fish_z_symlink(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+        let source = Fish(&opts).render().unwrap();
+
+        // `link/../sibling` exists, but `real/dir/../sibling` does not.
+        let tempdir = tempfile::tempdir().unwrap();
+        let root = tempdir.path().canonicalize().unwrap();
+        let (link, sibling) = (root.join("link"), root.join("sibling"));
+        std::fs::create_dir_all(root.join("real/dir")).unwrap();
+        std::fs::create_dir(&sibling).unwrap();
+        std::os::unix::fs::symlink(root.join("real/dir"), &link).unwrap();
+        let (link, sibling) = (link.display(), sibling.display());
+
+        let script =
+            format!("{source}\nbuiltin cd '{link}'\n__zoxide_z ../sibling\nand builtin pwd -L");
+        let stdout = if echo { format!("{sibling}\n{sibling}\n") } else { format!("{sibling}\n") };
+
+        Command::new("fish")
+            .env("HOME", &root)
+            .args(["--command", &script, "--no-config", "--private"])
+            .assert()
+            .success()
+            .stdout(stdout)
+            .stderr("");
+    }
+
     #[apply(opts)]
     fn nushell_nushell(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };

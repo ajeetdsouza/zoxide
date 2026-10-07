@@ -62,7 +62,7 @@ function __zoxide_hook() {
 {%- endif %}
 
 # Initialize hook.
-if [[ ${PROMPT_COMMAND:=} != *'__zoxide_hook'* ]]; then
+if [[ ${PROMPT_COMMAND[*]:-} != *'__zoxide_hook'* ]]; then
     if [[ "$(declare -p PROMPT_COMMAND 2>&1)" == "declare -a"* ]]; then
         PROMPT_COMMAND=("${PROMPT_COMMAND[@]}" '__zoxide_hook || \builtin true')
     else

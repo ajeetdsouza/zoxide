@@ -39,7 +39,7 @@ done
         );
         Command::new("bash")
             .env("ZOXIDE_INIT", &init)
-            .args(["--noprofile", "--norc", "-c", &script])
+            .args(["--noprofile", "--norc", "-e", "-u", "-o", "pipefail", "-c", &script])
             .assert()
             .success()
             .stdout("")

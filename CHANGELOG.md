@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Import: atuin entries are now fetched with `--tz=+0`, so timestamps are parsed as UTC regardless of the atuin `timezone` setting (which defaults to local).
+- Import: an error is now reported when the atuin process fails, instead of silently importing nothing.
 - Bash/Zsh: fix `z` failing on Cygwin/MSYS2 due to `cygpath` being passed a bad string.
 - Nushell: `z` now handles relative paths through symlinked directories.
 

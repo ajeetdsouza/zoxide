@@ -13,9 +13,13 @@ pub(crate) struct Atuin {}
 
 impl Importer for Atuin {
     fn dirs(&self) -> Result<impl Iterator<Item = Result<Dir<'static>, ImportError>>> {
-        // atuin renders `{time}` as `YYYY-MM-DD HH:MM:SS` in UTC.
+        // atuin renders `{time}` as `YYYY-MM-DD HH:MM:SS` in the timezone configured in its
+        // settings, which defaults to the system's local timezone (atuin v18.0.0 and later).
+        // Pass an explicit UTC offset so that the timestamps are unambiguous; the
+        // `<+|-><hour>` offset spec is the only format accepted by every atuin version that
+        // supports this flag.
         let mut child = Command::new("atuin")
-            .args(["history", "list", "--format={time}\t{directory}", "--print0"])
+            .args(["history", "list", "--format={time}\t{directory}", "--print0", "--tz=+0"])
             .stdout(Stdio::piped())
             .spawn()
             .context("failed to run `atuin`; is it installed and on PATH?")?;
@@ -33,13 +37,13 @@ struct Iter {
     buf: Vec<u8>,
     line_num: usize,
 
-    child: Child,
+    child: Option<Child>,
     prev_cwd: Option<String>,
 }
 
 impl Iter {
     fn new(reader: BufReader<ChildStdout>, child: Child) -> Self {
-        Self { reader, buf: Vec::new(), line_num: 0, child, prev_cwd: None }
+        Self { reader, buf: Vec::new(), line_num: 0, child: Some(child), prev_cwd: None }
     }
 
     fn err(&self, source: anyhow::Error) -> ImportError {
@@ -78,7 +82,22 @@ impl Iterator for Iter {
             self.line_num += 1;
 
             match self.reader.read_until(b'\0', &mut self.buf) {
-                Ok(0) => return None,
+                Ok(0) => {
+                    // End of stream: reap the child and report a non-zero exit, so that a
+                    // failing atuin (e.g. a version too old to support `--tz`) doesn't
+                    // silently import nothing. Its own error message, if any, has already
+                    // been printed to stderr.
+                    let mut child = self.child.take()?;
+                    return match child.wait() {
+                        Ok(status) if !status.success() => Some(Err(self.err(anyhow!(
+                            "atuin exited with an error ({status}); the import may be incomplete"
+                        )))),
+                        Ok(_) => None,
+                        Err(e) => {
+                            Some(Err(self.err(anyhow!(e).context("could not wait for atuin"))))
+                        }
+                    };
+                }
                 Ok(_) => {
                     if self.buf.last() == Some(&b'\0') {
                         self.buf.pop();
@@ -110,7 +129,9 @@ impl Iterator for Iter {
 
 impl Drop for Iter {
     fn drop(&mut self) {
-        _ = self.child.kill();
-        _ = self.child.wait();
+        if let Some(mut child) = self.child.take() {
+            _ = child.kill();
+            _ = child.wait();
+        }
     }
 }

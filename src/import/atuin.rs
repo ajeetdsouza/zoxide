@@ -13,11 +13,11 @@ pub(crate) struct Atuin {}
 
 impl Importer for Atuin {
     fn dirs(&self) -> Result<impl Iterator<Item = Result<Dir<'static>, ImportError>>> {
-        // atuin renders `{time}` as `YYYY-MM-DD HH:MM:SS` in the timezone configured in its
-        // settings, which defaults to the system's local timezone (atuin v18.0.0 and later).
-        // Pass an explicit UTC offset so that the timestamps are unambiguous; the
-        // `<+|-><hour>` offset spec is the only format accepted by every atuin version that
-        // supports this flag.
+        // atuin renders `{time}` as `YYYY-MM-DD HH:MM:SS` in the timezone configured in
+        // its settings, which defaults to the system's local timezone (atuin
+        // v18.0.0 and later). Pass an explicit UTC offset so that the
+        // timestamps are unambiguous; the `<+|-><hour>` offset spec is the only
+        // format accepted by every atuin version that supports this flag.
         let mut child = Command::new("atuin")
             .args(["history", "list", "--format={time}\t{directory}", "--print0", "--tz=+0"])
             .stdout(Stdio::piped())

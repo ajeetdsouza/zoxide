@@ -9,10 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The database is now stored as plaintext (`db.txt`) instead of bincode (`db.zo`).
+  Existing databases are migrated automatically.
+
 ### Fixed
 
 - Bash/Zsh: fix `z` failing on Cygwin/MSYS2 due to `cygpath` being passed a bad string.
 - Nushell: `z` now handles relative paths through symlinked directories.
+- Fish: repaint the prompt when exiting interactive Space-Tab completions without selecting.
+- POSIX: fix `z` failing when initialized with `--hook none` or `--hook pwd`.
+- `query --interactive` no longer panics when writing to a closed pipe.
 
 ## [0.10.0] - 2026-07-04
 

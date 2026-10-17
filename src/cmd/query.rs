@@ -32,7 +32,9 @@ impl Query {
     fn query_interactive(&self, stream: &mut Stream, now: Epoch) -> Result<()> {
         let mut fzf = Self::get_fzf()?;
         let selection = loop {
-            match stream.next() {
+            // Checking whether a directory exists can be slow, so stop as soon as fzf exits instead of waiting for the next write to fail.
+            let dir = stream.next_until(|| fzf.has_exited().unwrap_or(true));
+            match dir {
                 Some(dir) if Some(dir.path.as_ref()) == self.exclude.as_deref() => continue,
                 Some(dir) => {
                     if let Some(selection) = fzf.write(dir, now)? {

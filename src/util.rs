@@ -130,6 +130,12 @@ impl FzfChild {
         }
     }
 
+    /// Returns true if fzf has already exited, e.g. because the user made a selection before all entries were written.
+    pub fn has_exited(&mut self) -> Result<bool> {
+        let status = self.0.try_wait().context("wait failed on fzf")?;
+        Ok(status.is_some())
+    }
+
     pub fn wait(&mut self) -> Result<String> {
         // Drop stdin to prevent deadlock.
         mem::drop(self.0.stdin.take());

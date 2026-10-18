@@ -391,6 +391,9 @@ When calling `zoxide init`, the following flags are available:
     | `prompt`        | At every shell prompt             |
     | `pwd` (default) | Whenever the directory is changed |
 
+    `pwd` is not supported on POSIX shells: `zoxide init posix` prints a warning
+    and installs no hook there, so use `--hook prompt` instead.
+
 - `--no-cmd`
   - Prevents zoxide from defining the `z` and `zi` commands.
   - These functions will still be available in your shell as `__zoxide_z` and

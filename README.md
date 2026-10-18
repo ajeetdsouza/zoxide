@@ -372,6 +372,10 @@ zoxide can be installed in 4 easy steps:
    | z.lua    | `zoxide import z.lua`    |
    | zsh-z    | `zoxide import zsh-z`    |
 
+   > **Note:**
+   > Import fails if the current database is not empty. Pass `--merge` to import
+   > into an existing database instead.
+
 ## Configuration
 
 ### Flags

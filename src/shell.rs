@@ -249,6 +249,25 @@ mod tests {
             .stderr("");
     }
 
+    #[test]
+    fn powershell_echo_no_args() {
+        let opts =
+            Opts { cmd: Some("z"), hook: InitHook::None, echo: true, resolve_symlinks: false };
+        let mut source = "Set-StrictMode -Version latest\n".to_string();
+        Powershell(&opts).render_into(&mut source).unwrap();
+        // A bare `z` passes `$null` as the destination. With `_ZO_ECHO=1`, the
+        // directory that was navigated to should still be printed.
+        source.push_str("\nz\n");
+
+        let assert = Command::new("pwsh")
+            .args(["-NoLogo", "-NonInteractive", "-NoProfile", "-Command", &source])
+            .assert()
+            .success()
+            .stderr("");
+        let stdout = &assert.get_output().stdout;
+        assert!(!stdout.is_empty(), "expected the new directory to be echoed");
+    }
+
     #[apply(opts)]
     fn tcsh_tcsh(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };

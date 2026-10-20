@@ -2,16 +2,20 @@
 .SH NAME
 \fBzoxide-import\fR - import data from other tools
 .SH SYNOPSIS
-.B zoxide import PATH --from FORMAT [OPTIONS]
+.B zoxide import [OPTIONS] <FORMAT>
 .SH OPTIONS
 .TP
-.B --from FORMAT
-The format of the database being imported:
+.B <FORMAT>
+The database to import from:
 .TS
 tab(|);
 l l.
+    \fBatuin\fR
     \fBautojump\fR
-    \fBz\fR|(for \fBfasd\fR, \fBz\fR, \fBz.lua\fR, or \fBzsh-z\fR)
+    \fBfasd\fR
+    \fBz\fR
+    \fBz.lua\fR
+    \fBzsh-z\fR
 .TE
 .sp
 Note: zoxide only imports paths from autojump, since its matching

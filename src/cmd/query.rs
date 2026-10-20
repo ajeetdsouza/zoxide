@@ -43,13 +43,14 @@ impl Query {
             }
         };
 
+        let stdout = &mut io::stdout();
         if self.score {
-            print!("{selection}");
+            write!(stdout, "{selection}").pipe_exit("stdout")?;
         } else {
             let path = selection.get(7..).context("could not read selection from fzf")?;
-            print!("{path}");
+            write!(stdout, "{path}").pipe_exit("stdout")?;
         }
-        Ok(())
+        stdout.flush().pipe_exit("stdout")
     }
 
     fn query_list(&self, stream: &mut Stream, now: Epoch) -> Result<()> {

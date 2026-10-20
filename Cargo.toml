@@ -35,15 +35,11 @@ time = { version = "0.3.47", default-features = false, features = ["parsing", "m
 [target.'cfg(windows)'.dependencies]
 which = "8.0.2"
 
-[build-dependencies]
-clap = { version = "4.3.0", features = ["derive"] }
+[dev-dependencies]
+assert_cmd = "2.0.0"
 clap_complete = "4.5.50"
 clap_complete_fig = "4.5.2"
 clap_complete_nushell = "4.5.5"
-color-print = "0.3.4"
-
-[dev-dependencies]
-assert_cmd = "2.0.0"
 rstest = { version = "0.26.0", default-features = false }
 rstest_reuse = "0.7.0"
 tempfile = "3.15.0"

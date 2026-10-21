@@ -12,6 +12,7 @@ use cmd::Cmd;
 fn main() -> io::Result<()> {
     // Since we are generating completions in the package directory, we need to
     // set this so that Cargo doesn't rebuild every time.
+    println!("cargo:rustc-check-cfg=cfg(test)");
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=src/");
     println!("cargo:rerun-if-changed=templates/");

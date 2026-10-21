@@ -203,6 +203,9 @@ impl Database {
                 dir1.score(now).total_cmp(&dir2.score(now))
             })
         });
+    }
+
+    pub fn mark_dirty(&mut self) {
         self.with_dirty_mut(|dirty| *dirty = true);
     }
 

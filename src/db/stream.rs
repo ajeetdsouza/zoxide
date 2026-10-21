@@ -83,11 +83,18 @@ impl<'a> Stream<'a> {
             None => return true,
         };
 
-        let path = util::to_lowercase(path);
+        // Normalize both path and keywords to use forward slashes so that
+        // backslash-separated paths (common on Windows) match forward-slash
+        // queries and vice versa.
+        let path = util::to_lowercase(path).replace('\\', "/");
+        let kw_last = util::to_lowercase(keywords_last).replace('\\', "/");
+        let keywords_norm: Vec<String> =
+            keywords.iter().map(|k| util::to_lowercase(k).replace('\\', "/")).collect();
+
         let mut path = path.as_str();
-        match path.rfind(keywords_last) {
+        match path.rfind(kw_last.as_str()) {
             Some(idx) => {
-                if path[idx + keywords_last.len()..].contains(path::is_separator) {
+                if path[idx + kw_last.len()..].contains(path::is_separator) {
                     return false;
                 }
                 path = &path[..idx];
@@ -95,8 +102,8 @@ impl<'a> Stream<'a> {
             None => return false,
         }
 
-        for keyword in keywords.iter().rev() {
-            match path.rfind(keyword) {
+        for keyword in keywords_norm.iter().rev() {
+            match path.rfind(keyword.as_str()) {
                 Some(idx) => path = &path[..idx],
                 None => return false,
             }
@@ -203,6 +210,35 @@ mod tests {
     #[case(&["/foo/", "/bar"], "/foo/bar", false)]
     #[case(&["/foo/", "/bar"], "/foo/baz/bar", true)]
     fn query(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
+        let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
+        let options = StreamOptions::new(0).with_keywords(keywords.iter());
+        let stream = Stream::new(db, options);
+        assert_eq!(is_match, stream.filter_by_keywords(path));
+    }
+
+    // Forward slash matching on Windows-style backslash paths.
+    // These tests run on ALL platforms because the normalization is
+    // unconditional — on Linux/macOS it's a harmless no-op.
+    #[rstest]
+    // Single keyword with forward slash query against backslash path
+    #[case(&["bar/meow"], r"~\foo\bar\meow", true)]
+    // Multiple keywords with forward slash query
+    #[case(&["bar", "meow"], r"~\foo\bar\meow", true)]
+    // Backslash query against forward-slash path (reverse direction)
+    #[case(&[r"bar\meow"], "/foo/bar/meow", true)]
+    // Mixed separators in query
+    #[case(&[r"bar/meow"], r"~\foo\bar\meow", true)]
+    // Full path with forward slashes
+    #[case(&[r"~\foo\bar\meow"], r"~\foo\bar\meow", true)]
+    // Forward slash query should not match partial component
+    #[case(&["bar/mee"], r"~\foo\bar\meow", false)]
+    // Single partial keyword — should NOT match since bar is not last component
+    #[case(&["bar"], r"~\foo\bar\meow", false)]
+    fn query_backslash_paths(
+        #[case] keywords: &[&str],
+        #[case] path: &str,
+        #[case] is_match: bool,
+    ) {
         let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
         let options = StreamOptions::new(0).with_keywords(keywords.iter());
         let stream = Stream::new(db, options);

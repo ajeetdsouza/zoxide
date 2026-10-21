@@ -378,3 +378,16 @@ pub fn to_lowercase(s: impl AsRef<str>) -> String {
     let s = s.as_ref();
     if s.is_ascii() { s.to_ascii_lowercase() } else { s.to_lowercase() }
 }
+
+/// Rewrite path separators to a single canonical form, so that queries match
+/// regardless of which separator was typed.
+///
+/// On Windows both `/` and `\` are accepted by the OS, so they are treated as
+/// equivalent. Elsewhere `\` is a valid filename character and is left alone.
+pub fn normalize_separators(s: String) -> String {
+    #[cfg(windows)]
+    if s.contains('/') {
+        return s.replace('/', "\\");
+    }
+    s
+}

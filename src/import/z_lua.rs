@@ -82,7 +82,7 @@ fn data_path() -> Result<PathBuf> {
 /// set -x _ZL_DATA "$_ZL_DATA_DIR/zlua.txt"
 /// ```
 fn data_path_fish() -> Result<PathBuf> {
-    let mut path = match env::var_os("XDG_DATA_HOME") {
+    let mut path = match env::var_os("XDG_DATA_HOME").filter(|xdg| !xdg.is_empty()) {
         Some(xdg) => PathBuf::from(xdg),
         None => {
             let mut path = dirs::home_dir().context("could not find home directory")?;

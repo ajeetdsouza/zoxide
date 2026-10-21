@@ -4,7 +4,7 @@ use anyhow::{Result, bail};
 
 use crate::cmd::{Add, Run};
 use crate::db::Database;
-use crate::{config, util};
+use crate::{config, path_resolver, util};
 
 impl Run for Add {
     fn run(&self) -> Result<()> {
@@ -19,10 +19,7 @@ impl Run for Add {
         let mut db = Database::open()?;
 
         for path in &self.paths {
-            let path =
-                if config::resolve_symlinks() { util::canonicalize } else { util::resolve_path }(
-                    path,
-                )?;
+            let path = path_resolver::resolve(path, config::resolve_symlinks())?;
             let path = util::path_to_str(&path)?;
 
             // Ignore path if it contains unsupported characters, or if it's in the exclude

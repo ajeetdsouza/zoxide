@@ -332,6 +332,14 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
                     base_path = get_drive_path(drive_letter);
                     stack.extend(base_path.components());
                 }
+                Prefix::UNC(..) | Prefix::VerbatimUNC(..) => {
+                    let prefix_component = components.next().unwrap();
+                    stack.push(prefix_component);
+                    if components.peek() == Some(&Component::RootDir) {
+                        let root = components.next().unwrap();
+                        stack.push(root);
+                    }
+                }
                 _ => bail!("invalid path: {}", path.display()),
             },
             Some(Component::RootDir) => {

@@ -28,9 +28,9 @@ impl Importer for Fasd {
 /// [ -z "$_FASD_DATA" ] && _FASD_DATA="$HOME/.fasd"
 /// ```
 fn data_path() -> Result<PathBuf> {
-    match env::var_os("_FASD_DATA").filter(|path| !path.is_empty()) {
-        Some(path) => Ok(PathBuf::from(path)),
-        None => {
+    match env::var_os("_FASD_DATA") {
+        Some(path) if !path.is_empty() => Ok(PathBuf::from(path)),
+        _ => {
             let mut path = dirs::home_dir().context("could not find home directory")?;
             path.push(".fasd");
             Ok(path)

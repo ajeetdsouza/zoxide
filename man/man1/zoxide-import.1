@@ -18,8 +18,9 @@ l l.
     \fBzsh-z\fR
 .TE
 .sp
-Note: zoxide only imports paths from autojump, since its matching
-algorithm is too different to import the scores.
+Note: zoxide does not import autojump scores as-is. They are
+normalized through a sigmoid function first, since the scoring
+algorithms are too different.
 .TP
 .B -h, --help
 Print help information.

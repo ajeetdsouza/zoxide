@@ -30,15 +30,13 @@ impl Importer for ZshZ {
 /// local datafile=${${custom_datafile:-$HOME/.z}:A}
 /// ```
 fn data_path() -> Result<PathBuf> {
-    match env::var_os("ZSHZ_DATA")
-        .filter(|path| !path.is_empty())
-        .or_else(|| env::var_os("_Z_DATA").filter(|path| !path.is_empty()))
-    {
-        Some(path) => Ok(PathBuf::from(path)),
-        None => {
-            let mut path = dirs::home_dir().context("could not find home directory")?;
-            path.push(".z");
-            Ok(path)
+    for var in ["ZSHZ_DATA", "_Z_DATA"] {
+        if let Some(path) = env::var_os(var).filter(|path| !path.is_empty()) {
+            return Ok(PathBuf::from(path));
         }
     }
+
+    let mut path = dirs::home_dir().context("could not find home directory")?;
+    path.push(".z");
+    Ok(path)
 }

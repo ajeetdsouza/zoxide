@@ -84,7 +84,32 @@ impl<'a> Stream<'a> {
         };
 
         let path = util::to_lowercase(path);
-        let mut path = path.as_str();
+        if Self::keywords_match(&path, keywords_last, keywords) {
+            return true;
+        }
+
+        // Try matching ASCII keywords against a romanization of non-ASCII
+        // path components. Each registered romanizer is tried in turn; when no
+        // transliteration features are compiled in this loop is empty and the
+        // whole block is a no-op.
+        let ascii_keywords = !keywords_last.is_empty()
+            && keywords_last.bytes().all(|b| b.is_ascii_alphabetic())
+            && keywords.iter().all(|k| !k.is_empty() && k.bytes().all(|b| b.is_ascii_alphabetic()));
+        if ascii_keywords {
+            for romanizer in crate::romanize::romanizers() {
+                if let Some(variants) = romanizer.variants(&path) {
+                    for variant in variants {
+                        if Self::keywords_match(&variant, keywords_last, keywords) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        false
+    }
+
+    fn keywords_match(mut path: &str, keywords_last: &str, keywords: &[String]) -> bool {
         match path.rfind(keywords_last) {
             Some(idx) => {
                 if path[idx + keywords_last.len()..].contains(path::is_separator) {
@@ -203,6 +228,33 @@ mod tests {
     #[case(&["/foo/", "/bar"], "/foo/bar", false)]
     #[case(&["/foo/", "/bar"], "/foo/baz/bar", true)]
     fn query(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
+        let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
+        let options = StreamOptions::new(0).with_keywords(keywords.iter());
+        let stream = Stream::new(db, options);
+        assert_eq!(is_match, stream.filter_by_keywords(path));
+    }
+
+    #[rstest]
+    #[cfg(feature = "pinyin")]
+    // Pinyin transliteration
+    #[case(&["shichang"], "/foo/市场", true)]
+    #[case(&["shichang"], "/foo/时长", true)]
+    #[case(&["fuchang"], "/foo/市场", true)]
+    #[case(&["chang"], "/foo/市场", true)]
+    #[case(&["shanghai"], "/foo/上海", true)]
+    #[case(&["yinhang"], "/foo/银行", true)]
+    // Case normalization
+    #[case(&["ShiChang"], "/foo/市场", true)]
+    // Chinese keyword still matches the raw path
+    #[case(&["市场"], "/foo/市场", true)]
+    // No match
+    #[case(&["sc"], "/foo/市场", false)]
+    #[case(&["bar"], "/foo/市场", false)]
+    #[case(&["beijing"], "/foo/上海", false)]
+    // The last keyword must match the last path component
+    #[case(&["shichang"], "/foo/市场/资料", false)]
+    #[case(&["shichang", "ziliao"], "/foo/市场/资料", true)]
+    fn query_pinyin(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
         let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
         let options = StreamOptions::new(0).with_keywords(keywords.iter());
         let stream = Stream::new(db, options);

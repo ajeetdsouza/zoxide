@@ -26,11 +26,12 @@ pub(crate) struct Iter<R: BufRead> {
     buf: Vec<u8>,
     line_num: usize,
     path: PathBuf,
+    done: bool,
 }
 
 impl<R: BufRead> Iter<R> {
     pub(crate) fn new(reader: R, path: PathBuf) -> Self {
-        Self { reader, buf: Vec::new(), line_num: 0, path }
+        Self { reader, buf: Vec::new(), line_num: 0, path, done: false }
     }
 
     fn err(&self, source: anyhow::Error) -> ImportError {
@@ -62,12 +63,19 @@ impl<R: BufRead> Iterator for Iter<R> {
     type Item = Result<Dir<'static>, ImportError>;
 
     fn next(&mut self) -> Option<Self::Item> {
+        if self.done {
+            return None;
+        }
+
         loop {
             self.buf.clear();
             self.line_num += 1;
 
             match self.reader.read_until(b'\n', &mut self.buf) {
-                Ok(0) => return None,
+                Ok(0) => {
+                    self.done = true;
+                    return None;
+                }
                 Ok(_) => {
                     if self.buf.last() == Some(&b'\n') {
                         self.buf.pop();
@@ -80,7 +88,10 @@ impl<R: BufRead> Iterator for Iter<R> {
                     }
                     return Some(self.parse_line(&self.buf));
                 }
-                Err(e) => return Some(Err(self.err(anyhow::Error::from(e)))),
+                Err(e) => {
+                    self.done = true;
+                    return Some(Err(self.err(anyhow::Error::from(e))));
+                }
             }
         }
     }
@@ -99,5 +110,36 @@ fn data_path() -> Result<PathBuf> {
             path.push(".z");
             Ok(path)
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::io::{self, BufRead, Read};
+
+    use super::*;
+
+    struct BrokenReader;
+
+    impl Read for BrokenReader {
+        fn read(&mut self, _buf: &mut [u8]) -> io::Result<usize> {
+            Err(io::Error::other("boom"))
+        }
+    }
+
+    impl BufRead for BrokenReader {
+        fn fill_buf(&mut self) -> io::Result<&[u8]> {
+            Err(io::Error::other("boom"))
+        }
+
+        fn consume(&mut self, _amt: usize) {}
+    }
+
+    #[test]
+    fn stops_after_read_error() {
+        let mut iter = Iter::new(BrokenReader, PathBuf::from("test"));
+
+        assert!(iter.next().unwrap().is_err());
+        assert!(iter.next().is_none());
     }
 }

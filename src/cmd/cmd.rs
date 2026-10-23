@@ -2,7 +2,8 @@
 
 use std::path::PathBuf;
 
-use clap::builder::{IntoResettable, Resettable, StyledStr};
+use clap::builder::styling::{AnsiColor, Effects};
+use clap::builder::{IntoResettable, Resettable, StyledStr, Styles};
 use clap::{Parser, Subcommand, ValueEnum, ValueHint};
 
 struct HelpTemplate;
@@ -31,6 +32,12 @@ https://github.com/ajeetdsouza/zoxide
     }
 }
 
+const STYLES: Styles = Styles::styled()
+    .header(AnsiColor::Yellow.on_default().effects(Effects::BOLD))
+    .usage(AnsiColor::Green.on_default().effects(Effects::BOLD))
+    .literal(AnsiColor::Green.on_default().effects(Effects::BOLD))
+    .placeholder(AnsiColor::Green.on_default());
+
 #[derive(Debug, Parser)]
 #[clap(
     about,
@@ -39,6 +46,7 @@ https://github.com/ajeetdsouza/zoxide
     disable_help_subcommand = true,
     propagate_version = true,
     version,
+    styles = STYLES,
 )]
 pub enum Cmd {
     Add(Add),

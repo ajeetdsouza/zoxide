@@ -29,7 +29,11 @@ impl Query {
         }
     }
 
+    #[cfg_attr(feature = "skim-tui", allow(unreachable_code))]
     fn query_interactive(&self, stream: &mut Stream, now: Epoch) -> Result<()> {
+        #[cfg(feature = "skim-tui")]
+        return crate::skim::query(self, stream, now);
+
         let mut fzf = Self::get_fzf()?;
         let selection = loop {
             match stream.next() {

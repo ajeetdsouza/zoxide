@@ -6,6 +6,8 @@ mod db;
 mod error;
 mod import;
 mod shell;
+#[cfg(feature = "skim-tui")]
+mod skim;
 mod util;
 
 use std::env;

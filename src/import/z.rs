@@ -93,8 +93,8 @@ impl<R: BufRead> Iterator for Iter<R> {
 /// ```
 fn data_path() -> Result<PathBuf> {
     match env::var_os("_Z_DATA") {
-        Some(path) => Ok(PathBuf::from(path)),
-        None => {
+        Some(path) if !path.is_empty() => Ok(PathBuf::from(path)),
+        _ => {
             let mut path = dirs::home_dir().context("could not find home directory")?;
             path.push(".z");
             Ok(path)

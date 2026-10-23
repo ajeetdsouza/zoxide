@@ -4,6 +4,10 @@
 .SH SYNOPSIS
 .B zoxide remove [PATHS] [OPTIONS]
 .SH DESCRIPTION
+Removes each \fBPATH\fR from the database. If a path is not found exactly as
+given, \fBzoxide\fR resolves it to an absolute path and tries again; if it is
+still not found, an error is raised.
+.sp
 If you'd like to permanently exclude a directory from the database, see the
 \fB_ZO_EXCLUDE_DIRS\fR environment variable in \fBzoxide\fR(1).
 .SH OPTIONS

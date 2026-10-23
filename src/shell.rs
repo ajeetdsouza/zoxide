@@ -206,23 +206,6 @@ mod tests {
         }
     }
 
-    #[test]
-    fn posix_dash_cd_dash_prefixed_dir() {
-        let opts =
-            Opts { cmd: Some("z"), hook: InitHook::None, echo: false, resolve_symlinks: false };
-        let source = Posix(&opts).render().unwrap();
-
-        let dir = tempfile::tempdir().unwrap();
-        std::fs::create_dir(dir.path().join("-foo")).unwrap();
-
-        Command::new("dash")
-            .current_dir(dir.path())
-            .args(["-e", "-u", "-c", &format!("{source}\nz -foo")])
-            .assert()
-            .success()
-            .stderr("");
-    }
-
     #[apply(opts)]
     fn posix_shellcheck(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };

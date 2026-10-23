@@ -86,6 +86,8 @@ function __zoxide_doctor() {
     [[ ${PROMPT_COMMAND[@]:-} == *'__zoxide_hook'* ]] && return 0
     # shellcheck disable=SC2199
     [[ ${__vsc_original_prompt_command[@]:-} == *'__zoxide_hook'* ]] && return 0
+    # shellcheck disable=SC2199
+    [[ ${_termius_prompt_cmd_original[@]:-} == *'__zoxide_hook'* ]] && return 0
 
     _ZO_DOCTOR=0
     \builtin printf '%s\n' \

@@ -85,19 +85,21 @@ impl<'a> Stream<'a> {
 
         let path = util::to_lowercase(path);
         let mut path = path.as_str();
-        match path.rfind(keywords_last) {
-            Some(idx) => {
-                if path[idx + keywords_last.len()..].contains(path::is_separator) {
+
+        let (idx, _end) = match rfind_component_match(path, keywords_last) {
+            Some((idx, end)) => {
+                if path[end..].contains(path::is_separator) {
                     return false;
                 }
-                path = &path[..idx];
+                (idx, end)
             }
             None => return false,
-        }
+        };
+        path = &path[..idx];
 
         for keyword in keywords.iter().rev() {
-            match path.rfind(keyword) {
-                Some(idx) => path = &path[..idx],
+            match rfind_component_match(path, keyword) {
+                Some((idx, _)) => path = &path[..idx],
                 None => return false,
             }
         }
@@ -174,6 +176,144 @@ impl StreamOptions {
     }
 }
 
+fn rfind_component_match(path: &str, keyword: &str) -> Option<(usize, usize)> {
+    if keyword.is_empty() {
+        return None;
+    }
+
+    if keyword.contains(path::is_separator) {
+        return path.rfind(keyword).map(|idx| (idx, idx + keyword.len()));
+    }
+
+    if let Some(idx) = path.rfind(keyword) {
+        return Some((idx, idx + keyword.len()));
+    }
+
+    let keyword_len = keyword.chars().count();
+
+    // Fuzzy: rightmost component where keyword is a subsequence, or edit
+    // distance 1 (equal-length typo) within a single component.
+    for (component_start, component) in rsplit_components_with_indices(path) {
+        if let Some((start, end)) = subsequence_bounds(component, keyword) {
+            return Some((component_start + start, component_start + end));
+        }
+
+        if keyword_len == component.chars().count() && edit_distance_leq1(component, keyword) {
+            return Some((component_start, component_start + component.len()));
+        }
+    }
+
+    None
+}
+
+fn rsplit_components_with_indices(path: &str) -> impl Iterator<Item = (usize, &str)> {
+    let mut components = Vec::new();
+    let mut end = path.len();
+
+    for (idx, ch) in path.char_indices().rev() {
+        if path::is_separator(ch) {
+            if idx + ch.len_utf8() < end {
+                components.push((idx + ch.len_utf8(), &path[idx + ch.len_utf8()..end]));
+            }
+            end = idx;
+        }
+    }
+
+    if end > 0 {
+        components.push((0, &path[..end]));
+    }
+
+    components.into_iter()
+}
+
+fn subsequence_bounds(haystack: &str, needle: &str) -> Option<(usize, usize)> {
+    if needle.is_empty() {
+        return None;
+    }
+
+    let mut start = None;
+    let mut needle_chars = needle.chars();
+    let mut next_needed = needle_chars.next()?;
+
+    for (idx, ch) in haystack.char_indices() {
+        if ch == next_needed {
+            start.get_or_insert(idx);
+            if let Some(n) = needle_chars.next() {
+                next_needed = n;
+            } else {
+                return Some((start.unwrap(), idx + ch.len_utf8()));
+            }
+        }
+    }
+
+    None
+}
+
+fn edit_distance_leq1(a: &str, b: &str) -> bool {
+    if a == b {
+        return true;
+    }
+
+    let a_chars: Vec<_> = a.chars().collect();
+    let b_chars: Vec<_> = b.chars().collect();
+    let a_len = a_chars.len();
+    let b_len = b_chars.len();
+
+    if (a_len as isize - b_len as isize).abs() > 1 {
+        return false;
+    }
+
+    if a_len == b_len {
+        // Single substitution?
+        let mut diffs = 0;
+        for (ac, bc) in a_chars.iter().zip(b_chars.iter()) {
+            if ac != bc {
+                diffs += 1;
+                if diffs > 1 {
+                    break;
+                }
+            }
+        }
+        if diffs == 1 {
+            return true;
+        }
+
+        // Single adjacent transposition?
+        for i in 0..a_len - 1 {
+            if a_chars[i] != b_chars[i] {
+                return i + 1 < a_len
+                    && a_chars[i] == b_chars[i + 1]
+                    && a_chars[i + 1] == b_chars[i]
+                    && a_chars[i + 2..] == b_chars[i + 2..]
+                    && a_chars[..i] == b_chars[..i];
+            }
+        }
+
+        return false;
+    }
+
+    // Lengths differ by exactly 1: check single insertion/deletion.
+    let (short, long) = if a_len < b_len { (&a_chars, &b_chars) } else { (&b_chars, &a_chars) };
+    let mut i = 0;
+    let mut j = 0;
+    let mut edits = 0;
+
+    while i < short.len() && j < long.len() {
+        if short[i] == long[j] {
+            i += 1;
+            j += 1;
+        } else {
+            edits += 1;
+            if edits > 1 {
+                return false;
+            }
+            j += 1; // skip one char in longer string
+        }
+    }
+
+    true
+}
+
 #[cfg(test)]
 mod tests {
     use std::path::PathBuf;
@@ -202,6 +342,11 @@ mod tests {
     #[case(&["foo", "o", "bar"], "/foo/bar", false)]
     #[case(&["/foo/", "/bar"], "/foo/bar", false)]
     #[case(&["/foo/", "/bar"], "/foo/baz/bar", true)]
+    // Fuzzy subsequence within component
+    #[case(&["docs"], "/home/Documents", true)]
+    #[case(&["dcmts"], "/home/Documents", true)]
+    // Typo tolerance (edit distance 1)
+    #[case(&["doucments"], "/home/Documents", true)]
     fn query(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
         let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
         let options = StreamOptions::new(0).with_keywords(keywords.iter());

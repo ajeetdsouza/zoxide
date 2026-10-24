@@ -51,6 +51,11 @@ impl<R: BufRead> Iter<R> {
 
         let rank = split.next().ok_or_else(err)?;
         let rank = rank.parse::<f64>().map_err(|_| err())?;
+        // Reject NaN, infinite and negative ranks: they would otherwise end up in the
+        // database and break scoring and aging.
+        if !rank.is_finite() || rank < 0.0 {
+            return Err(err());
+        }
 
         let path = split.next().ok_or_else(err)?;
 
@@ -98,6 +103,34 @@ fn data_path() -> Result<PathBuf> {
             let mut path = dirs::home_dir().context("could not find home directory")?;
             path.push(".z");
             Ok(path)
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::io::Cursor;
+
+    use super::*;
+
+    fn parse(input: &str) -> Vec<Result<Dir<'static>, ImportError>> {
+        Iter::new(Cursor::new(input.as_bytes().to_vec()), PathBuf::from(".z")).collect()
+    }
+
+    #[test]
+    fn valid_entry() {
+        let dirs = parse("/foo|2.5|100\n");
+        let dir = dirs[0].as_ref().unwrap();
+        assert_eq!(dir.path, "/foo");
+        assert_eq!(dir.rank, 2.5);
+        assert_eq!(dir.last_accessed, 100);
+    }
+
+    #[test]
+    fn invalid_rank() {
+        for rank in ["nan", "inf", "-inf", "-1"] {
+            let dirs = parse(&format!("/foo|{rank}|100\n"));
+            assert!(dirs[0].is_err(), "rank {rank} should be rejected");
         }
     }
 }

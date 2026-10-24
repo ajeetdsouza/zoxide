@@ -73,6 +73,15 @@ jobs:
         with:
           command: install
           args: --color=always --git=https://github.com/cross-rs/cross.git --locked --rev=e281947ca900da425e4ecea7483cfde646c8a1ea --verbose cross
+      - name: Install cargo-wix
+        if: ${{ runner.os == 'Windows' }}
+        uses: actions-rs/cargo@v1
+        env:
+          # cargo-wix does not require the static crt
+          RUSTFLAGS: ""
+        with:
+          command: install
+          args: --version 0.3.9 cargo-wix
       - name: Build binary
         uses: actions-rs/cargo@v1
         with:
@@ -104,6 +113,12 @@ jobs:
           7z a zoxide-${{ steps.get_version.outputs.value }}-${{ matrix.target }}.zip `
             CHANGELOG.md LICENSE README.md ./man/ ./contrib/completions/ `
             ./target/${{ matrix.target }}/release/zoxide.exe
+      - name: Build installer (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cargo wix -v --no-build --nocapture -I install/windows/main.wxs `
+            --target ${{ matrix.target }} `
+            --output zoxide-${{ steps.get_version.outputs.value }}-${{ matrix.target }}.msi
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
@@ -112,6 +127,7 @@ jobs:
             *.deb
             *.tar.gz
             *.zip
+            *.msi
       - name: Create release
         if: |
           github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'chore(release)')
@@ -122,5 +138,6 @@ jobs:
             *.deb
             *.tar.gz
             *.zip
+            *.msi
           name: ${{ steps.get_version.outputs.value }}
           tag_name: ""

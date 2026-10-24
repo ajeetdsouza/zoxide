@@ -9,5 +9,5 @@ jobs:
       - uses: vedantmgoyal2009/winget-releaser@v2
         with:
           identifier: ajeetdsouza.zoxide
-          installers-regex: '-pc-windows-msvc\.zip$'
+          installers-regex: '-pc-windows-msvc\.(zip|msi)$'
           token: ${{ secrets.WINGET_TOKEN }}

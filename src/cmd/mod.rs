@@ -1,6 +1,7 @@
 mod add;
 mod cmd;
 mod edit;
+mod env;
 mod import;
 mod init;
 mod query;
@@ -19,6 +20,7 @@ impl Run for Cmd {
         match self {
             Cmd::Add(cmd) => cmd.run(),
             Cmd::Edit(cmd) => cmd.run(),
+            Cmd::Env(cmd) => cmd.run(),
             Cmd::Import(cmd) => cmd.run(),
             Cmd::Init(cmd) => cmd.run(),
             Cmd::Query(cmd) => cmd.run(),

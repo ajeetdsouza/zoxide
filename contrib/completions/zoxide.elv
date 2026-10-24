@@ -24,6 +24,7 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand --version 'Print version'
             cand add 'Add a new directory or increment its rank'
             cand edit 'Edit the database'
+            cand env 'Display environment variables'
             cand import 'Import entries from another application'
             cand init 'Generate shell configuration'
             cand query 'Search for a directory in the database'
@@ -66,6 +67,54 @@ set edit:completion:arg-completer[zoxide] = {|@words|
             cand --version 'Print version'
         }
         &'zoxide;edit;reload'= {
+            cand -h 'Print help'
+            cand --help 'Print help'
+            cand -V 'Print version'
+            cand --version 'Print version'
+        }
+        &'zoxide;env'= {
+            cand -h 'Print help'
+            cand --help 'Print help'
+            cand -V 'Print version'
+            cand --version 'Print version'
+            cand _ZO_DATA_DIR 'Data directory'
+            cand _ZO_ECHO 'Echo the matched directory before navigating to it'
+            cand _ZO_EXCLUDE_DIRS 'Directories to exclude when jumping'
+            cand _ZO_FZF_OPTS 'Custom options for fzf'
+            cand _ZO_MAXAGE 'Maximum total age of entries'
+            cand _ZO_RESOLVE_SYMLINKS 'Resolve symlinks before storing paths'
+        }
+        &'zoxide;env;_ZO_DATA_DIR'= {
+            cand -h 'Print help'
+            cand --help 'Print help'
+            cand -V 'Print version'
+            cand --version 'Print version'
+        }
+        &'zoxide;env;_ZO_ECHO'= {
+            cand -h 'Print help'
+            cand --help 'Print help'
+            cand -V 'Print version'
+            cand --version 'Print version'
+        }
+        &'zoxide;env;_ZO_EXCLUDE_DIRS'= {
+            cand -h 'Print help'
+            cand --help 'Print help'
+            cand -V 'Print version'
+            cand --version 'Print version'
+        }
+        &'zoxide;env;_ZO_FZF_OPTS'= {
+            cand -h 'Print help'
+            cand --help 'Print help'
+            cand -V 'Print version'
+            cand --version 'Print version'
+        }
+        &'zoxide;env;_ZO_MAXAGE'= {
+            cand -h 'Print help'
+            cand --help 'Print help'
+            cand -V 'Print version'
+            cand --version 'Print version'
+        }
+        &'zoxide;env;_ZO_RESOLVE_SYMLINKS'= {
             cand -h 'Print help'
             cand --help 'Print help'
             cand -V 'Print version'

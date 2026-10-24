@@ -1,0 +1,24 @@
+.TH "ZOXIDE" "1" "2026-08-20" "" "zoxide"
+.SH NAME
+\fBzoxide-env\fR - display environment variables
+.SH SYNOPSIS
+.B zoxide env [VARIABLE]
+.SH DESCRIPTION
+Prints the resolved value of zoxide's environment variables after defaults have
+been applied. When no variable is specified, all variables are printed in
+\fBNAME=VALUE\fR format, one per line. This is useful for debugging
+configuration issues, since defaults vary across platforms and require
+processing in Rust.
+.sp
+Unset variables with no implicit default are printed with an empty value.
+See \fBzoxide\fR(1) for the full list of environment variables.
+.SH OPTIONS
+.TP
+.B -h, --help
+Print help information.
+.SH REPORTING BUGS
+For any issues, feature requests, or questions, please visit:
+.sp
+\fBhttps://github.com/ajeetdsouza/zoxide/issues\fR
+.SH AUTHOR
+Ajeet D'Souza \fB<98ajeet@gmail.com>\fR

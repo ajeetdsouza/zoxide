@@ -43,6 +43,48 @@ module completions {
     --version(-V)             # Print version
   ]
 
+  # Display environment variables
+  export extern "zoxide env" [
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+  ]
+
+  # Data directory
+  export extern "zoxide env _ZO_DATA_DIR" [
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+  ]
+
+  # Echo the matched directory before navigating to it
+  export extern "zoxide env _ZO_ECHO" [
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+  ]
+
+  # Directories to exclude when jumping
+  export extern "zoxide env _ZO_EXCLUDE_DIRS" [
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+  ]
+
+  # Custom options for fzf
+  export extern "zoxide env _ZO_FZF_OPTS" [
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+  ]
+
+  # Maximum total age of entries
+  export extern "zoxide env _ZO_MAXAGE" [
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+  ]
+
+  # Resolve symlinks before storing paths
+  export extern "zoxide env _ZO_RESOLVE_SYMLINKS" [
+    --help(-h)                # Print help
+    --version(-V)             # Print version
+  ]
+
   # Import entries from another application
   export extern "zoxide import" [
     --merge                   # Merge into existing database

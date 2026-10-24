@@ -128,7 +128,7 @@ impl Database {
     }
 
     /// Removes the directory with `path` from the store. This does not preserve
-    /// ordering, but is O(1).
+    /// ordering.
     pub fn remove(&mut self, path: impl AsRef<str>) -> bool {
         match self.dirs().iter().position(|dir| dir.path == path.as_ref()) {
             Some(idx) => {

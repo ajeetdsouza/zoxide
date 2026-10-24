@@ -29,7 +29,7 @@ function global:__zoxide_pwd {
 function global:__zoxide_cd($dir, $literal) {
     $dir = if ($literal) {
         if ($null -eq $dir) {
-            Microsoft.PowerShell.Management\Set-Location
+            Microsoft.PowerShell.Management\Set-Location -Passthru
         } else {
             Microsoft.PowerShell.Management\Set-Location -LiteralPath $dir -Passthru -ErrorAction Stop
         }

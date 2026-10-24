@@ -37,7 +37,3 @@ test *args:
 [windows]
 test *args:
     cargo +stable test --no-fail-fast --workspace {{args}}
-
-[unix]
-completions:
-    nix-shell --cores 0 --pure --run 'ZOXIDE_UPDATE_COMPLETIONS=1 cargo nextest run --all-features --bin zoxide completions'

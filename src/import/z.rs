@@ -50,7 +50,14 @@ impl<R: BufRead> Iter<R> {
         let last_accessed = last_accessed.parse::<u64>().map_err(|_| err())?;
 
         let rank = split.next().ok_or_else(err)?;
-        let rank = rank.parse::<f64>().map_err(|_| err())?;
+        // `parse` accepts `inf` / `nan`, and anything past f64's range parses
+        // as infinity. Aging multiplies every rank by a factor derived from
+        // their total, so letting one through turns the entire database into
+        // zeroes and NaNs.
+        let rank = match rank.parse::<f64>() {
+            Ok(rank) if rank.is_finite() => rank,
+            _ => return Err(err()),
+        };
 
         let path = split.next().ok_or_else(err)?;
 
@@ -99,5 +106,29 @@ fn data_path() -> Result<PathBuf> {
             path.push(".z");
             Ok(path)
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use rstest::rstest;
+
+    use super::*;
+
+    #[rstest]
+    #[case("/foo|3|100", true)]
+    #[case("/foo|0|100", true)]
+    #[case("/foo|1.5|100", true)]
+    // A path may contain `|`.
+    #[case("/f|oo|3|100", true)]
+    // Non-finite ranks poison the total that ageing divides by.
+    #[case("/foo|inf|100", false)]
+    #[case("/foo|-inf|100", false)]
+    #[case("/foo|nan|100", false)]
+    // Beyond f64's range, which `parse` rounds to infinity.
+    #[case("/foo|1e400|100", false)]
+    fn parse_line_rank(#[case] line: &str, #[case] is_ok: bool) {
+        let iter = Iter::new(std::io::empty(), PathBuf::new());
+        assert_eq!(is_ok, iter.parse_line(line.as_bytes()).is_ok());
     }
 }

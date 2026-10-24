@@ -93,7 +93,9 @@ if ($global:__zoxide_hooked -ne 1) {
         if ($null -ne $__zoxide_prompt_old) {
             & $__zoxide_prompt_old
         }
+        $exitCode = Microsoft.PowerShell.Utility\Get-Variable LASTEXITCODE -Scope Global -ErrorAction Ignore -ValueOnly
         $null = __zoxide_hook
+        $global:LASTEXITCODE = $exitCode
     }
 }
 {%- endif %}

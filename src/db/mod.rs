@@ -91,7 +91,13 @@ impl Database {
     }
 
     /// Increments the rank of a directory, or creates it if it does not exist.
+    ///
+    /// Paths containing newlines are skipped: they cannot round-trip through
+    /// the line-based database format.
     pub fn add(&mut self, path: impl AsRef<str> + Into<String>, by: Rank, now: Epoch) {
+        if path.as_ref().contains('\n') {
+            return;
+        }
         self.with_dirs_mut(|dirs| match dirs.iter_mut().find(|dir| dir.path == path.as_ref()) {
             Some(dir) => dir.rank = (dir.rank + by).max(0.0),
             None => {
@@ -105,7 +111,13 @@ impl Database {
     /// directory is already in the database, it is expected that the user
     /// either does a check before calling this, or calls `dedup()`
     /// afterward.
+    ///
+    /// Paths containing newlines are skipped: they cannot round-trip through
+    /// the line-based database format.
     pub fn add_unchecked(&mut self, path: impl AsRef<str> + Into<String>, rank: Rank, now: Epoch) {
+        if path.as_ref().contains('\n') {
+            return;
+        }
         self.with_dirs_mut(|dirs| {
             dirs.push(Dir { path: path.into().into(), rank, last_accessed: now })
         });
@@ -114,7 +126,13 @@ impl Database {
 
     /// Increments the rank and updates the last_accessed of a directory, or
     /// creates it if it does not exist.
+    ///
+    /// Paths containing newlines are skipped: they cannot round-trip through
+    /// the line-based database format.
     pub fn add_update(&mut self, path: impl AsRef<str> + Into<String>, by: Rank, now: Epoch) {
+        if path.as_ref().contains('\n') {
+            return;
+        }
         self.with_dirs_mut(|dirs| match dirs.iter_mut().find(|dir| dir.path == path.as_ref()) {
             Some(dir) => {
                 dir.rank = (dir.rank + by).max(0.0);
@@ -317,9 +335,7 @@ mod tests {
             db.add(path, 1.0, now);
             db.add(path, 1.0, now);
             db.save().unwrap();
-        }
-
-        {
+        }        {
             let db = Database::open_dir(data_dir.path()).unwrap();
             assert_eq!(db.dirs().len(), 1);
 
@@ -328,6 +344,16 @@ mod tests {
             assert!((dir.rank - 2.0).abs() < 0.01);
             assert_eq!(dir.last_accessed, now);
         }
+    }
+
+    #[test]
+    fn add_rejects_newline_path() {
+        let data_dir = tempfile::tempdir().unwrap();
+        let now = 946684800;
+
+        let mut db = Database::open_dir(data_dir.path()).unwrap();
+        db.add("/foo\nbar", 1.0, now);
+        assert_eq!(db.dirs().len(), 0);
     }
 
     #[test]

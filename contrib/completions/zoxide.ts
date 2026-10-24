@@ -271,6 +271,10 @@ const completion: Fig.Spec = {
           description: "Prevents zoxide from defining the `z` and `zi` commands",
         },
         {
+          name: "--db-only",
+          description: "Searches only the database instead of trying existing directories first",
+        },
+        {
           name: ["-h", "--help"],
           description: "Print help",
         },

@@ -4,8 +4,12 @@
 # pylint: disable=missing-module-docstring
 
 import builtins  # pylint: disable=unused-import
+{%- if !db_only || resolve_symlinks %}
 import os
+{%- if !db_only %}
 import os.path
+{%- endif %}
+{%- endif %}
 import subprocess
 import sys
 import typing
@@ -119,8 +123,10 @@ def __zoxide_z(args: list[str]) -> None:
         __zoxide_cd()
     elif args == ["-"]:
         __zoxide_cd("-")
+{%- if !db_only %}
     elif len(args) == 1 and os.path.isdir(args[0]):
         __zoxide_cd(args[0])
+{%- endif %}
     else:
         try:
             zoxide = __zoxide_bin()

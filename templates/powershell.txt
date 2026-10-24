@@ -110,12 +110,14 @@ function global:__zoxide_z {
     elseif ($args.Length -eq 1 -and ($args[0] -eq '-' -or $args[0] -eq '+')) {
         __zoxide_cd $args[0] $false
     }
+{%- if !db_only %}
     elseif ($args.Length -eq 1 -and (Microsoft.PowerShell.Management\Test-Path -PathType Container -LiteralPath $args[0])) {
         __zoxide_cd $args[0] $true
     }
     elseif ($args.Length -eq 1 -and (Microsoft.PowerShell.Management\Test-Path -PathType Container -Path $args[0] )) {
         __zoxide_cd $args[0] $false
     }
+{%- endif %}
     else {
         $result = __zoxide_pwd
         if ($null -ne $result) {

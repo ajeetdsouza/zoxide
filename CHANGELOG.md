@@ -15,8 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bash/Zsh: fix `z` failing on Cygwin/MSYS2 due to `cygpath` being passed a bad string.
 - Nushell: `z` now handles relative paths through symlinked directories.
 - POSIX: fix `z` failing to enter directories whose names start with `-`.
-- Building no longer fails on read-only sources when the committed completions
-  are up to date.
+- Build: fix compilation failing when the source directory is read-only.
 
 ## [0.10.0] - 2026-07-04
 

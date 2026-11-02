@@ -233,6 +233,10 @@ impl Database {
     }
 
     fn deserialize(bytes: &[u8]) -> Result<Vec<Dir<'_>>> {
+        // Some editors (e.g. Notepad, or PowerShell 5's `Set-Content -Encoding
+        // utf8`) start UTF-8 files with a byte order mark.
+        let bytes = bytes.strip_prefix(b"\xEF\xBB\xBF").unwrap_or(bytes);
+
         let mut dirs = Vec::new();
         let mut errors = Vec::new();
 
@@ -328,6 +332,24 @@ mod tests {
             assert!((dir.rank - 2.0).abs() < 0.01);
             assert_eq!(dir.last_accessed, now);
         }
+    }
+
+    #[test]
+    fn open_with_bom() {
+        let data_dir = tempfile::tempdir().unwrap();
+        let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
+        let now = 946684800;
+
+        let contents = format!("\u{FEFF}{now:010}\t0000002.00\t{path}\n");
+        fs::write(data_dir.path().join("db.txt"), contents).unwrap();
+
+        let db = Database::open_dir(data_dir.path()).unwrap();
+        assert_eq!(db.dirs().len(), 1);
+
+        let dir = &db.dirs()[0];
+        assert_eq!(dir.path, path);
+        assert!((dir.rank - 2.0).abs() < 0.01);
+        assert_eq!(dir.last_accessed, now);
     }
 
     #[test]

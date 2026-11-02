@@ -32,6 +32,7 @@ _zoxide() {
 _arguments "${_arguments_options[@]}" : \
 '-s+[The rank to increment the entry if it exists or initialize it with if it doesn'\''t]:SCORE:_default' \
 '--score=[The rank to increment the entry if it exists or initialize it with if it doesn'\''t]:SCORE:_default' \
+'--allow-non-directories[Allow paths that are not existing directories]' \
 '-h[Print help]' \
 '--help[Print help]' \
 '-V[Print version]' \

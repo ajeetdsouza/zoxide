@@ -20,6 +20,8 @@ const COL_WIDTH: usize = 10;
 const MIN_RANK: Rank = 0.01;
 /// The largest rank the database file can hold.
 const MAX_RANK: Rank = 9_999_999.99;
+/// The byte order mark that some editors write at the start of UTF-8 files.
+const UTF8_BOM: &[u8] = "\u{FEFF}".as_bytes();
 
 #[self_referencing]
 pub struct Database {
@@ -233,9 +235,7 @@ impl Database {
     }
 
     fn deserialize(bytes: &[u8]) -> Result<Vec<Dir<'_>>> {
-        // Some editors (e.g. Notepad, or PowerShell 5's `Set-Content -Encoding
-        // utf8`) start UTF-8 files with a byte order mark.
-        let bytes = bytes.strip_prefix(b"\xEF\xBB\xBF").unwrap_or(bytes);
+        let bytes = bytes.strip_prefix(UTF8_BOM).unwrap_or(bytes);
 
         let mut dirs = Vec::new();
         let mut errors = Vec::new();

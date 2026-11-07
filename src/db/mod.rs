@@ -329,13 +329,13 @@ mod tests {
 
             let dir = &db.dirs()[0];
             assert_eq!(dir.path, path);
-            assert!((dir.rank - 2.0).abs() < 0.01);
+            assert_eq!(dir.rank, 2.0);
             assert_eq!(dir.last_accessed, now);
         }
     }
 
     #[test]
-    fn open_with_bom() {
+    fn open_with_utf8_bom() {
         let data_dir = tempfile::tempdir().unwrap();
         let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
         let now = 946684800;
@@ -348,7 +348,7 @@ mod tests {
 
         let dir = &db.dirs()[0];
         assert_eq!(dir.path, path);
-        assert!((dir.rank - 2.0).abs() < 0.01);
+        assert_eq!(dir.rank, 2.0);
         assert_eq!(dir.last_accessed, now);
     }
 

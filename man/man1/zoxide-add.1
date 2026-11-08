@@ -2,7 +2,7 @@
 .SH NAME
 \fBzoxide-add\fR - add a new directory or increment its rank
 .SH SYNOPSIS
-.B zoxide add [PATHS]
+.B zoxide add [OPTIONS] <PATHS>...
 .SH DESCRIPTION
 If the directory is not already in the database, this command creates a new
 entry for it with a default score of 1, otherwise, it increments the existing
@@ -13,6 +13,10 @@ time. After this, it runs the \fBAGING\fR algorithm on the database. See
 If you'd like to prevent a directory from being added to the database, see the
 \fB_ZO_EXCLUDE_DIRS\fR environment variable in \fBzoxide\fR(1).
 .SH OPTIONS
+.TP
+.B -s, --score <SCORE>
+The rank to increment the entry by if it exists, or initialize it with if it
+doesn't. Defaults to 1.
 .TP
 .B -h, --help
 Print help information.

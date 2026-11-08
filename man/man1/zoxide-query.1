@@ -8,8 +8,11 @@ Query the database for paths matching the keywords. The exact \fBMATCHING\fR
 algorithm is described in \fBzoxide\fR(1).
 .SH OPTIONS
 .TP
-.B --all
+.B -a, --all
 Show deleted directories.
+.TP
+.B --base-dir PATH
+Only search within this directory.
 .TP
 .B --exclude PATH
 Exclude a path from query results.

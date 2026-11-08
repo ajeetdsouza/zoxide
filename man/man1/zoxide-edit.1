@@ -1,0 +1,40 @@
+.TH "ZOXIDE" "1" "2021-04-12" "" "zoxide"
+.SH NAME
+\fBzoxide-edit\fR - edit the database interactively
+.SH SYNOPSIS
+.B zoxide edit
+.SH DESCRIPTION
+Sorts the database by score, saves it, and opens an interactive editing
+session for its entries. Requires \fBfzf\fR(1) to be installed.
+.sp
+Inside the session, the following keys modify the entry under the cursor:
+.TS
+tab(|);
+l l.
+    \fBKey\fR|\fBAction\fR
+    \fBctrl-r\fR|T{
+Reload the list from the database
+T}
+    \fBctrl-d\fR|T{
+Delete the entry
+T}
+    \fBctrl-w\fR|T{
+Increment the entry's rank
+T}
+    \fBctrl-s\fR|T{
+Decrement the entry's rank
+T}
+    \fBenter\fR|T{
+Exit the session
+T}
+.TE
+.SH OPTIONS
+.TP
+.B -h, --help
+Print help information.
+.SH REPORTING BUGS
+For any issues, feature requests, or questions, please visit:
+.sp
+\fBhttps://github.com/ajeetdsouza/zoxide/issues\fR
+.SH AUTHOR
+Ajeet D'Souza \fB<98ajeet@gmail.com>\fR

@@ -16,6 +16,10 @@ const completion: Fig.Spec = {
           },
         },
         {
+          name: "--allow-non-directories",
+          description: "Allow paths that are not existing directories",
+        },
+        {
           name: ["-h", "--help"],
           description: "Print help",
         },

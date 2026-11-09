@@ -57,6 +57,10 @@ pub(crate) fn run(importer: &impl Importer, db: &mut Database) -> Result<()> {
     for entry in importer.dirs()? {
         match entry {
             Ok(dir) => {
+                if dir.path.is_empty() {
+                    _ = writeln!(stderr, "skipping entry with an empty path");
+                    continue;
+                }
                 if exclude_dirs.iter().any(|glob| glob.matches(&dir.path)) {
                     continue;
                 }
@@ -79,4 +83,38 @@ pub(crate) fn run(importer: &impl Importer, db: &mut Database) -> Result<()> {
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use std::borrow::Cow;
+
+    use super::*;
+    use crate::db::Rank;
+
+    struct Fixed(Vec<(&'static str, Rank)>);
+
+    impl Importer for Fixed {
+        fn dirs(&self) -> Result<impl Iterator<Item = Result<Dir<'static>, ImportError>>> {
+            Ok(self.0.iter().map(|&(path, rank)| {
+                Ok(Dir { path: Cow::Borrowed(path), rank, last_accessed: 100 })
+            }))
+        }
+    }
+
+    #[test]
+    fn skips_empty_paths() {
+        let data_dir = tempfile::tempdir().unwrap();
+        let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
+
+        {
+            let mut db = Database::open_dir(data_dir.path()).unwrap();
+            run(&Fixed(vec![("", 1.0), (path, 2.0)]), &mut db).unwrap();
+            db.save().unwrap();
+        }
+
+        let db = Database::open_dir(data_dir.path()).unwrap();
+        assert_eq!(db.dirs().len(), 1);
+        assert_eq!(db.dirs()[0].path, path);
+    }
 }

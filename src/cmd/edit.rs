@@ -24,8 +24,15 @@ impl Run for Edit {
                 }
                 db.save()?;
 
+                // Modifying an entry can leave the database unsorted: `remove` uses
+                // `swap_remove`, and `add` changes a rank in place. fzf displays
+                // entries in the order it receives them, so sort them here instead of
+                // relying on the order they happen to be stored in.
+                let mut dirs = db.dirs().iter().collect::<Vec<_>>();
+                dirs.sort_unstable_by(|dir1, dir2| dir2.score(now).total_cmp(&dir1.score(now)));
+
                 let stdout = &mut io::stdout().lock();
-                for dir in db.dirs().iter().rev() {
+                for dir in dirs {
                     write!(stdout, "{}\0", dir.display().with_score(now).with_separator('\t'))
                         .pipe_exit("fzf")?;
                 }

@@ -316,6 +316,25 @@ mod tests {
             .stderr("");
     }
 
+    #[rstest]
+    #[case(None)]
+    #[case(Some("z"))]
+    #[case(Some("jump"))]
+    fn xonsh_completion(#[case] cmd: Option<&str>) {
+        let opts = Opts { cmd, hook: InitHook::None, echo: false, resolve_symlinks: false };
+        let source = Xonsh(&opts).render().unwrap();
+        // Parse the Python fixture with Python rather than Xonsh's hybrid parser.
+        let test = format!("exec({:?})", include_str!("../tests/xonsh.py"));
+
+        Command::new("xonsh")
+            .args(["--no-rc", "-c", &test])
+            .write_stdin(source)
+            .assert()
+            .success()
+            .stdout("")
+            .stderr("");
+    }
+
     #[apply(opts)]
     fn zsh_shellcheck(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };

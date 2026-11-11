@@ -101,6 +101,15 @@ When set to 1, \fBz\fR will resolve symlinks before adding directories to
 the database.
 .SH ALGORITHM
 .TP
+.B MATCHING
+All terms must be present in the path in order, and the last term must match
+within the last component of the path, with nothing following it in that
+component. Matching is case-insensitive. Additionally, when zoxide is built
+with the \fBpinyin\fR feature, ASCII keywords may match the pinyin
+transliteration of Chinese path components (e.g. \fBz shichang\fR matches
+\fB/foo/市场\fR and \fB/foo/时长\fR). This only applies when every keyword
+consists entirely of ASCII letters.
+.TP
 .B AGING
 zoxide uses a parameter called \fB_ZO_MAXAGE\fR to limit the number of entries
 in the database based on usage patterns. If the total \fBFRECENCY\fR of the

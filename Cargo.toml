@@ -29,6 +29,10 @@ dunce = "1.0.1"
 fastrand = "2.0.0"
 glob = "0.3.0"
 ouroboros = "0.18.3"
+pinyin = { version = "0.11", default-features = false, features = [
+    "heteronym",
+    "plain",
+], optional = true }
 serde = { version = "1.0.116", features = ["derive"] }
 time = { version = "0.3.47", default-features = false, features = ["parsing", "macros", "std"] }
 
@@ -51,6 +55,7 @@ tempfile = "3.15.0"
 [features]
 default = []
 nix-dev = []
+pinyin = ["dep:pinyin"]
 
 [profile.release]
 codegen-units = 1

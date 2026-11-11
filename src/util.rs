@@ -42,6 +42,8 @@ impl Fzf {
             // Search mode
             "--delimiter=\t",
             "--nth=2",
+            // Renders the dimmed git branch annotation.
+            "--ansi",
             // Scripting
             "--read0",
         ])
@@ -60,9 +62,9 @@ impl Fzf {
         self.args([
             // Non-POSIX args are only available on certain operating systems.
             if cfg!(target_os = "linux") {
-                r"--preview=\command -p ls -Cp --color=always --group-directories-first {2..}"
+                r"--preview=\command -p ls -Cp --color=always --group-directories-first {2}"
             } else {
-                r"--preview=\command -p ls -Cp {2..}"
+                r"--preview=\command -p ls -Cp {2}"
             },
             // Rounded edges don't display correctly on some terminals.
             "--preview-window=down,30%,sharp",
@@ -123,7 +125,12 @@ pub struct FzfChild(Child);
 impl FzfChild {
     pub fn write(&mut self, dir: &Dir, now: Epoch) -> Result<Option<String>> {
         let handle = self.0.stdin.as_mut().unwrap();
-        match write!(handle, "{}\0", dir.display().with_score(now).with_separator('\t')) {
+        let display = dir.display().with_score(now).with_separator('\t');
+        let result = match git_branch(dir.path.as_ref()) {
+            Some(branch) => write!(handle, "{display}\t\x1b[2m[{branch}]\x1b[0m\0"),
+            None => write!(handle, "{display}\0"),
+        };
+        match result {
             Ok(()) => Ok(None),
             Err(e) if e.kind() == io::ErrorKind::BrokenPipe => self.wait().map(Some),
             Err(e) => Err(e).context("could not write to fzf"),
@@ -151,6 +158,26 @@ impl FzfChild {
 }
 
 /// Similar to [`fs::write`], but atomic (best effort on Windows).
+/// Returns the checked-out branch (or short commit hash if detached) when
+/// `dir` is the root of a git repository.
+pub fn git_branch(dir: impl AsRef<Path>) -> Option<String> {
+    let dot_git = dir.as_ref().join(".git");
+    let git_dir = if dot_git.is_dir() {
+        dot_git
+    } else {
+        // Worktrees and submodules use a `.git` file pointing at the real directory.
+        let contents = fs::read_to_string(&dot_git).ok()?;
+        let target = Path::new(contents.strip_prefix("gitdir:")?.trim());
+        dir.as_ref().join(target)
+    };
+    let head = fs::read_to_string(git_dir.join("HEAD")).ok()?;
+    let head = head.trim();
+    match head.strip_prefix("ref: ") {
+        Some(r) => Some(r.strip_prefix("refs/heads/").unwrap_or(r).to_string()),
+        None => Some(head.get(..7).unwrap_or(head).to_string()),
+    }
+}
+
 pub fn write(path: impl AsRef<Path>, contents: impl AsRef<[u8]>) -> Result<()> {
     let path = path.as_ref();
     let contents = contents.as_ref();

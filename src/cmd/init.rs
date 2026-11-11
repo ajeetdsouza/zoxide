@@ -13,7 +13,7 @@ impl Run for Init {
         let cmd = if self.no_cmd { None } else { Some(self.cmd.as_str()) };
         let echo = config::echo();
         let resolve_symlinks = config::resolve_symlinks();
-        let opts = &Opts { cmd, hook: self.hook, echo, resolve_symlinks };
+        let opts = &Opts { cmd, hook: self.hook, echo, resolve_symlinks, db_only: self.db_only };
 
         let source = match self.shell {
             InitShell::Bash => Bash(opts).render(),

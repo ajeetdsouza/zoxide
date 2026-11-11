@@ -50,8 +50,10 @@ fn __zoxide_z {|@rest|
         __zoxide_cd ~
     } elif (builtin:eq [-] $rest) {
         __zoxide_cd $oldpwd
+{%- if !db_only %}
     } elif (and ('builtin:==' (builtin:count $rest) 1) (path:is-dir &follow-symlink=$true $rest[0])) {
         __zoxide_cd $rest[0]
+{%- endif %}
     } else {
         var path
         try {

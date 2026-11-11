@@ -332,6 +332,18 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
                     base_path = get_drive_path(drive_letter);
                     stack.extend(base_path.components());
                 }
+                Prefix::UNC(server, share) | Prefix::VerbatimUNC(server, share) => {
+                    let server = server.to_string_lossy();
+                    let share = share.to_string_lossy();
+
+                    components.next();
+                    if components.peek() == Some(&Component::RootDir) {
+                        components.next();
+                    }
+
+                    base_path = format!(r"\\{server}\{share}").into();
+                    stack.extend(base_path.components());
+                }
                 _ => bail!("invalid path: {}", path.display()),
             },
             Some(Component::RootDir) => {
@@ -377,4 +389,37 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
 pub fn to_lowercase(s: impl AsRef<str>) -> String {
     let s = s.as_ref();
     if s.is_ascii() { s.to_ascii_lowercase() } else { s.to_lowercase() }
+}
+
+#[cfg(all(test, windows))]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn resolve_path_unc() {
+        let resolved = resolve_path(r"\\a.network-drive\a-folder").unwrap();
+        assert_eq!(resolved, PathBuf::from(r"\\a.network-drive\a-folder"));
+    }
+
+    #[test]
+    fn resolve_path_unc_with_subdirs() {
+        let resolved = resolve_path(r"\\a.network-drive\a-folder\subdir\nested").unwrap();
+        assert_eq!(resolved, PathBuf::from(r"\\a.network-drive\a-folder\subdir\nested"));
+    }
+
+    #[test]
+    fn resolve_path_verbatim_unc() {
+        // `\\?\UNC\server\share\...` is the verbatim form Windows APIs produce
+        // for UNC paths (e.g. via `dunce`/`canonicalize` on paths that were
+        // already long-path-prefixed). It should resolve to the same
+        // non-verbatim form as a plain UNC path.
+        let resolved = resolve_path(r"\\?\UNC\a.network-drive\a-folder\subdir").unwrap();
+        assert_eq!(resolved, PathBuf::from(r"\\a.network-drive\a-folder\subdir"));
+    }
+
+    #[test]
+    fn resolve_path_disk() {
+        let resolved = resolve_path(r"C:\Users\test").unwrap();
+        assert_eq!(resolved, PathBuf::from(r"C:\Users\test"));
+    }
 }

@@ -75,12 +75,18 @@ z foo /            # cd into a subdirectory starting with foo
 z ~/foo            # z also works like a regular cd command
 z foo/             # cd into relative path
 z ..               # cd one level up
+z ...              # cd two levels up
+z ....             # cd three levels up (add a dot for each extra level)
 z -                # cd into previous directory
 
 zi foo             # cd with interactive selection (using fzf)
 
 z foo<SPACE><TAB>  # show interactive completions (bash 4.4+/fish/zsh only)
 ```
+
+For a single argument of three or more dots, each extra dot moves up another
+level. Existing directories take precedence. Nushell uses its native dot
+expansion instead.
 
 Read more about the matching algorithm [here][algorithm-matching].
 

@@ -3,6 +3,7 @@
 
 use builtin
 use path
+use re
 
 {{ section }}
 # Utility functions for zoxide.
@@ -52,6 +53,8 @@ fn __zoxide_z {|@rest|
         __zoxide_cd $oldpwd
     } elif (and ('builtin:==' (builtin:count $rest) 1) (path:is-dir &follow-symlink=$true $rest[0])) {
         __zoxide_cd $rest[0]
+    } elif (and ('builtin:==' (builtin:count $rest) 1) (re:match '^\.\.\.+$' $rest[0])) {
+        __zoxide_cd (re:replace '\.' '../' $rest[0][1..])
     } else {
         var path
         try {

@@ -107,6 +107,14 @@ __zoxide_z() {
         fi
     elif [ "$#" -eq 1 ] && (\command cd -- "$1") >/dev/null 2>&1; then
         __zoxide_cd "$1"
+    elif [ "$#" -eq 1 ] && [ "${1#...}" != "$1" ] && [ "$1" = "${1%%[!.]*}" ] && [ ! -d "$1" ]; then
+        __zoxide_result=${1#.}
+        set -- ''
+        while [ -n "${__zoxide_result}" ]; do
+            set -- "$1../"
+            __zoxide_result=${__zoxide_result#.}
+        done
+        __zoxide_cd "$1"
     else
         __zoxide_result="$(\command zoxide query --exclude "$(__zoxide_pwd || \command true)" -- "$@")" &&
             __zoxide_cd "${__zoxide_result}"

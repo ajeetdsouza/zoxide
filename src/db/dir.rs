@@ -1,5 +1,6 @@
 use std::borrow::Cow;
 use std::fmt::{self, Display, Formatter};
+use std::path::{MAIN_SEPARATOR, Path};
 
 use serde::Deserialize;
 
@@ -37,11 +38,12 @@ pub struct DirDisplay<'a> {
     dir: &'a Dir<'a>,
     now: Option<Epoch>,
     separator: char,
+    home: Option<&'a str>,
 }
 
 impl<'a> DirDisplay<'a> {
     fn new(dir: &'a Dir) -> Self {
-        Self { dir, separator: ' ', now: None }
+        Self { dir, separator: ' ', now: None, home: None }
     }
 
     pub fn with_score(mut self, now: Epoch) -> Self {
@@ -53,6 +55,12 @@ impl<'a> DirDisplay<'a> {
         self.separator = separator;
         self
     }
+
+    /// Abbreviates paths under the given home directory using `~`.
+    pub fn with_home(mut self, home: Option<&'a str>) -> Self {
+        self.home = home;
+        self
+    }
 }
 
 impl Display for DirDisplay<'_> {
@@ -61,9 +69,38 @@ impl Display for DirDisplay<'_> {
             let score = self.dir.score(now).clamp(0.0, 9999.0);
             write!(f, "{score:>6.1}{}", self.separator)?;
         }
-        write!(f, "{}", self.dir.path)
+
+        // `strip_prefix` compares whole components, so `/home/alice2` is not
+        // treated as being under `/home/alice`.
+        let path = self.dir.path.as_ref();
+        let rest = self.home.and_then(|home| Path::new(path).strip_prefix(home).ok());
+        match rest.and_then(Path::to_str) {
+            Some("") => write!(f, "~"),
+            Some(rest) => write!(f, "~{MAIN_SEPARATOR}{rest}"),
+            None => write!(f, "{path}"),
+        }
     }
 }
 
 pub type Rank = f64;
 pub type Epoch = u64;
+
+#[cfg(test)]
+mod tests {
+    use rstest::rstest;
+
+    use super::*;
+
+    #[rstest]
+    #[case("/home/alice/foo/bar", Some("/home/alice"), "~/foo/bar")]
+    #[case("/home/alice", Some("/home/alice"), "~")]
+    #[case("/home/alice2/foo", Some("/home/alice"), "/home/alice2/foo")]
+    #[case("/home", Some("/home/alice"), "/home")]
+    #[case("/usr/bin", Some("/home/alice"), "/usr/bin")]
+    #[case("/home/alice/foo", None, "/home/alice/foo")]
+    fn display_home(#[case] path: &str, #[case] home: Option<&str>, #[case] expected: &str) {
+        let dir = Dir { path: path.into(), rank: 1.0, last_accessed: 0 };
+        let display = dir.display().with_home(home).to_string();
+        assert_eq!(expected, display.replace(MAIN_SEPARATOR, "/"));
+    }
+}

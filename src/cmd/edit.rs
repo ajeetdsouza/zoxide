@@ -78,7 +78,7 @@ ctrl-w:increment\tctrl-s:decrement
                 "--color=label:bold",
                 "--tabstop=1",
             ])
-            .enable_preview()
+            .enable_preview(None)
             .spawn()
     }
 }

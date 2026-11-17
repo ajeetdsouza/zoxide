@@ -1,7 +1,8 @@
+use std::borrow::Cow;
 use std::ffi::OsStr;
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, Read, Write};
-use std::path::{Component, Path, PathBuf};
+use std::path::{Component, MAIN_SEPARATOR, Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::time::SystemTime;
 use std::{env, mem};
@@ -24,6 +25,8 @@ pub struct Fzf(Command);
 
 impl Fzf {
     const ERR_FZF_NOT_FOUND: &'static str = "could not find fzf, is it installed?";
+    /// Passes the home directory to the preview command.
+    const ENV_HOME: &'static str = "_ZO_TILDE_HOME";
 
     pub fn new() -> Result<Self> {
         // On Windows, CreateProcess implicitly searches the current working
@@ -51,19 +54,33 @@ impl Fzf {
         Ok(Fzf(cmd))
     }
 
-    pub fn enable_preview(&mut self) -> &mut Self {
+    /// Enables the preview window. If `home` is set, the paths shown in fzf
+    /// are abbreviated using `~`, and are expanded again before previewing.
+    pub fn enable_preview(&mut self, home: Option<&str>) -> &mut Self {
         // Previews are only supported on UNIX.
         if !cfg!(unix) {
             return self;
         }
 
+        // Non-POSIX args are only available on certain operating systems.
+        let ls = if cfg!(target_os = "linux") {
+            r"\command -p ls -Cp --color=always --group-directories-first"
+        } else {
+            r"\command -p ls -Cp"
+        };
+        let preview = match home {
+            Some(home) => {
+                self.env(Self::ENV_HOME, home);
+                format!(
+                    r#"--preview=p={{2..}}; case "$p" in "~"|"~/"*) p="${}${{p#?}}";; esac; {ls} "$p""#,
+                    Self::ENV_HOME,
+                )
+            }
+            None => format!("--preview={ls} {{2..}}"),
+        };
+
         self.args([
-            // Non-POSIX args are only available on certain operating systems.
-            if cfg!(target_os = "linux") {
-                r"--preview=\command -p ls -Cp --color=always --group-directories-first {2..}"
-            } else {
-                r"--preview=\command -p ls -Cp {2..}"
-            },
+            preview.as_str(),
             // Rounded edges don't display correctly on some terminals.
             "--preview-window=down,30%,sharp",
         ])
@@ -121,9 +138,10 @@ impl Fzf {
 pub struct FzfChild(Child);
 
 impl FzfChild {
-    pub fn write(&mut self, dir: &Dir, now: Epoch) -> Result<Option<String>> {
+    pub fn write(&mut self, dir: &Dir, now: Epoch, home: Option<&str>) -> Result<Option<String>> {
         let handle = self.0.stdin.as_mut().unwrap();
-        match write!(handle, "{}\0", dir.display().with_score(now).with_separator('\t')) {
+        let dir = dir.display().with_score(now).with_separator('\t').with_home(home);
+        match write!(handle, "{dir}\0") {
             Ok(()) => Ok(None),
             Err(e) if e.kind() == io::ErrorKind::BrokenPipe => self.wait().map(Some),
             Err(e) => Err(e).context("could not write to fzf"),
@@ -373,8 +391,48 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
     Ok(stack.iter().collect())
 }
 
+/// Returns the home directory as a string, for abbreviating paths with `~`.
+pub fn home_dir() -> Option<String> {
+    // Rebuilding the path from its components drops any trailing separators.
+    let home: PathBuf = dirs::home_dir()?.components().collect();
+    // Abbreviating the root directory would make every path longer.
+    home.parent()?;
+    home.into_os_string().into_string().ok()
+}
+
+/// Reverses the abbreviation of the home directory to `~`. Absolute paths
+/// never start with `~`, so this cannot be confused with a real path.
+pub fn expand_tilde<'a>(path: &'a str, home: &str) -> Cow<'a, str> {
+    match path.strip_prefix('~') {
+        Some(rest) if rest.trim_end_matches(['\r', '\n']).is_empty() => {
+            Cow::Owned(format!("{home}{rest}"))
+        }
+        Some(rest) if rest.starts_with(['/', MAIN_SEPARATOR]) => {
+            Cow::Owned(format!("{home}{rest}"))
+        }
+        _ => Cow::Borrowed(path),
+    }
+}
+
 /// Convert a string to lowercase, with a fast path for ASCII strings.
 pub fn to_lowercase(s: impl AsRef<str>) -> String {
     let s = s.as_ref();
     if s.is_ascii() { s.to_ascii_lowercase() } else { s.to_lowercase() }
+}
+
+#[cfg(test)]
+mod tests {
+    use rstest::rstest;
+
+    #[rstest]
+    #[case("~", "/home/alice")]
+    #[case("~\n", "/home/alice\n")]
+    #[case("~/foo/bar", "/home/alice/foo/bar")]
+    #[case("~/foo/bar\n", "/home/alice/foo/bar\n")]
+    #[case("/home/alice/foo", "/home/alice/foo")]
+    #[case("/~/foo", "/~/foo")]
+    #[case("/foo/~", "/foo/~")]
+    fn expand_tilde(#[case] path: &str, #[case] expected: &str) {
+        assert_eq!(expected, super::expand_tilde(path, "/home/alice"));
+    }
 }

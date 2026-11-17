@@ -30,12 +30,17 @@ impl Query {
     }
 
     fn query_interactive(&self, stream: &mut Stream, now: Epoch) -> Result<()> {
-        let mut fzf = Self::get_fzf()?;
+        // Paths are abbreviated with `~` only while being displayed in fzf, the
+        // output always contains the full path.
+        let home = if config::tilde() { util::home_dir() } else { None };
+        let home = home.as_deref();
+
+        let mut fzf = Self::get_fzf(home)?;
         let selection = loop {
             match stream.next() {
                 Some(dir) if Some(dir.path.as_ref()) == self.exclude.as_deref() => continue,
                 Some(dir) => {
-                    if let Some(selection) = fzf.write(dir, now)? {
+                    if let Some(selection) = fzf.write(dir, now, home)? {
                         break selection;
                     }
                 }
@@ -43,11 +48,17 @@ impl Query {
             }
         };
 
+        let (score, path) =
+            selection.split_at_checked(7).context("could not read selection from fzf")?;
+        let path = match home {
+            Some(home) => util::expand_tilde(path, home),
+            None => path.into(),
+        };
+
         let stdout = &mut io::stdout();
         if self.score {
-            write!(stdout, "{selection}").pipe_exit("stdout")?;
+            write!(stdout, "{score}{path}").pipe_exit("stdout")?;
         } else {
-            let path = selection.get(7..).context("could not read selection from fzf")?;
             write!(stdout, "{path}").pipe_exit("stdout")?;
         }
         stdout.flush().pipe_exit("stdout")
@@ -91,7 +102,7 @@ impl Query {
         Ok(stream)
     }
 
-    fn get_fzf() -> Result<FzfChild> {
+    fn get_fzf(home: Option<&str>) -> Result<FzfChild> {
         let mut fzf = Fzf::new()?;
         if let Some(fzf_opts) = config::fzf_opts() {
             fzf.env("FZF_DEFAULT_OPTS", fzf_opts)
@@ -115,7 +126,7 @@ impl Query {
                 // Scripting
                 "--exit-0",
             ])
-            .enable_preview()
+            .enable_preview(home)
         }
         .spawn()
     }

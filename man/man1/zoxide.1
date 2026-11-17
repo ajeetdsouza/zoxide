@@ -99,6 +99,12 @@ the database. By default, this is set to 10000.
 .B _ZO_RESOLVE_SYMLINKS
 When set to 1, \fBz\fR will resolve symlinks before adding directories to
 the database.
+.TP
+.B _ZO_TILDE
+When set to 1, paths under your home directory are displayed with a \fB~\fR
+prefix during interactive selection. The selected path is still returned in
+full. If you use a custom preview command in \fB_ZO_FZF_OPTS\fR, note that it
+will receive the path as it is displayed, i.e. starting with \fB~\fR.
 .SH ALGORITHM
 .TP
 .B AGING

@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `$_ZO_TILDE` to display the home directory as `~` during interactive selection.
+
 ### Fixed
 
 - Import: fetch atuin history in UTC instead of the local timezone.

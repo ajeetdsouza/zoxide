@@ -435,6 +435,12 @@ Environment variables[^2] can be used for configuration. They must be set before
 - `_ZO_RESOLVE_SYMLINKS`
   - When set to 1, `z` will resolve symlinks before adding directories to the
     database.
+- `_ZO_TILDE`
+  - When set to 1, paths under your home directory are displayed with a `~`
+    prefix during interactive selection. The selected path is still returned in
+    full.
+  - If you use a custom preview command in `_ZO_FZF_OPTS`, note that it will
+    receive the path as it is displayed, i.e. starting with `~`.
 
 ## Third-party integrations
 

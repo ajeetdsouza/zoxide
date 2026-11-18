@@ -7,6 +7,10 @@ use glob::Pattern;
 
 use crate::db::Rank;
 
+pub fn base_dir() -> Option<PathBuf> {
+    env::var_os("_ZO_BASE_DIR").map(PathBuf::from)
+}
+
 pub fn data_dir() -> Result<PathBuf> {
     let dir = match env::var_os("_ZO_DATA_DIR") {
         Some(path) => PathBuf::from(path),

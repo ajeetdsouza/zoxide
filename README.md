@@ -398,9 +398,16 @@ When calling `zoxide init`, the following flags are available:
 
 ### Environment variables
 
-Environment variables[^2] can be used for configuration. They must be set before
-`zoxide init` is called.
+Environment variables[^2] can be used for configuration. Set them before
+`zoxide init` unless noted below.
 
+- `_ZO_BASE_DIR`
+  - Sets the default base directory for `zoxide query`. Use an absolute path
+    to match only stored paths at or below that directory.
+  - `zoxide query` reads this setting each time it runs. An unset or empty
+    value supplies no default.
+  - An explicit `--base-dir` takes precedence. Pass `--base-dir=` to search
+    without a base directory for one query.
 - `_ZO_DATA_DIR`
   - Specifies the directory in which the database is stored.
   - The default value varies across OSes:

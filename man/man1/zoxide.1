@@ -46,8 +46,15 @@ Print help information.
 .B -V, --version
 Print version information.
 .SH ENVIRONMENT VARIABLES
-Environment variables can be used for configuration. They must be set before
-\fBzoxide-init\fR(1) is called.
+Environment variables can be used for configuration. Set them before
+\fBzoxide-init\fR(1) unless noted below.
+.TP
+.B _ZO_BASE_DIR
+Sets the default base directory for \fBzoxide-query\fR(1). Use an absolute
+path to match only stored paths at or below that directory. Each query reads
+this setting when it runs. An unset or empty value supplies no default.
+An explicit \fB--base-dir\fR takes precedence.
+Pass \fB--base-dir=\fR to search without a base directory for one query.
 .TP
 .B _ZO_DATA_DIR
 Specifies the directory in which the database is stored. The default value

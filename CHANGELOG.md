@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Nushell: `z` now supports Space-Tab completions.
+
+### Changed
+
+- Nushell: upgrade minimum supported version to v0.116.0.
+
 ### Fixed
 
 - Import: fetch atuin history in UTC instead of the local timezone.

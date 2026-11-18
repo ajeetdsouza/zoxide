@@ -1,9 +1,11 @@
 #[path = "src/cmd/cmd.rs"]
 mod cmd;
 
-use std::{env, io};
+use std::path::Path;
+use std::{env, fs, io};
 
 use clap::CommandFactory as _;
+use clap_complete::Generator;
 use clap_complete::shells::{Bash, Elvish, Fish, PowerShell, Zsh};
 use clap_complete_fig::Fig;
 use clap_complete_nushell::Nushell;
@@ -16,21 +18,29 @@ fn main() -> io::Result<()> {
     println!("cargo:rerun-if-changed=src/");
     println!("cargo:rerun-if-changed=templates/");
     println!("cargo:rerun-if-changed=tests/");
-    generate_completions()
+
+    generate_completions(Bash)?;
+    generate_completions(Elvish)?;
+    generate_completions(Fig)?;
+    generate_completions(Fish)?;
+    generate_completions(Nushell)?;
+    generate_completions(PowerShell)?;
+    generate_completions(Zsh)?;
+
+    Ok(())
 }
 
-fn generate_completions() -> io::Result<()> {
+/// Writes a shell's completions only if they differ from the committed file.
+fn generate_completions(generator: impl Generator) -> io::Result<()> {
     const BIN_NAME: &str = env!("CARGO_PKG_NAME");
     const OUT_DIR: &str = "contrib/completions";
-    let cmd = &mut Cmd::command();
 
-    clap_complete::generate_to(Bash, cmd, BIN_NAME, OUT_DIR)?;
-    clap_complete::generate_to(Elvish, cmd, BIN_NAME, OUT_DIR)?;
-    clap_complete::generate_to(Fig, cmd, BIN_NAME, OUT_DIR)?;
-    clap_complete::generate_to(Fish, cmd, BIN_NAME, OUT_DIR)?;
-    clap_complete::generate_to(Nushell, cmd, BIN_NAME, OUT_DIR)?;
-    clap_complete::generate_to(PowerShell, cmd, BIN_NAME, OUT_DIR)?;
-    clap_complete::generate_to(Zsh, cmd, BIN_NAME, OUT_DIR)?;
+    let path = Path::new(OUT_DIR).join(generator.file_name(BIN_NAME));
+    let mut generated = Vec::new();
+    clap_complete::generate(generator, &mut Cmd::command(), BIN_NAME, &mut generated);
 
+    if !fs::read(&path).is_ok_and(|content| content == generated) {
+        fs::write(&path, generated)?;
+    }
     Ok(())
 }

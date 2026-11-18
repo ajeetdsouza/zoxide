@@ -13,9 +13,10 @@ pub(crate) struct Atuin {}
 
 impl Importer for Atuin {
     fn dirs(&self) -> Result<impl Iterator<Item = Result<Dir<'static>, ImportError>>> {
-        // atuin renders `{time}` as `YYYY-MM-DD HH:MM:SS` in UTC.
+        // atuin renders `{time}` as `YYYY-MM-DD HH:MM:SS` in the configured
+        // timezone, which defaults to local time, so request UTC explicitly.
         let mut child = Command::new("atuin")
-            .args(["history", "list", "--format={time}\t{directory}", "--print0"])
+            .args(["history", "list", "--format={time}\t{directory}", "--print0", "--tz=utc"])
             .stdout(Stdio::piped())
             .spawn()
             .context("failed to run `atuin`; is it installed and on PATH?")?;

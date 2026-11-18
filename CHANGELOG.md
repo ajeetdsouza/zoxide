@@ -19,8 +19,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Bash/Zsh: `z` failing on Cygwin/MSYS2 due to `cygpath` being passed a bad string.
+- Import: fetch atuin history in UTC instead of the local timezone.
+- Bash/Zsh: fix `z` failing on Cygwin/MSYS2 due to `cygpath` being passed a bad string.
 - Nushell: `z` now handles relative paths through symlinked directories.
+- POSIX: fix `z` failing to enter directories whose names start with `-`.
+- Build: fix compilation failing when the source directory is read-only.
+- PowerShell: the prompt hook no longer resets `$LASTEXITCODE`.
+- Database: keep the file permissions of `db.txt` when saving.
 
 ## [0.10.0] - 2026-07-04
 

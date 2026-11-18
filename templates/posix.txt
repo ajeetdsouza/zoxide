@@ -34,7 +34,7 @@ __zoxide_pwd() {
 # cd + custom logic based on the value of _ZO_ECHO.
 __zoxide_cd() {
     # shellcheck disable=SC2164
-    \command cd "$@" {%- if echo %} && __zoxide_pwd {%- endif %}
+    \command cd -- "$@" {%- if echo %} && __zoxide_pwd {%- endif %}
 }
 
 {{ section }}
@@ -55,6 +55,13 @@ __zoxide_hook() {
 if [ "${PS1:=}" = "${PS1#*\$(__zoxide_hook)}" ]; then
     PS1="${PS1}\$(__zoxide_hook)"
 fi
+
+{%- when InitHook::Pwd -%}
+\command printf "%s\n%s\n" \
+    "zoxide: PWD hooks are not supported on POSIX shells." \
+    "        Use 'zoxide init posix --hook prompt' instead."
+
+{%- endmatch %}
 
 # Report common issues.
 __zoxide_doctor() {
@@ -79,13 +86,6 @@ __zoxide_doctor() {
         '' >&2
 {%- endif %}
 }
-
-{%- when InitHook::Pwd -%}
-\command printf "%s\n%s\n" \
-    "zoxide: PWD hooks are not supported on POSIX shells." \
-    "        Use 'zoxide init posix --hook prompt' instead."
-
-{%- endmatch %}
 
 {{ section }}
 # When using zoxide with --no-cmd, alias these internal functions as desired.

@@ -83,8 +83,8 @@ fn data_path() -> Result<PathBuf> {
 /// ```
 fn data_path_fish() -> Result<PathBuf> {
     let mut path = match env::var_os("XDG_DATA_HOME") {
-        Some(xdg) => PathBuf::from(xdg),
-        None => {
+        Some(xdg) if !xdg.is_empty() => PathBuf::from(xdg),
+        _ => {
             let mut path = dirs::home_dir().context("could not find home directory")?;
             path.push(".local");
             path.push("share");

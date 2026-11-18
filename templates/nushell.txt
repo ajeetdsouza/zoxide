@@ -18,7 +18,7 @@ export-env {
     $env.config.hooks.pre_prompt
     | any { get __zoxide_hook? | default false }
   )
-  if not $__zoxide_hooked {
+  if $nu.history-enabled and not $__zoxide_hooked {
     $env.config.hooks.pre_prompt = ($env.config.hooks.pre_prompt | append {
       __zoxide_hook: true,
       code: {|| ^zoxide add -- $env.PWD}
@@ -29,10 +29,10 @@ export-env {
     $env.config.hooks.env_change.PWD? | default []
     | any { get __zoxide_hook? | default false }
   )
-  if not $__zoxide_hooked {
+  if $nu.history-enabled and not $__zoxide_hooked {
     $env.config.hooks.env_change.PWD = ($env.config.hooks.env_change.PWD? | append {
       __zoxide_hook: true,
-      code: {|_, dir| ^zoxide add -- $dir}
+      code: {|old, dir| if ($old | is-not-empty) { ^zoxide add -- $dir }}
     })
   }
 {%- endif %}

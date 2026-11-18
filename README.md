@@ -405,11 +405,11 @@ Environment variables[^2] can be used for configuration. They must be set before
   - Specifies the directory in which the database is stored.
   - The default value varies across OSes:
 
-    | OS          | Path                                     | Example                                    |
-    | ----------- | ---------------------------------------- | ------------------------------------------ |
-    | Linux / BSD | `$XDG_DATA_HOME` or `$HOME/.local/share` | `/home/alice/.local/share`                 |
-    | macOS       | `$HOME/Library/Application Support`      | `/Users/Alice/Library/Application Support` |
-    | Windows     | `%LOCALAPPDATA%`                         | `C:\Users\Alice\AppData\Local`             |
+    | OS          | Path                                                   | Example                                           |
+    | ----------- | ------------------------------------------------------ | ------------------------------------------------- |
+    | Linux / BSD | `$XDG_DATA_HOME/zoxide` or `$HOME/.local/share/zoxide` | `/home/alice/.local/share/zoxide`                 |
+    | macOS       | `$HOME/Library/Application Support/zoxide`             | `/Users/Alice/Library/Application Support/zoxide` |
+    | Windows     | `%LOCALAPPDATA%\zoxide`                                | `C:\Users\Alice\AppData\Local\zoxide`             |
 
 - `_ZO_ECHO`
   - When set to 1, `z` will print the matched directory before navigating to
@@ -497,7 +497,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 [felix]: https://github.com/kyoheiu/felix
 [freshports]: https://www.freshports.org/sysutils/zoxide/
 [fzf-installation]: https://github.com/junegunn/fzf#installation
-[fzf-man]: https://manpages.ubuntu.com/manpages/en/man1/fzf.1.html
+[fzf-man]: https://junegunn.github.io/fzf/reference/
 [fzf]: https://github.com/junegunn/fzf
 [gentoo packages]: https://packages.gentoo.org/packages/app-shells/zoxide
 [glob]: https://man7.org/linux/man-pages/man7/glob.7.html

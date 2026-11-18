@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Release binaries now come with GitHub artifact attestations.
+
 ### Fixed
 
 - Import: fetch atuin history in UTC instead of the local timezone.

@@ -22,7 +22,17 @@ impl<'a> Stream<'a> {
     }
 
     pub fn next(&mut self) -> Option<&Dir<'_>> {
+        self.next_until(|| false)
+    }
+
+    /// Like [`Stream::next`], but returns `None` as soon as `stop` returns true. 
+    /// `stop` is checked before every entry, since skipping entries that don't exist can take a long time.
+    pub fn next_until(&mut self, mut stop: impl FnMut() -> bool) -> Option<&Dir<'_>> {
         while let Some(idx) = self.idxs.next() {
+            if stop() {
+                return None;
+            }
+
             let dir = &self.db.dirs()[idx];
 
             if !self.filter_by_keywords(&dir.path) {

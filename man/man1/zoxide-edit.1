@@ -1,0 +1,37 @@
+.TH "ZOXIDE" "1" "2021-04-12" "" "zoxide"
+.SH NAME
+\fBzoxide-edit\fR - edit the database interactively
+.SH SYNOPSIS
+.B zoxide edit [OPTIONS]
+.SH DESCRIPTION
+Opens the database in an interactive \fBfzf\fR(1) window, sorted by score, so
+that entries can be adjusted or removed. This command requires \fBfzf\fR(1).
+.sp
+The following keys are available:
+.TP
+.B ctrl-w
+Increment the score of the selected directory by 1.
+.TP
+.B ctrl-s
+Decrement the score of the selected directory by 1.
+.TP
+.B ctrl-d
+Delete the selected directory from the database.
+.TP
+.B ctrl-r
+Reload the list.
+.TP
+.B enter
+Close the window.
+.PP
+Changes are saved to the database as soon as they are made.
+.SH OPTIONS
+.TP
+.B -h, --help
+Print help information.
+.SH REPORTING BUGS
+For any issues, feature requests, or questions, please visit:
+.sp
+\fBhttps://github.com/ajeetdsouza/zoxide/issues\fR
+.SH AUTHOR
+Ajeet D'Souza \fB<98ajeet@gmail.com>\fR

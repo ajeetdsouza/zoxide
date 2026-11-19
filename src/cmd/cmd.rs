@@ -63,6 +63,10 @@ pub struct Add {
     /// doesn't
     #[clap(short, long)]
     pub score: Option<f64>,
+
+    /// Allow paths that are not existing directories
+    #[clap(long)]
+    pub allow_non_directories: bool,
 }
 
 /// Edit the database

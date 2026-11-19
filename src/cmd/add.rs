@@ -30,7 +30,7 @@ impl Run for Add {
             if path.contains(EXCLUDE_CHARS) || exclude_dirs.iter().any(|glob| glob.matches(path)) {
                 continue;
             }
-            if !Path::new(path).is_dir() {
+            if !self.allow_non_directories && !Path::new(path).is_dir() {
                 bail!("not a directory: {path}");
             }
 

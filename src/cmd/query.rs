@@ -44,10 +44,13 @@ impl Query {
         };
 
         let stdout = &mut io::stdout();
+        // fzf echoes the whole line: `score \t path [\t git branch]`.
+        let mut fields = selection.trim_end_matches('\n').split('\t');
+        let (score, path) =
+            fields.next().zip(fields.next()).context("could not read selection from fzf")?;
         if self.score {
-            write!(stdout, "{selection}").pipe_exit("stdout")?;
+            write!(stdout, "{score}\t{path}").pipe_exit("stdout")?;
         } else {
-            let path = selection.get(7..).context("could not read selection from fzf")?;
             write!(stdout, "{path}").pipe_exit("stdout")?;
         }
         stdout.flush().pipe_exit("stdout")

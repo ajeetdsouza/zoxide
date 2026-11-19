@@ -8,6 +8,7 @@ use crate::error::BrokenPipeHandler;
 use crate::util::{self, Fzf, FzfChild};
 
 impl Run for Edit {
+    #[cfg_attr(feature = "skim-tui", allow(unreachable_code))]
     fn run(&self) -> Result<()> {
         let now = util::current_time()?;
         let db = &mut Database::open()?;
@@ -34,6 +35,9 @@ impl Run for Edit {
             None => {
                 db.sort_by_score(now);
                 db.save()?;
+                #[cfg(feature = "skim-tui")]
+                return crate::skim::edit(db);
+
                 Self::get_fzf()?.wait()?;
                 Ok(())
             }

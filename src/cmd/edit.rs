@@ -33,6 +33,7 @@ impl Run for Edit {
             }
             None => {
                 db.sort_by_score(now);
+                db.mark_dirty();
                 db.save()?;
                 Self::get_fzf()?.wait()?;
                 Ok(())

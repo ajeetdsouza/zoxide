@@ -6,6 +6,7 @@ pub struct Opts<'a> {
     pub hook: InitHook,
     pub echo: bool,
     pub resolve_symlinks: bool,
+    pub db_only: bool,
 }
 
 macro_rules! make_template {
@@ -50,12 +51,19 @@ mod tests {
         #[values(InitHook::None, InitHook::Prompt, InitHook::Pwd)] hook: InitHook,
         #[values(false, true)] echo: bool,
         #[values(false, true)] resolve_symlinks: bool,
+        #[values(false, true)] db_only: bool,
     ) {
     }
 
     #[apply(opts)]
-    fn bash_bash(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+    fn bash_bash(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+        db_only: bool,
+    ) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks, db_only };
         let source = Bash(&opts).render().unwrap();
         Command::new("bash")
             .args(["--noprofile", "--norc", "-e", "-u", "-o", "pipefail", "-c", &source])
@@ -66,8 +74,14 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn bash_shellcheck(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+    fn bash_shellcheck(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+        db_only: bool,
+    ) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks, db_only };
         let source = Bash(&opts).render().unwrap();
 
         Command::new("shellcheck")
@@ -80,8 +94,14 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn bash_shfmt(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+    fn bash_shfmt(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+        db_only: bool,
+    ) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks, db_only };
         let mut source = Bash(&opts).render().unwrap();
         source.push('\n');
 
@@ -95,8 +115,14 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn elvish_elvish(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+    fn elvish_elvish(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+        db_only: bool,
+    ) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks, db_only };
         let mut source = String::new();
 
         // Filter out lines using edit:*, since those functions are only available in
@@ -115,8 +141,14 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn fish_no_builtin_abbr(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+    fn fish_no_builtin_abbr(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+        db_only: bool,
+    ) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks, db_only };
         let source = Fish(&opts).render().unwrap();
         assert!(
             !source.contains("builtin abbr"),
@@ -125,8 +157,14 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn fish_fish(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+    fn fish_fish(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+        db_only: bool,
+    ) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks, db_only };
         let source = Fish(&opts).render().unwrap();
 
         let tempdir = tempfile::tempdir().unwrap();
@@ -142,8 +180,14 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn fish_fishindent(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+    fn fish_fishindent(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+        db_only: bool,
+    ) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks, db_only };
         let mut source = Fish(&opts).render().unwrap();
         source.push('\n');
 
@@ -160,8 +204,14 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn nushell_nushell(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+    fn nushell_nushell(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+        db_only: bool,
+    ) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks, db_only };
         let source = Nushell(&opts).render().unwrap();
 
         let tempdir = tempfile::tempdir().unwrap();
@@ -180,8 +230,14 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn posix_bash(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+    fn posix_bash(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+        db_only: bool,
+    ) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks, db_only };
         let source = Posix(&opts).render().unwrap();
 
         let assert = Command::new("bash")
@@ -195,8 +251,14 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn posix_dash(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+    fn posix_dash(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+        db_only: bool,
+    ) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks, db_only };
         let source = Posix(&opts).render().unwrap();
 
         let assert =
@@ -207,8 +269,14 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn posix_shellcheck(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+    fn posix_shellcheck(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+        db_only: bool,
+    ) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks, db_only };
         let source = Posix(&opts).render().unwrap();
 
         Command::new("shellcheck")
@@ -221,8 +289,14 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn posix_shfmt(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+    fn posix_shfmt(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+        db_only: bool,
+    ) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks, db_only };
         let mut source = Posix(&opts).render().unwrap();
         source.push('\n');
 
@@ -236,8 +310,14 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn powershell_pwsh(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+    fn powershell_pwsh(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+        db_only: bool,
+    ) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks, db_only };
         let mut source = "Set-StrictMode -Version latest\n".to_string();
         Powershell(&opts).render_into(&mut source).unwrap();
 
@@ -250,8 +330,14 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn tcsh_tcsh(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+    fn tcsh_tcsh(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+        db_only: bool,
+    ) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks, db_only };
         let source = Tcsh(&opts).render().unwrap();
 
         Command::new("tcsh")
@@ -264,8 +350,14 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn xonsh_black(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+    fn xonsh_black(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+        db_only: bool,
+    ) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks, db_only };
         let mut source = Xonsh(&opts).render().unwrap();
         source.push('\n');
 
@@ -278,16 +370,28 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn xonsh_mypy(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+    fn xonsh_mypy(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+        db_only: bool,
+    ) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks, db_only };
         let source = Xonsh(&opts).render().unwrap();
 
         Command::new("mypy").args(["--command", &source, "--strict"]).assert().success().stderr("");
     }
 
     #[apply(opts)]
-    fn xonsh_pylint(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+    fn xonsh_pylint(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+        db_only: bool,
+    ) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks, db_only };
         let mut source = Xonsh(&opts).render().unwrap();
         source.push('\n');
 
@@ -300,8 +404,14 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn xonsh_xonsh(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+    fn xonsh_xonsh(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+        db_only: bool,
+    ) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks, db_only };
         let source = Xonsh(&opts).render().unwrap();
 
         let tempdir = tempfile::tempdir().unwrap();
@@ -317,8 +427,14 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn zsh_shellcheck(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+    fn zsh_shellcheck(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+        db_only: bool,
+    ) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks, db_only };
         let source = Zsh(&opts).render().unwrap();
 
         // ShellCheck doesn't support zsh yet: https://github.com/koalaman/shellcheck/issues/809
@@ -332,8 +448,14 @@ mod tests {
     }
 
     #[apply(opts)]
-    fn zsh_zsh(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
+    fn zsh_zsh(
+        cmd: Option<&str>,
+        hook: InitHook,
+        echo: bool,
+        resolve_symlinks: bool,
+        db_only: bool,
+    ) {
+        let opts = Opts { cmd, hook, echo, resolve_symlinks, db_only };
         let source = Zsh(&opts).render().unwrap();
 
         Command::new("zsh")

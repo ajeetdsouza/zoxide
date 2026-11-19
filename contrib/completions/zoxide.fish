@@ -81,6 +81,7 @@ complete -c zoxide -n "__fish_zoxide_using_subcommand init" -l hook -d 'Changes 
 prompt\t''
 pwd\t''"
 complete -c zoxide -n "__fish_zoxide_using_subcommand init" -l no-cmd -d 'Prevents zoxide from defining the `z` and `zi` commands'
+complete -c zoxide -n "__fish_zoxide_using_subcommand init" -l db-only -d 'Searches only the database instead of trying existing directories first'
 complete -c zoxide -n "__fish_zoxide_using_subcommand init" -s h -l help -d 'Print help'
 complete -c zoxide -n "__fish_zoxide_using_subcommand init" -s V -l version -d 'Print version'
 complete -c zoxide -n "__fish_zoxide_using_subcommand query" -l exclude -d 'Exclude the current directory' -r -f -a "(__fish_complete_directories)"

@@ -79,8 +79,10 @@ function __zoxide_z
         __zoxide_cd $HOME
     else if test "$argv" = -
         __zoxide_cd -
+{%- if !db_only %}
     else if test $argc -eq 1 -a -d $argv[1]
         __zoxide_cd $argv[1]
+{%- endif %}
     else if test $argc -eq 2 -a $argv[1] = --
         __zoxide_cd -- $argv[2]
     else

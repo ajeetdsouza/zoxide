@@ -48,6 +48,9 @@ else\
         cd -\
     else if ("$#__zoxide_args" == 1 && -d "$__zoxide_args[1]") then\
         cd "$__zoxide_args[1]"\
+    else if ("$#__zoxide_args" == 1 && "$__zoxide_args[1]" =~ ...* && "$__zoxide_args[1]" !~ *[^.]*) then\
+        set __zoxide_result = "$__zoxide_args[1]:s|.||:gas|.|../|"\
+        cd "$__zoxide_result"\
     else\
         set __zoxide_pwd = `{{ pwd_cmd }}`\
         set __zoxide_result = "`zoxide query --exclude '"'"'$__zoxide_pwd'"'"' -- $__zoxide_args`" && cd "$__zoxide_result"\

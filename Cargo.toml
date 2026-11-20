@@ -3,7 +3,6 @@ authors = ["Ajeet D'Souza <98ajeet@gmail.com>"]
 categories = ["command-line-utilities", "filesystem"]
 description = "A smarter cd command for your terminal"
 edition = "2024"
-homepage = "https://github.com/ajeetdsouza/zoxide"
 keywords = ["cli", "filesystem", "shell", "tool", "utility"]
 license = "MIT"
 name = "zoxide"

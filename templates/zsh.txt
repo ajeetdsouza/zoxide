@@ -176,7 +176,9 @@ if [[ -o zle ]]; then
     \builtin zle -N __zoxide_z_complete_helper
 {%- if let Some(cmd) = cmd %}
 
-    [[ "${+functions[compdef]}" -ne 0 ]] && \compdef __zoxide_z_complete {{ cmd }}
+    if [[ "${+functions[compdef]}" -ne 0 ]]; then
+        \compdef __zoxide_z_complete {{ cmd }}
+    fi
 {%- endif %}
 fi
 

@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::ffi::OsStr;
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, Read, Write};
@@ -243,8 +244,77 @@ fn rename(from: impl AsRef<Path>, to: impl AsRef<Path>) -> Result<()> {
 }
 
 pub fn canonicalize(path: impl AsRef<Path>) -> Result<PathBuf> {
-    dunce::canonicalize(&path)
-        .with_context(|| format!("could not resolve path: {}", path.as_ref().display()))
+    let path = dunce::canonicalize(&path)
+        .with_context(|| format!("could not resolve path: {}", path.as_ref().display()))?;
+
+    // On Windows, canonicalization leaves UNC paths in their verbatim form
+    // (`\\?\UNC\server\share`), which shells such as PowerShell refuse to
+    // navigate to. Normalize them to the equivalent plain form
+    // (`\\server\share`). This is a no-op on other platforms, where
+    // canonicalized paths are always rooted at `/`.
+    if let Some(path) = path.to_str()
+        && is_unc(path)
+    {
+        return Ok(PathBuf::from(simplify_unc(path).into_owned()));
+    }
+
+    Ok(path)
+}
+
+/// Returns true if the path is a verbatim UNC path, i.e. it starts with
+/// `\\?\UNC\` (or the forward-slash form `//?/UNC/`).
+pub fn is_verbatim_unc(path: &str) -> bool {
+    let Some(rest) = path.strip_prefix(r#"\\?\"#).or_else(|| path.strip_prefix("//?/")) else {
+        return false;
+    };
+    let rest = rest.as_bytes();
+    // The `UNC` part is matched case-insensitively.
+    rest.len() >= 4 && rest[..3].eq_ignore_ascii_case(b"unc") && matches!(rest[3], b'\\' | b'/')
+}
+
+/// Returns true if the path has a plain UNC prefix: `\\server\share` or
+/// `//server/share`, with a non-empty server and share.
+fn has_plain_unc_prefix(path: &str) -> bool {
+    // Exclude verbatim (`\\?\...`) and device (`\\.\...`) paths.
+    if path.starts_with(r#"\\?\"#)
+        || path.starts_with(r#"\\.\"#)
+        || path.starts_with("//?/")
+        || path.starts_with("//./")
+    {
+        return false;
+    }
+
+    let Some(rest) = path.strip_prefix(r"\\").or_else(|| path.strip_prefix("//")) else {
+        return false;
+    };
+    let mut parts = rest.split(['\\', '/']);
+    let (Some(server), Some(share)) = (parts.next(), parts.next()) else {
+        return false;
+    };
+    !server.is_empty() && !share.is_empty()
+}
+
+/// Returns true if the path is a UNC path: `\\server\share`,
+/// `//server/share`, or a verbatim UNC path (`\\?\UNC\server\share`).
+/// UNC paths are always absolute on Windows.
+pub fn is_unc(path: &str) -> bool {
+    is_verbatim_unc(path) || has_plain_unc_prefix(path)
+}
+
+/// Normalizes a verbatim UNC path (`\\?\UNC\server\share\...`) to the plain
+/// UNC form (`\\server\share\...`). The two forms are equivalent on Windows,
+/// but only the plain form can be passed to shells. Other paths are returned
+/// unchanged.
+pub fn simplify_unc(path: &str) -> Cow<'_, str> {
+    if !is_verbatim_unc(path) {
+        return Cow::Borrowed(path);
+    }
+
+    // Strip the 8-byte `\\?\UNC\` (or `//?/UNC/`) prefix and replace it with
+    // `\\` (or `//`), preserving the separator style of the input.
+    let (separator, rest) =
+        if path.starts_with("//") { ("//", &path[8..]) } else { (r"\\", &path[8..]) };
+    Cow::Owned(format!("{separator}{rest}"))
 }
 
 pub fn current_dir() -> Result<PathBuf> {
@@ -311,6 +381,33 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
             Ok(path)
         }
 
+        /// Returns the `\\server\share` root of a UNC path.
+        fn unc_root(server: &OsStr, share: &OsStr) -> PathBuf {
+            format!(r"\\{}\{}", server.to_string_lossy(), share.to_string_lossy()).into()
+        }
+
+        /// Returns the root of an absolute path: `\\server\share` for UNC paths
+        /// (a verbatim `\\?\UNC\server\share` prefix is normalized to the plain
+        /// form, which is what shells can navigate to), or the drive root
+        /// (`C:\`) for disk paths.
+        fn get_root(path: &Path) -> Result<PathBuf> {
+            if let Some(Component::Prefix(prefix)) = path.components().next() {
+                match prefix.kind() {
+                    Prefix::UNC(server, share) | Prefix::VerbatimUNC(server, share) => {
+                        return Ok(unc_root(server, share));
+                    }
+                    Prefix::Disk(drive_letter) | Prefix::VerbatimDisk(drive_letter) => {
+                        return Ok(get_drive_path(drive_letter));
+                    }
+                    _ => {}
+                }
+            }
+
+            let drive_letter = get_drive_letter(path)
+                .with_context(|| format!("could not get drive letter: {}", path.display()))?;
+            Ok(get_drive_path(drive_letter))
+        }
+
         match components.peek() {
             Some(Component::Prefix(prefix)) => match prefix.kind() {
                 Prefix::Disk(drive_letter) => {
@@ -333,16 +430,27 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
                     base_path = get_drive_path(drive_letter);
                     stack.extend(base_path.components());
                 }
+                // UNC paths (`\\server\share`) are always absolute. A verbatim
+                // UNC prefix (`\\?\UNC\server\share`) is normalized to the
+                // plain form, which is what shells can navigate to.
+                Prefix::UNC(..) | Prefix::VerbatimUNC(..) => {
+                    components.next();
+                    if components.peek() == Some(&Component::RootDir) {
+                        components.next();
+                    }
+
+                    base_path = get_root(path)?;
+                    stack.extend(base_path.components());
+                }
                 _ => bail!("invalid path: {}", path.display()),
             },
             Some(Component::RootDir) => {
                 components.next();
 
-                let current_dir = env::current_dir()?;
-                let drive_letter = get_drive_letter(&current_dir).with_context(|| {
-                    format!("could not get drive letter: {}", current_dir.display())
-                })?;
-                base_path = get_drive_path(drive_letter);
+                // If the current directory is itself on a UNC path
+                // (`\\server\share\...`), reuse its root instead of looking
+                // up a drive letter.
+                base_path = get_root(&env::current_dir()?)?;
                 stack.extend(base_path.components());
             }
             _ => {
@@ -378,6 +486,143 @@ pub fn resolve_path(path: impl AsRef<Path>) -> Result<PathBuf> {
 pub fn to_lowercase(s: impl AsRef<str>) -> String {
     let s = s.as_ref();
     if s.is_ascii() { s.to_ascii_lowercase() } else { s.to_lowercase() }
+}
+
+// These tests are pure string functions, so they run on all platforms
+// (including the Linux CI runners).
+#[cfg(test)]
+mod unc_tests {
+    use rstest::rstest;
+
+    use super::*;
+
+    #[rstest]
+    // Plain UNC paths
+    #[case(r"\\server\share", true)]
+    #[case(r"\\server\share\dir\sub", true)]
+    #[case(r"\\wsl$\fedoraremix", true)]
+    #[case(r"\\NAS\Share", true)]
+    // Forward-slash form (e.g. MSYS2), which Windows parses as UNC
+    #[case("//server/share", true)]
+    #[case("//server/share/dir", true)]
+    // Verbatim UNC paths (produced by canonicalization on Windows)
+    #[case(r"\\?\UNC\server\share", true)]
+    #[case(r"\\?\UNC\server\share\dir", true)]
+    #[case(r"\\?\UNC\wsl$\fedoraremix", true)]
+    #[case("//?/UNC/server/share", true)]
+    #[case(r"\\?\unc\server\share", true)] // case-insensitive
+    // Not UNC paths
+    #[case(r"C:\Users\foo", false)]
+    #[case("C:/Users/foo", false)]
+    #[case(r"\\?\C:\Users\foo", false)] // verbatim disk
+    #[case(r"\\.\COM1", false)] // device path
+    #[case(r"\foo\bar", false)]
+    #[case("/foo/bar", false)]
+    #[case(r"relative\path", false)]
+    #[case(r"\\server", false)] // no share
+    #[case(r"\\server\", false)] // empty share
+    #[case(r"\\", false)]
+    #[case("//", false)]
+    #[case(r"\\?\UNC", false)] // incomplete verbatim prefix
+    #[case("", false)]
+    fn detects_unc(#[case] path: &str, #[case] expected: bool) {
+        assert_eq!(is_unc(path), expected, "is_unc({path:?})");
+    }
+
+    #[rstest]
+    #[case(r"\\?\UNC\server\share", true)]
+    #[case(r"\\?\UNC\server\share\dir", true)]
+    #[case("//?/UNC/server/share", true)]
+    #[case(r"\\?\unc\server\share", true)] // case-insensitive
+    #[case(r"\\server\share", false)] // already plain
+    #[case(r"\\?\C:\foo", false)] // verbatim disk, not UNC
+    #[case(r"\\.\COM1", false)]
+    #[case(r"C:\foo", false)]
+    #[case("/foo/bar", false)]
+    #[case("", false)]
+    fn detects_verbatim_unc(#[case] path: &str, #[case] expected: bool) {
+        assert_eq!(is_verbatim_unc(path), expected, "is_verbatim_unc({path:?})");
+    }
+
+    #[rstest]
+    // Verbatim UNC is normalized to plain UNC
+    #[case(r"\\?\UNC\server\share", r"\\server\share")]
+    #[case(r"\\?\UNC\server\share\dir\sub", r"\\server\share\dir\sub")]
+    #[case(r"\\?\UNC\wsl$\fedoraremix", r"\\wsl$\fedoraremix")]
+    #[case("//?/UNC/server/share/dir", "//server/share/dir")] // keeps separator style
+    #[case(r"\\?\unc\server\share", r"\\server\share")] // case-insensitive prefix
+    // Everything else is left unchanged
+    #[case(r"\\server\share", r"\\server\share")]
+    #[case(r"\\server\share\dir", r"\\server\share\dir")]
+    #[case("//server/share", "//server/share")]
+    #[case(r"C:\Users\foo", r"C:\Users\foo")]
+    #[case(r"\\?\C:\Users\foo", r"\\?\C:\Users\foo")] // verbatim disk: dunce handles this
+    #[case(r"\\.\COM1", r"\\.\COM1")]
+    #[case("/foo/bar", "/foo/bar")]
+    #[case("relative", "relative")]
+    #[case("", "")]
+    fn normalizes_verbatim_unc(#[case] path: &str, #[case] expected: &str) {
+        assert_eq!(simplify_unc(path), expected, "simplify_unc({path:?})");
+    }
+
+    /// Regression test for https://github.com/ajeetdsouza/zoxide/issues/162:
+    /// UNC paths must be recognized as valid absolute paths, and canonicalized
+    /// UNC paths must not keep the `\\?\UNC\` prefix that shells reject.
+    #[test]
+    fn issue_162_unc_paths() {
+        // `zoxide add \\wsl$\fedoraremix` used to fail with `invalid path:
+        // UNC(...)`.
+        assert!(is_unc(r"\\wsl$\fedoraremix"));
+        // `dunce::canonicalize` leaves UNC paths as `\\?\UNC\wsl$\fedoraremix`,
+        // which PowerShell refuses to cd into.
+        assert_eq!(simplify_unc(r"\\?\UNC\wsl$\fedoraremix"), r"\\wsl$\fedoraremix");
+    }
+}
+
+#[cfg(all(test, windows))]
+mod windows_tests {
+    use std::path::PathBuf;
+
+    use super::*;
+
+    #[test]
+    fn resolve_path_unc() {
+        assert_eq!(resolve_path(r"\\server\share").unwrap(), PathBuf::from(r"\\server\share"));
+        assert_eq!(
+            resolve_path(r"\\server\share\dir\sub").unwrap(),
+            PathBuf::from(r"\\server\share\dir\sub")
+        );
+        assert_eq!(
+            resolve_path(r"\\wsl$\fedoraremix").unwrap(),
+            PathBuf::from(r"\\wsl$\fedoraremix")
+        );
+    }
+
+    #[test]
+    fn resolve_path_verbatim_unc_is_normalized() {
+        assert_eq!(
+            resolve_path(r"\\?\UNC\server\share\dir").unwrap(),
+            PathBuf::from(r"\\server\share\dir")
+        );
+    }
+
+    #[test]
+    fn resolve_path_unc_with_dots() {
+        assert_eq!(
+            resolve_path(r"\\server\share\dir\..\other").unwrap(),
+            PathBuf::from(r"\\server\share\other")
+        );
+        // Cannot traverse above the share root.
+        assert_eq!(
+            resolve_path(r"\\server\share\..\..").unwrap(),
+            PathBuf::from(r"\\server\share")
+        );
+    }
+
+    #[test]
+    fn resolve_path_disk_unchanged() {
+        assert_eq!(resolve_path(r"C:\Users\test").unwrap(), PathBuf::from(r"C:\Users\test"));
+    }
 }
 
 #[cfg(all(test, unix))]

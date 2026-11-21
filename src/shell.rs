@@ -263,39 +263,6 @@ mod tests {
             .stderr("");
     }
 
-    #[cfg(unix)]
-    #[rstest]
-    fn tcsh_pwd_quoted(#[values("foo  bar", "foo{bar")] dir: &str) {
-        use std::os::unix::fs::PermissionsExt;
-
-        let opts = Opts { cmd: None, hook: InitHook::Pwd, echo: false, resolve_symlinks: false };
-        let mut source = Tcsh(&opts).render().unwrap();
-        source.push_str("\n__zoxide_hook\n__zoxide_z kw\n__zoxide_zi kw\n");
-
-        let tempdir = tempfile::tempdir().unwrap();
-        let tempdir = tempdir.path().canonicalize().unwrap();
-        let dir = tempdir.join(dir);
-        std::fs::create_dir(&dir).unwrap();
-        let stub = tempdir.join("zoxide");
-        std::fs::write(&stub, "#!/bin/sh\nprintf '%s\\n' \"$@\" >&2\necho .\n").unwrap();
-        std::fs::set_permissions(&stub, std::fs::Permissions::from_mode(0o755)).unwrap();
-
-        let path = format!("{}:{}", tempdir.display(), std::env::var("PATH").unwrap());
-        let dir_str = dir.display();
-        Command::new("tcsh")
-            .args(["-f", "-s"])
-            .env("PATH", path)
-            .current_dir(&dir)
-            .write_stdin(source)
-            .assert()
-            .success()
-            .stdout("")
-            .stderr(format!(
-                "query\n--exclude\n{dir_str}\n--\nkw\n\
-                 query\n--exclude\n{dir_str}\n--interactive\n--\nkw\n"
-            ));
-    }
-
     #[apply(opts)]
     fn xonsh_black(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };

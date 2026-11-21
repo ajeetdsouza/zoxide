@@ -87,7 +87,12 @@ impl<'a> Stream<'a> {
         let mut path = path.as_str();
         match path.rfind(keywords_last) {
             Some(idx) => {
-                if path[idx + keywords_last.len()..].contains(path::is_separator) {
+                // Ignore trailing separators, so that drive roots like `C:\`
+                // can be matched by their drive letter.
+                if path[idx + keywords_last.len()..]
+                    .trim_end_matches(path::is_separator)
+                    .contains(path::is_separator)
+                {
                     return false;
                 }
                 path = &path[..idx];
@@ -203,6 +208,22 @@ mod tests {
     #[case(&["/foo/", "/bar"], "/foo/bar", false)]
     #[case(&["/foo/", "/bar"], "/foo/baz/bar", true)]
     fn query(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
+        let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
+        let options = StreamOptions::new(0).with_keywords(keywords.iter());
+        let stream = Stream::new(db, options);
+        assert_eq!(is_match, stream.filter_by_keywords(path));
+    }
+
+    #[cfg(windows)]
+    #[rstest]
+    // Drive roots
+    #[case(&["c"], r"C:\", true)]
+    #[case(&["c:"], r"C:\", true)]
+    #[case(&[r"c:\"], r"C:\", true)]
+    #[case(&["d"], r"C:\", false)]
+    #[case(&["c"], r"C:\foo", false)]
+    #[case(&["c", "foo"], r"C:\foo", true)]
+    fn query_drive_root(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
         let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
         let options = StreamOptions::new(0).with_keywords(keywords.iter());
         let stream = Stream::new(db, options);

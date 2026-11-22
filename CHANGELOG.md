@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PowerShell: the prompt hook no longer resets `$LASTEXITCODE`.
 - Database: keep the file permissions of `db.txt` when saving.
 - Tcsh: fix init, `z` and `zi` in directories with `{` or repeated spaces.
+- Tcsh: fix `--cmd cd` leaving `cd` unable to change directory.
 
 ## [0.10.0] - 2026-07-04
 

@@ -129,12 +129,14 @@ impl Database {
             dirs.retain(|dir| dir.rank.is_finite());
             dirty |= dirs.len() != len_before;
 
-            let total_age = dirs.iter().map(|dir| dir.rank).sum::<Rank>();
-            if total_age > max_age {
-                let factor = 0.9 * max_age / total_age;
+            // Sum relative to the largest rank, so the total cannot overflow.
+            let max_rank = dirs.iter().map(|dir| dir.rank).fold(0.0, Rank::max);
+            let relative_total = dirs.iter().map(|dir| dir.rank / max_rank).sum::<Rank>();
+            if relative_total * max_rank > max_age {
+                let scale = 0.9 * max_age / relative_total;
                 for idx in (0..dirs.len()).rev() {
                     let dir = &mut dirs[idx];
-                    dir.rank *= factor;
+                    dir.rank = dir.rank / max_rank * scale;
                     if dir.rank < 1.0 {
                         dirs.swap_remove(idx);
                     }
@@ -311,6 +313,25 @@ mod tests {
         assert_eq!(dirs.len(), 1);
         assert_eq!(dirs[0].path, "/foo");
         assert!((dirs[0].rank - 1.0).abs() < 0.01);
+    }
+
+    #[test]
+    fn age_keeps_finite_ranks_whose_total_overflows() {
+        let data_dir = tempfile::tempdir().unwrap();
+        let now = 946684800;
+
+        let mut db = Database::open_dir(data_dir.path()).unwrap();
+        db.add_unchecked("/a", 1.0e308, now);
+        db.add_unchecked("/b", 1.0e308, now);
+        db.age(10000.0);
+
+        // Each rank is finite, but their sum is infinite. Both entries keep
+        // their share of the 0.9 * max_age budget instead of being scaled to zero.
+        let dirs = db.dirs();
+        assert_eq!(dirs.len(), 2);
+        for dir in dirs {
+            assert!((dir.rank - 4500.0).abs() < 1.0, "rank was {}", dir.rank);
+        }
     }
 
     #[test]

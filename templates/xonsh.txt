@@ -3,9 +3,11 @@
 
 # pylint: disable=missing-module-docstring
 
+import ast
 import builtins  # pylint: disable=unused-import
 import os
 import os.path
+import re
 import subprocess
 import sys
 import typing
@@ -170,6 +172,141 @@ builtins.aliases["{{cmd}}i"] = __zoxide_zi  # type: ignore  # pylint:disable=no-
 {{ not_configured }}
 
 {%- endmatch %}
+
+{{ section }}
+# Interactive completions for prompt_toolkit.
+#
+
+# Keep manually assigned aliases recognizable after reinitialization.
+setattr(__zoxide_z, "__zoxide_complete", True)
+
+
+def __zoxide_complete_command(
+    text: str, parser: typing.Any
+) -> tuple[str, list[str]] | None:
+    """Recognize a standalone command without evaluating shell expressions."""
+    if not text.endswith(" ") or "\n" in text or "\r" in text:
+        return None
+    context = parser.parse(text, len(text))
+    if context is None or context.command is None:
+        return None
+    current = context.command
+    name = current.args[0].raw_value if current.args else ""
+    aliases = builtins.aliases  # type: ignore # pylint:disable=no-member
+    if (
+        len(current.args) < 2
+        or current.arg_index != len(current.args)
+        or name not in aliases
+        or not getattr(
+            getattr(aliases[name], "func", aliases[name]), "__zoxide_complete", False
+        )
+    ):
+        return None
+    pattern = (
+        r"\s*" + r"\s+".join(re.escape(arg.raw_value) for arg in current.args) + r"\s+"
+    )
+    if re.fullmatch(pattern, text) is None:
+        return None
+    args = []
+    try:
+        for arg in current.args[1:]:
+            if arg.opening_quote:
+                value = ast.literal_eval(arg.raw_value)
+                if not isinstance(value, str):
+                    raise ValueError("not a string")
+                if "$" in value or value.startswith("~"):
+                    raise ValueError("not a literal keyword")
+            else:
+                if any(char in arg.value for char in "\"'$@();|<>&`\\*?[]{}~"):
+                    raise ValueError("not a literal keyword")
+                value = arg.value
+            args.append(value)
+    except (SyntaxError, ValueError):
+        return None
+    prefix = text[: len(text) - len(text.lstrip())] + name
+    return prefix, args
+
+
+if "__zoxide_keybindings" not in globals():
+
+    @builtins.events.on_ptk_create  # type: ignore  # pylint:disable=no-member
+    def __zoxide_keybindings(bindings: typing.Any, **_kwargs: typing.Any) -> None:
+        """Keep native Tab completion, and use fzf after a keyword and a space."""
+        # These dependencies are only needed by the prompt_toolkit shell.
+        # pylint: disable=import-outside-toplevel
+        from prompt_toolkit.application import (  # type: ignore[import-not-found, unused-ignore] # pylint:disable=import-error
+            get_app,
+            run_in_terminal,
+        )
+        from prompt_toolkit.document import Document  # type: ignore[import-not-found, unused-ignore] # pylint:disable=import-error
+        from prompt_toolkit.filters import (  # type: ignore[import-not-found, unused-ignore] # pylint:disable=import-error
+            Condition,
+            emacs_insert_mode,
+            has_completions,
+            vi_insert_mode,
+        )
+        from xonsh.parsers.completion_context import (  # type: ignore # pylint:disable=import-error
+            CompletionContextParser,
+        )
+
+        parser = CompletionContextParser()
+        pending = False
+
+        def enabled() -> bool:
+            document = get_app().current_buffer.document
+            return (
+                not pending
+                and document.is_cursor_at_the_end
+                and not has_completions()
+                and __zoxide_complete_command(document.text, parser) is not None
+            )
+
+        def complete(event: typing.Any) -> None:
+            """Suspend the prompt while fzf owns the terminal."""
+            nonlocal pending
+            buffer = event.current_buffer
+            document = buffer.document
+            parsed = __zoxide_complete_command(document.text, parser)
+            if parsed is None:
+                return
+            prefix, args = parsed
+            pending = True
+
+            def select() -> None:
+                nonlocal pending
+                try:
+                    result = subprocess.run(
+                        [
+                            __zoxide_bin(),
+                            "query",
+                            "-i",
+                            "--exclude",
+                            __zoxide_pwd(),
+                            "--",
+                        ]
+                        + args,
+                        check=False,
+                        env=__zoxide_env(),
+                        stdout=subprocess.PIPE,
+                    )
+                    if result.returncode != 0 or not result.stdout.endswith(b"\n"):
+                        return
+                    path = result.stdout[:-1].decode("utf-8")
+                    if path and buffer.document == document:
+                        # Quoted subprocess strings still expand environment variables.
+                        text = f"{prefix} @({path!r}) "
+                        buffer.document = Document(text, len(text))
+                except (OSError, UnicodeError, RuntimeError) as exc:
+                    print(f"zoxide: {exc}", file=sys.stderr)
+                finally:
+                    pending = False
+
+            run_in_terminal(select)
+
+        bindings.add(
+            "c-i", filter=Condition(enabled) & (emacs_insert_mode | vi_insert_mode)
+        )(complete)
+
 
 {{ section }}
 # To initialize zoxide, add this to your configuration (usually ~/.xonshrc):

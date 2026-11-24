@@ -79,7 +79,7 @@ z -                # cd into previous directory
 
 zi foo             # cd with interactive selection (using fzf)
 
-z foo<SPACE><TAB>  # show interactive completions (bash 4.4+/fish/zsh only)
+z foo<SPACE><TAB>  # show interactive completions (bash 4.4+/fish/xonsh/zsh)
 ```
 
 Read more about the matching algorithm [here][algorithm-matching].
@@ -312,6 +312,11 @@ zoxide can be installed in 4 easy steps:
    > ```python
    > execx($(zoxide init xonsh), 'exec', __xonsh__.ctx, filename='zoxide')
    > ```
+   >
+   > Interactive completions require the `prompt_toolkit` shell. Type a keyword
+   > followed by a space and Tab to select a path, then press Enter to navigate.
+   > These completions support standalone commands with literal keywords;
+   > compound commands and shell expressions keep Xonsh's native completion.
 
    </details>
 

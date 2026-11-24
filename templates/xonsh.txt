@@ -121,6 +121,8 @@ def __zoxide_z(args: list[str]) -> None:
         __zoxide_cd("-")
     elif len(args) == 1 and os.path.isdir(args[0]):
         __zoxide_cd(args[0])
+    elif len(args) == 1 and len(args[0]) >= 3 and not args[0].strip("."):
+        __zoxide_cd("../" * (len(args[0]) - 1))
     else:
         try:
             zoxide = __zoxide_bin()

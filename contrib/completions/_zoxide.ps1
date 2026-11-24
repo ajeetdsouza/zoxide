@@ -36,6 +36,7 @@ Register-ArgumentCompleter -Native -CommandName 'zoxide' -ScriptBlock {
         'zoxide;add' {
             [CompletionResult]::new('-s', '-s', [CompletionResultType]::ParameterName, 'The rank to increment the entry if it exists or initialize it with if it doesn''t')
             [CompletionResult]::new('--score', '--score', [CompletionResultType]::ParameterName, 'The rank to increment the entry if it exists or initialize it with if it doesn''t')
+            [CompletionResult]::new('--allow-non-directories', '--allow-non-directories', [CompletionResultType]::ParameterName, 'Allow paths that are not existing directories')
             [CompletionResult]::new('-h', '-h', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('--help', '--help', [CompletionResultType]::ParameterName, 'Print help')
             [CompletionResult]::new('-V', '-V ', [CompletionResultType]::ParameterName, 'Print version')

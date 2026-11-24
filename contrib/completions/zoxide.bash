@@ -85,7 +85,7 @@ _zoxide() {
             return 0
             ;;
         zoxide__subcmd__add)
-            opts="-s -h -V --score --help --version <PATHS>..."
+            opts="-s -h -V --score --allow-non-directories --help --version <PATHS>..."
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 2 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0

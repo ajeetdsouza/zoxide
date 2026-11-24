@@ -337,23 +337,7 @@ mod tests {
         let source = Zsh(&opts).render().unwrap();
 
         Command::new("zsh")
-            .args(["-e", "-u", "-o", "pipefail", "--no-globalrcs", "--no-rcs", "-c", &source])
-            .assert()
-            .success()
-            .stdout("")
-            .stderr("");
-    }
-
-    #[apply(opts)]
-    fn zsh_zsh_interactive(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
-        let opts = Opts { cmd, hook, echo, resolve_symlinks };
-        let source = Zsh(&opts).render().unwrap();
-
-        // An interactive shell has zle enabled, so the completions are set up.
-        // No rc files are read, so compinit has not run and compdef is not
-        // defined; the init script must still succeed.
-        Command::new("zsh")
-            .args(["-i", "--no-globalrcs", "--no-rcs", "-c", &source])
+            .args(["-i", "-e", "-u", "-o", "pipefail", "--no-globalrcs", "--no-rcs", "-c", &source])
             .assert()
             .success()
             .stdout("")

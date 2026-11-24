@@ -403,6 +403,8 @@ Environment variables[^2] can be used for configuration. They must be set before
 
 - `_ZO_DATA_DIR`
   - Specifies the directory in which the database is stored.
+  - Must be an absolute path. The database file is named `db.zo` inside this
+    directory.
   - The default value varies across OSes:
 
     | OS          | Path                                                   | Example                                           |

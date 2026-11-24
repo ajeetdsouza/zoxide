@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Database: load `db.txt` faster by validating it as UTF-8 once.
+
 ### Fixed
 
 - Import: fetch atuin history in UTC instead of the local timezone.

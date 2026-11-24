@@ -234,18 +234,38 @@ impl Database {
         Ok(buffer)
     }
 
-    fn deserialize(bytes: &[u8]) -> Result<Vec<Dir<'_>>> {
+    fn deserialize<'a>(bytes: &'a [u8]) -> Result<Vec<Dir<'a>>> {
         let bytes = bytes.strip_prefix(UTF8_BOM).unwrap_or(bytes);
 
         let mut dirs = Vec::new();
         let mut errors = Vec::new();
 
-        for (idx, line) in bytes.split(|byte| *byte == b'\n').enumerate() {
-            match Self::deserialize_line(line) {
-                Ok(Some(dir)) => dirs.push(dir),
-                Ok(None) => {}
-                Err(e) => errors.push(format!("line {}: {e:#}", idx + 1)),
+        let mut push_line = |idx: usize, result: Result<Option<Dir<'a>>>| match result {
+            Ok(Some(dir)) => dirs.push(dir),
+            Ok(None) => {}
+            Err(e) => errors.push(format!("line {}: {e:#}", idx + 1)),
+        };
+        // Validate the file as UTF-8 once. If that fails, the lines before the
+        // first invalid byte are still valid, and the rest of the lines are
+        // validated one by one, so that their errors do not change.
+        let (text, rest) = match str::from_utf8(bytes) {
+            Ok(text) => (Some(text), None),
+            Err(e) => {
+                let valid = &bytes[..e.valid_up_to()];
+                let end = valid.iter().rposition(|byte| *byte == b'\n').map_or(0, |idx| idx + 1);
+                let text = str::from_utf8(&bytes[..end]).unwrap_or_default();
+                (text.strip_suffix('\n'), Some(&bytes[end..]))
             }
+        };
+        let mut idx = 0;
+        for line in text.into_iter().flat_map(|text| text.split('\n')) {
+            push_line(idx, Self::deserialize_line(line));
+            idx += 1;
+        }
+        for line in rest.into_iter().flat_map(|rest| rest.split(|byte| *byte == b'\n')) {
+            let line = str::from_utf8(line).context("invalid UTF-8");
+            push_line(idx, line.and_then(Self::deserialize_line));
+            idx += 1;
         }
 
         if !errors.is_empty() {
@@ -260,8 +280,7 @@ impl Database {
         Ok(dirs)
     }
 
-    fn deserialize_line(line: &[u8]) -> Result<Option<Dir<'_>>> {
-        let line = str::from_utf8(line).context("invalid UTF-8")?;
+    fn deserialize_line(line: &str) -> Result<Option<Dir<'_>>> {
         let line = line.strip_suffix('\r').unwrap_or(line);
         if line.trim().is_empty() {
             return Ok(None);

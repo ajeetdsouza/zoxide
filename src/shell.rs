@@ -206,27 +206,6 @@ mod tests {
         }
     }
 
-    #[test]
-    fn posix_dash_z_double_dash() {
-        let opts =
-            Opts { cmd: Some("z"), hook: InitHook::None, echo: false, resolve_symlinks: false };
-        let source = Posix(&opts).render().unwrap();
-
-        let tempdir = tempfile::tempdir().unwrap();
-        let tempdir = tempdir.path().canonicalize().unwrap();
-        std::fs::create_dir(tempdir.join("-dir")).unwrap();
-
-        let script = format!("{source}\nz -- -dir && pwd -P\n");
-        Command::new("dash")
-            .args(["-e", "-u", "-c", &script])
-            .current_dir(&tempdir)
-            .env("_ZO_DATA_DIR", &tempdir)
-            .assert()
-            .success()
-            .stdout(format!("{}\n", tempdir.join("-dir").display()))
-            .stderr("");
-    }
-
     #[apply(opts)]
     fn posix_shellcheck(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };

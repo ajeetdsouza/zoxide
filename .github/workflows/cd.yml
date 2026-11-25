@@ -11,12 +11,16 @@ jobs:
       id-token: write
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        run: |
+          rustup toolchain install stable --profile minimal --no-self-update
+          rustup default stable
       - name: Authenticate with crates.io
         id: auth
-        uses: rust-lang/crates-io-auth-action@v1
+        uses: rust-lang/crates-io-auth-action@v1.0.6
       - name: Publish
         run: cargo publish
         env:

@@ -5,8 +5,10 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: vedantmgoyal2009/winget-releaser@v2
+      - uses: vedantmgoyal9/winget-releaser@v2
         with:
           identifier: ajeetdsouza.zoxide
           installers-regex: '-pc-windows-msvc\.zip$'

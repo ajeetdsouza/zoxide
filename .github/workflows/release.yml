@@ -57,39 +57,27 @@ jobs:
           file: Cargo.toml
           field: package.version
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          override: true
-          target: ${{ matrix.target }}
+        shell: bash
+        run: |
+          rustup set profile minimal
+          rustup toolchain install stable
+          rustup override set stable
+          rustup target add --toolchain stable ${{ matrix.target }}
       - name: Setup cache
         uses: Swatinem/rust-cache@v2.9.3
         with:
           key: ${{ matrix.target }}
       - name: Install cross
         if: ${{ runner.os == 'Linux' }}
-        uses: actions-rs/cargo@v1
-        with:
-          command: install
-          args: --color=always --git=https://github.com/cross-rs/cross.git --locked --rev=e281947ca900da425e4ecea7483cfde646c8a1ea --verbose cross
+        run: cargo install --color=always --git=https://github.com/cross-rs/cross.git --locked --rev=e281947ca900da425e4ecea7483cfde646c8a1ea --verbose cross
       - name: Build binary
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release --locked --target=${{ matrix.target }} --color=always --verbose
-          use-cross: ${{ runner.os == 'Linux' }}
+        run: ${{ runner.os == 'Linux' && 'cross' || 'cargo' }} build --release --locked --target=${{ matrix.target }} --color=always --verbose
       - name: Install cargo-deb
         if: ${{ matrix.deb == true }}
-        uses: actions-rs/install@v0.1
-        with:
-          crate: cargo-deb
+        run: cargo install cargo-deb
       - name: Build deb
         if: ${{ matrix.deb == true }}
-        uses: actions-rs/cargo@v1
-        with:
-          command: deb
-          args: --no-build --no-strip --output=. --target=${{ matrix.target }}
+        run: cargo deb --no-build --no-strip --output=. --target=${{ matrix.target }}
       - name: Package (*nix)
         if: runner.os != 'Windows'
         run: |

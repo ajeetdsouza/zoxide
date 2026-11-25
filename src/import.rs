@@ -102,11 +102,9 @@ mod tests {
         let data_dir = tempfile::tempdir().unwrap();
         let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
 
-        {
-            let mut db = Database::open_dir(data_dir.path()).unwrap();
-            run(&Fixed(vec![("", 1.0), ("foo", 1.0), (path, 2.0)]), &mut db).unwrap();
-            db.save().unwrap();
-        }
+        let mut db = Database::open_dir(data_dir.path()).unwrap();
+        run(&Fixed(vec![("", 1.0), ("foo", 1.0), (path, 2.0)]), &mut db).unwrap();
+        db.save().unwrap();
 
         let db = Database::open_dir(data_dir.path()).unwrap();
         assert_eq!(db.dirs().len(), 1);

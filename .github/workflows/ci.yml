@@ -21,7 +21,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -30,7 +30,7 @@ jobs:
           rustup set profile minimal
           rustup toolchain install stable --component clippy
           rustup toolchain install nightly --component rustfmt --allow-downgrade
-      - uses: cachix/install-nix-action@v31
+      - uses: cachix/install-nix-action@v31.11.5
         if: ${{ matrix.os != 'windows-latest' }}
         with:
           nix_path: nixpkgs=channel:nixos-unstable

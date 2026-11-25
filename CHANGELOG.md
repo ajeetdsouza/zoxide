@@ -9,14 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Release binaries now come with GitHub artifact attestations.
+
 ### Fixed
 
 - Import: fetch atuin history in UTC instead of the local timezone.
 - Bash/Zsh: fix `z` failing on Cygwin/MSYS2 due to `cygpath` being passed a bad string.
 - Nushell: `z` now handles relative paths through symlinked directories.
 - POSIX: fix `z` failing to enter directories whose names start with `-`.
+- POSIX: `z -- dir` now enters `dir` directly.
 - Build: fix compilation failing when the source directory is read-only.
 - PowerShell: the prompt hook no longer resets `$LASTEXITCODE`.
+- Database: keep the file permissions of `db.txt` when saving.
+- Zsh: init no longer leaves a non-zero exit status if `compinit` has not run.
+- Tcsh: fix init, `z` and `zi` in directories with `{` or repeated spaces.
 - Import: skip entries that are not absolute paths. Empty paths used to corrupt
   the database.
 

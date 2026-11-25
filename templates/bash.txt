@@ -37,6 +37,7 @@ function __zoxide_cd() {
 {%- if hook == InitHook::Prompt %}
 function __zoxide_hook() {
     \builtin local -r retval="$?"
+    __zoxide_hook_ok=1
     if [[ -o history ]]; then
         # shellcheck disable=SC2312
         \command zoxide add -- "$(__zoxide_pwd)"
@@ -49,6 +50,7 @@ __zoxide_oldpwd="$(__zoxide_pwd)"
 
 function __zoxide_hook() {
     \builtin local -r retval="$?"
+    __zoxide_hook_ok=1
     \builtin local pwd_tmp
     pwd_tmp="$(__zoxide_pwd)"
     if [[ ${__zoxide_oldpwd} != "${pwd_tmp}" ]]; then
@@ -75,6 +77,11 @@ fi
 
 {%- endif %}
 
+{#
+  Many terminal integrations (VS Code, Termius, Warp, inshellisense) replace
+  PROMPT_COMMAND with a wrapper hook, so checking for __zoxide_hook in
+  PROMPT_COMMAND doesn't work. Instead, the hook sets a flag when it runs.
+-#}
 # Report common issues.
 function __zoxide_doctor() {
 {%- if hook == InitHook::None %}
@@ -82,10 +89,8 @@ function __zoxide_doctor() {
 
 {%- else %}
     [[ ${_ZO_DOCTOR:-1} -eq 0 ]] && return 0
-    # shellcheck disable=SC2199
-    [[ ${PROMPT_COMMAND[@]:-} == *'__zoxide_hook'* ]] && return 0
-    # shellcheck disable=SC2199
-    [[ ${__vsc_original_prompt_command[@]:-} == *'__zoxide_hook'* ]] && return 0
+    [[ -n ${__zoxide_hook_ok:-} ]] && return 0
+    [[ $- == *i* ]] || return 0
 
     _ZO_DOCTOR=0
     \builtin printf '%s\n' \

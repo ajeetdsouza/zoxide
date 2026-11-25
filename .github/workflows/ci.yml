@@ -46,11 +46,11 @@ jobs:
           authToken: ${{ env.CACHIX_AUTH_TOKEN }}
           name: zoxide
       - name: Setup cache
-        uses: Swatinem/rust-cache@v2.9.2
+        uses: Swatinem/rust-cache@v2.9.3
         with:
           key: ${{ matrix.os }}
       - name: Install just
-        uses: taiki-e/install-action@v2.87.21
+        uses: taiki-e/install-action@v2.88.0
         with:
           tool: just
       - name: Run lints + tests

@@ -337,7 +337,7 @@ mod tests {
         let source = Zsh(&opts).render().unwrap();
 
         Command::new("zsh")
-            .args(["-e", "-u", "-o", "pipefail", "--no-globalrcs", "--no-rcs", "-c", &source])
+            .args(["-i", "-e", "-u", "-o", "pipefail", "--no-globalrcs", "--no-rcs", "-c", &source])
             .assert()
             .success()
             .stdout("")

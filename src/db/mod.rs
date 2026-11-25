@@ -20,6 +20,8 @@ const COL_WIDTH: usize = 10;
 const MIN_RANK: Rank = 0.01;
 /// The largest rank the database file can hold.
 const MAX_RANK: Rank = 9_999_999.99;
+/// The byte order mark that some editors write at the start of UTF-8 files.
+const UTF8_BOM: &[u8] = "\u{FEFF}".as_bytes();
 
 #[self_referencing]
 pub struct Database {
@@ -233,6 +235,8 @@ impl Database {
     }
 
     fn deserialize(bytes: &[u8]) -> Result<Vec<Dir<'_>>> {
+        let bytes = bytes.strip_prefix(UTF8_BOM).unwrap_or(bytes);
+
         let mut dirs = Vec::new();
         let mut errors = Vec::new();
 
@@ -325,9 +329,27 @@ mod tests {
 
             let dir = &db.dirs()[0];
             assert_eq!(dir.path, path);
-            assert!((dir.rank - 2.0).abs() < 0.01);
+            assert_eq!(dir.rank, 2.0);
             assert_eq!(dir.last_accessed, now);
         }
+    }
+
+    #[test]
+    fn open_with_utf8_bom() {
+        let data_dir = tempfile::tempdir().unwrap();
+        let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
+        let now = 946684800;
+
+        let contents = format!("\u{FEFF}{now:010}\t0000002.00\t{path}\n");
+        fs::write(data_dir.path().join("db.txt"), contents).unwrap();
+
+        let db = Database::open_dir(data_dir.path()).unwrap();
+        assert_eq!(db.dirs().len(), 1);
+
+        let dir = &db.dirs()[0];
+        assert_eq!(dir.path, path);
+        assert_eq!(dir.rank, 2.0);
+        assert_eq!(dir.last_accessed, now);
     }
 
     #[test]

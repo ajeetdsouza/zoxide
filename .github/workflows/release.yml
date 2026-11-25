@@ -50,6 +50,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Get version
         id: get_version
         uses: SebRollen/toml-action@v1.2.0

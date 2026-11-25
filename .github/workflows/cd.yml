@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Install Rust toolchain
         run: |
           rustup toolchain install stable --profile minimal --no-self-update

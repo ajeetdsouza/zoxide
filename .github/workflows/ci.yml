@@ -24,6 +24,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          persist-credentials: false
       - if: ${{ matrix.os == 'windows-latest' }}
         run: |
           rustup set profile minimal

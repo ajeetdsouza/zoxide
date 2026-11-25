@@ -5,6 +5,8 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: vedantmgoyal2009/winget-releaser@v2
         with:

@@ -13,7 +13,7 @@ mod z_lua;
 mod zsh_z;
 
 use std::io::{self, Write};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 
@@ -56,16 +56,11 @@ pub(crate) fn run(importer: &impl Importer, db: &mut Database) -> Result<()> {
 
     for entry in importer.dirs()? {
         match entry {
-            Ok(dir) => {
-                if dir.path.is_empty() {
-                    _ = writeln!(stderr, "skipping entry with an empty path");
-                    continue;
-                }
-                if exclude_dirs.iter().any(|glob| glob.matches(&dir.path)) {
-                    continue;
-                }
-                db.add_unchecked(dir.path, dir.rank, dir.last_accessed);
+            Ok(dir) if exclude_dirs.iter().any(|glob| glob.matches(&dir.path)) => {}
+            Ok(dir) if Path::new(&*dir.path).is_relative() => {
+                _ = writeln!(stderr, "skipping relative path: {:?}", dir.path);
             }
+            Ok(dir) => db.add_unchecked(dir.path, dir.rank, dir.last_accessed),
             Err(e) => {
                 let location = match &e.path {
                     Some(path) => format!("{}:{}", path.display(), e.line_num),
@@ -103,13 +98,13 @@ mod tests {
     }
 
     #[test]
-    fn skips_empty_paths() {
+    fn skips_relative_paths() {
         let data_dir = tempfile::tempdir().unwrap();
         let path = if cfg!(windows) { r"C:\foo\bar" } else { "/foo/bar" };
 
         {
             let mut db = Database::open_dir(data_dir.path()).unwrap();
-            run(&Fixed(vec![("", 1.0), (path, 2.0)]), &mut db).unwrap();
+            run(&Fixed(vec![("", 1.0), ("foo", 1.0), (path, 2.0)]), &mut db).unwrap();
             db.save().unwrap();
         }
 

@@ -25,6 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Database: keep the file permissions of `db.txt` when saving.
 - Zsh: init no longer leaves a non-zero exit status if `compinit` has not run.
 - Tcsh: fix init, `z` and `zi` in directories with `{` or repeated spaces.
+- Import: skip entries that are not absolute paths. Empty paths used to corrupt
+  the database.
 
 ## [0.10.0] - 2026-07-04
 

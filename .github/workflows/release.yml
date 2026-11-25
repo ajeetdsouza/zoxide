@@ -7,7 +7,9 @@ on:
 env:
   CARGO_INCREMENTAL: 0
 permissions:
+  attestations: write
   contents: write
+  id-token: write
 jobs:
   release:
     name: ${{ matrix.target }}
@@ -109,6 +111,15 @@ jobs:
         with:
           name: ${{ matrix.target }}
           path: |
+            *.deb
+            *.tar.gz
+            *.zip
+      - name: Attest build provenance
+        if: |
+          github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'chore(release)')
+        uses: actions/attest@v4
+        with:
+          subject-path: |
             *.deb
             *.tar.gz
             *.zip

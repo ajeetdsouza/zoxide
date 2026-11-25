@@ -40,24 +40,29 @@ unset __zoxide_precmd
 #
 
 # Jump to a directory using only keywords.
+{#
+  `chdir` is a synonym for `cd`, but tcsh does not alias-expand it. With
+  `--cmd cd` these aliases are installed as `cd`, so calling `cd` here would
+  re-enter the alias and the directory would never change.
+#}
 alias __zoxide_z 'set __zoxide_args = (\!*)\
 if ("$#__zoxide_args" == 0) then\
-    cd ~\
+    chdir ~\
 else\
     if ("$#__zoxide_args" == 1 && "$__zoxide_args[1]" == "-") then\
-        cd -\
+        chdir -\
     else if ("$#__zoxide_args" == 1 && -d "$__zoxide_args[1]") then\
-        cd "$__zoxide_args[1]"\
+        chdir "$__zoxide_args[1]"\
     else\
         set __zoxide_pwd = "`{{ pwd_cmd }}`"\
-        set __zoxide_result = "`zoxide query --exclude '"'"'$__zoxide_pwd'"'"' -- $__zoxide_args`" && cd "$__zoxide_result"\
+        set __zoxide_result = "`zoxide query --exclude '"'"'$__zoxide_pwd'"'"' -- $__zoxide_args`" && chdir "$__zoxide_result"\
     endif\
 endif'
 
 # Jump to a directory using interactive search.
 alias __zoxide_zi 'set __zoxide_args = (\!*)\
 set __zoxide_pwd = "`{{ pwd_cmd }}`"\
-set __zoxide_result = "`zoxide query --exclude '"'"'$__zoxide_pwd'"'"' --interactive -- $__zoxide_args`" && cd "$__zoxide_result"'
+set __zoxide_result = "`zoxide query --exclude '"'"'$__zoxide_pwd'"'"' --interactive -- $__zoxide_args`" && chdir "$__zoxide_result"'
 
 {{ section }}
 # Commands for zoxide. Disable these using --no-cmd.

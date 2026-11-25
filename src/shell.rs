@@ -263,6 +263,38 @@ mod tests {
             .stderr("");
     }
 
+    /// With `--cmd cd`, the `z` alias is installed as `cd`. Its body must not
+    /// call `cd`, because tcsh re-enters the alias and the directory never
+    /// changes. `chdir` is a synonym that tcsh does not alias-expand.
+    #[test]
+    fn tcsh_cmd_cd_enters_directory() {
+        let opts =
+            Opts { cmd: Some("cd"), hook: InitHook::None, echo: false, resolve_symlinks: false };
+        let mut source = Tcsh(&opts).render().unwrap();
+
+        let tempdir = tempfile::tempdir().unwrap();
+        let target = tempdir.path();
+        source.push_str(&format!(
+            "\nset __zoxide_test = (\"{}\")\ncd $__zoxide_test\necho \"PWD:$cwd\"\n",
+            target.display()
+        ));
+
+        let output = Command::new("tcsh")
+            .args(["-e", "-f", "-s"])
+            .write_stdin(source)
+            .assert()
+            .success()
+            .get_output()
+            .stdout
+            .clone();
+        let stdout = String::from_utf8(output).unwrap();
+
+        assert!(
+            stdout.contains(&format!("PWD:{}", target.display())),
+            "`cd` did not change directory; tcsh printed: {stdout:?}"
+        );
+    }
+
     #[apply(opts)]
     fn xonsh_black(cmd: Option<&str>, hook: InitHook, echo: bool, resolve_symlinks: bool) {
         let opts = Opts { cmd, hook, echo, resolve_symlinks };

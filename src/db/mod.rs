@@ -224,12 +224,12 @@ impl Database {
 
         for dir in dirs {
             let rank = dir.rank.clamp(MIN_RANK, MAX_RANK);
-            writeln!(
-                buffer,
-                "{:0COL_WIDTH$}\t{rank:0COL_WIDTH$.2}\t{}",
-                dir.last_accessed, dir.path
-            )
-            .context("could not serialize database")?;
+            write_padded_u64(&mut buffer, dir.last_accessed);
+            buffer.push(b'\t');
+            write_padded_rank(&mut buffer, rank).context("could not serialize database")?;
+            buffer.push(b'\t');
+            buffer.extend_from_slice(dir.path.as_bytes());
+            buffer.push(b'\n');
         }
         Ok(buffer)
     }
@@ -237,14 +237,24 @@ impl Database {
     fn deserialize(bytes: &[u8]) -> Result<Vec<Dir<'_>>> {
         let bytes = bytes.strip_prefix(UTF8_BOM).unwrap_or(bytes);
 
-        let mut dirs = Vec::new();
+        let mut dirs = Vec::with_capacity(bytes.len() / 48);
         let mut errors = Vec::new();
 
-        for (idx, line) in bytes.split(|byte| *byte == b'\n').enumerate() {
-            match Self::deserialize_line(line) {
-                Ok(Some(dir)) => dirs.push(dir),
-                Ok(None) => {}
-                Err(e) => errors.push(format!("line {}: {e:#}", idx + 1)),
+        if let Ok(text) = str::from_utf8(bytes) {
+            for (idx, line) in text.split('\n').enumerate() {
+                match Self::deserialize_str_line(line) {
+                    Ok(Some(dir)) => dirs.push(dir),
+                    Ok(None) => {}
+                    Err(e) => errors.push(format!("line {}: {e:#}", idx + 1)),
+                }
+            }
+        } else {
+            for (idx, line) in bytes.split(|byte| *byte == b'\n').enumerate() {
+                match Self::deserialize_line(line) {
+                    Ok(Some(dir)) => dirs.push(dir),
+                    Ok(None) => {}
+                    Err(e) => errors.push(format!("line {}: {e:#}", idx + 1)),
+                }
             }
         }
 
@@ -262,20 +272,43 @@ impl Database {
 
     fn deserialize_line(line: &[u8]) -> Result<Option<Dir<'_>>> {
         let line = str::from_utf8(line).context("invalid UTF-8")?;
+        Self::deserialize_str_line(line)
+    }
+
+    fn deserialize_str_line(line: &str) -> Result<Option<Dir<'_>>> {
         let line = line.strip_suffix('\r').unwrap_or(line);
-        if line.trim().is_empty() {
+        if line.is_empty()
+            || (line.as_bytes().iter().all(u8::is_ascii_whitespace))
+            || line.trim().is_empty()
+        {
             return Ok(None);
         }
 
         const EXPECTED: &str = "expected: <timestamp> <rank> <path>";
-        let (last_accessed, line) =
-            line.trim_start().split_once(char::is_whitespace).context(EXPECTED)?;
-        let (rank, path) = line.trim_start().split_once(char::is_whitespace).context(EXPECTED)?;
-        let path = path.trim_start();
+        let (last_accessed, rank, path) = if let Some((ts, rest)) = line.split_once('\t')
+            && !ts.is_empty()
+            && !ts.as_bytes()[0].is_ascii_whitespace()
+            && let Some((rk, p)) = rest.split_once('\t')
+            && !rk.is_empty()
+            && !rk.as_bytes()[0].is_ascii_whitespace()
+            && !p.is_empty()
+            && !p.as_bytes()[0].is_ascii_whitespace()
+            && !p.chars().next().unwrap().is_whitespace()
+        {
+            (ts, rk, p)
+        } else {
+            let (last_accessed, rest) =
+                line.trim_start().split_once(char::is_whitespace).context(EXPECTED)?;
+            let (rank, path) =
+                rest.trim_start().split_once(char::is_whitespace).context(EXPECTED)?;
+            (last_accessed, rank, path.trim_start())
+        };
 
-        let last_accessed = last_accessed
-            .parse::<Epoch>()
-            .with_context(|| format!("could not parse timestamp: {last_accessed}"))?;
+        let last_accessed = parse_epoch_fast(last_accessed).unwrap_or_else(|| {
+            last_accessed
+                .parse::<Epoch>()
+                .with_context(|| format!("could not parse timestamp: {last_accessed}"))
+        })?;
         let rank = rank
             .parse::<Rank>()
             .with_context(|| format!("could not parse rank: {rank}"))?
@@ -304,6 +337,85 @@ impl Database {
         }
         deserializer.deserialize(bytes_dirs).context("corrupted data")
     }
+}
+
+const DIGITS2: &[u8; 200] = b"\
+0001020304050607080910111213141516171819\
+2021222324252627282930313233343536373839\
+4041424344454647484950515253545556575859\
+6061626364656667686970717273747576777879\
+8081828384858687888990919293949596979899";
+
+#[inline]
+fn write_padded_u64(buf: &mut Vec<u8>, mut val: u64) {
+    if val < 10_000_000_000 {
+        let mut out = [b'0'; COL_WIDTH];
+        let mut i = COL_WIDTH;
+        while i >= 2 {
+            let rem = (val % 100) as usize;
+            val /= 100;
+            i -= 2;
+            out[i] = DIGITS2[rem * 2];
+            out[i + 1] = DIGITS2[rem * 2 + 1];
+        }
+        buf.extend_from_slice(&out);
+    } else {
+        let _ = write!(buf, "{val:0COL_WIDTH$}");
+    }
+}
+
+#[inline]
+fn write_padded_rank(buf: &mut Vec<u8>, rank: Rank) -> io::Result<()> {
+    let scaled = rank * 100.0;
+    let rounded = scaled.round_ties_even();
+    // Fall back to core::fmt only on hairline half-way values where multiplying
+    // by 100 could suffer double rounding, or non-finite values.
+    if rounded.is_finite()
+        && (0.0..=999_999_999.0).contains(&rounded)
+        && ((scaled - scaled.floor()) - 0.5).abs() > 1e-9
+    {
+        let mut cents = rounded as u64;
+        let frac = (cents % 100) as usize;
+        cents /= 100;
+        let mut out = [b'0'; COL_WIDTH];
+        out[9] = DIGITS2[frac * 2 + 1];
+        out[8] = DIGITS2[frac * 2];
+        out[7] = b'.';
+        let d2 = (cents % 100) as usize;
+        cents /= 100;
+        out[6] = DIGITS2[d2 * 2 + 1];
+        out[5] = DIGITS2[d2 * 2];
+        let d1 = (cents % 100) as usize;
+        cents /= 100;
+        out[4] = DIGITS2[d1 * 2 + 1];
+        out[3] = DIGITS2[d1 * 2];
+        let d0 = (cents % 100) as usize;
+        cents /= 100;
+        out[2] = DIGITS2[d0 * 2 + 1];
+        out[1] = DIGITS2[d0 * 2];
+        out[0] = b'0' + (cents as u8);
+        buf.extend_from_slice(&out);
+        Ok(())
+    } else {
+        write!(buf, "{rank:0COL_WIDTH$.2}")
+    }
+}
+
+#[inline]
+fn parse_epoch_fast(s: &str) -> Option<Result<Epoch>> {
+    let bytes = s.as_bytes();
+    if bytes.is_empty() || bytes.len() > 19 {
+        return None;
+    }
+    let mut acc: u64 = 0;
+    for &b in bytes {
+        let d = b.wrapping_sub(b'0');
+        if d > 9 {
+            return None;
+        }
+        acc = acc * 10 + u64::from(d);
+    }
+    Some(Ok(acc))
 }
 
 #[cfg(test)]
@@ -350,6 +462,22 @@ mod tests {
         assert_eq!(dir.path, path);
         assert_eq!(dir.rank, 2.0);
         assert_eq!(dir.last_accessed, now);
+    }
+
+    #[test]
+    fn fast_format_matches_std_fmt() {
+        for val in [0, 1, 9, 42, 999_999_999, 9_999_999_999, 10_000_000_000, u64::MAX] {
+            let mut buf = Vec::new();
+            write_padded_u64(&mut buf, val);
+            assert_eq!(String::from_utf8(buf).unwrap(), format!("{val:0COL_WIDTH$}"));
+        }
+
+        for rank in [MIN_RANK, 0.005, 0.1, 1.0, 1.005, 1.25, 99.99, 12345.67, 999_999.995, MAX_RANK]
+        {
+            let mut buf = Vec::new();
+            write_padded_rank(&mut buf, rank).unwrap();
+            assert_eq!(String::from_utf8(buf).unwrap(), format!("{rank:0COL_WIDTH$.2}"));
+        }
     }
 
     #[test]

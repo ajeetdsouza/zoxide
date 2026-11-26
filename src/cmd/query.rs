@@ -54,7 +54,7 @@ impl Query {
     }
 
     fn query_list(&self, stream: &mut Stream, now: Epoch) -> Result<()> {
-        let handle = &mut io::stdout().lock();
+        let mut handle = io::BufWriter::new(io::stdout().lock());
         while let Some(dir) = stream.next() {
             if Some(dir.path.as_ref()) == self.exclude.as_deref() {
                 continue;
@@ -62,7 +62,7 @@ impl Query {
             let dir = if self.score { dir.display().with_score(now) } else { dir.display() };
             writeln!(handle, "{dir}").pipe_exit("stdout")?;
         }
-        Ok(())
+        handle.flush().pipe_exit("stdout")
     }
 
     fn query_first(&self, stream: &mut Stream, now: Epoch) -> Result<()> {

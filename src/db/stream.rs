@@ -12,23 +12,25 @@ pub struct Stream<'a> {
     db: &'a mut Database,
     idxs: Rev<Range<usize>>,
     options: StreamOptions,
+    all_keywords_ascii: bool,
+    lowercase_buf: String,
 }
 
 impl<'a> Stream<'a> {
     pub fn new(db: &'a mut Database, options: StreamOptions) -> Self {
         db.sort_by_score(options.now);
         let idxs = (0..db.dirs().len()).rev();
-        Stream { db, idxs, options }
+        let all_keywords_ascii = options.keywords.iter().all(|k| k.is_ascii());
+        Stream { db, idxs, options, all_keywords_ascii, lowercase_buf: String::new() }
     }
 
     pub fn next(&mut self) -> Option<&Dir<'_>> {
         while let Some(idx) = self.idxs.next() {
-            let dir = &self.db.dirs()[idx];
-
-            if !self.filter_by_keywords(&dir.path) {
+            if !self.filter_by_keywords_idx(idx) {
                 continue;
             }
 
+            let dir = &self.db.dirs()[idx];
             if !self.filter_by_base_dir(&dir.path) {
                 continue;
             }
@@ -77,33 +79,111 @@ impl<'a> Stream<'a> {
         resolver(path).map(|metadata| metadata.is_dir()).unwrap_or_default()
     }
 
-    fn filter_by_keywords(&self, path: &str) -> bool {
+    fn filter_by_keywords_idx(&mut self, idx: usize) -> bool {
         let (keywords_last, keywords) = match self.options.keywords.split_last() {
             Some(split) => split,
             None => return true,
         };
 
-        let path = util::to_lowercase(path);
-        let mut path = path.as_str();
-        match path.rfind(keywords_last) {
-            Some(idx) => {
-                if path[idx + keywords_last.len()..].contains(path::is_separator) {
-                    return false;
-                }
-                path = &path[..idx];
+        let path = self.db.dirs()[idx].path.as_ref();
+        if self.all_keywords_ascii && path.is_ascii() {
+            return filter_ascii_keywords(path, keywords_last, keywords);
+        }
+
+        self.lowercase_buf.clear();
+        for c in path.chars() {
+            for lc in c.to_lowercase() {
+                self.lowercase_buf.push(lc);
             }
+        }
+        filter_lowercase_keywords(&self.lowercase_buf, keywords_last, keywords)
+    }
+
+    #[cfg(test)]
+    fn filter_by_keywords(&mut self, path: &str) -> bool {
+        let (keywords_last, keywords) = match self.options.keywords.split_last() {
+            Some(split) => split,
+            None => return true,
+        };
+
+        if self.all_keywords_ascii && path.is_ascii() {
+            return filter_ascii_keywords(path, keywords_last, keywords);
+        }
+
+        self.lowercase_buf.clear();
+        for c in path.chars() {
+            for lc in c.to_lowercase() {
+                self.lowercase_buf.push(lc);
+            }
+        }
+        filter_lowercase_keywords(&self.lowercase_buf, keywords_last, keywords)
+    }
+}
+
+#[inline]
+fn rfind_ascii_ci(haystack: &[u8], needle_lower: &[u8]) -> Option<usize> {
+    let n = needle_lower.len();
+    if n == 0 {
+        return Some(haystack.len());
+    }
+    if n > haystack.len() {
+        return None;
+    }
+    let last = needle_lower[n - 1];
+    let prefix = &needle_lower[..n - 1];
+    let mut end = haystack.len();
+    while end >= n {
+        if haystack[end - 1].to_ascii_lowercase() == last
+            && haystack[end - n..end - 1].eq_ignore_ascii_case(prefix)
+        {
+            return Some(end - n);
+        }
+        end -= 1;
+    }
+    None
+}
+
+fn filter_ascii_keywords(path: &str, keywords_last: &str, keywords: &[String]) -> bool {
+    let mut bytes = path.as_bytes();
+    match rfind_ascii_ci(bytes, keywords_last.as_bytes()) {
+        Some(idx) => {
+            if path[idx + keywords_last.len()..].contains(path::is_separator) {
+                return false;
+            }
+            bytes = &bytes[..idx];
+        }
+        None => return false,
+    }
+
+    for keyword in keywords.iter().rev() {
+        match rfind_ascii_ci(bytes, keyword.as_bytes()) {
+            Some(idx) => bytes = &bytes[..idx],
             None => return false,
         }
-
-        for keyword in keywords.iter().rev() {
-            match path.rfind(keyword) {
-                Some(idx) => path = &path[..idx],
-                None => return false,
-            }
-        }
-
-        true
     }
+
+    true
+}
+
+fn filter_lowercase_keywords(mut path: &str, keywords_last: &str, keywords: &[String]) -> bool {
+    match path.rfind(keywords_last) {
+        Some(idx) => {
+            if path[idx + keywords_last.len()..].contains(path::is_separator) {
+                return false;
+            }
+            path = &path[..idx];
+        }
+        None => return false,
+    }
+
+    for keyword in keywords.iter().rev() {
+        match path.rfind(keyword) {
+            Some(idx) => path = &path[..idx],
+            None => return false,
+        }
+    }
+
+    true
 }
 
 pub struct StreamOptions {
@@ -205,7 +285,7 @@ mod tests {
     fn query(#[case] keywords: &[&str], #[case] path: &str, #[case] is_match: bool) {
         let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
         let options = StreamOptions::new(0).with_keywords(keywords.iter());
-        let stream = Stream::new(db, options);
+        let mut stream = Stream::new(db, options);
         assert_eq!(is_match, stream.filter_by_keywords(path));
     }
 }

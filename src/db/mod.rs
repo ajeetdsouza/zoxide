@@ -149,12 +149,22 @@ impl Database {
     pub fn age(&mut self, max_age: Rank) {
         let mut dirty = false;
         self.with_dirs_mut(|dirs| {
-            let total_age = dirs.iter().map(|dir| dir.rank).sum::<Rank>();
-            if total_age > max_age {
-                let factor = 0.9 * max_age / total_age;
+            // A non-finite rank would make the total non-finite too, which
+            // either scales every other rank to zero and drops it, or leaves
+            // the total NaN so that no comparison below ever holds and the
+            // database stops ageing entirely. Drop those entries instead.
+            let len_before = dirs.len();
+            dirs.retain(|dir| dir.rank.is_finite());
+            dirty |= dirs.len() != len_before;
+
+            // Sum relative to the largest rank, so the total cannot overflow.
+            let max_rank = dirs.iter().map(|dir| dir.rank).fold(0.0, Rank::max);
+            let relative_total = dirs.iter().map(|dir| dir.rank / max_rank).sum::<Rank>();
+            if relative_total * max_rank > max_age {
+                let scale = 0.9 * max_age / relative_total;
                 for idx in (0..dirs.len()).rev() {
                     let dir = &mut dirs[idx];
-                    dir.rank *= factor;
+                    dir.rank = dir.rank / max_rank * scale;
                     if dir.rank < 1.0 {
                         dirs.swap_remove(idx);
                     }
@@ -376,5 +386,61 @@ mod tests {
             assert!(!db.remove(path));
             db.save().unwrap();
         }
+    }
+
+    #[test]
+    fn age_drops_non_finite_ranks() {
+        let data_dir = tempfile::tempdir().unwrap();
+        let now = 946684800;
+
+        let mut db = Database::open_dir(data_dir.path()).unwrap();
+        db.add_unchecked("/foo", 1.0, now);
+        db.add_unchecked("/bar", f64::INFINITY, now);
+        db.add_unchecked("/baz", f64::NAN, now);
+        db.age(10000.0);
+
+        // The finite entry survives, and it is not scaled to zero by a total
+        // that a non-finite rank has poisoned.
+        let dirs = db.dirs();
+        assert_eq!(dirs.len(), 1);
+        assert_eq!(dirs[0].path, "/foo");
+        assert!((dirs[0].rank - 1.0).abs() < 0.01);
+    }
+
+    #[test]
+    fn age_keeps_finite_ranks_whose_total_overflows() {
+        let data_dir = tempfile::tempdir().unwrap();
+        let now = 946684800;
+
+        let mut db = Database::open_dir(data_dir.path()).unwrap();
+        db.add_unchecked("/a", 1.0e308, now);
+        db.add_unchecked("/b", 1.0e308, now);
+        db.age(10000.0);
+
+        // Each rank is finite, but their sum is infinite. Both entries keep
+        // their share of the 0.9 * max_age budget instead of being scaled to zero.
+        let dirs = db.dirs();
+        assert_eq!(dirs.len(), 2);
+        for dir in dirs {
+            assert!((dir.rank - 4500.0).abs() < 1.0, "rank was {}", dir.rank);
+        }
+    }
+
+    #[test]
+    fn age_keeps_ageing_after_non_finite_rank() {
+        let data_dir = tempfile::tempdir().unwrap();
+        let now = 946684800;
+
+        let mut db = Database::open_dir(data_dir.path()).unwrap();
+        db.add_unchecked("/poison", f64::NAN, now);
+        for i in 0..20 {
+            db.add_unchecked(format!("/dir{i}"), 600.0, now);
+        }
+        db.age(10000.0);
+
+        // Without dropping the NaN the total stays NaN, no comparison holds,
+        // and the database never ages below max_age again.
+        let total = db.dirs().iter().map(|dir| dir.rank).sum::<Rank>();
+        assert!(total <= 10000.0, "database did not age: total is {total}");
     }
 }

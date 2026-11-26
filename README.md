@@ -411,6 +411,10 @@ Environment variables[^2] can be used for configuration. They must be set before
     | macOS       | `$HOME/Library/Application Support/zoxide`             | `/Users/Alice/Library/Application Support/zoxide` |
     | Windows     | `%LOCALAPPDATA%\zoxide`                                | `C:\Users\Alice\AppData\Local\zoxide`             |
 
+- `_ZO_DOCTOR`
+  - When set to 0, silences the warning printed by `z` and `zi` when zoxide
+    was not initialized at the end of your shell configuration file.
+  - By default, this is set to 1. The warning is shown once per shell.
 - `_ZO_ECHO`
   - When set to 1, `z` will print the matched directory before navigating to
     it.

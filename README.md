@@ -462,6 +462,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 | [yazi]                | File manager                                 | Natively supported                      |
 | [zabb]                | Finds the shortest possible query for a path | Natively supported                      |
 | [zesh]                | `zellij` session manager                     | Natively supported                      |
+| [zop]                 | Shared git/jj project list for pickers       | Natively supported                      |
 | [zsh-autocomplete]    | Realtime completions for zsh                 | Natively supported                      |
 
 [^1]:
@@ -547,6 +548,7 @@ Environment variables[^2] can be used for configuration. They must be set before
 [yazi]: https://github.com/sxyazi/yazi
 [zabb]: https://github.com/Mellbourn/zabb
 [zesh]: https://github.com/roberte777/zesh
+[zop]: https://github.com/theherk/zop
 [zoxide.el]: https://gitlab.com/Vonfry/zoxide.el
 [zoxide.vim]: https://github.com/nanotee/zoxide.vim
 [zoxide.xplr]: https://github.com/sayanarijit/zoxide.xplr

@@ -55,6 +55,11 @@ impl<'a> Stream<'a> {
 
     fn filter_by_base_dir(&self, path: &str) -> bool {
         match &self.options.base_dir {
+            // Paths on Windows are case-insensitive, and `base_dir` is already
+            // lowercased in `with_base_dir`.
+            Some(base_dir) if cfg!(windows) => {
+                Path::new(&util::to_lowercase(path)).starts_with(base_dir)
+            }
             Some(base_dir) => Path::new(path).starts_with(base_dir),
             None => true,
         }
@@ -169,7 +174,7 @@ impl StreamOptions {
     }
 
     pub fn with_base_dir(mut self, base_dir: Option<String>) -> Self {
-        self.base_dir = base_dir;
+        self.base_dir = if cfg!(windows) { base_dir.map(util::to_lowercase) } else { base_dir };
         self
     }
 }
@@ -207,5 +212,18 @@ mod tests {
         let options = StreamOptions::new(0).with_keywords(keywords.iter());
         let stream = Stream::new(db, options);
         assert_eq!(is_match, stream.filter_by_keywords(path));
+    }
+
+    #[cfg(windows)]
+    #[rstest]
+    #[case(r"C:\Users\Foo", r"C:\Users\Foo\bar", true)]
+    #[case(r"c:\users\foo", r"C:\Users\Foo\bar", true)]
+    #[case(r"C:\USERS\FOO\", r"C:\Users\Foo\bar", true)]
+    #[case(r"c:\users\foobar", r"C:\Users\Foo\bar", false)]
+    fn base_dir_windows(#[case] base_dir: &str, #[case] path: &str, #[case] is_match: bool) {
+        let db = &mut Database::new(PathBuf::new(), Vec::new(), |_| Vec::new(), false);
+        let options = StreamOptions::new(0).with_base_dir(Some(base_dir.to_string()));
+        let stream = Stream::new(db, options);
+        assert_eq!(is_match, stream.filter_by_base_dir(path));
     }
 }

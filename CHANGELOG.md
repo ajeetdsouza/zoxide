@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tcsh: fix init, `z` and `zi` in directories with `{` or repeated spaces.
 - Import: skip entries that are not absolute paths. Empty paths used to corrupt
   the database.
+- Bash: support non-Cygwin Windows environments (e.g. `brush`).
 
 ## [0.10.0] - 2026-07-04
 
